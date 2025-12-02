@@ -2,20 +2,23 @@
 
 ## Project Overview
 
-Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), modern science, and the NBSN framework (Neuron, Biomolekul, Sensorik, Nature). Users answer daily questions across 6 units and earn points/scores.
+Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), modern science, and the NBSN framework (Neuron, Biomolekul, Sensorik, Nature). Users answer daily questions, book appointments, attend events, read insights, and analyze media content—all earning points/scores.
 
-## Architecture: Multi-Page Structure
+## Architecture: Multi-Page SPA Pattern
 
-**The project uses a modular multi-page structure:**
+**Five-page structure sharing single CSS/JS:**
 
-- **`index.html`**: Main journey tracking page (6 units daily questions)
-- **`booking.html`**: Booking praktisi page (appointment scheduling)
-- **`style.css`**: Shared CSS for all pages, organized by component sections
-- **`script.js`**: Shared JavaScript with page-specific logic
+- **`index.html`**: Journey tracking (6 units with daily questions)
+- **`booking.html`**: Practitioner appointment scheduling with WhatsApp integration (+62-821-8808-0688)
+- **`events.html`**: Webinar & workshop listings with mode/topic filters
+- **`insight.html`**: Educational articles with AI-powered NBSN recommendations
+- **`media.html`**: YouTube player + podcast audio + AI content analysis
+- **`style.css`**: Shared CSS organized by page sections (Events: line 1102, Insight: 1200, Media: 1339)
+- **`script.js`**: Unified JavaScript (1512 lines) with page-specific init functions
 
 **External dependencies**: Tailwind CDN, Lucide icons CDN, Google Fonts (Inter)  
 **No build system**: Direct browser execution - open any HTML file  
-**Navigation**: Simplified navbar with Journey and Booking links only
+**Navigation**: Consistent navbar across all 5 pages + mobile hamburger menu with slide-in drawer
 
 ## Critical Code Patterns
 
@@ -91,37 +94,43 @@ addPoints(value)   // Add points and refresh display
 
 Organized by component with section headers:
 
-- Header Styles (lines 11-40)
-- Hero Section (lines 42-60)
-- Tab Navigation (lines 62-85)
-- Question Cards (lines 87-110)
-- Buttons (lines 112-180)
-- Status Indicators (lines 220-236)
+- Keyframe Animations (lines 16-117): fadeIn, slideUp, pulse, shimmer, bounce, glow, rotate, counterGlow
+- Header Styles (lines 119-223): Logo, nav links, hamburger button
+- Hero Section (lines 227-295): Score counter, rotating gradient
+- Tab Navigation (lines 297-339): Shimmer on hover, glow when active
+- Question Cards (lines 361-429): Staggered slide-up animations
+- Buttons (lines 441-625): Selected states (green/red), hover effects
+- Booking Styles (lines 697-945): Form inputs, slot buttons, date picker
+- **Events Styles** (line 1102): Filters, event cards with shimmer sweep
+- **Insight Styles** (line 1200): Article cards, NBSN recommendation cards
+- **Media Styles** (line 1339): YouTube player, podcast items, AI analysis cards
 
 **Custom classes replace inline styles**:
 
-- `.logo-box` → amber square logo
-- `.btn-yes` → green "Ya" button
-- `.btn-no` → gray "Belum" button
-- `.status-answered` → emerald text for completed
-- `.status-unanswered` → slate text for incomplete
+- `.logo-box` → amber square logo with pulse animation
+- `.btn-yes` / `.btn-no` → gold border default, green/red when selected
+- `.hamburger-btn` → mobile menu trigger (visible only on `md:hidden`)
+- `.mobile-menu` → 280px slide-in drawer from right (-100% to 0)
+- `.mobile-menu-overlay` → backdrop with blur effect
 
 ## JavaScript Architecture (script.js)
 
-**Six main sections** (follow this structure when adding features):
+**Organized by feature with page-specific sections:**
 
-1. **DATA MODEL** (line 7): UNITS array with all questions
-2. **STORAGE HELPERS** (line 250): localStorage wrapper functions
-3. **UI RENDERING** (line 320): buildTabs(), showUnit(), DOM manipulation
-4. **USER INTERACTIONS** (line 420): answer(), toggleInfo() handlers
-5. **SCORING CALCULATIONS** (line 470): calcUnit(), calcAll() formulas
-6. **INITIALIZATION** (line 520): init() function, DOMContentLoaded
+1. **DATA MODEL** (line 7): `UNITS` array (6 units), `EVENTS_DATA` (line 941), `INSIGHT_DATA` (line 1082), `PODCAST_DATA` (line 1189)
+2. **STORAGE HELPERS** (line ~250): `_db()`, `getState()`, `addPoints()`, `refreshNav()`
+3. **UI RENDERING** (line ~320): `buildTabs()`, `showUnit()`, DOM manipulation with `escapeHtml()`
+4. **USER INTERACTIONS** (line ~420): `answer()` with button state toggling, `toggleInfo()`
+5. **SCORING** (line ~470): `calcUnit()`, `calcAll()` with `animateCounter()` (ease-out cubic, 1500ms)
+6. **MOBILE MENU** (line 618): `initMobileMenu()` - hamburger, overlay, scroll lock
+7. **PAGE INITS** (line 664+): `init()`, `initBooking()` (874), `initEvents()` (1029), `initInsight()` (1154), `initMedia()` (1442)
+8. **APP STARTUP** (line 1481): Page detection via unique element IDs (`slots`, `events`, `articles`, `ytPlayer`)
 
-**Scoring formulas**:
+**Scoring formulas & point rewards**:
 
 - Unit score: `(yesCount / totalItems) * 100` → bonus = `floor(score/20)`
 - Total score: average of all units → bonus = `floor(total/25)`
-- Each "Ya" answer: immediate +1 point
+- Each "Ya" answer: +1 point immediate | Insight summary: +2 points | Media analysis: +3 points
 
 ## Development Workflow
 
@@ -132,27 +141,44 @@ Organized by component with section headers:
 5. **Debug localStorage**: DevTools → Application → Local Storage
 6. **Clear state**: Console → `localStorage.clear()`
 
-## Booking Page Pattern (booking.html)
+## Page-Specific Patterns
 
-**State management**: Uses `bookingState` object for selected time slot  
-**Key functions**:
+### Booking Page (booking.html)
 
-- `generateSlots()` - Creates time slot buttons
-- `selectSlot(time)` - Handles slot selection with visual feedback
-- `updateBookingSummary()` - Updates booking summary display
-- `confirmBooking()` - Validates and confirms booking
-- `resetBookingForm()` - Resets form to initial state
-
-**Form fields**: branch, practitioner, date, mode, time slots  
+**State**: `bookingState` object for selected time slot  
+**Key functions**: `generateSlots()`, `selectSlot()`, `updateBookingSummary()`, `formatDateIndo()`, `confirmBooking()`  
+**WhatsApp integration**: `confirmBooking()` opens wa.me link with formatted booking message to +62-821-8808-0688  
+**Datepicker**: Min date = today, max date = +3 months (set in `initBooking()`)  
 **Validation**: Must select both date and time before confirm
+
+### Events Page (events.html)
+
+**State**: `EVENTS_DATA` array with mode (online/offline) and topic filters  
+**Key functions**: `renderEvents()` with filter logic, re-renders on select change  
+**Filter IDs**: `eventMode`, `eventTopic` - both default to "all"
+
+### Insight Page (insight.html)
+
+**State**: `INSIGHT_DATA` array (4 articles)  
+**Key functions**: `renderInsightArticles()`, `summarizeArticle(index)` - creates NBSN cards and adds +2 points  
+**Pattern**: onclick attribute used for article buttons (exception to event listener rule)
+
+### Media Page (media.html)
+
+**State**: `PODCAST_DATA` array (4 episodes with sample URLs)  
+**Key functions**: `loadYouTube()`, `extractYouTubeId()`, `playPodcast()`, `analyzeMedia()` with keyword detection  
+**YouTube**: Supports youtube.com/watch?v=, youtu.be/, and embed URLs  
+**AI Analysis**: Keyword-based simulation checking alignment with Qur'an/Sunnah (+3 points on analyze)
 
 ## Common Pitfalls to Avoid
 
-1. ❌ Don't add inline onclick handlers to HTML
+1. ❌ Don't add inline onclick handlers to HTML (except `summarizeArticle()` on insight page buttons)
 2. ❌ Don't add inline styles to HTML
-3. ❌ Don't forget to escape quotes in UNITS array strings
-4. ❌ Don't skip XSS escaping when inserting dynamic content
-5. ❌ Don't forget to update both pages when changing shared components (header/footer)
+3. ❌ Don't forget to escape quotes in UNITS array strings with `\'`
+4. ❌ Don't skip XSS escaping when inserting dynamic content via `escapeHtml()`
+5. ❌ Don't forget to update ALL 5 pages when changing shared components (header/footer/nav)
+6. ❌ Don't forget `initMobileMenu()` call when creating new pages
+7. ❌ Don't use page-specific element IDs in shared functions (breaks page detection logic)
 
 ## Page Structure
 
@@ -160,9 +186,12 @@ Current pages in project:
 
 - **`index.html`** - Journey tracking (6 units with daily questions)
 - **`booking.html`** - Appointment booking with praktisi
+- **`events.html`** - Webinar & workshop listings
+- **`insight.html`** - Educational articles with AI summaries
+- **`media.html`** - YouTube player, podcast audio, AI content analysis
 
-**Navigation pattern**: Simple two-page nav (Journey, Booking)  
-When modifying header/footer, update both HTML files for consistency.
+**Navigation pattern**: Five-page nav (Journey, Booking, Events, Insight, Media)  
+When modifying header/footer, update ALL HTML files for consistency.
 
 ## Language & Content
 
