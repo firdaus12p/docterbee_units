@@ -1303,137 +1303,228 @@ function loadCustomAudio() {
 }
 
 /**
- * Analyze media content with AI
+ * Analyze media content with AI using Gemini API
  */
-function analyzeMedia() {
-  const notes = (
-    document.getElementById("mediaNotes")?.value || ""
-  ).toLowerCase();
+async function analyzeMedia() {
+  const youtubeUrl = document.getElementById("ytUrl")?.value || "";
+  const notes = document.getElementById("mediaNotes")?.value || "";
   const aiResult = document.getElementById("aiResult");
+  const btnAnalyze = document.getElementById("btnAnalyze");
 
   if (!aiResult) return;
+
+  // Validation
+  if (!youtubeUrl && !notes) {
+    alert("Masukkan URL YouTube atau catatan terlebih dahulu.");
+    return;
+  }
 
   if (!notes) {
     alert("Tuliskan catatan terlebih dahulu.");
     return;
   }
 
-  // AI analysis simulation based on keywords
-  const checks = [
-    {
-      keyword: "madu",
-      aligned: true,
-      quran: "QS An-Nahl: 69",
-      note: "Madu sebagai syifa'.",
-    },
-    {
-      keyword: "puasa",
-      aligned: true,
-      quran: "HR. Tirmidzi",
-      note: "Puasa adalah perisai.",
-    },
-    {
-      keyword: "berlebih",
-      aligned: false,
-      quran: "QS Al-A'raf: 31",
-      note: "Larangan berlebih-lebihan.",
-    },
-    {
-      keyword: "shalat",
-      aligned: true,
-      quran: "QS Al-Ma'un",
-      note: "Menegakkan shalat.",
-    },
-    {
-      keyword: "rokok",
-      aligned: false,
-      quran: "Kaedah fiqh",
-      note: "Dharar harus dihilangkan.",
-    },
-  ];
-
-  const aligned = [];
-  const corrections = [];
-
-  checks.forEach((check) => {
-    if (notes.includes(check.keyword)) {
-      if (check.aligned) {
-        aligned.push(check);
-      } else {
-        corrections.push(check);
-      }
-    }
-  });
-
-  const analysisHTML = `
-    <div class="grid md:grid-cols-2 gap-4">
-      <div class="ai-analysis-card">
-        <div class="font-semibold mb-1 flex items-center gap-2">
-          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-          Selaras Qur'an & Sunnah
-        </div>
-        <ul class="list-disc pl-5 text-slate-200/85">
-          ${
-            aligned.length > 0
-              ? aligned
-                  .map(
-                    (x) =>
-                      `<li><b>${escapeHtml(x.keyword)}</b> — ${escapeHtml(
-                        x.quran
-                      )} <span class='opacity-70'>(${escapeHtml(
-                        x.note
-                      )})</span></li>`
-                  )
-                  .join("")
-              : "<li class='opacity-70'>Belum ada.</li>"
-          }
-        </ul>
-      </div>
-      <div class="ai-analysis-card">
-        <div class="font-semibold mb-1 flex items-center gap-2">
-          <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400"></i>
-          Perlu Dikoreksi
-        </div>
-        <ul class="list-disc pl-5 text-slate-200/85">
-          ${
-            corrections.length > 0
-              ? corrections
-                  .map(
-                    (x) =>
-                      `<li><b>${escapeHtml(x.keyword)}</b> — ${escapeHtml(
-                        x.quran
-                      )} <span class='opacity-70'>(${escapeHtml(
-                        x.note
-                      )})</span></li>`
-                  )
-                  .join("")
-              : "<li class='opacity-70'>Tidak terdeteksi.</li>"
-          }
-        </ul>
-      </div>
-    </div>
-    <div class="ai-analysis-card mt-4">
-      <div class="font-semibold mb-1 flex items-center gap-2">
-        <i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i>
-        Catatan Sains (ringkas)
-      </div>
-      <ul class="list-disc pl-5 text-slate-200/85">
-        <li>Madu: enzim & flavonoid → dukung antioksidan endogen.</li>
-        <li>Puasa: autofagi & sensitivitas insulin.</li>
-        <li>Pembatasan gula & rokok → inflamasi sistemik turun.</li>
-      </ul>
-    </div>
-  `;
-
-  aiResult.innerHTML = analysisHTML;
-
-  // Re-initialize Lucide icons for new content
-  if (typeof lucide !== "undefined" && lucide.createIcons) {
+  // Show loading state
+  if (btnAnalyze) {
+    btnAnalyze.disabled = true;
+    btnAnalyze.innerHTML =
+      '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menganalisis...';
     lucide.createIcons();
   }
 
-  // Add points for analysis
-  addPoints(3);
+  aiResult.innerHTML = `
+    <div class="ai-analysis-card text-center">
+      <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-400"></i>
+      <p class="text-slate-300">Menghubungi Gemini AI...</p>
+    </div>
+  `;
+  lucide.createIcons();
+
+  try {
+    // Call backend API
+    const response = await fetch("http://localhost:3000/api/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        youtubeUrl: youtubeUrl,
+        notes: notes,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Gagal menganalisis konten");
+    }
+
+    // Display AI summary
+    const formattedSummary = formatAISummary(data.summary);
+    aiResult.innerHTML = formattedSummary;
+
+    // Re-initialize Lucide icons
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+
+    // Add points for successful analysis
+    addPoints(3);
+  } catch (error) {
+    console.error("Gemini API error:", error);
+
+    // Check if it's a quota error
+    const isQuotaError =
+      error.message.includes("Kuota") ||
+      error.message.includes("quota") ||
+      error.message.includes("429");
+
+    // Show error with troubleshooting
+    aiResult.innerHTML = `
+      <div class="ai-analysis-card border-${
+        isQuotaError ? "amber" : "red"
+      }-500/30">
+        <div class="font-semibold mb-2 flex items-center gap-2 text-${
+          isQuotaError ? "amber" : "red"
+        }-400">
+          <i data-lucide="${
+            isQuotaError ? "clock" : "alert-triangle"
+          }" class="w-5 h-5"></i>
+          ${isQuotaError ? "Kuota API Tercapai" : "Gagal Menganalisis"}
+        </div>
+        <p class="text-slate-300 mb-3">${escapeHtml(error.message)}</p>
+        <div class="text-sm text-slate-400">
+          <p class="font-semibold mb-1">${
+            isQuotaError ? "Solusi" : "Troubleshooting"
+          }:</p>
+          <ul class="list-disc pl-5 space-y-1">
+            ${
+              isQuotaError
+                ? `
+              <li><b>Tunggu 1-2 menit</b> lalu coba lagi (Free tier: 15 requests/menit)</li>
+              <li>Refresh halaman ini setelah menunggu</li>
+              <li>Atau upgrade ke <a href="https://ai.google.dev/pricing" target="_blank" class="text-amber-400 underline">paid plan</a> untuk quota lebih besar</li>
+            `
+                : `
+              <li>Pastikan server backend berjalan: <code class="bg-slate-700 px-1 rounded">npm start</code></li>
+              <li>Cek koneksi ke <code class="bg-slate-700 px-1 rounded">http://localhost:3000</code></li>
+              <li>Periksa API key Gemini di file <code class="bg-slate-700 px-1 rounded">.env</code></li>
+              <li>Lihat console browser (F12) untuk detail error</li>
+            `
+            }
+          </ul>
+        </div>
+      </div>
+    `;
+
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  } finally {
+    // Reset button state
+    if (btnAnalyze) {
+      btnAnalyze.disabled = false;
+      btnAnalyze.innerHTML =
+        '<i data-lucide="sparkles" class="w-4 h-4"></i> Analisis AI';
+      lucide.createIcons();
+    }
+  }
+}
+
+/**
+ * Format AI summary from Gemini API response to styled HTML
+ */
+function formatAISummary(text) {
+  if (!text) return "<p class='text-slate-400'>Tidak ada hasil analisis.</p>";
+
+  // Split into sections (assuming Gemini returns structured text)
+  const lines = text.split("\n").filter((line) => line.trim());
+
+  let html = '<div class="space-y-4">';
+  let currentSection = "";
+  let currentList = [];
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    // Detect section headers (bold text with **)
+    if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
+      // Close previous section
+      if (currentList.length > 0) {
+        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join(
+          ""
+        )}</ul>`;
+        currentList = [];
+      }
+
+      // Add new section header
+      const headerText = trimmed.replace(/\*\*/g, "");
+      let iconName = "info";
+      let iconColor = "text-sky-400";
+
+      if (headerText.includes("Selaras") || headerText.includes("selaras")) {
+        iconName = "check-circle";
+        iconColor = "text-emerald-400";
+      } else if (
+        headerText.includes("Koreksi") ||
+        headerText.includes("koreksi")
+      ) {
+        iconName = "alert-circle";
+        iconColor = "text-amber-400";
+      } else if (headerText.includes("Sains") || headerText.includes("sains")) {
+        iconName = "flask-conical";
+        iconColor = "text-sky-400";
+      } else if (headerText.includes("NBSN")) {
+        iconName = "brain";
+        iconColor = "text-purple-400";
+      }
+
+      html += `
+        <div class="ai-analysis-card">
+          <div class="font-semibold mb-2 flex items-center gap-2">
+            <i data-lucide="${iconName}" class="w-4 h-4 ${iconColor}"></i>
+            ${escapeHtml(headerText)}
+          </div>
+      `;
+      currentSection = headerText;
+    }
+    // Detect numbered lists (1. 2. 3.)
+    else if (/^\d+\.\s/.test(trimmed)) {
+      const content = trimmed.replace(/^\d+\.\s/, "");
+      currentList.push(`<li>${escapeHtml(content)}</li>`);
+    }
+    // Detect bullet points (- or *)
+    else if (trimmed.startsWith("-") || trimmed.startsWith("*")) {
+      const content = trimmed.substring(1).trim();
+      currentList.push(`<li>${escapeHtml(content)}</li>`);
+    }
+    // Regular paragraph
+    else if (trimmed) {
+      if (currentList.length > 0) {
+        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join(
+          ""
+        )}</ul>`;
+        currentList = [];
+      }
+      html += `<p class="text-slate-200/85">${escapeHtml(trimmed)}</p>`;
+    }
+  });
+
+  // Close remaining list
+  if (currentList.length > 0) {
+    html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join(
+      ""
+    )}</ul>`;
+  }
+
+  // Close last section
+  if (currentSection) {
+    html += "</div>";
+  }
+
+  html += "</div>";
+
+  return html;
 }
 
 /**
