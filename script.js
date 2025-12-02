@@ -253,6 +253,11 @@ function refreshNav() {
   if (navPointsEl) {
     navPointsEl.textContent = _getPoints();
   }
+
+  const mobileNavPointsEl = document.getElementById("mobileNavPoints");
+  if (mobileNavPointsEl) {
+    mobileNavPointsEl.textContent = _getPoints();
+  }
 }
 
 /**
@@ -513,7 +518,12 @@ function calcUnit(unitId) {
 
   const scoreElement = document.getElementById("score_" + unitId);
   if (scoreElement) {
-    scoreElement.textContent = score;
+    // Animate counter from 0 to score
+    if (score > 0) {
+      animateCounter(scoreElement, 0, score, 1200);
+    } else {
+      scoreElement.textContent = score;
+    }
   }
 
   // Add bonus points
@@ -521,6 +531,45 @@ function calcUnit(unitId) {
   if (bonusPoints > 0) {
     addPoints(bonusPoints);
   }
+}
+
+/**
+ * Animate counter from start to end value
+ * @param {HTMLElement} element - Element to animate
+ * @param {number} start - Start value
+ * @param {number} end - End value
+ * @param {number} duration - Animation duration in milliseconds
+ */
+function animateCounter(element, start, end, duration) {
+  if (!element) return;
+
+  // Add counting class for CSS animation
+  element.classList.add("counting");
+
+  const startTime = performance.now();
+  const range = end - start;
+
+  function updateCounter(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Easing function (ease-out)
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(start + range * easeOut);
+
+    element.textContent = currentValue;
+
+    if (progress < 1) {
+      requestAnimationFrame(updateCounter);
+    } else {
+      // Remove counting class when animation completes
+      setTimeout(() => {
+        element.classList.remove("counting");
+      }, 500);
+    }
+  }
+
+  requestAnimationFrame(updateCounter);
 }
 
 /**
@@ -546,7 +595,12 @@ function calcAll() {
   const totalScoreElement = document.getElementById("totalScore");
 
   if (totalScoreElement) {
-    totalScoreElement.textContent = isNaN(total) ? "—" : total;
+    if (isNaN(total) || total === 0) {
+      totalScoreElement.textContent = total === 0 ? "0" : "—";
+    } else {
+      // Animate counter from 0 to total score
+      animateCounter(totalScoreElement, 0, total, 1500);
+    }
   }
 
   // Add bonus points
@@ -554,6 +608,52 @@ function calcAll() {
   if (bonusPoints > 0) {
     addPoints(bonusPoints);
   }
+}
+
+// ==================== MOBILE MENU ====================
+
+/**
+ * Initialize mobile menu functionality
+ */
+function initMobileMenu() {
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+  const closeMobileMenu = document.getElementById("closeMobileMenu");
+
+  if (!hamburgerBtn || !mobileMenu || !mobileMenuOverlay) return;
+
+  // Open mobile menu
+  hamburgerBtn.addEventListener("click", () => {
+    mobileMenu.classList.add("open");
+    mobileMenuOverlay.classList.remove("hidden");
+    mobileMenuOverlay.classList.add("show");
+    document.body.style.overflow = "hidden"; // Prevent scrolling
+  });
+
+  // Close mobile menu
+  const closeMobileMenuHandler = () => {
+    mobileMenu.classList.remove("open");
+    mobileMenuOverlay.classList.remove("show");
+    setTimeout(() => {
+      mobileMenuOverlay.classList.add("hidden");
+    }, 300);
+    document.body.style.overflow = ""; // Restore scrolling
+  };
+
+  if (closeMobileMenu) {
+    closeMobileMenu.addEventListener("click", closeMobileMenuHandler);
+  }
+
+  mobileMenuOverlay.addEventListener("click", closeMobileMenuHandler);
+
+  // Close menu when clicking on a nav link
+  const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+  mobileNavLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      setTimeout(closeMobileMenuHandler, 200);
+    });
+  });
 }
 
 // ==================== INITIALIZATION ====================
@@ -577,6 +677,9 @@ function init() {
   if (calcAllBtn) {
     calcAllBtn.addEventListener("click", calcAll);
   }
+
+  // Initialize mobile menu
+  initMobileMenu();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -637,6 +740,40 @@ function selectSlot(time) {
 }
 
 /**
+ * Format date to Indonesian format
+ * @param {string} dateStr - Date string in YYYY-MM-DD format
+ * @returns {string} Formatted date string
+ */
+function formatDateIndo(dateStr) {
+  if (!dateStr) return "";
+
+  const months = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+  const date = new Date(dateStr + "T00:00:00");
+  const dayName = days[date.getDay()];
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${dayName}, ${day} ${month} ${year}`;
+}
+
+/**
  * Update booking summary display
  */
 function updateBookingSummary() {
@@ -645,7 +782,8 @@ function updateBookingSummary() {
 
   const branch = document.getElementById("branch")?.value || "";
   const practitioner = document.getElementById("pract")?.value || "";
-  const date = document.getElementById("date")?.value || "";
+  const dateRaw = document.getElementById("date")?.value || "";
+  const dateFormatted = dateRaw ? formatDateIndo(dateRaw) : "(belum dipilih)";
   const mode = document.getElementById("mode")?.value || "";
   const time = bookingState.selectedTime || "(belum dipilih)";
 
@@ -661,7 +799,7 @@ function updateBookingSummary() {
       </div>
       <div class="summary-card">
         <b>Tanggal</b>
-        <div class="opacity-80">${date || "(belum dipilih)"}</div>
+        <div class="opacity-80">${dateFormatted}</div>
       </div>
       <div class="summary-card">
         <b>Jam</b>
@@ -676,20 +814,44 @@ function updateBookingSummary() {
 }
 
 /**
- * Confirm booking
+ * Confirm booking and send to WhatsApp
  */
 function confirmBooking() {
   updateBookingSummary();
 
-  const date = document.getElementById("date")?.value;
-  if (!date || !bookingState.selectedTime) {
+  const dateRaw = document.getElementById("date")?.value;
+  if (!dateRaw || !bookingState.selectedTime) {
     alert("Pilih tanggal dan jam terlebih dahulu.");
     return;
   }
 
-  alert(
-    "Terima kasih! Pemesanan Anda tercatat (demo). Kami akan menghubungi via WhatsApp."
-  );
+  // Get form values
+  const branch = document.getElementById("branch")?.value || "";
+  const practitioner = document.getElementById("pract")?.value || "";
+  const mode = document.getElementById("mode")?.value || "";
+  const time = bookingState.selectedTime;
+  const dateFormatted = formatDateIndo(dateRaw);
+
+  // Create WhatsApp message
+  const message =
+    `*BOOKING PRAKTISI DOCTERBEE*\n\n` +
+    `Cabang: ${branch}\n` +
+    `Praktisi: ${practitioner}\n` +
+    `Tanggal: ${dateFormatted}\n` +
+    `Jam: ${time}\n` +
+    `Mode: ${mode}\n\n` +
+    `Mohon konfirmasi ketersediaan jadwal. Terima kasih! 🙏`;
+
+  // WhatsApp number (remove + and spaces)
+  const phoneNumber = "6282188080688";
+
+  // Create WhatsApp URL
+  const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+    message
+  )}`;
+
+  // Open WhatsApp in new tab
+  window.open(whatsappURL, "_blank");
 }
 
 /**
@@ -716,6 +878,28 @@ function initBooking() {
     yearElement.textContent = new Date().getFullYear();
   }
 
+  // Initialize date picker with minimum date as today
+  const dateInput = document.getElementById("date");
+  if (dateInput) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${year}-${month}-${day}`;
+
+    dateInput.setAttribute("min", todayStr);
+
+    // Set max date to 3 months from now
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 3);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = String(maxDate.getMonth() + 1).padStart(2, "0");
+    const maxDay = String(maxDate.getDate()).padStart(2, "0");
+    const maxDateStr = `${maxYear}-${maxMonth}-${maxDay}`;
+
+    dateInput.setAttribute("max", maxDateStr);
+  }
+
   // Generate time slots
   generateSlots();
   updateBookingSummary();
@@ -739,6 +923,9 @@ function initBooking() {
       field.addEventListener("change", updateBookingSummary);
     }
   });
+
+  // Initialize mobile menu
+  initMobileMenu();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
