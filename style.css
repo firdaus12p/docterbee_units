@@ -1,0 +1,338 @@
+/* ========================================
+   Docterbee Journey - Custom Styles
+   ======================================== */
+
+/* Base Typography */
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Arial, sans-serif;
+}
+
+/* ========================================
+   Header Styles
+   ======================================== */
+
+.logo-box {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.75rem;
+  background-color: rgb(251 191 36 / 0.9);
+}
+
+.nav-link {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+  opacity: 1;
+}
+
+.points-display {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(51 65 85);
+  padding: 0.375rem 0.75rem;
+}
+
+/* ========================================
+   Hero Section
+   ======================================== */
+
+.hero-section {
+  border-radius: 1rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.6);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-calc-all {
+  margin-top: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgb(251 191 36);
+  color: rgb(15 23 42);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-calc-all:hover {
+  background-color: rgb(245 158 11);
+}
+
+/* ========================================
+   Tab Navigation
+   ======================================== */
+
+.tab-button {
+  border-radius: 0.5rem;
+  border: 1px solid rgb(51 65 85);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: rgb(15 23 42);
+}
+
+.tab-button.active {
+  background-color: rgb(15 23 42 / 0.6);
+}
+
+/* ========================================
+   Unit Container
+   ======================================== */
+
+.unit-wrap {
+  border-radius: 1rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.6);
+  padding: 1.25rem;
+}
+
+/* ========================================
+   Question Cards
+   ======================================== */
+
+.question-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.5);
+  padding: 1rem;
+}
+
+.card-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+
+.btn-yes {
+  border-radius: 0.5rem;
+  background-color: rgb(52 211 153);
+  color: rgb(15 23 42);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-yes:hover {
+  background-color: rgb(16 185 129);
+}
+
+.btn-no {
+  border-radius: 0.5rem;
+  background-color: rgb(30 41 59);
+  border: 1px solid rgb(51 65 85);
+  color: inherit;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-no:hover {
+  background-color: rgb(51 65 85);
+}
+
+.btn-info {
+  border-radius: 0.5rem;
+  border: 1px solid rgb(51 65 85);
+  background-color: transparent;
+  color: inherit;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-info:hover {
+  background-color: rgb(30 41 59);
+}
+
+.btn-calc-unit {
+  border-radius: 0.5rem;
+  background-color: rgb(251 191 36);
+  color: rgb(15 23 42);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-calc-unit:hover {
+  background-color: rgb(245 158 11);
+}
+
+/* ========================================
+   Info Box
+   ======================================== */
+
+.info-box {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(226 232 240 / 0.9);
+  border-radius: 0.5rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.6);
+  padding: 0.75rem;
+}
+
+.info-box.hidden {
+  display: none;
+}
+
+.info-box b {
+  font-weight: 600;
+}
+
+/* ========================================
+   Status Indicators
+   ======================================== */
+
+.status-answered {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(110 231 183);
+}
+
+.status-unanswered {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(148 163 184);
+}
+
+/* ========================================
+   Booking Page Styles
+   ======================================== */
+
+.booking-container {
+  border-radius: 1rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.6);
+  padding: 1.25rem;
+}
+
+.booking-input,
+.booking-select {
+  margin-top: 0.25rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: rgb(15 23 42 / 0.6);
+  border: 1px solid rgb(30 41 59);
+  padding: 0.5rem 0.75rem;
+  color: inherit;
+  font-size: 0.875rem;
+}
+
+.booking-input:focus,
+.booking-select:focus {
+  outline: 2px solid rgb(251 191 36 / 0.5);
+  outline-offset: 2px;
+}
+
+.slot-button {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(51 65 85);
+  font-size: 0.875rem;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.slot-button:hover {
+  background-color: rgb(251 191 36 / 0.1);
+}
+
+.slot-button.selected {
+  background-color: rgb(251 191 36);
+  color: rgb(15 23 42);
+  border-color: rgb(251 191 36);
+}
+
+.btn-primary {
+  border-radius: 0.5rem;
+  background-color: rgb(251 191 36);
+  color: rgb(15 23 42);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: rgb(245 158 11);
+}
+
+.btn-secondary {
+  border-radius: 0.5rem;
+  border: 1px solid rgb(51 65 85);
+  background-color: transparent;
+  color: inherit;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(30 41 59);
+}
+
+.booking-sidebar {
+  border-radius: 1rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.6);
+  padding: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.summary-card {
+  border-radius: 0.5rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.5);
+  padding: 0.75rem;
+}
+
+.booking-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  display: block;
+  margin-bottom: 0.25rem;
+}
