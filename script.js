@@ -309,7 +309,7 @@ function showUnit(unitId) {
     .map((item) => {
       const isAnswered = answers[item.key] === 1;
       const statusClass = isAnswered ? "status-answered" : "status-unanswered";
-      const statusText = isAnswered ? "Terpenuhi" : "Belum dicatat";
+      const statusText = isAnswered ? "Terpenuhi" : "Belum melakukan";
 
       return `
       <div class="question-card">
@@ -323,10 +323,14 @@ function showUnit(unitId) {
           <div class="text-xs ${unit.color}">Dalil · Sains · NBSN</div>
         </div>
         <div class="mt-3 flex flex-wrap gap-2">
-          <button class="btn-yes" data-unit="${unitId}" data-key="${
+          <button class="btn-yes ${
+            isAnswered ? "selected" : ""
+          }" data-unit="${unitId}" data-key="${
         item.key
       }" data-value="1">Ya</button>
-          <button class="btn-no" data-unit="${unitId}" data-key="${
+          <button class="btn-no ${
+            !isAnswered && answers[item.key] === 0 ? "selected" : ""
+          }" data-unit="${unitId}" data-key="${
         item.key
       }" data-value="0">Belum</button>
           <button class="btn-info" data-unit="${unitId}" data-key="${
@@ -449,13 +453,32 @@ function answer(unitId, key, value) {
   const element = document.getElementById("ans_" + unitId + "_" + key);
   if (!element) return;
 
+  // Update status text
   if (value === 1) {
     element.textContent = "Terpenuhi";
     element.className = "status-answered";
     addPoints(1);
   } else {
-    element.textContent = "Belum dicatat";
+    element.textContent = "Belum melakukan";
     element.className = "status-unanswered";
+  }
+
+  // Update button selected states
+  const yesBtn = document.querySelector(
+    `.btn-yes[data-unit="${unitId}"][data-key="${key}"]`
+  );
+  const noBtn = document.querySelector(
+    `.btn-no[data-unit="${unitId}"][data-key="${key}"]`
+  );
+
+  if (yesBtn && noBtn) {
+    if (value === 1) {
+      yesBtn.classList.add("selected");
+      noBtn.classList.remove("selected");
+    } else {
+      yesBtn.classList.remove("selected");
+      noBtn.classList.add("selected");
+    }
   }
 }
 
