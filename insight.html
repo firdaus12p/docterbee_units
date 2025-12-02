@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docterbee – Booking Praktisi</title>
+    <title>Docterbee – Insight Reader</title>
 
     <!-- External Stylesheets -->
     <link
@@ -27,9 +27,9 @@
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="index.html" class="nav-link">Journey</a>
-          <a href="booking.html" class="nav-link" style="opacity: 1">Booking</a>
+          <a href="booking.html" class="nav-link">Booking</a>
           <a href="events.html" class="nav-link">Events</a>
-          <a href="insight.html" class="nav-link">Insight</a>
+          <a href="insight.html" class="nav-link" style="opacity: 1">Insight</a>
           <a href="media.html" class="nav-link">Media</a>
         </nav>
         <div class="flex items-center gap-3">
@@ -76,88 +76,48 @@
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
-      <h1 class="text-3xl md:text-4xl font-bold mb-2">Booking Praktisi</h1>
-      <p class="text-slate-300/85 mb-6 max-w-2xl">
-        Pilih cabang, praktisi, tanggal, dan jam. *Demo ini hanya simulasi UI
-        tanpa pembayaran.*
-      </p>
+      <div class="mb-6">
+        <h1 class="text-3xl md:text-4xl font-bold">Docterbee Insight</h1>
+        <p class="text-slate-300/85">
+          Artikel edukasi sains × Qur'ani. Pilih artikel lalu minta AI merangkum
+          & memberi rekomendasi NBSN.
+        </p>
+      </div>
 
       <div class="grid gap-6 md:grid-cols-3">
-        <!-- Booking Form -->
-        <div class="booking-container space-y-4 md:col-span-2">
-          <div class="grid md:grid-cols-2 gap-3">
-            <label class="booking-label">
-              Cabang
-              <select id="branch" class="booking-select">
-                <option>Docterbee Kolaka</option>
-                <option>Docterbee Makassar</option>
-                <option>Docterbee Kendari</option>
-              </select>
-            </label>
-            <label class="booking-label">
-              Praktisi
-              <select id="pract" class="booking-select">
-                <option>dr. Aisyah – Health Educator</option>
-                <option>dr. Fawwaz – Lifestyle Medicine</option>
-                <option>Ust. Malik – Qur'anic Advisor</option>
-              </select>
-            </label>
-          </div>
+        <section class="booking-container md:col-span-2">
+          <div id="articles" class="grid gap-4"></div>
+        </section>
 
-          <div class="grid md:grid-cols-2 gap-3">
-            <label class="booking-label">
-              Tanggal
-              <input id="date" type="date" class="booking-input" />
-            </label>
-            <label class="booking-label">
-              Mode
-              <select id="mode" class="booking-select">
-                <option>Online (Video)</option>
-                <option>Offline (Datang ke Cabang)</option>
-              </select>
-            </label>
-          </div>
-
-          <div>
-            <div class="text-sm mb-2 opacity-80">Pilih Jam</div>
-            <div id="slots" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>
-          </div>
-
-          <div class="flex gap-3">
-            <button id="btnConfirmBooking" class="btn-primary">
-              Konfirmasi
-            </button>
-            <button id="btnResetForm" class="btn-secondary">Reset</button>
-          </div>
-        </div>
-
-        <!-- Sidebar Info -->
-        <aside class="booking-sidebar">
+        <aside class="insight-sidebar">
           <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="shield-check" class="w-4 h-4 text-amber-300"></i>
-            <b>Kebijakan</b>
+            <i data-lucide="filter" class="w-4 h-4 text-amber-300"></i>
+            <b>Filter</b>
           </div>
-          <ul class="list-disc pl-5 text-slate-300/85 space-y-1">
-            <li>Konfirmasi akan dikirim via WhatsApp.</li>
-            <li>Batal minimal 6 jam sebelum jadwal.</li>
-            <li>Untuk keadaan darurat, hubungi cabang terkait.</li>
+          <ul class="space-y-1 text-slate-300/85">
+            <li><input type="checkbox" checked /> Nutrisi</li>
+            <li><input type="checkbox" checked /> Ibadah</li>
+            <li><input type="checkbox" checked /> Kebiasaan</li>
+            <li><input type="checkbox" checked /> Sains</li>
           </ul>
           <div class="mt-4 flex items-center gap-2">
-            <i data-lucide="calendar" class="w-4 h-4 text-sky-300"></i>
-            <b>Jam Operasional</b>
+            <i data-lucide="book-open-check" class="w-4 h-4 text-sky-300"></i>
+            <b>NBSN</b>
           </div>
-          <p class="text-slate-300/80">Senin–Sabtu, 09.00–20.00 WITA.</p>
+          <p class="text-slate-300/80">
+            Setiap ringkasan mengikuti kerangka
+            Neuron–Biomolekul–Sensorik–Nature.
+          </p>
         </aside>
       </div>
 
-      <!-- Summary Section -->
       <section class="mt-8 booking-container">
-        <div class="mb-4">
-          <div class="text-lg font-semibold">Ringkasan</div>
+        <div class="p-5 border-b border-slate-800">
+          <div class="text-lg font-semibold">Ringkasan AI</div>
         </div>
-        <div id="summary" class="text-sm text-slate-200">
+        <div id="insightResult" class="p-5 text-sm text-slate-200">
           <p class="opacity-70">
-            Pilih slot untuk melihat ringkasan pemesanan.
+            Klik <b>Ringkas & Rekomendasi</b> pada salah satu artikel.
           </p>
         </div>
       </section>

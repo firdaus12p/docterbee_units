@@ -936,22 +936,575 @@ function initBooking() {
   refreshNav();
 }
 
+// ==================== EVENTS PAGE FUNCTIONS ====================
+
+/**
+ * Events data
+ */
+const EVENTS_DATA = [
+  {
+    title: "Cara Hidup Rasulullah – Pagi Sehat",
+    mode: "online",
+    topic: "quranic",
+    date: "2025-11-05 19:30",
+    host: "Ust. Malik & dr. Aisyah",
+    brief: "Ritme ibadah, tidur, hidrasi, dan sarapan Qur'ani.",
+  },
+  {
+    title: "Cold-Pressed & Biomolekul Antioksidan",
+    mode: "offline",
+    topic: "nutrition",
+    date: "2025-11-09 10:00",
+    host: "Praktisi Docterbee",
+    brief: "Praktik memilih bahan lokal & demo pressing.",
+  },
+  {
+    title: "Puasa, Autofagi, & Metabolisme",
+    mode: "online",
+    topic: "science",
+    date: "2025-11-12 19:30",
+    host: "dr. Fawwaz",
+    brief: "Efek puasa pada perbaikan sel & sensitivitas insulin.",
+  },
+  {
+    title: "Parenting Qur'ani Anti-Stres",
+    mode: "offline",
+    topic: "parenting",
+    date: "2025-11-16 09:00",
+    host: "Psikolog Docterbee",
+    brief: "Emotional regulation & rutinitas keluarga.",
+  },
+  {
+    title: "Produktivitas & Shalat Tepat Waktu",
+    mode: "online",
+    topic: "productivity",
+    date: "2025-11-19 20:00",
+    host: "Coach Docterbee",
+    brief: "Timeboxing, fokus, dan dzikir kerja.",
+  },
+];
+
+/**
+ * Render events based on filters
+ */
+function renderEvents() {
+  const modeFilter = document.getElementById("eventMode")?.value || "all";
+  const topicFilter = document.getElementById("eventTopic")?.value || "all";
+  const eventsContainer = document.getElementById("events");
+
+  if (!eventsContainer) return;
+
+  eventsContainer.innerHTML = "";
+
+  const filteredEvents = EVENTS_DATA.filter(
+    (e) =>
+      (modeFilter === "all" || e.mode === modeFilter) &&
+      (topicFilter === "all" || e.topic === topicFilter)
+  );
+
+  filteredEvents.forEach((event) => {
+    const card = document.createElement("div");
+    card.className = "event-card";
+    card.innerHTML = `
+      <div class="text-lg font-semibold">${escapeHtml(event.title)}</div>
+      <div class="text-xs text-amber-300 mt-1">${escapeHtml(
+        event.mode.toUpperCase()
+      )} · ${escapeHtml(event.topic)}</div>
+      <div class="text-sm text-slate-400 mt-1">${escapeHtml(
+        event.date
+      )} — ${escapeHtml(event.host)}</div>
+      <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(event.brief)}</p>
+      <div class="mt-3 flex gap-2">
+        <a href="booking.html" class="btn-primary-sm">Daftar</a>
+        <button class="btn-secondary-sm">Detail</button>
+      </div>
+    `;
+    eventsContainer.appendChild(card);
+  });
+}
+
+/**
+ * Initialize events page
+ */
+function initEvents() {
+  // Set current year in footer
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+
+  // Render events
+  renderEvents();
+
+  // Attach filter listeners
+  const modeSelect = document.getElementById("eventMode");
+  const topicSelect = document.getElementById("eventTopic");
+
+  if (modeSelect) {
+    modeSelect.addEventListener("change", renderEvents);
+  }
+
+  if (topicSelect) {
+    topicSelect.addEventListener("change", renderEvents);
+  }
+
+  // Initialize mobile menu
+  initMobileMenu();
+
+  // Initialize Lucide icons
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+
+  // Refresh navigation points
+  refreshNav();
+}
+
+// ==================== INSIGHT PAGE FUNCTIONS ====================
+
+/**
+ * Insight articles data
+ */
+const INSIGHT_DATA = [
+  {
+    title: "Madu 3–5mm & Autofagi",
+    tag: "Sains · Nutrisi",
+    brief:
+      "Bagaimana komponen bioaktif madu mikro mendukung proses perbaikan sel.",
+  },
+  {
+    title: "Puasa Senin-Kamis & Metabolisme",
+    tag: "Ibadah · Sains",
+    brief: "Efek puasa terhadap sensitivitas insulin & hormon lapar.",
+  },
+  {
+    title: "Shalat Tepat Waktu & Stres",
+    tag: "Ibadah · Kebiasaan",
+    brief: "Hubungan ritme ibadah dan stabilitas sistem limbik.",
+  },
+  {
+    title: "Batasi Gula Tambahan",
+    tag: "Nutrisi · Kebiasaan",
+    brief: "Mengapa gula rafinasi menaikkan inflamasi sistemik.",
+  },
+];
+
+/**
+ * Render insight articles
+ */
+function renderInsightArticles() {
+  const articlesContainer = document.getElementById("articles");
+  if (!articlesContainer) return;
+
+  articlesContainer.innerHTML = "";
+
+  INSIGHT_DATA.forEach((article, index) => {
+    const card = document.createElement("div");
+    card.className = "article-card";
+    card.innerHTML = `
+      <div class="text-lg font-semibold">${escapeHtml(article.title)}</div>
+      <div class="text-xs text-amber-300 mt-1">${escapeHtml(article.tag)}</div>
+      <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(article.brief)}</p>
+      <div class="mt-3 flex gap-2">
+        <button onclick="summarizeArticle(${index})" class="btn-primary-sm">Ringkas & Rekomendasi</button>
+        <button class="btn-secondary-sm">Baca Lengkap</button>
+      </div>
+    `;
+    articlesContainer.appendChild(card);
+  });
+}
+
+/**
+ * Summarize article with NBSN recommendations
+ * @param {number} index - Article index
+ */
+function summarizeArticle(index) {
+  const article = INSIGHT_DATA[index];
+  const resultContainer = document.getElementById("insightResult");
+
+  if (!resultContainer) return;
+
+  const nbsnHTML = `
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="nbsn-card">
+        <div class="font-semibold mb-1">Ringkasan</div>
+        <p class="text-slate-200/85">${escapeHtml(article.brief)}</p>
+      </div>
+      <div class="nbsn-card">
+        <div class="font-semibold mb-1">Rekomendasi NBSN</div>
+        <ul class="list-disc pl-5 text-slate-200/85">
+          <li><b>Neuron:</b> catat emosi & syukur harian.</li>
+          <li><b>Biomolekul:</b> madu murni 1–2 sdm/hari, hidrasi cukup.</li>
+          <li><b>Sensorik:</b> tidur 7–8 jam, paparan matahari pagi.</li>
+          <li><b>Nature:</b> puasa sunnah & kurangi gula rafinasi.</li>
+        </ul>
+      </div>
+    </div>
+  `;
+
+  resultContainer.innerHTML = nbsnHTML;
+
+  // Add points for reading insight
+  addPoints(2);
+}
+
+/**
+ * Initialize insight page
+ */
+function initInsight() {
+  // Set current year in footer
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+
+  // Render articles
+  renderInsightArticles();
+
+  // Initialize mobile menu
+  initMobileMenu();
+
+  // Initialize Lucide icons
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+
+  // Refresh navigation points
+  refreshNav();
+}
+
+// ==================== MEDIA PAGE FUNCTIONS ====================
+
+/**
+ * Podcast data
+ */
+const PODCAST_DATA = [
+  {
+    title: "Cara Hidup Rasulullah – Subuh Routine",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  },
+  {
+    title: "Tadabbur Al-Qur'an – QS. Al-Mulk",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  },
+  {
+    title: "Obat dalam Sunnah – Madu & Habbatussauda",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  },
+  {
+    title: "Science by Docterbee – Autofagi & Puasa",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  },
+];
+
+/**
+ * Render podcast list
+ */
+function renderPodcastList() {
+  const podcastList = document.getElementById("podcastList");
+  if (!podcastList) return;
+
+  podcastList.innerHTML = "";
+
+  PODCAST_DATA.forEach((podcast) => {
+    const button = document.createElement("button");
+    button.className = "podcast-item";
+    button.textContent = podcast.title;
+    button.addEventListener("click", () =>
+      playPodcast(podcast.title, podcast.url)
+    );
+    podcastList.appendChild(button);
+  });
+}
+
+/**
+ * Play podcast
+ * @param {string} title - Podcast title
+ * @param {string} url - Podcast URL
+ */
+function playPodcast(title, url) {
+  const nowPlaying = document.getElementById("nowPlaying");
+  const audioPlayer = document.getElementById("audioPlayer");
+
+  if (nowPlaying) {
+    nowPlaying.textContent = title;
+  }
+
+  if (audioPlayer) {
+    audioPlayer.src = url;
+    audioPlayer.play().catch(() => {
+      console.log("Audio autoplay prevented");
+    });
+  }
+}
+
+/**
+ * Load YouTube video
+ */
+function loadYouTube() {
+  const ytUrl = document.getElementById("ytUrl")?.value.trim();
+  const ytPlayer = document.getElementById("ytPlayer");
+
+  if (!ytPlayer) return;
+
+  if (!ytUrl) {
+    ytPlayer.innerHTML =
+      '<div class="p-6 text-center text-slate-400">Masukkan URL YouTube terlebih dahulu.</div>';
+    return;
+  }
+
+  // Extract video ID from URL
+  const videoId = extractYouTubeId(ytUrl);
+
+  if (!videoId) {
+    ytPlayer.innerHTML =
+      '<div class="p-6 text-center text-slate-400">URL tidak valid.</div>';
+    return;
+  }
+
+  ytPlayer.innerHTML = `<iframe class="w-full h-full rounded-xl" src="https://www.youtube.com/embed/${escapeHtml(
+    videoId
+  )}" title="YouTube video" allowfullscreen></iframe>`;
+}
+
+/**
+ * Extract YouTube video ID from URL
+ * @param {string} url - YouTube URL
+ * @returns {string} Video ID or empty string
+ */
+function extractYouTubeId(url) {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,
+    /youtube\.com\/embed\/([^&\s]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  return "";
+}
+
+/**
+ * Load custom audio
+ */
+function loadCustomAudio() {
+  const customUrl = document.getElementById("customAudioUrl")?.value.trim();
+
+  if (!customUrl) {
+    alert("Tempel URL .mp3 terlebih dahulu.");
+    return;
+  }
+
+  playPodcast("Custom Audio", customUrl);
+}
+
+/**
+ * Analyze media content with AI
+ */
+function analyzeMedia() {
+  const notes = (
+    document.getElementById("mediaNotes")?.value || ""
+  ).toLowerCase();
+  const aiResult = document.getElementById("aiResult");
+
+  if (!aiResult) return;
+
+  if (!notes) {
+    alert("Tuliskan catatan terlebih dahulu.");
+    return;
+  }
+
+  // AI analysis simulation based on keywords
+  const checks = [
+    {
+      keyword: "madu",
+      aligned: true,
+      quran: "QS An-Nahl: 69",
+      note: "Madu sebagai syifa'.",
+    },
+    {
+      keyword: "puasa",
+      aligned: true,
+      quran: "HR. Tirmidzi",
+      note: "Puasa adalah perisai.",
+    },
+    {
+      keyword: "berlebih",
+      aligned: false,
+      quran: "QS Al-A'raf: 31",
+      note: "Larangan berlebih-lebihan.",
+    },
+    {
+      keyword: "shalat",
+      aligned: true,
+      quran: "QS Al-Ma'un",
+      note: "Menegakkan shalat.",
+    },
+    {
+      keyword: "rokok",
+      aligned: false,
+      quran: "Kaedah fiqh",
+      note: "Dharar harus dihilangkan.",
+    },
+  ];
+
+  const aligned = [];
+  const corrections = [];
+
+  checks.forEach((check) => {
+    if (notes.includes(check.keyword)) {
+      if (check.aligned) {
+        aligned.push(check);
+      } else {
+        corrections.push(check);
+      }
+    }
+  });
+
+  const analysisHTML = `
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="ai-analysis-card">
+        <div class="font-semibold mb-1 flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+          Selaras Qur'an & Sunnah
+        </div>
+        <ul class="list-disc pl-5 text-slate-200/85">
+          ${
+            aligned.length > 0
+              ? aligned
+                  .map(
+                    (x) =>
+                      `<li><b>${escapeHtml(x.keyword)}</b> — ${escapeHtml(
+                        x.quran
+                      )} <span class='opacity-70'>(${escapeHtml(
+                        x.note
+                      )})</span></li>`
+                  )
+                  .join("")
+              : "<li class='opacity-70'>Belum ada.</li>"
+          }
+        </ul>
+      </div>
+      <div class="ai-analysis-card">
+        <div class="font-semibold mb-1 flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400"></i>
+          Perlu Dikoreksi
+        </div>
+        <ul class="list-disc pl-5 text-slate-200/85">
+          ${
+            corrections.length > 0
+              ? corrections
+                  .map(
+                    (x) =>
+                      `<li><b>${escapeHtml(x.keyword)}</b> — ${escapeHtml(
+                        x.quran
+                      )} <span class='opacity-70'>(${escapeHtml(
+                        x.note
+                      )})</span></li>`
+                  )
+                  .join("")
+              : "<li class='opacity-70'>Tidak terdeteksi.</li>"
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="ai-analysis-card mt-4">
+      <div class="font-semibold mb-1 flex items-center gap-2">
+        <i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i>
+        Catatan Sains (ringkas)
+      </div>
+      <ul class="list-disc pl-5 text-slate-200/85">
+        <li>Madu: enzim & flavonoid → dukung antioksidan endogen.</li>
+        <li>Puasa: autofagi & sensitivitas insulin.</li>
+        <li>Pembatasan gula & rokok → inflamasi sistemik turun.</li>
+      </ul>
+    </div>
+  `;
+
+  aiResult.innerHTML = analysisHTML;
+
+  // Re-initialize Lucide icons for new content
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+
+  // Add points for analysis
+  addPoints(3);
+}
+
+/**
+ * Initialize media page
+ */
+function initMedia() {
+  // Set current year in footer
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+
+  // Render podcast list
+  renderPodcastList();
+
+  // Attach event listeners
+  const btnLoadYT = document.getElementById("btnLoadYT");
+  if (btnLoadYT) {
+    btnLoadYT.addEventListener("click", loadYouTube);
+  }
+
+  const btnAnalyze = document.getElementById("btnAnalyze");
+  if (btnAnalyze) {
+    btnAnalyze.addEventListener("click", analyzeMedia);
+  }
+
+  const btnLoadCustomAudio = document.getElementById("btnLoadCustomAudio");
+  if (btnLoadCustomAudio) {
+    btnLoadCustomAudio.addEventListener("click", loadCustomAudio);
+  }
+
+  // Initialize mobile menu
+  initMobileMenu();
+
+  // Initialize Lucide icons
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+
+  // Refresh navigation points
+  refreshNav();
+}
+
 // ==================== APP STARTUP ====================
 
 // Initialize on DOM ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
-    // Check if on booking page
+    // Check which page we're on
     if (document.getElementById("slots")) {
       initBooking();
+    } else if (document.getElementById("events")) {
+      initEvents();
+    } else if (document.getElementById("articles")) {
+      initInsight();
+    } else if (document.getElementById("ytPlayer")) {
+      initMedia();
     } else {
       init();
     }
   });
 } else {
-  // Check if on booking page
+  // Check which page we're on
   if (document.getElementById("slots")) {
     initBooking();
+  } else if (document.getElementById("events")) {
+    initEvents();
+  } else if (document.getElementById("articles")) {
+    initInsight();
+  } else if (document.getElementById("ytPlayer")) {
+    initMedia();
   } else {
     init();
   }

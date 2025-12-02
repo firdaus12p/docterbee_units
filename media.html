@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docterbee – Booking Praktisi</title>
+    <title>Docterbee – Media & AI</title>
 
     <!-- External Stylesheets -->
     <link
@@ -27,10 +27,10 @@
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="index.html" class="nav-link">Journey</a>
-          <a href="booking.html" class="nav-link" style="opacity: 1">Booking</a>
+          <a href="booking.html" class="nav-link">Booking</a>
           <a href="events.html" class="nav-link">Events</a>
           <a href="insight.html" class="nav-link">Insight</a>
-          <a href="media.html" class="nav-link">Media</a>
+          <a href="media.html" class="nav-link" style="opacity: 1">Media</a>
         </nav>
         <div class="flex items-center gap-3">
           <span class="points-display"> Points: <b id="navPoints">0</b> </span>
@@ -76,88 +76,96 @@
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
-      <h1 class="text-3xl md:text-4xl font-bold mb-2">Booking Praktisi</h1>
-      <p class="text-slate-300/85 mb-6 max-w-2xl">
-        Pilih cabang, praktisi, tanggal, dan jam. *Demo ini hanya simulasi UI
-        tanpa pembayaran.*
-      </p>
+      <div class="mb-6">
+        <h1 class="text-3xl md:text-4xl font-bold">Media & AI</h1>
+        <p class="text-slate-300/85">
+          Putar <b>podcast audio</b> atau <b>video YouTube</b>, lalu minta AI
+          menganalisis kesesuaian dengan Qur'an, Hadis, Docterbee, dan sains.
+        </p>
+      </div>
 
       <div class="grid gap-6 md:grid-cols-3">
-        <!-- Booking Form -->
-        <div class="booking-container space-y-4 md:col-span-2">
-          <div class="grid md:grid-cols-2 gap-3">
-            <label class="booking-label">
-              Cabang
-              <select id="branch" class="booking-select">
-                <option>Docterbee Kolaka</option>
-                <option>Docterbee Makassar</option>
-                <option>Docterbee Kendari</option>
-              </select>
-            </label>
-            <label class="booking-label">
-              Praktisi
-              <select id="pract" class="booking-select">
-                <option>dr. Aisyah – Health Educator</option>
-                <option>dr. Fawwaz – Lifestyle Medicine</option>
-                <option>Ust. Malik – Qur'anic Advisor</option>
-              </select>
-            </label>
+        <!-- Left: YouTube -->
+        <section class="media-container md:col-span-2">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="youtube" class="w-5 h-5 text-rose-400"></i>
+            <div class="font-semibold">YouTube Player</div>
           </div>
-
-          <div class="grid md:grid-cols-2 gap-3">
-            <label class="booking-label">
-              Tanggal
-              <input id="date" type="date" class="booking-input" />
-            </label>
-            <label class="booking-label">
-              Mode
-              <select id="mode" class="booking-select">
-                <option>Online (Video)</option>
-                <option>Offline (Datang ke Cabang)</option>
-              </select>
-            </label>
+          <label class="media-label">Tempel URL YouTube</label>
+          <div class="flex gap-2 mt-1">
+            <input
+              id="ytUrl"
+              class="media-input flex-1"
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+            <button id="btnLoadYT" class="btn-primary-sm">Load</button>
           </div>
-
-          <div>
-            <div class="text-sm mb-2 opacity-80">Pilih Jam</div>
-            <div id="slots" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>
+          <div
+            id="ytPlayer"
+            class="media-player aspect-video mt-4 flex items-center justify-center text-slate-400"
+          >
+            <span>Video akan tampil di sini.</span>
           </div>
-
-          <div class="flex gap-3">
-            <button id="btnConfirmBooking" class="btn-primary">
-              Konfirmasi
+          <div class="mt-4">
+            <label class="media-label">Catatan / poin penting</label>
+            <textarea
+              id="mediaNotes"
+              class="media-textarea"
+              placeholder="Tuliskan ringkasan atau poin video di sini..."
+            ></textarea>
+          </div>
+          <div class="mt-3 flex items-center gap-3">
+            <button id="btnAnalyze" class="btn-analyze">
+              Analisis AI (Demo)
             </button>
-            <button id="btnResetForm" class="btn-secondary">Reset</button>
+            <span class="text-xs text-slate-400">*Simulasi tanpa server.</span>
           </div>
-        </div>
+        </section>
 
-        <!-- Sidebar Info -->
-        <aside class="booking-sidebar">
+        <!-- Right: Podcast -->
+        <aside class="media-sidebar">
           <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="shield-check" class="w-4 h-4 text-amber-300"></i>
-            <b>Kebijakan</b>
+            <i data-lucide="podcast" class="w-4 h-4 text-amber-300"></i>
+            <b>Podcast Audio</b>
           </div>
-          <ul class="list-disc pl-5 text-slate-300/85 space-y-1">
-            <li>Konfirmasi akan dikirim via WhatsApp.</li>
-            <li>Batal minimal 6 jam sebelum jadwal.</li>
-            <li>Untuk keadaan darurat, hubungi cabang terkait.</li>
-          </ul>
-          <div class="mt-4 flex items-center gap-2">
-            <i data-lucide="calendar" class="w-4 h-4 text-sky-300"></i>
-            <b>Jam Operasional</b>
+          <p class="text-slate-300/85 mb-2">Pilih episode untuk diputar:</p>
+
+          <div id="podcastList" class="space-y-2"></div>
+
+          <div class="podcast-now-playing">
+            <div class="flex items-center gap-2 mb-1">
+              <i data-lucide="mic" class="w-4 h-4 text-sky-300"></i>
+              <b>Sekarang Diputar</b>
+            </div>
+            <div id="nowPlaying" class="text-slate-200/90 text-sm mb-2">—</div>
+            <audio id="audioPlayer" controls class="w-full"></audio>
           </div>
-          <p class="text-slate-300/80">Senin–Sabtu, 09.00–20.00 WITA.</p>
+
+          <div class="mt-4">
+            <div class="flex items-center gap-2 mb-1">
+              <i data-lucide="upload" class="w-4 h-4 text-emerald-300"></i>
+              <b>Muat audio Anda sendiri</b>
+            </div>
+            <input
+              id="customAudioUrl"
+              class="media-input-sm mb-2"
+              placeholder="Tempel URL .mp3"
+            />
+            <button id="btnLoadCustomAudio" class="btn-secondary-sm">
+              Putar
+            </button>
+          </div>
         </aside>
       </div>
 
-      <!-- Summary Section -->
+      <!-- AI Result -->
       <section class="mt-8 booking-container">
-        <div class="mb-4">
-          <div class="text-lg font-semibold">Ringkasan</div>
+        <div class="p-5 border-b border-slate-800">
+          <div class="text-lg font-semibold">Hasil Analisis AI</div>
         </div>
-        <div id="summary" class="text-sm text-slate-200">
+        <div id="aiResult" class="p-5 text-sm text-slate-200">
           <p class="opacity-70">
-            Pilih slot untuk melihat ringkasan pemesanan.
+            Masukkan URL & catatan, lalu klik <b>Analisis AI</b>.
           </p>
         </div>
       </section>
