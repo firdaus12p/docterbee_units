@@ -4,34 +4,63 @@
 
 Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), modern science, and the NBSN framework (Neuron, Biomolekul, Sensorik, Nature). Users answer daily questions, book appointments, attend events, read insights, and analyze media content—all earning points/scores.
 
-## Architecture: Multi-Page SPA Pattern
+**Tech Stack**: Node.js + Express (backend), MySQL/XAMPP (database), Vanilla JS + Tailwind CSS (frontend)  
+**Key Insight**: Frontend and backend are decoupled - frontend works standalone with localStorage/mock data, backend provides API persistence
 
-**Five-page structure sharing single CSS/JS:**
+## Architecture: Full-Stack Hybrid SPA
 
-- **`index.html`**: Journey tracking (6 units with daily questions)
-- **`booking.html`**: Practitioner appointment scheduling with WhatsApp integration (+62-821-8808-0688)
-- **`events.html`**: Webinar & workshop listings with mode/topic filters
-- **`insight.html`**: Educational articles with AI-powered NBSN recommendations
-- **`media.html`**: YouTube player + podcast audio + AI content analysis
-- **`style.css`**: Shared CSS organized by page sections (Events: line 1102, Insight: 1200, Media: 1339)
-- **`script.js`**: Unified JavaScript (1512 lines) with page-specific init functions
+### Frontend (Multi-Page Pattern)
 
-**External dependencies**: Tailwind CDN, Lucide icons CDN, Google Fonts (Inter)  
-**No build system**: Direct browser execution - open any HTML file  
-**Navigation**: Consistent navbar across all 5 pages + mobile hamburger menu with slide-in drawer
+**Seven HTML pages with organized CSS/JS (moved to folders):**
 
-## Critical Code Patterns
+- **`index.html`**: Journey tracking (6 units) - uses `localStorage` for state
+- **`booking.html`**: Appointment + promo validation - calls `/api/bookings`, `/api/coupons/validate`
+- **`events.html`**: Webinar listings - fetches from `/api/events` (falls back to mock `EVENTS_DATA`)
+- **`insight.html`**: Articles - fetches from `/api/insight` (falls back to mock `INSIGHT_DATA`)
+- **`media.html`**: YouTube/podcast player + AI analysis via `/api/summarize` (Gemini)
+- **`admin-dashboard.html`**: CRUD for bookings/events/articles/coupons - uses `sessionStorage` auth
+- **`services.html`**: Services listing
+
+**File Organization** (critical - paths changed from root):
+
+- **`css/style.css`**: 1669 lines (Header: 119, Hero: 227, Booking: 697, Events: 1102, Insight: 1200, Media: 1339)
+- **`js/script.js`**: 1860 lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Page inits: 664+)
+- **`js/admin-dashboard.js`**: 781 lines for admin (Auth check: line 18, Login: 90, Tab switching: 117)
+
+**All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or `js/admin-dashboard.js` for admin)
+
+### Backend (Express + MySQL)
+
+**API server with auto-initializing database:**
+
+- **`backend/server.mjs`**: Main server (231 lines) - mounts 4 routers, serves static files from root, Gemini endpoint
+- **`backend/db.mjs`**: Connection pool (149 lines) - creates 4 tables on startup if missing
+- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs (each ~200-280 lines)
+
+**Database Tables** (auto-created):
+
+1. `bookings` - service_name, booking_date, booking_time, promo_code, status (enum), indexed
+2. `events` - title, event_date, mode (enum: online/offline), topic, is_active (soft delete)
+3. `articles` - title, slug (unique), content, image_url, is_published (soft delete)
+4. `coupons` - code (unique), discount_type (enum: percentage/fixed), value, usage_limit, is_active
+
+**Critical**: MySQL runs on port **3307** (not default 3306) - XAMPP configuration. Set `DB_PORT=3307` in `.env`
+
+## Critical Development Patterns
 
 ### 1. Event Handling (NO inline onclick!)
 
 ```javascript
-// ❌ WRONG (old pattern in docterbee_units.html):
-<button onclick="answer('u1','subuh',1)">Ya</button>
+// ❌ WRONG (old pattern): <button onclick="answer('u1','subuh',1)">Ya</button>
 
-// ✅ CORRECT (current pattern in script.js):
-<button class="btn-yes" data-unit="u1" data-key="subuh" data-value="1">Ya</button>
+// ✅ CORRECT (current pattern in js/script.js):
+<button class="btn-yes" data-unit="u1" data-key="subuh" data-value="1">
+  Ya
+</button>
 // Attached via: attachUnitEventListeners() using addEventListener
 ```
+
+**Exception**: `insight.html` uses inline `onclick="summarizeArticle(0)"` on article buttons (legacy pattern, accepted)
 
 ### 2. String Safety (Escape quotes!)
 
@@ -41,17 +70,51 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 // ✅ CORRECT: 'Nature: napas 2"' → use double quote inside single quote
 ```
 
-**Critical**: When adding questions to UNITS array, escape single quotes with `\'`
+**Critical**: When adding questions to `UNITS` array in `js/script.js`, escape single quotes with `\'`
 
-### 3. XSS Prevention
+### 3. XSS Prevention (Frontend)
 
-All user-facing content uses `escapeHtml()` function (line ~380 in script.js):
+All user-facing content uses `escapeHtml()` function (~line 380 in js/script.js):
 
 ```javascript
 <div class="font-semibold">${escapeHtml(item.q)}</div>
 ```
 
 Never insert raw strings into innerHTML without escaping.
+
+### 4. SQL Injection Prevention (Backend)
+
+All database queries use parameterized statements via mysql2:
+
+```javascript
+// ✅ CORRECT: Parameterized query in backend/routes/bookings.mjs
+const booking = await queryOne("SELECT * FROM bookings WHERE id = ?", [id]);
+
+// ❌ WRONG: String concatenation
+const booking = await queryOne(`SELECT * FROM bookings WHERE id = ${id}`);
+```
+
+### 5. API Response Pattern
+
+All backend routes follow consistent JSON structure:
+
+```javascript
+// Success response
+res.json({ success: true, data: result, count: result.length });
+
+// Error response
+res.status(404).json({ success: false, error: "Resource tidak ditemukan" });
+```
+
+### 6. Soft Deletes (Not Hard Deletes)
+
+Tables use `is_active` or `is_published` flags instead of DELETE:
+
+```javascript
+// backend/routes/events.mjs - Soft delete
+await query("UPDATE events SET is_active = 0 WHERE id = ?", [id]);
+// Never: await query("DELETE FROM events WHERE id = ?", [id]);
+```
 
 ## Data Model: UNITS Array (script.js, line 7)
 
@@ -134,67 +197,162 @@ Organized by component with section headers:
 
 ## Development Workflow
 
-1. **Edit data**: Modify UNITS array in `script.js`
-2. **Edit styles**: Update `style.css` (never add inline styles to HTML)
-3. **Edit logic**: Update functions in `script.js` (maintain section organization)
-4. **Test**: Open `index.html` in browser
-5. **Debug localStorage**: DevTools → Application → Local Storage
+### Frontend Development
+
+1. **Edit data**: Modify `UNITS` array in `js/script.js` (line 7)
+2. **Edit styles**: Update `css/style.css` (never add inline styles to HTML)
+3. **Edit logic**: Update functions in `js/script.js` (maintain section organization by feature)
+4. **Test frontend**: Open `http://localhost:3000/index.html` in browser (requires backend running)
+5. **Debug localStorage**: DevTools → Application → Local Storage → `db_units`, `db_points`
 6. **Clear state**: Console → `localStorage.clear()`
+
+### Backend Development
+
+1. **Start server**: `npm start` (or `npm run dev` for watch mode)
+2. **Check database**: phpMyAdmin → `docterbee_units` database (via XAMPP)
+3. **Test API**: Use browser or Postman - all endpoints return JSON
+4. **View logs**: Console shows connection status, errors, request logs
+5. **Auto-restart**: Use `npm run dev` for automatic reload on file changes
+
+### Critical Setup Steps
+
+```bash
+# 1. Install dependencies (first time only)
+npm install
+
+# 2. Start XAMPP MySQL (port 3307)
+# Open XAMPP Control Panel → Start MySQL
+
+# 3. Configure environment
+cp .env.example .env
+# Edit: DB_PORT=3307, GEMINI_API_KEY=your_key
+
+# 4. Start backend (auto-creates tables)
+npm start
+# Expected: "✅ Database connected" + "✅ Table: bookings/events/articles/coupons"
+
+# 5. Open frontend
+# http://localhost:3000/index.html
+# http://localhost:3000/admin-dashboard.html (admin/docterbee2025)
+```
+
+### Common Commands
+
+- `npm start` - Production mode (backend server)
+- `npm run dev` - Development mode with auto-reload
+- `npm run old-server` - Fallback to legacy server.mjs (no database)
+- `Get-Process node | Stop-Process` - PowerShell: Kill all Node processes
+- `netstat -ano | Select-String ":3000"` - PowerShell: Check port usage
 
 ## Page-Specific Patterns
 
 ### Booking Page (booking.html)
 
-**State**: `bookingState` object for selected time slot  
-**Key functions**: `generateSlots()`, `selectSlot()`, `updateBookingSummary()`, `formatDateIndo()`, `confirmBooking()`  
-**WhatsApp integration**: `confirmBooking()` opens wa.me link with formatted booking message to +62-821-8808-0688  
-**Datepicker**: Min date = today, max date = +3 months (set in `initBooking()`)  
-**Validation**: Must select both date and time before confirm
+**State**: `bookingState` object for selected time slot + validated coupon  
+**Key functions**: `generateSlots()`, `selectSlot()`, `validatePromoCode()` (async), `saveBookingToDatabase()` (async), `confirmBooking()`  
+**API integration**:
+
+- `POST /api/coupons/validate` - Validates promo code, returns discount info
+- `POST /api/bookings` - Saves booking, auto-increments coupon usage_count
+  **WhatsApp integration**: `confirmBooking()` opens wa.me link (+62-821-8808-0688) with formatted message  
+  **Datepicker**: Min = today, max = +3 months (set in `initBooking()`)
 
 ### Events Page (events.html)
 
-**State**: `EVENTS_DATA` array with mode (online/offline) and topic filters  
-**Key functions**: `renderEvents()` with filter logic, re-renders on select change  
-**Filter IDs**: `eventMode`, `eventTopic` - both default to "all"
+**State**: `EVENTS_DATA` mock array (fallback), loads from `/api/events?mode=&topic=` on init  
+**Key functions**: `renderEvents()` (async) with filter logic, `formatEventDate()` helper  
+**Filter IDs**: `eventMode`, `eventTopic` - both default to "all", triggers re-render on change
 
 ### Insight Page (insight.html)
 
-**State**: `INSIGHT_DATA` array (4 articles)  
-**Key functions**: `renderInsightArticles()`, `summarizeArticle(index)` - creates NBSN cards and adds +2 points  
-**Pattern**: onclick attribute used for article buttons (exception to event listener rule)
+**State**: `INSIGHT_DATA` mock array (fallback), loads from `/api/insight` on init  
+**Key functions**: `renderInsightArticles()` (async), `summarizeArticleById(slug)` (async with API call)  
+**Pattern**: onclick attribute used for article buttons (`onclick="summarizeArticle(0)"`) - legacy exception  
+**Points**: +2 points when user clicks "Lihat Rekomendasi NBSN"
 
 ### Media Page (media.html)
 
 **State**: `PODCAST_DATA` array (4 episodes with sample URLs)  
 **Key functions**: `loadYouTube()`, `extractYouTubeId()`, `playPodcast()`, `analyzeMedia()` with keyword detection  
-**YouTube**: Supports youtube.com/watch?v=, youtu.be/, and embed URLs  
-**AI Analysis**: Keyword-based simulation checking alignment with Qur'an/Sunnah (+3 points on analyze)
+**YouTube**: Supports youtube.com/watch?v=, youtu.be/, embed URLs (iframe injection)  
+**AI Analysis**: Sends notes to `/api/summarize` (Gemini), checks alignment with Qur'an/Sunnah (+3 points)
+
+### Admin Dashboard (admin-dashboard.html)
+
+**Authentication**: Simple sessionStorage-based (`admin_session` key), credentials: `admin/docterbee2025`  
+**Structure**: 4 sections with tab navigation (Bookings, Events, Insight, Coupons)  
+**Key patterns**:
+
+- `sessionStorage` check on load (line 18 in js/admin-dashboard.js)
+- All CRUD uses fetch API to backend (`API_BASE = "http://localhost:3000/api"`)
+- Modal-based editing (open/close functions per section)
+- Status dropdown for bookings (pending/confirmed/completed/cancelled)
+- Soft delete for events/articles (sets `is_active=0` or `is_published=0`)
+
+**Critical functions per section**:
+
+- Bookings: `loadBookings()`, `updateBookingStatus()`, `filterBookingStatus`
+- Events: `loadEvents()`, `openEventModal()`, `handleEventSubmit()`, `deleteEvent()`
+- Insight: `loadArticles()`, `openArticleModal()`, `handleArticleSubmit()`, `deleteArticle()`
+- Coupons: `loadCoupons()`, `openCouponModal()`, `handleCouponSubmit()`, `deleteCoupon()`
 
 ## Common Pitfalls to Avoid
 
 1. ❌ Don't add inline onclick handlers to HTML (except `summarizeArticle()` on insight page buttons)
-2. ❌ Don't add inline styles to HTML
+2. ❌ Don't add inline styles to HTML - all styling in `css/style.css`
 3. ❌ Don't forget to escape quotes in UNITS array strings with `\'`
-4. ❌ Don't skip XSS escaping when inserting dynamic content via `escapeHtml()`
-5. ❌ Don't forget to update ALL 5 pages when changing shared components (header/footer/nav)
-6. ❌ Don't forget `initMobileMenu()` call when creating new pages
-7. ❌ Don't use page-specific element IDs in shared functions (breaks page detection logic)
+4. ❌ Don't skip XSS escaping when inserting dynamic content - use `escapeHtml()`
+5. ❌ Don't use string concatenation in SQL queries - always use parameterized statements
+6. ❌ Don't hard delete database records - use soft delete flags (`is_active`, `is_published`)
+7. ❌ Don't forget to update ALL 7 HTML pages when changing shared components (header/footer/nav)
+8. ❌ Don't forget `initMobileMenu()` call when creating new pages
+9. ❌ Don't assume MySQL default port 3306 - this project uses 3307 (XAMPP config)
+10. ❌ Don't use `require()` in backend - this project uses ES Modules (`import/export`)
 
-## Page Structure
+## Project Structure
 
-Current pages in project:
+```
+docterbee_units/
+├── backend/              # Node.js + Express API
+│   ├── server.mjs       # Main server with route mounting
+│   ├── db.mjs           # MySQL pool + table initialization
+│   └── routes/          # Modular API endpoints
+│       ├── bookings.mjs
+│       ├── events.mjs
+│       ├── insight.mjs
+│       └── coupons.mjs
+├── css/                 # Organized stylesheets
+│   └── style.css        # 1669 lines, component-organized
+├── js/                  # Organized JavaScript
+│   ├── script.js        # 1860 lines, public pages logic
+│   └── admin-dashboard.js # 781 lines, admin CRUD
+├── docs/                # All documentation
+│   ├── QUICKSTART.md
+│   ├── SETUP_GUIDE.md
+│   ├── DATABASE_SCHEMA.md
+│   └── ...
+├── *.html               # 7 pages (index, booking, events, insight, media, services, admin-dashboard)
+├── .env                 # Config (gitignored, contains DB_PORT=3307, GEMINI_API_KEY)
+├── .env.example         # Config template
+└── package.json         # Dependencies + scripts
+```
+
+**Current pages**:
 
 - **`index.html`** - Journey tracking (6 units with daily questions)
-- **`booking.html`** - Appointment booking with praktisi
+- **`booking.html`** - Appointment booking with promo validation
 - **`events.html`** - Webinar & workshop listings
 - **`insight.html`** - Educational articles with AI summaries
 - **`media.html`** - YouTube player, podcast audio, AI content analysis
+- **`services.html`** - Services listing
+- **`admin-dashboard.html`** - Admin control panel (protected)
 
-**Navigation pattern**: Five-page nav (Journey, Booking, Events, Insight, Media)  
-When modifying header/footer, update ALL HTML files for consistency.
+**Navigation pattern**: Five-page public nav (Journey, Booking, Events, Insight, Media)  
+When modifying header/footer, update ALL 7 HTML files for consistency.
 
 ## Language & Content
 
 - **Primary language**: Indonesian (Bahasa Indonesia)
 - **Islamic terms**: Keep Arabic terminology (Subuh, Zuhur, Qur'an, etc.)
 - **Tone**: Friendly, educational, faith-integrated wellness
+- **API responses**: JSON with `success`, `data`, `error` fields
