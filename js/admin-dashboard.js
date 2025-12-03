@@ -205,7 +205,8 @@ async function loadBookings() {
           </td>
           <td class="p-3">
             <button 
-              onclick="viewBookingDetail(${booking.id})"
+              data-action="view-booking"
+              data-id="${booking.id}"
               class="text-amber-400 hover:text-amber-300 text-xs"
             >
               Detail
@@ -215,6 +216,14 @@ async function loadBookings() {
       `
         )
         .join("");
+
+      // Attach event listeners using event delegation
+      tbody.querySelectorAll('[data-action="view-booking"]').forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const id = this.getAttribute("data-id");
+          viewBookingDetail(parseInt(id));
+        });
+      });
     } else {
       tbody.innerHTML =
         '<tr><td colspan="9" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
@@ -279,13 +288,15 @@ async function loadArticles() {
           </div>
           <div class="flex gap-2">
             <button 
-              onclick="editArticle(${article.id})"
+              data-action="edit-article"
+              data-id="${article.id}"
               class="flex-1 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm"
             >
               Edit
             </button>
             <button 
-              onclick="deleteArticle(${article.id})"
+              data-action="delete-article"
+              data-id="${article.id}"
               class="px-3 py-2 rounded text-sm bg-red-900/30 hover:bg-red-900/50 text-red-400"
             >
               Hapus
@@ -299,6 +310,20 @@ async function loadArticles() {
       grid.innerHTML =
         '<div class="booking-container p-6 text-center text-slate-400">Belum ada artikel</div>';
     }
+
+    // Attach event listeners using event delegation
+    grid.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const action = this.getAttribute("data-action");
+        const id = this.getAttribute("data-id");
+
+        if (action === "edit-article") {
+          editArticle(parseInt(id));
+        } else if (action === "delete-article") {
+          deleteArticle(parseInt(id));
+        }
+      });
+    });
   } catch (error) {
     console.error("Error loading articles:", error);
     grid.innerHTML =
@@ -413,15 +438,27 @@ async function loadEvents() {
     '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/events?limit=100`);
+    // Admin: includeInactive=true to see all events (active & inactive)
+    const response = await fetch(
+      `${API_BASE}/events?limit=100&includeInactive=true`
+    );
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
       grid.innerHTML = result.data
         .map(
           (event) => `
-        <div class="booking-container p-5">
-          <h3 class="font-semibold mb-2">${escapeHtml(event.title)}</h3>
+        <div class="booking-container p-5 ${
+          event.is_active === 0 ? "opacity-50 border-red-900/30" : ""
+        }">
+          <h3 class="font-semibold mb-2">
+            ${escapeHtml(event.title)}
+            ${
+              event.is_active === 0
+                ? '<span class="ml-2 text-xs text-red-400">(Tidak Aktif)</span>'
+                : ""
+            }
+          </h3>
           <div class="text-sm text-slate-400 space-y-1 mb-3">
             <div>📅 ${formatDate(event.event_date)}</div>
             <div>
@@ -437,13 +474,15 @@ async function loadEvents() {
           </div>
           <div class="flex gap-2">
             <button 
-              onclick="editEvent(${event.id})"
+              data-action="edit-event"
+              data-id="${event.id}"
               class="flex-1 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm"
             >
               Edit
             </button>
             <button 
-              onclick="deleteEvent(${event.id})"
+              data-action="delete-event"
+              data-id="${event.id}"
               class="px-3 py-2 rounded text-sm bg-red-900/30 hover:bg-red-900/50 text-red-400"
             >
               Hapus
@@ -457,10 +496,24 @@ async function loadEvents() {
       grid.innerHTML =
         '<div class="booking-container p-6 text-center text-slate-400">Belum ada event</div>';
     }
+
+    // Attach event listeners using event delegation
+    grid.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const action = this.getAttribute("data-action");
+        const id = this.getAttribute("data-id");
+
+        if (action === "edit-event") {
+          editEvent(parseInt(id));
+        } else if (action === "delete-event") {
+          deleteEvent(parseInt(id));
+        }
+      });
+    });
   } catch (error) {
     console.error("Error loading events:", error);
     grid.innerHTML =
-      '<div class="booking-container p-6 text-center text-red-400">Error loading data</div>';
+      '<div class="booking-container p-6 text-center text-red-400">Error loading events</div>';
   }
 }
 
@@ -520,7 +573,10 @@ async function handleEventSubmit(e) {
 
 async function editEvent(id) {
   try {
-    const response = await fetch(`${API_BASE}/events/${id}`);
+    // Admin: includeInactive=true to edit inactive events
+    const response = await fetch(
+      `${API_BASE}/events/${id}?includeInactive=true`
+    );
     const result = await response.json();
 
     if (result.success) {
@@ -616,13 +672,15 @@ async function loadCoupons() {
           </div>
           <div class="flex gap-2">
             <button 
-              onclick="editCoupon(${coupon.id})"
+              data-action="edit-coupon"
+              data-id="${coupon.id}"
               class="flex-1 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm"
             >
               Edit
             </button>
             <button 
-              onclick="deleteCoupon(${coupon.id})"
+              data-action="delete-coupon"
+              data-id="${coupon.id}"
               class="px-3 py-2 rounded text-sm bg-red-900/30 hover:bg-red-900/50 text-red-400"
             >
               Hapus
@@ -636,6 +694,20 @@ async function loadCoupons() {
       grid.innerHTML =
         '<div class="booking-container p-6 text-center text-slate-400">Belum ada kode promo</div>';
     }
+
+    // Attach event listeners using event delegation
+    grid.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const action = this.getAttribute("data-action");
+        const id = this.getAttribute("data-id");
+
+        if (action === "edit-coupon") {
+          editCoupon(parseInt(id));
+        } else if (action === "delete-coupon") {
+          deleteCoupon(parseInt(id));
+        }
+      });
+    });
   } catch (error) {
     console.error("Error loading coupons:", error);
     grid.innerHTML =
@@ -650,6 +722,7 @@ function openCouponModal(id = null) {
     : "Kode Promo Baru";
   document.getElementById("couponForm").reset();
   document.getElementById("couponId").value = id || "";
+  document.getElementById("couponMinBookingValue").value = "0";
   document.getElementById("couponIsActive").checked = true;
 
   if (typeof lucide !== "undefined") {
@@ -671,6 +744,9 @@ async function handleCouponSubmit(e) {
     discountType: document.getElementById("couponDiscountType").value,
     discountValue: parseFloat(
       document.getElementById("couponDiscountValue").value
+    ),
+    minBookingValue: parseFloat(
+      document.getElementById("couponMinBookingValue")?.value || 0
     ),
     maxUses: document.getElementById("couponMaxUses").value || null,
     expiresAt: document.getElementById("couponExpiresAt").value || null,
@@ -716,6 +792,8 @@ async function editCoupon(id) {
         coupon.discount_type;
       document.getElementById("couponDiscountValue").value =
         coupon.discount_value;
+      document.getElementById("couponMinBookingValue").value =
+        coupon.min_booking_value || 0;
       document.getElementById("couponMaxUses").value = coupon.max_uses || "";
       if (coupon.expires_at) {
         document.getElementById("couponExpiresAt").value = coupon.expires_at

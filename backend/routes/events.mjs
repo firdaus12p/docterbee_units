@@ -3,12 +3,16 @@ import { query, queryOne } from "../db.mjs";
 
 const router = express.Router();
 
-// GET /api/events - List all events (public)
+// GET /api/events - List all events (public & admin)
 router.get("/", async (req, res) => {
   try {
-    const { mode, topic, limit = 50 } = req.query;
+    const { mode, topic, limit = 50, includeInactive } = req.query;
 
-    let sql = "SELECT * FROM events WHERE is_active = 1";
+    // For admin: includeInactive=true to see all events
+    let sql =
+      includeInactive === "true"
+        ? "SELECT * FROM events WHERE 1=1"
+        : "SELECT * FROM events WHERE is_active = 1";
     const params = [];
 
     if (mode && mode !== "all") {
@@ -40,15 +44,19 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/events/:id - Get single event (public)
+// GET /api/events/:id - Get single event (public & admin)
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    const { includeInactive } = req.query;
 
-    const event = await queryOne(
-      "SELECT * FROM events WHERE id = ? AND is_active = 1",
-      [id]
-    );
+    // For admin: includeInactive=true to see inactive events
+    const sql =
+      includeInactive === "true"
+        ? "SELECT * FROM events WHERE id = ?"
+        : "SELECT * FROM events WHERE id = ? AND is_active = 1";
+
+    const event = await queryOne(sql, [id]);
 
     if (!event) {
       return res.status(404).json({
