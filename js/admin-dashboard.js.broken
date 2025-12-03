@@ -10,7 +10,6 @@ let isLoggedIn = false;
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ DOM Content Loaded - Initializing...");
-
   // Set year
   document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -27,9 +26,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Login form
+  console.log("📝 Attaching login form event listener");
   document.getElementById("loginForm").addEventListener("submit", handleLogin);
 
-  // Logout button - FIX: Changed from "submit" to "click"
+  // Logout button
+  console.log("📝 Attaching logout button event listener");
   document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
   // Tab navigation
@@ -51,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Insight section
   document
     .getElementById("btnNewArticle")
-    .addEventListener("click", () => openArticleModal());
+    .addEventListener("click", openArticleModal);
   document
     .getElementById("closeArticleModal")
     .addEventListener("click", closeArticleModal);
@@ -65,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Events section
   document
     .getElementById("btnNewEvent")
-    .addEventListener("click", () => openEventModal());
+    .addEventListener("click", openEventModal);
   document
     .getElementById("closeEventModal")
     .addEventListener("click", closeEventModal);
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Coupons section
   document
     .getElementById("btnNewCoupon")
-    .addEventListener("click", () => openCouponModal());
+    .addEventListener("click", openCouponModal);
   document
     .getElementById("closeCouponModal")
     .addEventListener("click", closeCouponModal);
@@ -94,17 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // Login handling
 function handleLogin(e) {
   e.preventDefault();
-  console.log("[LOGIN] 🔵 Login attempt");
-
+  console.log("[LOGIN] 🔵 Login attempt started");
+  
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
-
-  console.log(
-    "[LOGIN] Username:",
-    username,
-    "| Password length:",
-    password.length
-  );
+  
+  console.log("[LOGIN] 📝 Username:", username);
+  console.log("[LOGIN] 📝 Password length:", password.length);
+  console.log("[LOGIN] 🔐 Checking credentials...");
 
   // Simple hardcoded auth (replace with API call later)
   if (username === "admin" && password === "docterbee2025") {
@@ -114,6 +112,8 @@ function handleLogin(e) {
     showDashboard();
   } else {
     console.log("[LOGIN] ❌ Invalid credentials");
+    console.log("[LOGIN] Expected: admin / docterbee2025");
+    console.log("[LOGIN] Received: " + username + " / [password hidden]");
     document.getElementById("loginError").textContent =
       "Username atau password salah";
     document.getElementById("loginError").classList.remove("hidden");
@@ -121,23 +121,28 @@ function handleLogin(e) {
 }
 
 function handleLogout() {
+  console.log("[LOGIN] 🔵 Logout requested");
   isLoggedIn = false;
   sessionStorage.removeItem("admin_session");
   document.getElementById("loginOverlay").classList.remove("hidden");
   document.getElementById("dashboardContainer").classList.add("hidden");
+  console.log("[LOGIN] ✅ Logged out successfully");
 }
 
 function showDashboard() {
+  console.log("[LOGIN] 🎉 Showing dashboard");
   document.getElementById("loginOverlay").classList.add("hidden");
   document.getElementById("dashboardContainer").classList.remove("hidden");
 
   // Load initial data
+  console.log("[LOGIN] 📊 Loading initial bookings data");
   loadBookings();
 
   // Refresh icons
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
+  console.log("[LOGIN] ✅ Dashboard ready");
 }
 
 // Tab switching
@@ -169,6 +174,7 @@ function switchSection(section) {
 // ========== BOOKINGS ==========
 
 async function loadBookings() {
+  console.log("[BOOKINGS] 🔵 START loadBookings()");
   const status = document.getElementById("filterBookingStatus").value;
   const tbody = document.getElementById("bookingsTableBody");
 
@@ -177,8 +183,11 @@ async function loadBookings() {
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
+    console.log("[BOOKINGS] 📡 Fetching:", url, status ? `(Filter: ${status})` : "(No filter)");
     const response = await fetch(url);
+    console.log("[BOOKINGS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[BOOKINGS] 📦 Result:", result);
 
     if (result.success && result.data.length > 0) {
       tbody.innerHTML = result.data
@@ -252,20 +261,32 @@ async function loadBookings() {
 }
 
 async function updateBookingStatus(id, status) {
+  console.log(`[BOOKINGS] 🔵 START updateBookingStatus(${id}, "${status}")`);
   try {
-    const response = await fetch(`${API_BASE}/bookings/${id}`, {
+    const url = `${API_BASE}/bookings/${id}`;
+    const data = { status };
+    console.log("[BOOKINGS] 📡 PATCH:", url, "Data:", data);
+    
+    const response = await fetch(url, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(data),
     });
-
+    
+    console.log("[BOOKINGS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[BOOKINGS] 📦 Result:", result);
+    
     if (result.success) {
-      alert("Status berhasil diupdate");
+      alert("✅ Status booking berhasil diupdate");
+      console.log("[BOOKINGS] ✅ Status updated successfully");
+    } else {
+      alert("❌ Gagal update status: " + (result.error || "Unknown error"));
+      console.error("[BOOKINGS] ❌ Failed:", result.error);
     }
   } catch (error) {
-    console.error("Error updating status:", error);
-    alert("Gagal update status");
+    console.error("[BOOKINGS] ❌ EXCEPTION:", error);
+    alert("❌ Error update status: " + error.message);
   }
 }
 
@@ -277,13 +298,18 @@ function viewBookingDetail(id) {
 // ========== INSIGHT (ARTICLES) ==========
 
 async function loadArticles() {
+  console.log("[ARTICLES] 🔵 START loadArticles()");
   const grid = document.getElementById("articlesGrid");
   grid.innerHTML =
     '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/insight`);
+    const url = `${API_BASE}/insight`;
+    console.log("[ARTICLES] 📡 Fetching:", url);
+    const response = await fetch(url);
+    console.log("[ARTICLES] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[ARTICLES] 📦 Result:", result);
 
     if (result.success && result.data.length > 0) {
       grid.innerHTML = result.data
@@ -371,6 +397,7 @@ function closeArticleModal() {
 
 async function handleArticleSubmit(e) {
   e.preventDefault();
+  console.log("[ARTICLES] 🔵 START handleArticleSubmit()");
 
   const id = document.getElementById("articleId").value;
   const data = {
@@ -384,6 +411,7 @@ async function handleArticleSubmit(e) {
   try {
     const url = id ? `${API_BASE}/insight/${id}` : `${API_BASE}/insight`;
     const method = id ? "PATCH" : "POST";
+    console.log(`[ARTICLES] 📡 ${method}:`, url, "Data:", data);
 
     const response = await fetch(url, {
       method,
@@ -391,17 +419,22 @@ async function handleArticleSubmit(e) {
       body: JSON.stringify(data),
     });
 
+    console.log("[ARTICLES] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[ARTICLES] 📦 Result:", result);
+    
     if (result.success) {
-      alert(id ? "Artikel berhasil diupdate" : "Artikel berhasil dibuat");
+      alert(id ? "✅ Artikel berhasil diupdate" : "✅ Artikel berhasil dibuat");
+      console.log("[ARTICLES] ✅ Success");
       closeArticleModal();
       loadArticles();
     } else {
-      alert(result.error || "Gagal menyimpan artikel");
+      alert("❌ Gagal menyimpan artikel: " + (result.error || "Unknown error"));
+      console.error("[ARTICLES] ❌ Failed:", result.error);
     }
   } catch (error) {
-    console.error("Error saving article:", error);
-    alert("Gagal menyimpan artikel");
+    console.error("[ARTICLES] ❌ EXCEPTION:", error);
+    alert("❌ Error menyimpan artikel: " + error.message);
   }
 }
 
@@ -449,16 +482,20 @@ async function deleteArticle(id) {
 // ========== EVENTS ==========
 
 async function loadEvents() {
+  console.log("[EVENTS] 🔵 START loadEvents()");
   const grid = document.getElementById("eventsGrid");
   grid.innerHTML =
     '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
 
   try {
     // Admin: includeInactive=true to see all events (active & inactive)
-    const response = await fetch(
-      `${API_BASE}/events?limit=100&includeInactive=true`
-    );
+    const url = `${API_BASE}/events?limit=100&includeInactive=true`;
+    console.log("[EVENTS] 📡 Fetching:", url);
+    
+    const response = await fetch(url);
+    console.log("[EVENTS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[EVENTS] 📦 Result:", result);
 
     if (result.success && result.data.length > 0) {
       grid.innerHTML = result.data
@@ -552,6 +589,7 @@ function closeEventModal() {
 
 async function handleEventSubmit(e) {
   e.preventDefault();
+  console.log("[EVENTS] 🔵 START handleEventSubmit()");
 
   const id = document.getElementById("eventId").value;
   const data = {
@@ -566,6 +604,7 @@ async function handleEventSubmit(e) {
   try {
     const url = id ? `${API_BASE}/events/${id}` : `${API_BASE}/events`;
     const method = id ? "PATCH" : "POST";
+    console.log(`[EVENTS] 📡 ${method}:`, url, "Data:", data);
 
     const response = await fetch(url, {
       method,
@@ -573,27 +612,32 @@ async function handleEventSubmit(e) {
       body: JSON.stringify(data),
     });
 
+    console.log("[EVENTS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[EVENTS] 📦 Result:", result);
+    
     if (result.success) {
-      alert(id ? "Event berhasil diupdate" : "Event berhasil dibuat");
+      alert(id ? "✅ Event berhasil diupdate" : "✅ Event berhasil dibuat");
+      console.log("[EVENTS] ✅ Success, closing modal and reloading...");
       closeEventModal();
       loadEvents();
     } else {
-      alert(result.error || "Gagal menyimpan event");
+      alert("❌ Gagal menyimpan event: " + (result.error || "Unknown error"));
+      console.error("[EVENTS] ❌ Failed:", result.error);
     }
   } catch (error) {
-    console.error("Error saving event:", error);
-    alert("Gagal menyimpan event");
-  }
-}
-
+    console.error("[EVENTS] ❌ EXCEPTION:", error);
 async function editEvent(id) {
+  console.log(`[EVENTS] 🔵 START editEvent(${id})`);
   try {
     // Admin: includeInactive=true to edit inactive events
-    const response = await fetch(
-      `${API_BASE}/events/${id}?includeInactive=true`
-    );
+    const url = `${API_BASE}/events/${id}?includeInactive=true`;
+    console.log("[EVENTS] 📡 Fetching:", url);
+    
+    const response = await fetch(url);
+    console.log("[EVENTS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[EVENTS] 📦 Result:", result);
 
     if (result.success) {
       const event = result.data;
@@ -606,43 +650,62 @@ async function editEvent(id) {
         event.description || "";
       document.getElementById("eventLink").value = event.link || "";
 
+      console.log("[EVENTS] ✅ Event loaded, opening modal");
       openEventModal(id);
+    } else {
+      alert("❌ Gagal memuat event: " + (result.error || "Unknown error"));
+      console.error("[EVENTS] ❌ Failed:", result.error);
     }
   } catch (error) {
-    console.error("Error loading event:", error);
-    alert("Gagal memuat event");
-  }
-}
-
+    console.error("[EVENTS] ❌ EXCEPTION:", error);
 async function deleteEvent(id) {
-  if (!confirm("Yakin ingin menghapus event ini?")) return;
+  console.log(`[EVENTS] 🔵 START deleteEvent(${id})`);
+  if (!confirm("Yakin ingin menghapus event ini?")) {
+    console.log("[EVENTS] ⚠️ Delete cancelled by user");
+    return;
+  }
 
   try {
-    const response = await fetch(`${API_BASE}/events/${id}`, {
+    const url = `${API_BASE}/events/${id}`;
+    console.log("[EVENTS] 📡 DELETE:", url);
+    
+    const response = await fetch(url, {
       method: "DELETE",
     });
 
+    console.log("[EVENTS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[EVENTS] 📦 Result:", result);
+    
     if (result.success) {
-      alert("Event berhasil dihapus");
+      alert("✅ Event berhasil dihapus");
+      console.log("[EVENTS] ✅ Event deleted");
       loadEvents();
+    } else {
+      alert("❌ Gagal menghapus event: " + (result.error || "Unknown error"));
+      console.error("[EVENTS] ❌ Failed:", result.error);
     }
   } catch (error) {
-    console.error("Error deleting event:", error);
-    alert("Gagal menghapus event");
+    console.error("[EVENTS] ❌ EXCEPTION:", error);
+    alert("❌ Error menghapus event: " + error.message);
   }
 }
 
 // ========== COUPONS ==========
 
 async function loadCoupons() {
+  console.log("[COUPONS] 🔵 START loadCoupons()");
   const grid = document.getElementById("couponsGrid");
   grid.innerHTML =
     '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/coupons`);
+    const url = `${API_BASE}/coupons`;
+    console.log("[COUPONS] 📡 Fetching:", url);
+    const response = await fetch(url);
+    console.log("[COUPONS] 📥 Response status:", response.status, response.statusText);
     const result = await response.json();
+    console.log("[COUPONS] 📦 Result:", result);
 
     if (result.success && result.data.length > 0) {
       grid.innerHTML = result.data
