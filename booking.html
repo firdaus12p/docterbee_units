@@ -27,7 +27,7 @@
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="index.html" class="nav-link">Journey</a>
-          <a href="booking.html" class="nav-link" style="opacity: 1">Booking</a>
+          <a href="services.html" class="nav-link active">Services</a>
           <a href="events.html" class="nav-link">Events</a>
           <a href="insight.html" class="nav-link">Insight</a>
           <a href="media.html" class="nav-link">Media</a>
@@ -61,7 +61,7 @@
         </div>
         <nav class="mobile-menu-nav">
           <a href="index.html" class="mobile-nav-link">Journey</a>
-          <a href="booking.html" class="mobile-nav-link">Booking</a>
+          <a href="services.html" class="mobile-nav-link active">Services</a>
           <a href="events.html" class="mobile-nav-link">Events</a>
           <a href="insight.html" class="mobile-nav-link">Insight</a>
           <a href="media.html" class="mobile-nav-link">Media</a>
@@ -81,6 +81,25 @@
         Pilih cabang, praktisi, tanggal, dan jam. *Demo ini hanya simulasi UI
         tanpa pembayaran.*
       </p>
+
+      <!-- Selected Service Indicator -->
+      <div
+        id="serviceIndicator"
+        class="mb-6 hidden rounded-2xl border-2 border-amber-400/40 bg-gradient-to-r from-amber-900/20 to-slate-900/60 p-4"
+      >
+        <div class="flex items-center gap-3">
+          <i data-lucide="check-circle" class="w-5 h-5 text-amber-400"></i>
+          <div>
+            <div class="text-xs text-slate-300/70 mb-1">
+              Layanan yang dipilih:
+            </div>
+            <div
+              id="serviceIndicatorText"
+              class="text-lg font-semibold text-amber-300"
+            ></div>
+          </div>
+        </div>
+      </div>
 
       <div class="grid gap-6 md:grid-cols-3">
         <!-- Booking Form -->

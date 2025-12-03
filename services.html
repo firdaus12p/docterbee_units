@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docterbee – Layanan & Praktisi</title>
+
+    <!-- External Stylesheets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-slate-950 text-slate-100">
+    <!-- Header Navigation (Consistent with other pages) -->
+    <header
+      class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+    >
+      <div
+        class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="logo-box"></div>
+          <span class="font-semibold">Docterbee</span>
+        </a>
+        <nav class="hidden md:flex gap-6 text-sm">
+          <a href="index.html" class="nav-link">Journey</a>
+          <a href="services.html" class="nav-link active">Services</a>
+          <a href="events.html" class="nav-link">Events</a>
+          <a href="insight.html" class="nav-link">Insight</a>
+          <a href="media.html" class="nav-link">Media</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <span class="points-display"> Points: <b id="navPoints">0</b> </span>
+          <button
+            id="hamburgerBtn"
+            class="md:hidden hamburger-btn"
+            aria-label="Toggle menu"
+          >
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div
+        class="p-6 border-b border-slate-800 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-2">
+          <div class="logo-box"></div>
+          <span class="font-semibold">Docterbee</span>
+        </div>
+        <button id="closeMenuBtn" aria-label="Close menu">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <nav class="p-6 flex flex-col gap-4">
+        <a
+          href="index.html"
+          class="text-base hover:text-amber-400 transition-colors"
+          >Journey</a
+        >
+        <a href="services.html" class="text-base text-amber-400 font-semibold"
+          >Services</a
+        >
+        <a
+          href="events.html"
+          class="text-base hover:text-amber-400 transition-colors"
+          >Events</a
+        >
+        <a
+          href="insight.html"
+          class="text-base hover:text-amber-400 transition-colors"
+          >Insight</a
+        >
+        <a
+          href="media.html"
+          class="text-base hover:text-amber-400 transition-colors"
+          >Media</a
+        >
+      </nav>
+      <div class="p-6 border-t border-slate-800">
+        <div class="points-display text-center">
+          Points: <b id="mobilePoints">0</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="mx-auto max-w-6xl px-4 md:px-6 py-10">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">Layanan & Praktisi</h1>
+        <p class="text-slate-300/85">
+          Pilih layanan kesehatan berbasis Qur'an, Sunnah, dan framework NBSN
+        </p>
+      </div>
+
+      <!-- Filter & Services Grid -->
+      <div class="grid gap-6 lg:grid-cols-4">
+        <!-- Sidebar Filter -->
+        <aside
+          class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 text-sm h-fit"
+        >
+          <div class="font-semibold mb-3 flex items-center gap-2">
+            <i data-lucide="filter" class="w-4 h-4"></i>
+            Filter Layanan
+          </div>
+
+          <!-- Branch Filter -->
+          <label class="block mb-3">
+            <span class="text-slate-300/85 text-xs mb-1 block">Cabang</span>
+            <select
+              id="branchFilter"
+              class="w-full rounded-lg bg-slate-900/60 border border-slate-800 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none"
+            >
+              <option value="all">Semua Cabang</option>
+              <option value="kolaka">Kolaka</option>
+              <option value="makassar">Makassar</option>
+              <option value="kendari">Kendari</option>
+            </select>
+          </label>
+
+          <!-- Mode Filter -->
+          <label class="block mb-3">
+            <span class="text-slate-300/85 text-xs mb-1 block">Mode</span>
+            <select
+              id="modeFilter"
+              class="w-full rounded-lg bg-slate-900/60 border border-slate-800 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none"
+            >
+              <option value="all">Semua Mode</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
+          </label>
+
+          <!-- Category Filter -->
+          <div class="mt-4">
+            <div class="font-semibold mb-2 text-xs text-slate-300/85">
+              Kategori
+            </div>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="catManual"
+                  checked
+                  class="rounded text-amber-400"
+                />
+                <label
+                  for="catManual"
+                  class="text-slate-300/85 text-sm cursor-pointer"
+                  >Manual Therapy</label
+                >
+              </li>
+              <li class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="catKlinis"
+                  checked
+                  class="rounded text-amber-400"
+                />
+                <label
+                  for="catKlinis"
+                  class="text-slate-300/85 text-sm cursor-pointer"
+                  >Konsultasi Klinis</label
+                >
+              </li>
+              <li class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="catNutrisi"
+                  checked
+                  class="rounded text-amber-400"
+                />
+                <label
+                  for="catNutrisi"
+                  class="text-slate-300/85 text-sm cursor-pointer"
+                  >Nutrisi & Gizi</label
+                >
+              </li>
+              <li class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="catKeluarga"
+                  checked
+                  class="rounded text-amber-400"
+                />
+                <label
+                  for="catKeluarga"
+                  class="text-slate-300/85 text-sm cursor-pointer"
+                  >Keluarga & Parenting</label
+                >
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Services Grid -->
+        <section class="lg:col-span-3 grid gap-4 md:grid-cols-2">
+          <!-- Service Card: Bekam -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-amber-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">Bekam Profesional</div>
+              <span
+                class="text-xs rounded-full bg-amber-400/10 border border-amber-400/40 px-2 py-1 text-amber-300"
+                >Manual</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Terapi hijamah sesuai SOP medis & hygiene. Berdasarkan hadis
+              shahih.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+              <span>Kolaka, Makassar</span>
+            </div>
+            <a
+              href="booking.html?service=Bekam%20Profesional"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Pijat Refleksi -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-amber-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">Pijat Refleksi</div>
+              <span
+                class="text-xs rounded-full bg-amber-400/10 border border-amber-400/40 px-2 py-1 text-amber-300"
+                >Manual</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Refleksi kaki & titik akupresur untuk relaksasi dan sirkulasi
+              darah.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+              <span>Semua cabang</span>
+            </div>
+            <a
+              href="booking.html?service=Pijat%20Refleksi"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Ahli Gizi -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-emerald-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">
+                Ahli Gizi – Praktisi Docterbee
+              </div>
+              <span
+                class="text-xs rounded-full bg-emerald-400/10 border border-emerald-400/40 px-2 py-1 text-emerald-300"
+                >Nutrisi</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Rencana makan sesuai sunnah Nabi & prinsip biokimia nutrisi.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span>Online & Offline</span>
+            </div>
+            <a
+              href="booking.html?service=Ahli%20Gizi"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Konsultasi Kehamilan -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-emerald-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">Konsultasi Kehamilan</div>
+              <span
+                class="text-xs rounded-full bg-emerald-400/10 border border-emerald-400/40 px-2 py-1 text-emerald-300"
+                >Maternal</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Edukasi Quranic care untuk ibu hamil & gizi seimbang.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span>Online & Offline</span>
+            </div>
+            <a
+              href="booking.html?service=Konsultasi%20Kehamilan"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Perawat -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-sky-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">Perawat – Home Care</div>
+              <span
+                class="text-xs rounded-full bg-sky-400/10 border border-sky-400/40 px-2 py-1 text-sky-300"
+                >Klinis</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Perawatan dasar di rumah, monitoring harian pasien.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="home" class="w-3.5 h-3.5"></i>
+              <span>Home visit</span>
+            </div>
+            <a
+              href="booking.html?service=Perawat%20Home%20Care"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Psikolog -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-fuchsia-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">
+                Psikolog – Praktisi Docterbee
+              </div>
+              <span
+                class="text-xs rounded-full bg-fuchsia-400/10 border border-fuchsia-400/40 px-2 py-1 text-fuchsia-300"
+                >Mind</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Regulasi emosi, parenting Islami, dan produktivitas.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span>Online & Offline</span>
+            </div>
+            <a
+              href="booking.html?service=Psikolog"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Dokter Umum -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-sky-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">Dokter Umum</div>
+              <span
+                class="text-xs rounded-full bg-sky-400/10 border border-sky-400/40 px-2 py-1 text-sky-300"
+                >Klinis</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Konsultasi kesehatan umum terpadu dengan pendekatan holistik.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span>Online & Offline</span>
+            </div>
+            <a
+              href="booking.html?service=Dokter%20Umum"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Service Card: Spesialis -->
+          <div
+            class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-sky-400/40 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">
+                Spesialis – Praktisi Docterbee
+              </div>
+              <span
+                class="text-xs rounded-full bg-sky-400/10 border border-sky-400/40 px-2 py-1 text-sky-300"
+                >Klinis</span
+              >
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              Kolaborasi dokter spesialis dengan Qur'anic lifestyle counseling.
+            </p>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span>Online & Offline</span>
+            </div>
+            <a
+              href="booking.html?service=Spesialis"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+
+          <!-- Featured Program: Full Width -->
+          <div
+            class="service-card md:col-span-2 rounded-2xl border-2 border-emerald-400/40 bg-gradient-to-br from-emerald-900/20 to-slate-900/60 p-6 hover:border-emerald-400/60 transition-all"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="text-xl font-bold mb-1">
+                  Family Practitioner Certification
+                </div>
+                <span
+                  class="text-xs rounded-full bg-emerald-400/10 border border-emerald-400/40 px-2 py-1 text-emerald-300"
+                  >Program Sertifikasi</span
+                >
+              </div>
+              <i data-lucide="award" class="w-8 h-8 text-emerald-400"></i>
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4 leading-relaxed">
+              Program sertifikasi keluarga untuk menjadi
+              <b>praktisi kesehatan rumah</b>—berbasis Qur'an, Sunnah, dan sains
+              modern. Cocok untuk ibu rumah tangga, pendidik, dan siapa saja
+              yang ingin menjaga kesehatan keluarga secara mandiri.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="text-xs bg-slate-800 rounded-full px-3 py-1"
+                >12 Minggu</span
+              >
+              <span class="text-xs bg-slate-800 rounded-full px-3 py-1"
+                >Online + Offline</span
+              >
+              <span class="text-xs bg-slate-800 rounded-full px-3 py-1"
+                >Sertifikat Resmi</span
+              >
+            </div>
+            <a
+              href="booking.html?service=Family%20Practitioner%20Certification"
+              class="inline-flex items-center gap-2 rounded-lg bg-emerald-400 text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-emerald-500 transition-colors"
+            >
+              <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+              Daftar Program
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="mt-16 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+    >
+      <p>
+        © <span id="year"></span> Docterbee – Kesehatan berbasis Qur'an & Sunnah
+      </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+      // Initialize year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Initialize Lucide icons
+      if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
+
+      // Initialize mobile menu
+      if (typeof initMobileMenu === "function") {
+        initMobileMenu();
+      }
+
+      // Refresh navigation points
+      if (typeof refreshNav === "function") {
+        refreshNav();
+      }
+    </script>
+  </body>
+</html>

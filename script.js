@@ -697,6 +697,7 @@ function init() {
  */
 const bookingState = {
   selectedTime: null,
+  serviceName: null,
 };
 
 /**
@@ -786,28 +787,33 @@ function updateBookingSummary() {
   const dateFormatted = dateRaw ? formatDateIndo(dateRaw) : "(belum dipilih)";
   const mode = document.getElementById("mode")?.value || "";
   const time = bookingState.selectedTime || "(belum dipilih)";
+  const service = bookingState.serviceName || "(belum dipilih)";
 
   summaryEl.innerHTML = `
     <div class="grid md:grid-cols-2 gap-3">
       <div class="summary-card">
-        <b>Cabang</b>
-        <div class="opacity-80">${escapeHtml(branch)}</div>
+        <b>Layanan</b>
+        <div class="opacity-80">${escapeHtml(service)}</div>
       </div>
       <div class="summary-card">
-        <b>Praktisi</b>
-        <div class="opacity-80">${escapeHtml(practitioner)}</div>
+        <b>Mode</b>
+        <div class="opacity-80">${escapeHtml(mode)}</div>
+      </div>
+      <div class="summary-card">
+        <b>Cabang</b>
+        <div class="opacity-80">${escapeHtml(branch)}</div>
       </div>
       <div class="summary-card">
         <b>Tanggal</b>
         <div class="opacity-80">${dateFormatted}</div>
       </div>
       <div class="summary-card">
+        <b>Praktisi</b>
+        <div class="opacity-80">${escapeHtml(practitioner)}</div>
+      </div>
+      <div class="summary-card">
         <b>Jam</b>
         <div class="opacity-80">${time}</div>
-      </div>
-      <div class="summary-card md:col-span-2">
-        <b>Mode</b>
-        <div class="opacity-80">${escapeHtml(mode)}</div>
       </div>
     </div>
   `;
@@ -831,10 +837,12 @@ function confirmBooking() {
   const mode = document.getElementById("mode")?.value || "";
   const time = bookingState.selectedTime;
   const dateFormatted = formatDateIndo(dateRaw);
+  const service = bookingState.serviceName || "";
 
   // Create WhatsApp message
   const message =
     `*BOOKING PRAKTISI DOCTERBEE*\n\n` +
+    `Layanan: ${service}\n` +
     `Cabang: ${branch}\n` +
     `Praktisi: ${practitioner}\n` +
     `Tanggal: ${dateFormatted}\n` +
@@ -872,6 +880,23 @@ function resetBookingForm() {
  * Initialize booking page
  */
 function initBooking() {
+  // Read service parameter from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const serviceParam = urlParams.get("service");
+  if (serviceParam) {
+    bookingState.serviceName = decodeURIComponent(serviceParam);
+
+    // Show service indicator
+    const serviceIndicator = document.getElementById("serviceIndicator");
+    const serviceIndicatorText = document.getElementById(
+      "serviceIndicatorText"
+    );
+    if (serviceIndicator && serviceIndicatorText) {
+      serviceIndicatorText.textContent = bookingState.serviceName;
+      serviceIndicator.classList.remove("hidden");
+    }
+  }
+
   // Set current year in footer
   const yearElement = document.getElementById("year");
   if (yearElement) {
