@@ -849,7 +849,7 @@ header {
   background: linear-gradient(135deg, rgb(15 23 42 / 0.8), rgb(30 41 59 / 0.5));
   padding: 1.25rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.3s ease;
   animation: slideUp 0.6s ease-out backwards;
 }
