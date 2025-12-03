@@ -47,6 +47,11 @@ async function initializeTables() {
         booking_date DATE NOT NULL,
         booking_time VARCHAR(20) NOT NULL,
         mode ENUM('online', 'offline') NOT NULL,
+        customer_name VARCHAR(255) DEFAULT NULL,
+        customer_phone VARCHAR(20) DEFAULT NULL,
+        customer_age INT DEFAULT NULL,
+        customer_gender ENUM('Laki-laki', 'Perempuan') DEFAULT NULL,
+        customer_address TEXT DEFAULT NULL,
         promo_code VARCHAR(50) DEFAULT NULL,
         discount_amount DECIMAL(10, 2) DEFAULT 0,
         status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
@@ -55,10 +60,37 @@ async function initializeTables() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_date (booking_date),
         INDEX idx_status (status),
-        INDEX idx_branch (branch)
+        INDEX idx_branch (branch),
+        INDEX idx_customer_phone (customer_phone)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: bookings");
+
+    // Check and add customer columns if not exist
+    try {
+      const [columns] = await connection.query(
+        "SHOW COLUMNS FROM bookings LIKE 'customer_name'"
+      );
+
+      if (columns.length === 0) {
+        console.log("⚙️  Adding customer columns to bookings table...");
+
+        await connection.query(`
+          ALTER TABLE bookings
+          ADD COLUMN customer_name VARCHAR(255) DEFAULT NULL AFTER mode,
+          ADD COLUMN customer_phone VARCHAR(20) DEFAULT NULL AFTER customer_name,
+          ADD COLUMN customer_age INT DEFAULT NULL AFTER customer_phone,
+          ADD COLUMN customer_gender ENUM('Laki-laki', 'Perempuan') DEFAULT NULL AFTER customer_age,
+          ADD COLUMN customer_address TEXT DEFAULT NULL AFTER customer_gender,
+          ADD INDEX idx_customer_phone (customer_phone)
+        `);
+
+        console.log("✅ Customer columns added successfully");
+      }
+    } catch (alterError) {
+      // If ALTER fails, it might be because columns already exist or other issues
+      console.log("ℹ️  Customer columns check:", alterError.message);
+    }
 
     // Create events table
     await connection.query(`

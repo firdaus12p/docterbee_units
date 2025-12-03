@@ -104,6 +104,72 @@
       <div class="grid gap-6 md:grid-cols-3">
         <!-- Booking Form -->
         <div class="booking-container space-y-4 md:col-span-2">
+          <!-- Data Pribadi -->
+          <div class="mb-4">
+            <div class="text-sm font-semibold text-amber-300 mb-3">
+              Data Pribadi
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <label class="booking-label">
+                Nama Lengkap <span class="text-red-400">*</span>
+                <input
+                  id="customerName"
+                  type="text"
+                  class="booking-input"
+                  placeholder="Nama lengkap Anda"
+                  required
+                />
+              </label>
+              <label class="booking-label">
+                No. HP / WhatsApp <span class="text-red-400">*</span>
+                <input
+                  id="customerPhone"
+                  type="tel"
+                  class="booking-input"
+                  placeholder="08xx-xxxx-xxxx"
+                  required
+                />
+              </label>
+            </div>
+            <div class="grid md:grid-cols-3 gap-3 mt-3">
+              <label class="booking-label">
+                Umur <span class="text-red-400">*</span>
+                <input
+                  id="customerAge"
+                  type="number"
+                  min="1"
+                  max="150"
+                  class="booking-input"
+                  placeholder="Tahun"
+                  required
+                />
+              </label>
+              <label class="booking-label">
+                Jenis Kelamin <span class="text-red-400">*</span>
+                <select id="customerGender" class="booking-select" required>
+                  <option value="">Pilih...</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </label>
+              <label class="booking-label md:col-span-1"> &nbsp; </label>
+            </div>
+            <label class="booking-label mt-3">
+              Alamat Lengkap <span class="text-red-400">*</span>
+              <textarea
+                id="customerAddress"
+                rows="2"
+                class="booking-input"
+                placeholder="Jalan, Kelurahan, Kecamatan, Kota/Kabupaten"
+                required
+              ></textarea>
+            </label>
+          </div>
+
+          <!-- Data Booking -->
+          <div class="text-sm font-semibold text-amber-300 mb-3">
+            Detail Booking
+          </div>
           <div class="grid md:grid-cols-2 gap-3">
             <label class="booking-label">
               Cabang
@@ -176,7 +242,8 @@
             <b>Kebijakan</b>
           </div>
           <ul class="list-disc pl-5 text-slate-300/85 space-y-1">
-            <li>Konfirmasi akan dikirim via WhatsApp.</li>
+            <li>Data Anda akan disimpan dengan aman.</li>
+            <li>Admin akan follow up melalui WhatsApp.</li>
             <li>Batal minimal 6 jam sebelum jadwal.</li>
             <li>Untuk keadaan darurat, hubungi cabang terkait.</li>
           </ul>

@@ -82,6 +82,11 @@ router.post("/", async (req, res) => {
       date,
       time,
       mode,
+      customerName,
+      customerPhone,
+      customerAge,
+      customerGender,
+      customerAddress,
       promoCode,
       notes,
     } = req.body;
@@ -92,6 +97,28 @@ router.post("/", async (req, res) => {
         success: false,
         error: "Data booking tidak lengkap",
       });
+    }
+
+    // Validate customer data if provided
+    if (
+      customerName ||
+      customerPhone ||
+      customerAge ||
+      customerGender ||
+      customerAddress
+    ) {
+      if (
+        !customerName ||
+        !customerPhone ||
+        !customerAge ||
+        !customerGender ||
+        !customerAddress
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Data pribadi harus diisi lengkap",
+        });
+      }
     }
 
     // Calculate discount if promo code provided
@@ -125,8 +152,8 @@ router.post("/", async (req, res) => {
     // Insert booking
     const result = await query(
       `INSERT INTO bookings 
-       (service_name, branch, practitioner, booking_date, booking_time, mode, promo_code, discount_amount, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (service_name, branch, practitioner, booking_date, booking_time, mode, customer_name, customer_phone, customer_age, customer_gender, customer_address, promo_code, discount_amount, notes)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         serviceName,
         branch,
@@ -134,6 +161,11 @@ router.post("/", async (req, res) => {
         date,
         time,
         mode,
+        customerName || null,
+        customerPhone || null,
+        customerAge || null,
+        customerGender || null,
+        customerAddress || null,
         promoCode || null,
         discountAmount,
         notes || null,
@@ -151,6 +183,11 @@ router.post("/", async (req, res) => {
         date,
         time,
         mode,
+        customerName,
+        customerPhone,
+        customerAge,
+        customerGender,
+        customerAddress,
         promoCode,
         discountAmount,
       },

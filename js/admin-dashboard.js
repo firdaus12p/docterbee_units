@@ -173,7 +173,7 @@ async function loadBookings() {
   const tbody = document.getElementById("bookingsTableBody");
 
   tbody.innerHTML =
-    '<tr><td colspan="9" class="text-center p-6 text-slate-400">Loading...</td></tr>';
+    '<tr><td colspan="11" class="text-center p-6 text-slate-400">Loading...</td></tr>';
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
@@ -199,6 +199,19 @@ async function loadBookings() {
             }">
               ${booking.mode}
             </span>
+          </td>
+          <td class="p-3">${escapeHtml(booking.customer_name || "-")}</td>
+          <td class="p-3">
+            ${
+              booking.customer_phone
+                ? `<a href="https://wa.me/${booking.customer_phone.replace(
+                    /[^0-9]/g,
+                    ""
+                  )}" target="_blank" class="text-emerald-400 hover:text-emerald-300">${escapeHtml(
+                    booking.customer_phone
+                  )}</a>`
+                : "-"
+            }
           </td>
           <td class="p-3">
             <select 
@@ -242,12 +255,12 @@ async function loadBookings() {
       });
     } else {
       tbody.innerHTML =
-        '<tr><td colspan="9" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
+        '<tr><td colspan="11" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
     }
   } catch (error) {
     console.error("Error loading bookings:", error);
     tbody.innerHTML =
-      '<tr><td colspan="9" class="text-center p-6 text-red-400">Error loading data</td></tr>';
+      '<tr><td colspan="11" class="text-center p-6 text-red-400">Error loading data</td></tr>';
   }
 }
 
@@ -269,9 +282,134 @@ async function updateBookingStatus(id, status) {
   }
 }
 
-function viewBookingDetail(id) {
-  // TODO: Show modal with full booking details
-  alert(`Detail booking #${id}\n(Feature coming soon)`);
+async function viewBookingDetail(id) {
+  try {
+    const response = await fetch(`${API_BASE}/bookings/${id}`);
+    const result = await response.json();
+
+    if (!result.success) {
+      alert("Gagal memuat detail booking");
+      return;
+    }
+
+    const booking = result.data;
+    const detailHTML = `
+      <div class="text-left space-y-3">
+        <div>
+          <span class="text-slate-400 text-sm">ID Booking:</span>
+          <p class="font-semibold">#${booking.id}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Layanan:</span>
+          <p class="font-semibold">${escapeHtml(booking.service_name)}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Cabang:</span>
+          <p>${escapeHtml(booking.branch)}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Praktisi:</span>
+          <p>${escapeHtml(booking.practitioner)}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Tanggal & Waktu:</span>
+          <p>${formatDate(booking.booking_date)} - ${escapeHtml(
+      booking.booking_time
+    )}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Mode:</span>
+          <p class="capitalize">${escapeHtml(booking.mode)}</p>
+        </div>
+        ${
+          booking.customer_name
+            ? `
+        <hr class="border-slate-700">
+        <h4 class="font-semibold text-amber-400">Data Pribadi</h4>
+        <div>
+          <span class="text-slate-400 text-sm">Nama:</span>
+          <p>${escapeHtml(booking.customer_name)}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">No. HP:</span>
+          <p><a href="https://wa.me/${booking.customer_phone.replace(
+            /[^0-9]/g,
+            ""
+          )}" target="_blank" class="text-emerald-400 hover:text-emerald-300">${escapeHtml(
+                booking.customer_phone
+              )}</a></p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Umur:</span>
+          <p>${booking.customer_age} tahun</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Jenis Kelamin:</span>
+          <p>${escapeHtml(booking.customer_gender)}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Alamat:</span>
+          <p>${escapeHtml(booking.customer_address)}</p>
+        </div>
+        `
+            : ""
+        }
+        ${
+          booking.promo_code
+            ? `
+        <hr class="border-slate-700">
+        <div>
+          <span class="text-slate-400 text-sm">Kode Promo:</span>
+          <p class="font-semibold text-emerald-400">${escapeHtml(
+            booking.promo_code
+          )}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Diskon:</span>
+          <p>${booking.discount_amount}%</p>
+        </div>
+        `
+            : ""
+        }
+        ${
+          booking.notes
+            ? `
+        <div>
+          <span class="text-slate-400 text-sm">Catatan:</span>
+          <p>${escapeHtml(booking.notes)}</p>
+        </div>
+        `
+            : ""
+        }
+        <div>
+          <span class="text-slate-400 text-sm">Status:</span>
+          <p class="capitalize font-semibold ${
+            booking.status === "completed"
+              ? "text-emerald-400"
+              : booking.status === "confirmed"
+              ? "text-blue-400"
+              : booking.status === "cancelled"
+              ? "text-red-400"
+              : "text-amber-400"
+          }">${escapeHtml(booking.status)}</p>
+        </div>
+        <div>
+          <span class="text-slate-400 text-sm">Dibuat:</span>
+          <p class="text-sm">${formatDate(booking.created_at)}</p>
+        </div>
+      </div>
+    `;
+
+    alert(
+      detailHTML
+        .replace(/<[^>]*>/g, "\n")
+        .replace(/\n+/g, "\n")
+        .trim()
+    );
+  } catch (error) {
+    console.error("Error loading booking detail:", error);
+    alert("Error memuat detail booking");
+  }
 }
 
 // ========== INSIGHT (ARTICLES) ==========
