@@ -25,7 +25,7 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 
 - **`css/style.css`**: 1669 lines (Header: 119, Hero: 227, Booking: 697, Events: 1102, Insight: 1200, Media: 1339)
 - **`js/script.js`**: 1860 lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Page inits: 664+)
-- **`js/admin-dashboard.js`**: 781 lines for admin (Auth check: line 18, Login: 90, Tab switching: 117)
+- **`js/admin-dashboard.js`**: 875 lines for admin (Auth check: line 18, Event listeners: 50-92, Tab switching: 117)
 
 **All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or `js/admin-dashboard.js` for admin)
 
@@ -59,6 +59,20 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 </button>
 // Attached via: attachUnitEventListeners() using addEventListener
 ```
+
+**CRITICAL BUG PATTERN** - Modal functions with optional parameters:
+
+```javascript
+// ❌ WRONG - Event object passed as parameter:
+.addEventListener("click", openCouponModal);
+// This passes PointerEvent to openCouponModal(id = null), causing "[object PointerEvent]" in URLs
+
+// ✅ CORRECT - Wrap in arrow function:
+.addEventListener("click", () => openCouponModal());
+// This ensures id parameter receives undefined, triggering default null value
+```
+
+**Applied in admin-dashboard.js** (lines 54, 68, 82): `openArticleModal()`, `openEventModal()`, `openCouponModal()`
 
 **Exception**: `insight.html` uses inline `onclick="summarizeArticle(0)"` on article buttons (legacy pattern, accepted)
 
@@ -239,10 +253,32 @@ npm start
 ### Common Commands
 
 - `npm start` - Production mode (backend server)
-- `npm run dev` - Development mode with auto-reload
+- `npm run dev` - Development mode with auto-reload (Node v18+ with --watch flag)
 - `npm run old-server` - Fallback to legacy server.mjs (no database)
 - `Get-Process node | Stop-Process` - PowerShell: Kill all Node processes
 - `netstat -ano | Select-String ":3000"` - PowerShell: Check port usage
+
+### Debugging Tips
+
+**Browser DevTools Network Tab**: Check for `[object PointerEvent]` in request URLs - indicates event object passed incorrectly as function parameter
+
+**Console Logging**: Add strategic console.logs in event handlers to trace data flow:
+
+```javascript
+console.log(
+  "Form submit - ID field value:",
+  document.getElementById("couponId").value
+);
+```
+
+**MCP Playwright Integration**: Use browser automation tools for real-world testing:
+
+```javascript
+// Check network requests after form submit
+const requests = await page.evaluate(() =>
+  performance.getEntriesByType("resource")
+);
+```
 
 ## Page-Specific Patterns
 
@@ -296,6 +332,37 @@ npm start
 - Insight: `loadArticles()`, `openArticleModal()`, `handleArticleSubmit()`, `deleteArticle()`
 - Coupons: `loadCoupons()`, `openCouponModal()`, `handleCouponSubmit()`, `deleteCoupon()`
 
+## Testing & Validation
+
+### Browser Automation Testing
+
+Use MCP Playwright for end-to-end testing of CRUD operations:
+
+```javascript
+// Example: Test coupon creation flow
+await page.click('[data-section="coupons"]');
+await page.click("#btnNewCoupon");
+await page.fill("#couponCode", "TEST2025");
+await page.selectOption("#couponDiscountType", "percentage");
+await page.fill("#couponDiscountValue", "15");
+
+// Verify hidden ID field is empty (not event object!)
+const couponId = await page.inputValue("#couponId");
+console.log("couponId before submit:", couponId); // Should be ""
+
+// Submit and check for success alert
+page.once("dialog", (dialog) => dialog.accept());
+await page.click('#couponForm button[type="submit"]');
+```
+
+### Common Test Scenarios
+
+1. **Login flow**: `admin/docterbee2025` → verify dashboard loads
+2. **Create operations**: Test all 3 types (coupon/event/article) for `[object PointerEvent]` bug
+3. **Edit operations**: Verify modal pre-fills with existing data
+4. **Network inspection**: Check PATCH/POST URLs don't contain event objects
+5. **localStorage state**: Verify `db_units`, `db_points` persist correctly
+
 ## Common Pitfalls to Avoid
 
 1. ❌ Don't add inline onclick handlers to HTML (except `summarizeArticle()` on insight page buttons)
@@ -308,6 +375,7 @@ npm start
 8. ❌ Don't forget `initMobileMenu()` call when creating new pages
 9. ❌ Don't assume MySQL default port 3306 - this project uses 3307 (XAMPP config)
 10. ❌ Don't use `require()` in backend - this project uses ES Modules (`import/export`)
+11. ❌ Don't pass functions directly to addEventListener if they have optional parameters - use arrow functions
 
 ## Project Structure
 
@@ -325,7 +393,7 @@ docterbee_units/
 │   └── style.css        # 1669 lines, component-organized
 ├── js/                  # Organized JavaScript
 │   ├── script.js        # 1860 lines, public pages logic
-│   └── admin-dashboard.js # 781 lines, admin CRUD
+│   └── admin-dashboard.js # 875 lines, admin CRUD
 ├── docs/                # All documentation
 │   ├── QUICKSTART.md
 │   ├── SETUP_GUIDE.md
