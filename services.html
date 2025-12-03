@@ -47,50 +47,31 @@
     </header>
 
     <!-- Mobile Menu Overlay -->
-    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
 
     <!-- Mobile Menu Drawer -->
     <div id="mobileMenu" class="mobile-menu">
-      <div
-        class="p-6 border-b border-slate-800 flex items-center justify-between"
-      >
-        <div class="flex items-center gap-2">
-          <div class="logo-box"></div>
-          <span class="font-semibold">Docterbee</span>
-        </div>
-        <button id="closeMenuBtn" aria-label="Close menu">
-          <i data-lucide="x" class="w-5 h-5"></i>
+      <div class="mobile-menu-header">
+        <span class="font-semibold">Menu</span>
+        <button
+          id="closeMobileMenu"
+          class="close-menu-btn"
+          aria-label="Close menu"
+        >
+          <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
-      <nav class="p-6 flex flex-col gap-4">
-        <a
-          href="index.html"
-          class="text-base hover:text-amber-400 transition-colors"
-          >Journey</a
-        >
-        <a href="services.html" class="text-base text-amber-400 font-semibold"
-          >Services</a
-        >
-        <a
-          href="events.html"
-          class="text-base hover:text-amber-400 transition-colors"
-          >Events</a
-        >
-        <a
-          href="insight.html"
-          class="text-base hover:text-amber-400 transition-colors"
-          >Insight</a
-        >
-        <a
-          href="media.html"
-          class="text-base hover:text-amber-400 transition-colors"
-          >Media</a
-        >
+      <nav class="mobile-menu-nav">
+        <a href="index.html" class="mobile-nav-link">Journey</a>
+        <a href="services.html" class="mobile-nav-link">Services</a>
+        <a href="events.html" class="mobile-nav-link">Events</a>
+        <a href="insight.html" class="mobile-nav-link">Insight</a>
+        <a href="media.html" class="mobile-nav-link">Media</a>
       </nav>
-      <div class="p-6 border-t border-slate-800">
-        <div class="points-display text-center">
-          Points: <b id="mobilePoints">0</b>
-        </div>
+      <div class="mobile-menu-footer">
+        <span class="points-display">
+          Points: <b id="mobileNavPoints">0</b>
+        </span>
       </div>
     </div>
 
