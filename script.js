@@ -698,7 +698,8 @@ function init() {
 const bookingState = {
   selectedTime: null,
   serviceName: null,
-};
+  validatedCoupon: null,
+};;
 
 /**
  * Generate time slots for booking
@@ -838,20 +839,35 @@ function confirmBooking() {
   const time = bookingState.selectedTime;
   const dateFormatted = formatDateIndo(dateRaw);
   const service = bookingState.serviceName || "";
+  const promoCode = document.getElementById("promoCode")?.value.trim().toUpperCase() || "";
 
   // Create WhatsApp message
-  const message =
+  let message =
     `*BOOKING PRAKTISI DOCTERBEE*\n\n` +
     `Layanan: ${service}\n` +
     `Cabang: ${branch}\n` +
     `Praktisi: ${practitioner}\n` +
     `Tanggal: ${dateFormatted}\n` +
     `Jam: ${time}\n` +
-    `Mode: ${mode}\n\n` +
-    `Mohon konfirmasi ketersediaan jadwal. Terima kasih! 🙏`;
+    `Mode: ${mode}\n`;
+  
+  if (promoCode) {
+    message += `Kode Promo: ${promoCode}\n`;
+  }
+  
+  message += `\nMohon konfirmasi ketersediaan jadwal. Terima kasih! 🙏`;
 
   // WhatsApp number (remove + and spaces)
   const phoneNumber = "6282188080688";
+
+  // Save to database first (async, don't block WhatsApp)
+  saveBookingToDatabase().then(saved => {
+    if (saved) {
+      console.log('✅ Booking tersimpan ke database');
+    } else {
+      console.log('⚠️ Booking tidak tersimpan ke database (tetap dikirim ke WhatsApp)');
+    }
+  });
 
   // Create WhatsApp URL
   const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
@@ -860,6 +876,126 @@ function confirmBooking() {
 
   // Open WhatsApp in new tab
   window.open(whatsappURL, "_blank");
+}
+
+
+// Validate promo code
+async function validatePromoCode() {
+  const promoCodeInput = document.getElementById('promoCode');
+  const promoResult = document.getElementById('promoResult');
+  const code = promoCodeInput?.value.trim();
+
+  if (!code) {
+    promoResult.className = 'text-sm text-slate-400';
+    promoResult.textContent = 'Masukkan kode promo terlebih dahulu';
+    promoResult.classList.remove('hidden');
+    return;
+  }
+
+  promoResult.className = 'text-sm text-slate-400';
+  promoResult.textContent = 'Memvalidasi...';
+  promoResult.classList.remove('hidden');
+
+  try {
+    const response = await fetch('http://localhost:3000/api/coupons/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code.toUpperCase() })
+    });
+
+    const result = await response.json();
+
+    if (result.success && result.valid) {
+      promoResult.className = 'text-sm text-emerald-400 bg-emerald-900/20 p-3 rounded-lg';
+      promoResult.innerHTML = `
+        <div class="flex items-center gap-2 mb-1">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <b>Kode promo valid!</b>
+        </div>
+        <div class="text-xs opacity-80">${escapeHtml(result.data.description || '')}</div>
+        <div class="mt-1">
+          Diskon: <b>${result.data.discountType === 'percentage' ? result.data.discountValue + '%' : 'Rp ' + result.data.discountValue.toLocaleString()}</b>
+        </div>
+      `;
+      
+      // Refresh icons
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      // Store validated coupon
+      bookingState.validatedCoupon = result.data;
+    } else {
+      promoResult.className = 'text-sm text-red-400 bg-red-900/20 p-3 rounded-lg';
+      promoResult.innerHTML = `
+        <div class="flex items-center gap-2">
+          <i data-lucide="x-circle" class="w-4 h-4"></i>
+          <span>${escapeHtml(result.error || 'Kode promo tidak valid')}</span>
+        </div>
+      `;
+      
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      bookingState.validatedCoupon = null;
+    }
+  } catch (error) {
+    console.error('Error validating promo:', error);
+    promoResult.className = 'text-sm text-red-400 bg-red-900/20 p-3 rounded-lg';
+    promoResult.textContent = 'Gagal memvalidasi kode promo. Pastikan server backend berjalan.';
+    bookingState.validatedCoupon = null;
+  }
+
+  promoResult.classList.remove('hidden');
+}
+
+// Save booking to database
+async function saveBookingToDatabase() {
+  const dateRaw = document.getElementById('date')?.value;
+  const branch = document.getElementById('branch')?.value || '';
+  const practitioner = document.getElementById('pract')?.value || '';
+  const mode = document.getElementById('mode')?.value || '';
+  const promoCode = document.getElementById('promoCode')?.value.trim().toUpperCase() || null;
+  const time = bookingState.selectedTime;
+  const service = bookingState.serviceName || '';
+
+  if (!dateRaw || !time) {
+    return false;
+  }
+
+  // Extract mode value (remove text in parentheses)
+  const modeValue = mode.toLowerCase().includes('online') ? 'online' : 'offline';
+
+  try {
+    const response = await fetch('http://localhost:3000/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        serviceName: service,
+        branch: branch,
+        practitioner: practitioner,
+        date: dateRaw,
+        time: time,
+        mode: modeValue,
+        promoCode: promoCode
+      })
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log('✅ Booking berhasil disimpan ke database:', result.data);
+      return true;
+    } else {
+      console.error('❌ Gagal menyimpan booking:', result.error);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Error saat menyimpan booking:', error);
+    // Don't block WhatsApp if DB save fails
+    return false;
+  }
 }
 
 /**
@@ -940,6 +1076,12 @@ function initBooking() {
     resetBtn.addEventListener("click", resetBookingForm);
   }
 
+  // Validate promo button
+  const validatePromoBtn = document.getElementById("btnValidatePromo");
+  if (validatePromoBtn) {
+    validatePromoBtn.addEventListener("click", validatePromoCode);
+  }
+
   // Update summary when form fields change
   const formFields = ["branch", "pract", "date", "mode"];
   formFields.forEach((fieldId) => {
@@ -1012,39 +1154,67 @@ const EVENTS_DATA = [
 /**
  * Render events based on filters
  */
-function renderEvents() {
+async function renderEvents() {
   const modeFilter = document.getElementById("eventMode")?.value || "all";
   const topicFilter = document.getElementById("eventTopic")?.value || "all";
   const eventsContainer = document.getElementById("events");
 
   if (!eventsContainer) return;
 
-  eventsContainer.innerHTML = "";
+  eventsContainer.innerHTML = '<div class="col-span-2 text-center text-slate-400 p-6">Loading events...</div>';
 
-  const filteredEvents = EVENTS_DATA.filter(
-    (e) =>
-      (modeFilter === "all" || e.mode === modeFilter) &&
-      (topicFilter === "all" || e.topic === topicFilter)
-  );
+  try {
+    // Build query params
+    let url = 'http://localhost:3000/api/events?limit=50';
+    if (modeFilter !== 'all') {
+      url += `&mode=${modeFilter}`;
+    }
+    if (topicFilter !== 'all') {
+      url += `&topic=${topicFilter}`;
+    }
 
-  filteredEvents.forEach((event) => {
-    const card = document.createElement("div");
-    card.className = "event-card";
-    card.innerHTML = `
-      <div class="text-lg font-semibold">${escapeHtml(event.title)}</div>
-      <div class="text-xs text-amber-300 mt-1">${escapeHtml(
-        event.mode.toUpperCase()
-      )} · ${escapeHtml(event.topic)}</div>
-      <div class="text-sm text-slate-400 mt-1">${escapeHtml(
-        event.date
-      )} — ${escapeHtml(event.host)}</div>
-      <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(event.brief)}</p>
-      <div class="mt-3 flex gap-2">
-        <a href="booking.html" class="btn-primary-sm">Daftar</a>
-        <button class="btn-secondary-sm">Detail</button>
-      </div>
-    `;
-    eventsContainer.appendChild(card);
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (!result.success || result.data.length === 0) {
+      eventsContainer.innerHTML = '<div class="col-span-2 text-center text-slate-400 p-6">Belum ada event tersedia</div>';
+      return;
+    }
+
+    eventsContainer.innerHTML = "";
+
+    result.data.forEach((event) => {
+      const card = document.createElement("div");
+      card.className = "event-card";
+      card.innerHTML = `
+        <div class="text-lg font-semibold">${escapeHtml(event.title)}</div>
+        <div class="text-xs text-amber-300 mt-1">${escapeHtml(
+          event.mode.toUpperCase()
+        )} · ${escapeHtml(event.topic)}</div>
+        <div class="text-sm text-slate-400 mt-1">${formatEventDate(event.event_date)}</div>
+        <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(event.description || 'Event kesehatan Islami bersama Docterbee')}</p>
+        <div class="mt-3 flex gap-2">
+          <a href="booking.html?service=${encodeURIComponent(event.title)}" class="btn-primary-sm">Daftar</a>
+          ${event.link ? `<a href="${escapeHtml(event.link)}" target="_blank" class="btn-secondary-sm">Link</a>` : ''}
+        </div>
+      `;
+      eventsContainer.appendChild(card);
+    });
+  } catch (error) {
+    console.error('Error loading events:', error);
+    eventsContainer.innerHTML = '<div class="col-span-2 text-center text-red-400 p-6">Gagal memuat events. Pastikan server backend berjalan.</div>';
+  }
+}
+
+// Helper to format event date
+function formatEventDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 }
 
@@ -1117,26 +1287,40 @@ const INSIGHT_DATA = [
 /**
  * Render insight articles
  */
-function renderInsightArticles() {
+async function renderInsightArticles() {
   const articlesContainer = document.getElementById("articles");
   if (!articlesContainer) return;
 
-  articlesContainer.innerHTML = "";
+  articlesContainer.innerHTML = '<div class="col-span-3 text-center text-slate-400 p-6">Loading articles...</div>';
 
-  INSIGHT_DATA.forEach((article, index) => {
-    const card = document.createElement("div");
-    card.className = "article-card";
-    card.innerHTML = `
-      <div class="text-lg font-semibold">${escapeHtml(article.title)}</div>
-      <div class="text-xs text-amber-300 mt-1">${escapeHtml(article.tag)}</div>
-      <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(article.brief)}</p>
-      <div class="mt-3 flex gap-2">
-        <button onclick="summarizeArticle(${index})" class="btn-primary-sm">Ringkas & Rekomendasi</button>
-        <button class="btn-secondary-sm">Baca Lengkap</button>
-      </div>
-    `;
-    articlesContainer.appendChild(card);
-  });
+  try {
+    const response = await fetch('http://localhost:3000/api/insight?limit=20');
+    const result = await response.json();
+
+    if (!result.success || result.data.length === 0) {
+      articlesContainer.innerHTML = '<div class="col-span-3 text-center text-slate-400 p-6">Belum ada artikel tersedia</div>';
+      return;
+    }
+
+    articlesContainer.innerHTML = "";
+
+    result.data.forEach((article) => {
+      const card = document.createElement("div");
+      card.className = "article-card";
+      card.innerHTML = `
+        <div class="text-lg font-semibold">${escapeHtml(article.title)}</div>
+        <div class="text-xs text-amber-300 mt-1">${escapeHtml(article.tags || 'Article')}</div>
+        <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(article.excerpt || article.content.substring(0, 150) + '...')}</p>
+        <div class="mt-3 flex gap-2">
+          <button onclick="summarizeArticleById('${escapeHtml(article.slug)}')" class="btn-primary-sm">Ringkas & Rekomendasi</button>
+        </div>
+      `;
+      articlesContainer.appendChild(card);
+    });
+  } catch (error) {
+    console.error('Error loading articles:', error);
+    articlesContainer.innerHTML = '<div class="col-span-3 text-center text-red-400 p-6">Gagal memuat articles. Pastikan server backend berjalan.</div>';
+  }
 }
 
 /**
@@ -1171,6 +1355,54 @@ function summarizeArticle(index) {
 
   // Add points for reading insight
   addPoints(2);
+}
+
+
+// Summarize article by slug (load from API)
+async function summarizeArticleById(slug) {
+  const resultContainer = document.getElementById("insightResult");
+
+  if (!resultContainer) return;
+
+  resultContainer.innerHTML = '<p class="text-slate-400">Loading article...</p>';
+
+  try {
+    const response = await fetch(`http://localhost:3000/api/insight/${slug}`);
+    const result = await response.json();
+
+    if (!result.success) {
+      resultContainer.innerHTML = '<p class="text-red-400">Artikel tidak ditemukan</p>';
+      return;
+    }
+
+    const article = result.data;
+
+    const nbsnHTML = `
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="nbsn-card">
+          <div class="font-semibold mb-1">Ringkasan</div>
+          <p class="text-slate-200/85">${escapeHtml(article.excerpt || article.content.substring(0, 300) + '...')}</p>
+        </div>
+        <div class="nbsn-card">
+          <div class="font-semibold mb-1">Rekomendasi NBSN</div>
+          <ul class="list-disc pl-5 text-slate-200/85">
+            <li><b>Neuron:</b> catat emosi & syukur harian.</li>
+            <li><b>Biomolekul:</b> madu murni 1–2 sdm/hari, hidrasi cukup.</li>
+            <li><b>Sensorik:</b> tidur 7–8 jam, paparan matahari pagi.</li>
+            <li><b>Nature:</b> puasa sunnah & kurangi gula rafinasi.</li>
+          </ul>
+        </div>
+      </div>
+    `;
+
+    resultContainer.innerHTML = nbsnHTML;
+
+    // Add points for reading insight
+    addPoints(2);
+  } catch (error) {
+    console.error('Error loading article:', error);
+    resultContainer.innerHTML = '<p class="text-red-400">Gagal memuat artikel</p>';
+  }
 }
 
 /**

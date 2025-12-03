@@ -1626,3 +1626,43 @@ header {
   display: block;
   margin-bottom: 0.25rem;
 }
+
+/* ========================================
+   Admin Dashboard Styles
+   ======================================== */
+
+.dashboard-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(30 41 59);
+  background-color: rgb(15 23 42 / 0.5);
+  color: rgb(203 213 225);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dashboard-tab:hover {
+  border-color: rgb(251 191 36 / 0.3);
+  background-color: rgb(30 41 59 / 0.5);
+}
+
+.dashboard-tab.active {
+  border-color: rgb(251 191 36);
+  background: linear-gradient(
+    135deg,
+    rgb(251 191 36 / 0.2),
+    rgb(251 191 36 / 0.05)
+  );
+  color: rgb(251 191 36);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+}
+
+.dashboard-section {
+  animation: fadeIn 0.3s ease-out;
+}

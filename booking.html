@@ -137,6 +137,25 @@
             </label>
           </div>
 
+          <div class="grid md:grid-cols-3 gap-3 items-end">
+            <label class="booking-label md:col-span-2">
+              Kode Promo (Opsional)
+              <input
+                id="promoCode"
+                type="text"
+                class="booking-input uppercase"
+                placeholder="Masukkan kode promo"
+              />
+            </label>
+            <button
+              id="btnValidatePromo"
+              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500 transition"
+            >
+              Validasi
+            </button>
+          </div>
+          <div id="promoResult" class="hidden text-sm"></div>
+
           <div>
             <div class="text-sm mb-2 opacity-80">Pilih Jam</div>
             <div id="slots" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>

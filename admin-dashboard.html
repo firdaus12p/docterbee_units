@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Docterbee</title>
+
+    <!-- External Stylesheets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-slate-950 text-slate-100">
+    <!-- Login Overlay (hidden after login) -->
+    <div
+      id="loginOverlay"
+      class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md"
+      >
+        <div class="flex items-center gap-3 mb-6">
+          <div class="logo-box"></div>
+          <div>
+            <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+            <p class="text-slate-400 text-sm">Docterbee Units</p>
+          </div>
+        </div>
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label class="block text-sm mb-2">Username</label>
+            <input
+              type="text"
+              id="loginUsername"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+              placeholder="admin"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">Password</label>
+            <input
+              type="password"
+              id="loginPassword"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+              placeholder="••••••"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500 transition"
+          >
+            Login
+          </button>
+          <p
+            id="loginError"
+            class="text-red-400 text-sm hidden text-center"
+          ></p>
+          <p class="text-slate-500 text-xs text-center">
+            Default: admin / docterbee2025
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Dashboard (hidden until login) -->
+    <div id="dashboardContainer" class="hidden">
+      <!-- Header Navigation -->
+      <header
+        class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+      >
+        <div
+          class="mx-auto max-w-7xl px-4 h-16 flex items-center justify-between"
+        >
+          <a href="index.html" class="flex items-center gap-2">
+            <div class="logo-box"></div>
+            <span class="font-semibold">Docterbee Admin</span>
+          </a>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-slate-400">Administrator</span>
+            <button
+              id="logoutBtn"
+              class="text-sm bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="mx-auto max-w-7xl px-4 py-8">
+        <!-- Tab Navigation -->
+        <div class="flex gap-2 mb-6 overflow-x-auto">
+          <button class="dashboard-tab active" data-section="bookings">
+            <i data-lucide="calendar-check" class="w-4 h-4"></i>
+            Booking Monitor
+          </button>
+          <button class="dashboard-tab" data-section="insight">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            Insight Manager
+          </button>
+          <button class="dashboard-tab" data-section="events">
+            <i data-lucide="video" class="w-4 h-4"></i>
+            Events Manager
+          </button>
+          <button class="dashboard-tab" data-section="coupons">
+            <i data-lucide="tag" class="w-4 h-4"></i>
+            Coupon Manager
+          </button>
+        </div>
+
+        <!-- Section: Booking Monitor -->
+        <section id="section-bookings" class="dashboard-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Booking Monitor</h2>
+            <div class="flex gap-2">
+              <select
+                id="filterBookingStatus"
+                class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm"
+              >
+                <option value="">Semua Status</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button
+                id="refreshBookings"
+                class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+          <div class="booking-container overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-900 border-b border-slate-800">
+                <tr>
+                  <th class="text-left p-3">ID</th>
+                  <th class="text-left p-3">Layanan</th>
+                  <th class="text-left p-3">Cabang</th>
+                  <th class="text-left p-3">Praktisi</th>
+                  <th class="text-left p-3">Tanggal</th>
+                  <th class="text-left p-3">Waktu</th>
+                  <th class="text-left p-3">Mode</th>
+                  <th class="text-left p-3">Status</th>
+                  <th class="text-left p-3">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="bookingsTableBody">
+                <tr>
+                  <td colspan="9" class="text-center p-6 text-slate-400">
+                    Loading...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section: Insight Manager -->
+        <section id="section-insight" class="dashboard-section hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Insight Manager</h2>
+            <button
+              id="btnNewArticle"
+              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+            >
+              + Artikel Baru
+            </button>
+          </div>
+          <div
+            id="articlesGrid"
+            class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+          >
+            <div class="booking-container p-6 text-center text-slate-400">
+              Loading...
+            </div>
+          </div>
+
+          <!-- Article Form Modal -->
+          <div
+            id="articleModal"
+            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+          >
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold" id="articleModalTitle">
+                  Artikel Baru
+                </h3>
+                <button
+                  id="closeArticleModal"
+                  class="text-slate-400 hover:text-slate-200"
+                >
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+              </div>
+              <form id="articleForm" class="space-y-4">
+                <input type="hidden" id="articleId" />
+                <div>
+                  <label class="block text-sm mb-2">Judul</label>
+                  <input
+                    type="text"
+                    id="articleTitle"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Slug (URL)</label>
+                  <input
+                    type="text"
+                    id="articleSlug"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="contoh-artikel"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Excerpt (Ringkasan)</label>
+                  <textarea
+                    id="articleExcerpt"
+                    rows="2"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  ></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Konten</label>
+                  <textarea
+                    id="articleContent"
+                    rows="8"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    required
+                  ></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm mb-2"
+                    >Tags (pisah dengan koma)</label
+                  >
+                  <input
+                    type="text"
+                    id="articleTags"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Nutrisi,Ibadah,Kebiasaan"
+                  />
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    type="submit"
+                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    id="cancelArticle"
+                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Events Manager -->
+        <section id="section-events" class="dashboard-section hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Events Manager</h2>
+            <button
+              id="btnNewEvent"
+              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+            >
+              + Event Baru
+            </button>
+          </div>
+          <div id="eventsGrid" class="grid gap-4 md:grid-cols-2">
+            <div class="booking-container p-6 text-center text-slate-400">
+              Loading...
+            </div>
+          </div>
+
+          <!-- Event Form Modal -->
+          <div
+            id="eventModal"
+            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+          >
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold" id="eventModalTitle">
+                  Event Baru
+                </h3>
+                <button
+                  id="closeEventModal"
+                  class="text-slate-400 hover:text-slate-200"
+                >
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+              </div>
+              <form id="eventForm" class="space-y-4">
+                <input type="hidden" id="eventId" />
+                <div>
+                  <label class="block text-sm mb-2">Judul Event</label>
+                  <input
+                    type="text"
+                    id="eventTitle"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm mb-2">Tanggal</label>
+                    <input
+                      type="date"
+                      id="eventDate"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Mode</label>
+                    <select
+                      id="eventMode"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    >
+                      <option value="online">Online</option>
+                      <option value="offline">Offline</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Topik</label>
+                  <select
+                    id="eventTopic"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    required
+                  >
+                    <option value="quranic">Qur'anic Lifestyle</option>
+                    <option value="nutrition">Nutrisi</option>
+                    <option value="science">Sains</option>
+                    <option value="parenting">Parenting</option>
+                    <option value="productivity">Produktivitas</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Deskripsi</label>
+                  <textarea
+                    id="eventDescription"
+                    rows="3"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  ></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Link (Zoom/Lokasi)</label>
+                  <input
+                    type="text"
+                    id="eventLink"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="https://zoom.us/... atau alamat lokasi"
+                  />
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    type="submit"
+                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    id="cancelEvent"
+                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Coupon Manager -->
+        <section id="section-coupons" class="dashboard-section hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Coupon Manager</h2>
+            <button
+              id="btnNewCoupon"
+              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+            >
+              + Kode Promo Baru
+            </button>
+          </div>
+          <div
+            id="couponsGrid"
+            class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+          >
+            <div class="booking-container p-6 text-center text-slate-400">
+              Loading...
+            </div>
+          </div>
+
+          <!-- Coupon Form Modal -->
+          <div
+            id="couponModal"
+            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+          >
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold" id="couponModalTitle">
+                  Kode Promo Baru
+                </h3>
+                <button
+                  id="closeCouponModal"
+                  class="text-slate-400 hover:text-slate-200"
+                >
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+              </div>
+              <form id="couponForm" class="space-y-4">
+                <input type="hidden" id="couponId" />
+                <div>
+                  <label class="block text-sm mb-2">Kode Promo</label>
+                  <input
+                    type="text"
+                    id="couponCode"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none uppercase"
+                    placeholder="WELCOME2025"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Deskripsi</label>
+                  <input
+                    type="text"
+                    id="couponDescription"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Diskon selamat datang 15%"
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm mb-2">Tipe Diskon</label>
+                    <select
+                      id="couponDiscountType"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    >
+                      <option value="percentage">Percentage (%)</option>
+                      <option value="fixed">Fixed (Rp)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Nilai Diskon</label>
+                    <input
+                      type="number"
+                      id="couponDiscountValue"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="15"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Max Uses (kosongkan = unlimited)</label
+                    >
+                    <input
+                      type="number"
+                      id="couponMaxUses"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="100"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Expires At</label>
+                    <input
+                      type="datetime-local"
+                      id="couponExpiresAt"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="couponIsActive"
+                    class="w-4 h-4"
+                    checked
+                  />
+                  <label class="text-sm">Aktif</label>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    type="submit"
+                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    id="cancelCoupon"
+                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer
+        class="mt-10 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+      >
+        © <span id="year"></span> Docterbee Admin Dashboard
+      </footer>
+    </div>
+
+    <!-- External Scripts -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="admin-dashboard.js"></script>
+  </body>
+</html>
