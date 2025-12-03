@@ -3,6 +3,24 @@ import { query, queryOne } from "../db.mjs";
 
 const router = express.Router();
 
+// Service price mapping (dalam Rupiah)
+const SERVICE_PRICES = {
+  "Bekam Profesional": 150000,
+  "Pijat Refleksi": 100000,
+  "Ahli Gizi": 200000,
+  "Konsultasi Kehamilan": 250000,
+  "Perawat Home Care": 300000,
+  Psikolog: 350000,
+  "Dokter Umum": 150000,
+  Spesialis: 500000,
+  "Family Practitioner Certification": 2000000,
+};
+
+// Helper function to get service price
+function getServicePrice(serviceName) {
+  return SERVICE_PRICES[serviceName] || 0;
+}
+
 // GET /api/bookings - List all bookings with optional filters
 router.get("/", async (req, res) => {
   try {
@@ -121,8 +139,13 @@ router.post("/", async (req, res) => {
       }
     }
 
+    // Get service price
+    const price = getServicePrice(serviceName);
+
     // Calculate discount if promo code provided
     let discountAmount = 0;
+    let finalPrice = price;
+
     if (promoCode) {
       const coupon = await queryOne(
         `SELECT * FROM coupons 
@@ -134,12 +157,15 @@ router.post("/", async (req, res) => {
       );
 
       if (coupon) {
-        // Simple discount calculation (can be enhanced)
+        // Calculate discount in Rupiah
         if (coupon.discount_type === "percentage") {
-          discountAmount = coupon.discount_value; // Store percentage value
+          discountAmount = Math.round((price * coupon.discount_value) / 100);
         } else {
-          discountAmount = coupon.discount_value; // Store fixed amount
+          discountAmount = coupon.discount_value;
         }
+
+        // Calculate final price
+        finalPrice = Math.max(0, price - discountAmount);
 
         // Increment usage count
         await query(
@@ -152,8 +178,8 @@ router.post("/", async (req, res) => {
     // Insert booking
     const result = await query(
       `INSERT INTO bookings 
-       (service_name, branch, practitioner, booking_date, booking_time, mode, customer_name, customer_phone, customer_age, customer_gender, customer_address, promo_code, discount_amount, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (service_name, branch, practitioner, booking_date, booking_time, mode, price, customer_name, customer_phone, customer_age, customer_gender, customer_address, promo_code, discount_amount, final_price, notes)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         serviceName,
         branch,
@@ -161,6 +187,7 @@ router.post("/", async (req, res) => {
         date,
         time,
         mode,
+        price,
         customerName || null,
         customerPhone || null,
         customerAge || null,
@@ -168,6 +195,7 @@ router.post("/", async (req, res) => {
         customerAddress || null,
         promoCode || null,
         discountAmount,
+        finalPrice,
         notes || null,
       ]
     );
@@ -183,6 +211,7 @@ router.post("/", async (req, res) => {
         date,
         time,
         mode,
+        price,
         customerName,
         customerPhone,
         customerAge,
@@ -190,6 +219,7 @@ router.post("/", async (req, res) => {
         customerAddress,
         promoCode,
         discountAmount,
+        finalPrice,
       },
     });
   } catch (error) {
@@ -254,6 +284,36 @@ router.patch("/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal mengupdate booking",
+    });
+  }
+});
+
+// GET /api/bookings/prices/:serviceName - Get service price
+router.get("/prices/:serviceName", (req, res) => {
+  try {
+    const { serviceName } = req.params;
+    const decodedServiceName = decodeURIComponent(serviceName);
+    const price = getServicePrice(decodedServiceName);
+
+    if (price === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Service tidak ditemukan atau harga belum tersedia",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        serviceName: decodedServiceName,
+        price,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting service price:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil harga service",
     });
   }
 });

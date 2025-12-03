@@ -173,7 +173,7 @@ async function loadBookings() {
   const tbody = document.getElementById("bookingsTableBody");
 
   tbody.innerHTML =
-    '<tr><td colspan="11" class="text-center p-6 text-slate-400">Loading...</td></tr>';
+    '<tr><td colspan="13" class="text-center p-6 text-slate-400">Loading...</td></tr>';
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
@@ -210,6 +210,32 @@ async function loadBookings() {
                   )}" target="_blank" class="text-emerald-400 hover:text-emerald-300">${escapeHtml(
                     booking.customer_phone
                   )}</a>`
+                : "-"
+            }
+          </td>
+          <td class="p-3 text-slate-300">
+            ${
+              booking.price
+                ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price)
+                : "-"
+            }
+            ${
+              booking.discount_amount > 0
+                ? '<div class="text-xs text-red-400">- Rp ' +
+                  new Intl.NumberFormat("id-ID").format(
+                    booking.discount_amount
+                  ) +
+                  "</div>"
+                : ""
+            }
+          </td>
+          <td class="p-3 font-semibold text-amber-300">
+            ${
+              booking.final_price
+                ? "Rp " +
+                  new Intl.NumberFormat("id-ID").format(booking.final_price)
+                : booking.price
+                ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price)
                 : "-"
             }
           </td>
@@ -255,12 +281,12 @@ async function loadBookings() {
       });
     } else {
       tbody.innerHTML =
-        '<tr><td colspan="11" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
+        '<tr><td colspan="13" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
     }
   } catch (error) {
     console.error("Error loading bookings:", error);
     tbody.innerHTML =
-      '<tr><td colspan="11" class="text-center p-6 text-red-400">Error loading data</td></tr>';
+      '<tr><td colspan="13" class="text-center p-6 text-red-400">Error loading data</td></tr>';
   }
 }
 
@@ -322,6 +348,38 @@ async function viewBookingDetail(id) {
           <p class="capitalize">${escapeHtml(booking.mode)}</p>
         </div>
         ${
+          booking.price
+            ? `
+        <hr class="border-slate-700">
+        <h4 class="font-semibold text-amber-400">Rincian Harga</h4>
+        <div>
+          <span class="text-slate-400 text-sm">Harga Layanan:</span>
+          <p class="font-semibold">Rp ${new Intl.NumberFormat("id-ID").format(
+            booking.price
+          )}</p>
+        </div>
+        ${
+          booking.discount_amount > 0
+            ? `
+        <div>
+          <span class="text-slate-400 text-sm">Diskon:</span>
+          <p class="text-red-400">- Rp ${new Intl.NumberFormat("id-ID").format(
+            booking.discount_amount
+          )}</p>
+        </div>
+        `
+            : ""
+        }
+        <div>
+          <span class="text-slate-400 text-sm">Total Bayar:</span>
+          <p class="font-bold text-lg text-amber-300">Rp ${new Intl.NumberFormat(
+            "id-ID"
+          ).format(booking.final_price || booking.price)}</p>
+        </div>
+        `
+            : ""
+        }
+        ${
           booking.customer_name
             ? `
         <hr class="border-slate-700">
@@ -357,16 +415,11 @@ async function viewBookingDetail(id) {
         ${
           booking.promo_code
             ? `
-        <hr class="border-slate-700">
         <div>
           <span class="text-slate-400 text-sm">Kode Promo:</span>
           <p class="font-semibold text-emerald-400">${escapeHtml(
             booking.promo_code
           )}</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Diskon:</span>
-          <p>${booking.discount_amount}%</p>
         </div>
         `
             : ""

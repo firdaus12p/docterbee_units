@@ -222,6 +222,34 @@
           </div>
           <div id="promoResult" class="hidden text-sm"></div>
 
+          <!-- Price Summary -->
+          <div
+            id="priceSummary"
+            class="hidden bg-gradient-to-r from-slate-900/60 to-slate-800/60 rounded-xl p-4 border border-slate-700"
+          >
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-slate-300">Harga Layanan:</span>
+              <span id="displayPrice" class="font-semibold text-lg">Rp 0</span>
+            </div>
+            <div
+              id="discountRow"
+              class="hidden flex justify-between items-center mb-2 text-emerald-400"
+            >
+              <span>Diskon:</span>
+              <span id="displayDiscount" class="font-semibold">- Rp 0</span>
+            </div>
+            <div
+              class="flex justify-between items-center pt-2 border-t border-slate-700"
+            >
+              <span class="text-amber-300 font-semibold">Total Bayar:</span>
+              <span
+                id="displayFinalPrice"
+                class="font-bold text-2xl text-amber-300"
+                >Rp 0</span
+              >
+            </div>
+          </div>
+
           <div>
             <div class="text-sm mb-2 opacity-80">Pilih Jam</div>
             <div id="slots" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>

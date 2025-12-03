@@ -699,6 +699,9 @@ const bookingState = {
   selectedTime: null,
   serviceName: null,
   validatedCoupon: null,
+  price: 0,
+  discountAmount: 0,
+  finalPrice: 0,
 };
 
 /**
@@ -968,6 +971,9 @@ async function validatePromoCode() {
 
       // Store validated coupon
       bookingState.validatedCoupon = result.data;
+
+      // Update price display with discount
+      updatePriceDisplay();
     } else {
       promoResult.className =
         "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
@@ -983,6 +989,9 @@ async function validatePromoCode() {
       }
 
       bookingState.validatedCoupon = null;
+
+      // Update price display (remove discount)
+      updatePriceDisplay();
     }
   } catch (error) {
     console.error("Error validating promo:", error);
@@ -990,6 +999,9 @@ async function validatePromoCode() {
     promoResult.textContent =
       "Gagal memvalidasi kode promo. Pastikan server backend berjalan.";
     bookingState.validatedCoupon = null;
+
+    // Update price display (remove discount)
+    updatePriceDisplay();
   }
 
   promoResult.classList.remove("hidden");
@@ -1072,6 +1084,86 @@ async function saveBookingToDatabase() {
 /**
  * Reset booking form
  */
+// Load service price from API
+async function loadServicePrice(serviceName) {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/bookings/prices/${encodeURIComponent(
+        serviceName
+      )}`
+    );
+    const result = await response.json();
+
+    if (result.success) {
+      bookingState.price = result.data.price;
+      updatePriceDisplay();
+    } else {
+      console.error("Failed to load price:", result.error);
+      bookingState.price = 0;
+    }
+  } catch (error) {
+    console.error("Error loading service price:", error);
+    bookingState.price = 0;
+  }
+}
+
+// Update price display with discount calculation
+function updatePriceDisplay() {
+  const priceSummary = document.getElementById("priceSummary");
+  const displayPrice = document.getElementById("displayPrice");
+  const discountRow = document.getElementById("discountRow");
+  const displayDiscount = document.getElementById("displayDiscount");
+  const displayFinalPrice = document.getElementById("displayFinalPrice");
+
+  if (!bookingState.price || bookingState.price === 0) {
+    priceSummary?.classList.add("hidden");
+    return;
+  }
+
+  // Show price summary
+  priceSummary?.classList.remove("hidden");
+
+  // Format price
+  const formattedPrice = new Intl.NumberFormat("id-ID").format(
+    bookingState.price
+  );
+  displayPrice.textContent = `Rp ${formattedPrice}`;
+
+  // Calculate discount if coupon is validated
+  let discountAmount = 0;
+  let finalPrice = bookingState.price;
+
+  if (bookingState.validatedCoupon) {
+    const coupon = bookingState.validatedCoupon;
+    if (coupon.discountType === "percentage") {
+      discountAmount = Math.round(
+        (bookingState.price * coupon.discountValue) / 100
+      );
+    } else {
+      discountAmount = coupon.discountValue;
+    }
+    finalPrice = Math.max(0, bookingState.price - discountAmount);
+
+    // Show discount row
+    discountRow?.classList.remove("hidden");
+    const formattedDiscount = new Intl.NumberFormat("id-ID").format(
+      discountAmount
+    );
+    displayDiscount.textContent = `- Rp ${formattedDiscount}`;
+  } else {
+    // Hide discount row
+    discountRow?.classList.add("hidden");
+  }
+
+  // Display final price
+  const formattedFinalPrice = new Intl.NumberFormat("id-ID").format(finalPrice);
+  displayFinalPrice.textContent = `Rp ${formattedFinalPrice}`;
+
+  // Store for later use
+  bookingState.discountAmount = discountAmount;
+  bookingState.finalPrice = finalPrice;
+}
+
 function resetBookingForm() {
   const dateInput = document.getElementById("date");
   if (dateInput) {
@@ -1102,6 +1194,9 @@ function initBooking() {
       serviceIndicatorText.textContent = bookingState.serviceName;
       serviceIndicator.classList.remove("hidden");
     }
+
+    // Load and display price
+    loadServicePrice(bookingState.serviceName);
   }
 
   // Set current year in footer

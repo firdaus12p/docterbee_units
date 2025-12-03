@@ -47,13 +47,15 @@ async function initializeTables() {
         booking_date DATE NOT NULL,
         booking_time VARCHAR(20) NOT NULL,
         mode ENUM('online', 'offline') NOT NULL,
+        price DECIMAL(10, 2) DEFAULT 0 COMMENT 'Harga asli service',
         customer_name VARCHAR(255) DEFAULT NULL,
         customer_phone VARCHAR(20) DEFAULT NULL,
         customer_age INT DEFAULT NULL,
         customer_gender ENUM('Laki-laki', 'Perempuan') DEFAULT NULL,
         customer_address TEXT DEFAULT NULL,
         promo_code VARCHAR(50) DEFAULT NULL,
-        discount_amount DECIMAL(10, 2) DEFAULT 0,
+        discount_amount DECIMAL(10, 2) DEFAULT 0 COMMENT 'Nilai diskon (Rp)',
+        final_price DECIMAL(10, 2) DEFAULT 0 COMMENT 'Harga setelah diskon',
         status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
         notes TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -90,6 +92,27 @@ async function initializeTables() {
     } catch (alterError) {
       // If ALTER fails, it might be because columns already exist or other issues
       console.log("ℹ️  Customer columns check:", alterError.message);
+    }
+
+    // Check and add price columns if not exist
+    try {
+      const [priceCol] = await connection.query(
+        "SHOW COLUMNS FROM bookings LIKE 'price'"
+      );
+
+      if (priceCol.length === 0) {
+        console.log("⚙️  Adding price columns to bookings table...");
+
+        await connection.query(`
+          ALTER TABLE bookings
+          ADD COLUMN price DECIMAL(10, 2) DEFAULT 0 COMMENT 'Harga asli service' AFTER mode,
+          ADD COLUMN final_price DECIMAL(10, 2) DEFAULT 0 COMMENT 'Harga setelah diskon' AFTER discount_amount
+        `);
+
+        console.log("✅ Price columns added successfully");
+      }
+    } catch (priceError) {
+      console.log("ℹ️  Price columns check:", priceError.message);
     }
 
     // Create events table
