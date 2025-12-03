@@ -89,6 +89,24 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("couponForm")
     .addEventListener("submit", handleCouponSubmit);
+
+  // Delete modal
+  document.getElementById("confirmDelete").addEventListener("click", () => {
+    if (deleteCallback) {
+      deleteCallback();
+      closeDeleteModal();
+    }
+  });
+  document
+    .getElementById("cancelDelete")
+    .addEventListener("click", closeDeleteModal);
+
+  // Close modal on overlay click
+  document.getElementById("deleteModal").addEventListener("click", (e) => {
+    if (e.target.id === "deleteModal") {
+      closeDeleteModal();
+    }
+  });
 });
 
 // Login handling
@@ -138,6 +156,9 @@ function showDashboard() {
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
+
+  // Check table overflow after a short delay to ensure DOM is ready
+  setTimeout(checkTableOverflow, 100);
 }
 
 // Tab switching
@@ -279,6 +300,9 @@ async function loadBookings() {
           viewBookingDetail(parseInt(id));
         });
       });
+
+      // Check if table actually overflows and adjust scrollbar visibility
+      checkTableOverflow();
     } else {
       tbody.innerHTML =
         '<tr><td colspan="13" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
@@ -287,6 +311,33 @@ async function loadBookings() {
     console.error("Error loading bookings:", error);
     tbody.innerHTML =
       '<tr><td colspan="13" class="text-center p-6 text-red-400">Error loading data</td></tr>';
+  }
+}
+
+// Helper function to check if table has overflow and manage scrollbar visibility
+function checkTableOverflow() {
+  const container = document.querySelector(
+    ".booking-container.overflow-x-auto"
+  );
+  if (container) {
+    const table = container.querySelector("table");
+    if (table) {
+      // Check if content width exceeds container width
+      const hasOverflow = table.scrollWidth > container.clientWidth;
+
+      // Add or remove a class to control scrollbar visibility
+      if (hasOverflow) {
+        container.style.overflowX = "auto";
+      } else {
+        container.style.overflowX = "hidden";
+      }
+    }
+  }
+
+  // Re-check on window resize
+  if (!window.hasOverflowListener) {
+    window.addEventListener("resize", checkTableOverflow);
+    window.hasOverflowListener = true;
   }
 }
 
@@ -806,22 +857,27 @@ async function editEvent(id) {
 }
 
 async function deleteEvent(id) {
-  if (!confirm("Yakin ingin menghapus event ini?")) return;
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus event ini secara permanen? Data event akan hilang selamanya dan tidak dapat dipulihkan.",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/events/${id}`, {
+          method: "DELETE",
+        });
 
-  try {
-    const response = await fetch(`${API_BASE}/events/${id}`, {
-      method: "DELETE",
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      alert("Event berhasil dihapus");
-      loadEvents();
+        const result = await response.json();
+        if (result.success) {
+          alert("Event berhasil dihapus permanen");
+          loadEvents();
+        } else {
+          alert(result.error || "Gagal menghapus event");
+        }
+      } catch (error) {
+        console.error("Error deleting event:", error);
+        alert("Gagal menghapus event");
+      }
     }
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    alert("Gagal menghapus event");
-  }
+  );
 }
 
 // ========== COUPONS ==========
@@ -1019,21 +1075,54 @@ async function editCoupon(id) {
 }
 
 async function deleteCoupon(id) {
-  if (!confirm("Yakin ingin menghapus kode promo ini?")) return;
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus kode promo ini secara permanen? Kode promo akan dihapus dari database dan tidak dapat dipulihkan.",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/coupons/${id}`, {
+          method: "DELETE",
+        });
 
-  try {
-    const response = await fetch(`${API_BASE}/coupons/${id}`, {
-      method: "DELETE",
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      alert("Kode promo berhasil dihapus");
-      loadCoupons();
+        const result = await response.json();
+        if (result.success) {
+          alert("Kode promo berhasil dihapus permanen");
+          loadCoupons();
+        } else {
+          alert(result.error || "Gagal menghapus kode promo");
+        }
+      } catch (error) {
+        console.error("Error deleting coupon:", error);
+        alert("Gagal menghapus kode promo");
+      }
     }
-  } catch (error) {
-    console.error("Error deleting coupon:", error);
-    alert("Gagal menghapus kode promo");
+  );
+}
+
+// ========== DELETE MODAL ==========
+
+let deleteCallback = null;
+
+function showDeleteModal(message, onConfirm) {
+  const modal = document.getElementById("deleteModal");
+  const messageEl = document.getElementById("deleteModalMessage");
+
+  if (modal && messageEl) {
+    messageEl.textContent = message;
+    modal.classList.remove("hidden");
+    deleteCallback = onConfirm;
+
+    // Refresh icons
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  }
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById("deleteModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    deleteCallback = null;
   }
 }
 

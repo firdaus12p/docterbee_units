@@ -1666,3 +1666,82 @@ header {
 .dashboard-section {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive table wrapper */
+/* Table wrapper - scrollbar only appears when content actually overflows */
+.booking-container.overflow-x-auto {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(51 65 85) transparent;
+}
+
+/* Custom scrollbar styling - thin and subtle */
+.booking-container.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.booking-container.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.booking-container.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgb(51 65 85);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.booking-container.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgb(71 85 105);
+}
+
+/* Hide scrollbar completely when content fits (no overflow) */
+@supports selector(::-webkit-scrollbar) {
+  .booking-container.overflow-x-auto {
+    scrollbar-width: auto;
+  }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .dashboard-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .booking-container table {
+    font-size: 0.75rem;
+  }
+
+  .booking-container table th,
+  .booking-container table td {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Delete modal animations */
+#deleteModal > div {
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

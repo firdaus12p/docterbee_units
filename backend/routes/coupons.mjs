@@ -277,8 +277,8 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Soft delete by setting is_active = 0
-    await query("UPDATE coupons SET is_active = 0 WHERE id = ?", [id]);
+    // Hard delete - permanently remove from database
+    await query("DELETE FROM coupons WHERE id = ?", [id]);
 
     res.json({
       success: true,

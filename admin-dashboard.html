@@ -78,13 +78,15 @@
         >
           <a href="index.html" class="flex items-center gap-2">
             <div class="logo-box"></div>
-            <span class="font-semibold">Docterbee Admin</span>
+            <span class="font-semibold hidden sm:inline">Docterbee Admin</span>
           </a>
-          <div class="flex items-center gap-4">
-            <span class="text-sm text-slate-400">Administrator</span>
+          <div class="flex items-center gap-2 sm:gap-4">
+            <span class="text-xs sm:text-sm text-slate-400 hidden md:inline"
+              >Administrator</span
+            >
             <button
               id="logoutBtn"
-              class="text-sm bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition"
+              class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 px-3 sm:px-4 py-2 rounded-lg transition"
             >
               Logout
             </button>
@@ -93,35 +95,50 @@
       </header>
 
       <!-- Main Content -->
-      <main class="mx-auto max-w-7xl px-4 py-8">
+      <main class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
         <!-- Tab Navigation -->
-        <div class="flex gap-2 mb-6">
-          <button class="dashboard-tab active" data-section="bookings">
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+          <button
+            class="dashboard-tab active whitespace-nowrap"
+            data-section="bookings"
+          >
             <i data-lucide="calendar-check" class="w-4 h-4"></i>
-            Booking Monitor
+            <span class="hidden sm:inline">Booking Monitor</span>
+            <span class="sm:hidden">Booking</span>
           </button>
-          <button class="dashboard-tab" data-section="insight">
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="insight"
+          >
             <i data-lucide="book-open" class="w-4 h-4"></i>
-            Insight Manager
+            <span class="hidden sm:inline">Insight Manager</span>
+            <span class="sm:hidden">Insight</span>
           </button>
-          <button class="dashboard-tab" data-section="events">
+          <button class="dashboard-tab whitespace-nowrap" data-section="events">
             <i data-lucide="video" class="w-4 h-4"></i>
-            Events Manager
+            <span class="hidden sm:inline">Events Manager</span>
+            <span class="sm:hidden">Events</span>
           </button>
-          <button class="dashboard-tab" data-section="coupons">
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="coupons"
+          >
             <i data-lucide="tag" class="w-4 h-4"></i>
-            Coupon Manager
+            <span class="hidden sm:inline">Coupon Manager</span>
+            <span class="sm:hidden">Coupon</span>
           </button>
         </div>
 
         <!-- Section: Booking Monitor -->
         <section id="section-bookings" class="dashboard-section">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold">Booking Monitor</h2>
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold">Booking Monitor</h2>
             <div class="flex gap-2">
               <select
                 id="filterBookingStatus"
-                class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm"
+                class="bg-slate-800 border border-slate-700 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm flex-1 sm:flex-none"
               >
                 <option value="">Semua Status</option>
                 <option value="pending">Pending</option>
@@ -131,7 +148,7 @@
               </select>
               <button
                 id="refreshBookings"
-                class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500"
               >
                 Refresh
               </button>
@@ -546,6 +563,47 @@
           </div>
         </section>
       </main>
+
+      <!-- Delete Confirmation Modal -->
+      <div
+        id="deleteModal"
+        class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md"
+        >
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="w-12 h-12 rounded-full bg-red-900/30 flex items-center justify-center"
+            >
+              <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-red-400">Konfirmasi Hapus</h3>
+              <p class="text-sm text-slate-400">
+                Tindakan ini tidak dapat dibatalkan
+              </p>
+            </div>
+          </div>
+          <p class="text-slate-300 mb-6" id="deleteModalMessage">
+            Apakah Anda yakin ingin menghapus item ini secara permanen?
+          </p>
+          <div class="flex gap-3">
+            <button
+              id="confirmDelete"
+              class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors"
+            >
+              Ya, Hapus Permanen
+            </button>
+            <button
+              id="cancelDelete"
+              class="flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg transition-colors"
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Footer -->
       <footer

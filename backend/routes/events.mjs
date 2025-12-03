@@ -205,8 +205,8 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Soft delete by setting is_active = 0
-    await query("UPDATE events SET is_active = 0 WHERE id = ?", [id]);
+    // Hard delete - permanently remove from database
+    await query("DELETE FROM events WHERE id = ?", [id]);
 
     res.json({
       success: true,
