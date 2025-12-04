@@ -180,7 +180,15 @@ async function fetchTranscriptWithRetry(videoId) {
               `   URL: ${selectedTrack.base_url.substring(0, 80)}...`
             );
 
-            const captionResponse = await fetch(selectedTrack.base_url);
+            // Add headers to mimic browser request
+            const captionResponse = await fetch(selectedTrack.base_url, {
+              headers: {
+                "User-Agent":
+                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                Accept: "text/xml,application/xml",
+                "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+              },
+            });
 
             if (!captionResponse.ok) {
               throw new Error(
@@ -193,6 +201,11 @@ async function fetchTranscriptWithRetry(videoId) {
             console.log(
               `📥 Downloaded caption XML (${captionXML.length} bytes)`
             );
+
+            // Check if XML is actually empty or invalid
+            if (!captionXML || captionXML.length === 0) {
+              throw new Error("Caption XML is empty (0 bytes received)");
+            }
 
             // Parse XML to extract text segments
             // Format: <text start="0.0" dur="2.5">Text here</text>
