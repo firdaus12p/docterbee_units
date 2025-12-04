@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Advisor Qur'ani – Docterbee</title>
+
+    <!-- External Stylesheets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-slate-950 text-slate-100">
+    <!-- Header Navigation -->
+    <header
+      class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+    >
+      <div
+        class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="logo-box"></div>
+          <span class="font-semibold">Docterbee</span>
+        </a>
+        <nav class="hidden md:flex gap-6 text-sm">
+          <a href="index.html" class="nav-link">Journey</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="booking.html" class="nav-link">Booking</a>
+          <a href="events.html" class="nav-link">Events</a>
+          <a href="insight.html" class="nav-link">Insight</a>
+          <a href="media.html" class="nav-link">Media</a>
+          <a href="ai-advisor.html" class="nav-link active">AI Advisor</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <span class="points-display"> Points: <b id="navPoints">0</b> </span>
+          <button
+            id="hamburgerBtn"
+            class="md:hidden hamburger-btn"
+            aria-label="Toggle menu"
+          >
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Overlay -->
+      <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="mobile-menu">
+        <div class="mobile-menu-header">
+          <span class="font-semibold">Menu</span>
+          <button
+            id="closeMobileMenu"
+            class="close-menu-btn"
+            aria-label="Close menu"
+          >
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+        <nav class="mobile-menu-nav">
+          <a href="index.html" class="mobile-nav-link">Journey</a>
+          <a href="services.html" class="mobile-nav-link">Services</a>
+          <a href="booking.html" class="mobile-nav-link">Booking</a>
+          <a href="events.html" class="mobile-nav-link">Events</a>
+          <a href="insight.html" class="mobile-nav-link">Insight</a>
+          <a href="media.html" class="mobile-nav-link">Media</a>
+          <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
+        </nav>
+        <div class="mobile-menu-footer">
+          <span class="points-display">
+            Points: <b id="mobileNavPoints">0</b>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
+      <!-- Hero Section -->
+      <section class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-3">AI Advisor Qur'ani</h1>
+        <p class="text-slate-300/85 max-w-3xl text-lg">
+          Tanyakan perilaku atau kebiasaan Anda, dapatkan <b>verdict</b> (Benar
+          / Salah / Hati‑hati) dengan <b>dalil</b> Al-Qur'an & Hadis serta
+          catatan biomolekuler berdasarkan framework NBSN.
+        </p>
+        <div
+          class="mt-4 inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-lg px-4 py-2 text-sm text-amber-300"
+        >
+          <i data-lucide="info" class="w-4 h-4"></i>
+          <span>Demo ini berjalan secara lokal (tanpa koneksi server)</span>
+        </div>
+      </section>
+
+      <!-- Main Grid -->
+      <div class="grid gap-6 lg:grid-cols-3">
+        <!-- Input Section -->
+        <div class="lg:col-span-2 booking-container">
+          <label class="block text-sm font-semibold mb-2 opacity-80"
+            >Pertanyaan / Perilaku</label
+          >
+          <textarea
+            id="questionInput"
+            class="w-full rounded-lg bg-slate-900/60 border border-slate-700 px-4 py-3 h-32 focus:border-amber-400 focus:outline-none transition"
+            placeholder="Contoh: Saya sering begadang, jarang shalat malam, dan minum kopi manis 3 gelas sehari. Bagaimana menurut syariat dan kesehatan?"
+          ></textarea>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button
+              onclick="analyzeQuestion()"
+              class="rounded-lg bg-amber-400 text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-amber-500 transition flex items-center gap-2"
+            >
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              Analisis Sekarang
+            </button>
+            <button
+              onclick="loadSample(0)"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-amber-400/50 transition"
+            >
+              Contoh 1
+            </button>
+            <button
+              onclick="loadSample(1)"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-amber-400/50 transition"
+            >
+              Contoh 2
+            </button>
+            <button
+              onclick="loadSample(2)"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-amber-400/50 transition"
+            >
+              Contoh 3
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar Info -->
+        <aside class="booking-container">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
+            <h3 class="font-semibold text-lg">Guardrails</h3>
+          </div>
+          <ul class="list-disc pl-5 text-slate-300/85 space-y-2 text-sm mb-5">
+            <li>AI untuk edukasi, bukan diagnosis medis</li>
+            <li>Jika bergejala berat → konsultasi praktisi</li>
+            <li>Rujukan dalil diambil dari korpus ringkas</li>
+          </ul>
+
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="book-open-check" class="w-5 h-5 text-sky-400"></i>
+            <h3 class="font-semibold text-lg">Framework NBSN</h3>
+          </div>
+          <p class="text-slate-300/85 text-sm">
+            <b>Neuron–Biomolekul–Sensorik–Nature</b> sebagai kerangka nasihat
+            holistik yang menggabungkan perspektif syariat dan sains modern.
+          </p>
+        </aside>
+      </div>
+
+      <!-- Results Section -->
+      <section class="mt-8 grid gap-6 lg:grid-cols-3">
+        <!-- Main Result -->
+        <div class="lg:col-span-2 booking-container">
+          <div class="border-b border-slate-800 pb-4 mb-4">
+            <h2 class="text-xl font-semibold flex items-center gap-2">
+              <i data-lucide="file-text" class="w-5 h-5 text-amber-400"></i>
+              Hasil Analisis
+            </h2>
+          </div>
+          <div id="analysisResult" class="text-sm text-slate-200 space-y-4">
+            <div class="flex items-center justify-center py-12 opacity-60">
+              <div class="text-center">
+                <i
+                  data-lucide="message-circle"
+                  class="w-12 h-12 mx-auto mb-3 opacity-50"
+                ></i>
+                <p>
+                  Tulis pertanyaan lalu klik <b>Analisis Sekarang</b> untuk
+                  melihat hasil
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips Sidebar -->
+        <div class="booking-container">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-amber-400"></i>
+            <h3 class="font-semibold text-lg">Tips Penggunaan</h3>
+          </div>
+          <ul class="list-disc pl-5 text-slate-300/85 space-y-2 text-sm">
+            <li>Gunakan kalimat yang spesifik & jujur</li>
+            <li>Sertakan kebiasaan: tidur, makan, ibadah</li>
+            <li>Tulis target perbaikan 7 hari ke depan</li>
+            <li>Ceritakan keluhan fisik jika ada</li>
+          </ul>
+
+          <div class="mt-5 pt-5 border-t border-slate-800">
+            <a
+              href="booking.html"
+              class="block text-center rounded-lg bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-sm font-semibold transition"
+            >
+              Booking Konsultasi Praktisi →
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="mt-16 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+    >
+      © <span id="year"></span> Docterbee – AI Advisor Qur'ani
+    </footer>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/script.js"></script>
+    <script>
+      // Sample questions
+      const SAMPLES = [
+        "Saya sering begadang sampai jam 1–2 pagi, minum kopi manis 3 gelas sehari, dan jarang olahraga. Bagaimana menurunkannya menurut Qur'an dan kesehatan?",
+        "Saya ingin mulai puasa Senin-Kamis dan rutin minum madu 20ml pagi hari. Apakah sudah benar dan ada saran tambahan?",
+        "Saya gampang marah di kantor dan sering melewatkan shalat tepat waktu. Apa langkah perbaikan yang disarankan?",
+      ];
+
+      // Dalil database (simplified)
+      const DALIL_DATABASE = [
+        {
+          type: "Al-Qur'an",
+          ref: "QS Al-Isra' 17:82",
+          text: "Dan Kami turunkan dari Al-Qur'an suatu yang menjadi penawar dan rahmat bagi orang-orang yang beriman.",
+          tags: ["quran", "healing", "rahmat"],
+        },
+        {
+          type: "Hadis",
+          ref: "HR. Bukhari & Muslim",
+          text: "Di dalam tubuh ada segumpal daging, jika baik maka baiklah seluruh tubuh, jika rusak maka rusaklah seluruh tubuh. Ketahuilah ia adalah hati.",
+          tags: ["heart", "health", "spiritual"],
+        },
+        {
+          type: "Al-Qur'an",
+          ref: "QS Al-A'raf 7:31",
+          text: "Makan dan minumlah, dan janganlah berlebih-lebihan. Sesungguhnya Allah tidak menyukai orang-orang yang berlebih-lebihan.",
+          tags: ["food", "balance", "moderation"],
+        },
+        {
+          type: "Hadis",
+          ref: "HR. Tirmidzi",
+          text: "Puasa adalah perisai. Apabila salah seorang dari kamu berpuasa, janganlah ia berkata kotor dan berbuat bodoh.",
+          tags: ["fasting", "discipline", "shield"],
+        },
+        {
+          type: "Al-Qur'an",
+          ref: "QS Al-Baqarah 2:183",
+          text: "Hai orang-orang yang beriman, diwajibkan atas kamu berpuasa sebagaimana diwajibkan atas orang-orang sebelum kamu agar kamu bertakwa.",
+          tags: ["fasting", "taqwa", "worship"],
+        },
+        {
+          type: "Hadis",
+          ref: "HR. Bukhari",
+          text: "Kesembuhan itu ada dalam tiga hal: minum madu, bekam, dan kay (sundut api). Dan aku melarang umatku dari kay.",
+          tags: ["honey", "healing", "medicine"],
+        },
+        {
+          type: "Al-Qur'an",
+          ref: "QS An-Nahl 16:69",
+          text: "Dari perut lebah itu keluar minuman yang bermacam-macam warnanya, di dalamnya terdapat obat yang menyembuhkan bagi manusia.",
+          tags: ["honey", "healing", "nature"],
+        },
+        {
+          type: "Hadis",
+          ref: "HR. Tirmidzi",
+          text: "Tidaklah turun suatu penyakit melainkan turun pula obatnya.",
+          tags: ["healing", "medicine", "hope"],
+        },
+      ];
+
+      function loadSample(index) {
+        document.getElementById("questionInput").value = SAMPLES[index];
+      }
+
+      function pickRelevantDalil(keywords) {
+        const scored = DALIL_DATABASE.map((dalil) => {
+          let score = 0;
+          keywords.forEach((kw) => {
+            if (dalil.tags.some((tag) => tag.includes(kw))) score += 2;
+            if (dalil.text.toLowerCase().includes(kw)) score += 1;
+          });
+          return { dalil, score };
+        });
+
+        scored.sort((a, b) => b.score - a.score);
+        return scored.slice(0, 2).map((s) => s.dalil);
+      }
+
+      function analyzeQuestion() {
+        const question = document
+          .getElementById("questionInput")
+          .value.toLowerCase()
+          .trim();
+
+        if (!question) {
+          alert("Tolong tulis pertanyaan/perilaku terlebih dahulu.");
+          return;
+        }
+
+        // Simple scoring algorithm
+        let score = 0;
+        const keywords = [];
+
+        // Negative behaviors
+        if (
+          question.includes("begadang") ||
+          question.includes("tidur kurang")
+        ) {
+          score -= 2;
+          keywords.push("tidur");
+        }
+        if (
+          question.includes("kopi manis") ||
+          question.includes("gula") ||
+          question.includes("manis berlebih")
+        ) {
+          score -= 1;
+          keywords.push("food", "balance");
+        }
+        if (question.includes("marah") || question.includes("emosi")) {
+          score -= 1;
+          keywords.push("heart", "spiritual");
+        }
+        if (question.includes("rokok") || question.includes("merokok")) {
+          score -= 2;
+          keywords.push("health");
+        }
+        if (
+          question.includes("skip") ||
+          question.includes("melewatkan shalat")
+        ) {
+          score -= 2;
+          keywords.push("worship");
+        }
+
+        // Positive behaviors
+        if (question.includes("olahraga") || question.includes("exercise")) {
+          score += 1;
+          keywords.push("health");
+        }
+        if (question.includes("puasa")) {
+          score += 2;
+          keywords.push("fasting", "taqwa");
+        }
+        if (question.includes("madu")) {
+          score += 1;
+          keywords.push("honey", "healing");
+        }
+        if (question.includes("shalat") || question.includes("salat")) {
+          score += 2;
+          keywords.push("worship", "spiritual");
+        }
+        if (question.includes("dzikir") || question.includes("zikir")) {
+          score += 1;
+          keywords.push("spiritual");
+        }
+
+        // Determine verdict
+        let verdict = "Hati‑hati";
+        let badgeClass = "bg-yellow-400 text-slate-900";
+
+        if (score >= 3) {
+          verdict = "Benar";
+          badgeClass = "bg-emerald-400 text-slate-900";
+        } else if (score <= -1) {
+          verdict = "Salah";
+          badgeClass = "bg-rose-500 text-white";
+        }
+
+        // Pick relevant dalil
+        const relevantDalil = pickRelevantDalil(keywords);
+
+        // Recommended steps
+        const steps = [
+          "Perbaiki pola tidur (target 7–8 jam/malam); matikan layar 60 menit sebelum tidur",
+          "Ganti manis rafinasi dengan madu murni 1–2 sdm/hari; perbanyak air putih (2L/hari)",
+          "Rutinkan shalat 5 waktu tepat waktu dan tambahkan dzikir pagi–petang",
+          "Tambahkan puasa sunnah (Senin-Kamis) atau olahraga ringan 20–30 menit/hari",
+          "Kurangi kafein dan gula, prioritaskan makanan whole food",
+          "Jika keluhan berat atau gejala persisten → konsultasi praktisi segera",
+        ];
+
+        // Biomolecular notes
+        const bioNotes = [
+          "<b>Tidur cukup</b> menurunkan kortisol (hormon stres) → menstabilkan sistem limbik & meningkatkan konsolidasi memori",
+          "<b>Madu murni</b> mengandung enzim, flavonoid & antioksidan → membantu sistem antioksidan endogen",
+          "<b>Puasa</b> meningkatkan autofagi (pembersihan sel) & sensitivitas insulin → metabolisme lebih efisien",
+          "<b>Shalat & dzikir</b> mengaktifkan parasympathetic nervous system → menurunkan heart rate & tekanan darah",
+          "<b>Aktivitas fisik</b> melepaskan endorfin & BDNF → mood meningkat, neuroplastisitas optimal",
+        ];
+
+        // Render result
+        const dalilHtml = relevantDalil
+          .map(
+            (d) => `
+          <li>
+            <b>${d.type}</b> — ${d.ref}:
+            <span class="opacity-90">"${d.text}"</span>
+          </li>
+        `
+          )
+          .join("");
+
+        const stepsHtml = steps.map((s) => `<li>${s}</li>`).join("");
+        const bioHtml = bioNotes.map((n) => `<li>${n}</li>`).join("");
+
+        document.getElementById("analysisResult").innerHTML = `
+          <div class="flex items-center gap-3 mb-4">
+            <span class="rounded-lg px-3 py-1.5 text-sm font-bold ${badgeClass}">
+              ${verdict}
+            </span>
+            <span class="text-xs opacity-70">Skor analisis: ${score}</span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2">
+                <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
+                Langkah yang Disarankan
+              </div>
+              <ul class="list-decimal pl-5 space-y-2 text-slate-200/90 text-sm">
+                ${stepsHtml}
+              </ul>
+            </div>
+
+            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+                Dalil Syar'i
+              </div>
+              <ul class="list-disc pl-5 space-y-2 text-slate-200/90 text-sm">
+                ${dalilHtml}
+              </ul>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mt-4">
+            <div class="font-semibold mb-3 flex items-center gap-2">
+              <i data-lucide="microscope" class="w-4 h-4 text-sky-400"></i>
+              Catatan Biomolekuler (NBSN Framework)
+            </div>
+            <ul class="list-disc pl-5 space-y-2 text-slate-200/90 text-sm">
+              ${bioHtml}
+            </ul>
+          </div>
+
+          <div class="mt-5 p-4 rounded-lg bg-amber-400/10 border border-amber-400/30">
+            <div class="flex gap-3">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-amber-200">
+                <b>Disclaimer:</b> Ini adalah analisis demo berbasis algoritma sederhana untuk tujuan edukasi.
+                Untuk kasus serius atau keluhan medis, <b>mohon konsultasi dengan praktisi profesional</b>.
+              </p>
+            </div>
+          </div>
+        `;
+
+        // Re-create icons
+        lucide.createIcons();
+
+        // Add points for using AI Advisor
+        addPoints(3);
+
+        // Smooth scroll to result
+        document
+          .getElementById("analysisResult")
+          .scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // Initialize
+      document.getElementById("year").textContent = new Date().getFullYear();
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
