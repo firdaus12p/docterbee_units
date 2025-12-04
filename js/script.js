@@ -1754,6 +1754,108 @@ function loadCustomAudio() {
 }
 
 /**
+ * Check if transcript is available for YouTube video
+ */
+async function checkTranscript() {
+  const youtubeUrl = document.getElementById("ytUrl")?.value || "";
+  const btnCheck = document.getElementById("btnCheckTranscript");
+  const transcriptStatus = document.getElementById("transcriptStatus");
+
+  if (!youtubeUrl) {
+    alert("Masukkan URL YouTube terlebih dahulu.");
+    return;
+  }
+
+  // Show loading
+  if (btnCheck) {
+    btnCheck.disabled = true;
+    btnCheck.innerHTML =
+      '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Checking...';
+    lucide.createIcons();
+  }
+
+  if (transcriptStatus) {
+    transcriptStatus.innerHTML = `
+      <div class="flex items-center gap-2 text-slate-400 text-sm">
+        <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+        <span>Memeriksa ketersediaan transcript...</span>
+      </div>
+    `;
+    lucide.createIcons();
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/api/check-transcript", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ youtubeUrl }),
+    });
+
+    const data = await response.json();
+
+    if (transcriptStatus) {
+      if (data.available) {
+        // ✅ Transcript available
+        transcriptStatus.innerHTML = `
+          <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1">
+                <div class="font-medium text-emerald-300 mb-1">✅ Transcript Tersedia!</div>
+                <div class="text-sm text-slate-300">${data.message}</div>
+                <div class="text-xs text-slate-400 mt-1">
+                  ${
+                    data.segmentCount
+                  } segmen • ${data.characterCount.toLocaleString()} karakter
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // ❌ Transcript not available
+        transcriptStatus.innerHTML = `
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1">
+                <div class="font-medium text-amber-300 mb-1">⚠️ Transcript Tidak Tersedia</div>
+                <div class="text-sm text-slate-300 whitespace-pre-line">${data.message}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+  } catch (error) {
+    console.error("Error checking transcript:", error);
+    if (transcriptStatus) {
+      transcriptStatus.innerHTML = `
+        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+          <div class="flex items-start gap-2">
+            <i data-lucide="x-circle" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"></i>
+            <div class="flex-1">
+              <div class="font-medium text-red-300 mb-1">❌ Error</div>
+              <div class="text-sm text-slate-300">Gagal memeriksa transcript: ${error.message}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+  } finally {
+    // Reset button
+    if (btnCheck) {
+      btnCheck.disabled = false;
+      btnCheck.innerHTML =
+        '<i data-lucide="search" class="w-3 h-3"></i> Check Transcript';
+      lucide.createIcons();
+    }
+  }
+}
+
+/**
  * Analyze media content with AI using Gemini API
  */
 async function analyzeMedia() {
@@ -1761,6 +1863,7 @@ async function analyzeMedia() {
   const notes = document.getElementById("mediaNotes")?.value || "";
   const aiResult = document.getElementById("aiResult");
   const btnAnalyze = document.getElementById("btnAnalyze");
+  const mediaNotes = document.getElementById("mediaNotes");
 
   if (!aiResult) return;
 
@@ -1770,9 +1873,12 @@ async function analyzeMedia() {
     return;
   }
 
-  if (!notes) {
-    alert("Tuliskan catatan terlebih dahulu.");
-    return;
+  // Auto-fetch transcript message
+  if (youtubeUrl && !notes) {
+    if (mediaNotes) {
+      mediaNotes.value = "Mengambil transcript otomatis...";
+      mediaNotes.disabled = true;
+    }
   }
 
   // Show loading state
@@ -1786,12 +1892,26 @@ async function analyzeMedia() {
   aiResult.innerHTML = `
     <div class="ai-analysis-card text-center">
       <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-400"></i>
-      <p class="text-slate-300">Menghubungi Gemini AI...</p>
+      <p class="text-slate-300">
+        ${
+          youtubeUrl && !notes
+            ? "Mengambil transcript YouTube..."
+            : "Menganalisis dengan Gemini AI..."
+        }
+      </p>
+      <p class="text-xs text-slate-500 mt-2">Mohon tunggu 5-15 detik</p>
     </div>
   `;
   lucide.createIcons();
 
   try {
+    // Debug: Log what we're sending
+    console.log("📤 Sending to backend:", {
+      youtubeUrl: youtubeUrl || "(empty)",
+      notes: notes ? notes.substring(0, 50) + "..." : "(empty)",
+      notesLength: notes.length,
+    });
+
     // Call backend API
     const response = await fetch("http://localhost:3000/api/summarize", {
       method: "POST",
@@ -1806,12 +1926,49 @@ async function analyzeMedia() {
 
     const data = await response.json();
 
+    // Debug: Log response
+    console.log("📥 Response from backend:", {
+      ok: response.ok,
+      status: response.status,
+      hasTranscript: data.hasTranscript,
+      source: data.source,
+      transcriptLength: data.transcriptLength,
+    });
+
     if (!response.ok) {
+      // Re-enable textarea if transcript fetch failed
+      if (mediaNotes) {
+        mediaNotes.disabled = false;
+        if (data.transcriptError) {
+          mediaNotes.value = "";
+          mediaNotes.placeholder =
+            "⚠️ Transcript tidak tersedia untuk video ini. Silakan tulis catatan/ringkasan video secara manual...";
+
+          // Show alert to user
+          alert(
+            "Transcript YouTube tidak tersedia untuk video ini.\n\n" +
+              "Solusi:\n" +
+              "1. Tonton video dan tulis ringkasan di kolom 'Catatan'\n" +
+              "2. Atau cari video lain yang memiliki subtitle/CC\n\n" +
+              "Error: " +
+              data.transcriptError
+          );
+        }
+      }
       throw new Error(data.error || "Gagal menganalisis konten");
     }
 
-    // Display AI summary
-    const formattedSummary = formatAISummary(data.summary);
+    // Re-enable textarea and show transcript source info
+    if (mediaNotes) {
+      mediaNotes.disabled = false;
+      if (data.hasTranscript && !notes) {
+        // If auto-transcript was used, show it in textarea
+        mediaNotes.value = `✅ Transcript otomatis diambil (${data.transcriptLength} karakter)\n\nAnda bisa edit atau tambahkan catatan di sini...`;
+      }
+    }
+
+    // Display AI summary with metadata
+    const formattedSummary = formatAISummary(data.summary, data);
     aiResult.innerHTML = formattedSummary;
 
     // Re-initialize Lucide icons
@@ -1879,19 +2036,51 @@ async function analyzeMedia() {
         '<i data-lucide="sparkles" class="w-4 h-4"></i> Analisis AI';
       lucide.createIcons();
     }
+
+    // Re-enable textarea
+    if (mediaNotes && mediaNotes.disabled) {
+      mediaNotes.disabled = false;
+    }
   }
 }
 
 /**
  * Format AI summary from Gemini API response to styled HTML
  */
-function formatAISummary(text) {
+function formatAISummary(text, metadata = {}) {
   if (!text) return "<p class='text-slate-400'>Tidak ada hasil analisis.</p>";
+
+  // Add metadata badge if available
+  let metadataBadge = "";
+  if (metadata.source) {
+    const sourceLabel =
+      metadata.source === "auto-transcript"
+        ? "✨ Auto Transcript"
+        : "📝 User Notes";
+    const sourceColor =
+      metadata.source === "auto-transcript"
+        ? "bg-emerald-400/10 border-emerald-400/30 text-emerald-300"
+        : "bg-sky-400/10 border-sky-400/30 text-sky-300";
+
+    metadataBadge = `
+      <div class="mb-4 inline-flex items-center gap-2 ${sourceColor} border rounded-lg px-3 py-1.5 text-xs">
+        <i data-lucide="${
+          metadata.source === "auto-transcript" ? "sparkles" : "file-text"
+        }" class="w-3 h-3"></i>
+        <span>${sourceLabel}</span>
+        ${
+          metadata.transcriptLength
+            ? `<span class="opacity-70">(${metadata.transcriptLength} karakter)</span>`
+            : ""
+        }
+      </div>
+    `;
+  }
 
   // Split into sections (assuming Gemini returns structured text)
   const lines = text.split("\n").filter((line) => line.trim());
 
-  let html = '<div class="space-y-4">';
+  let html = metadataBadge + '<div class="space-y-4">';
   let currentSection = "";
   let currentList = [];
 

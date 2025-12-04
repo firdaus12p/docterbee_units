@@ -110,19 +110,57 @@
           >
             <span>Video akan tampil di sini.</span>
           </div>
+
+          <!-- Check Transcript Button (NEW) -->
+          <div class="mt-4 flex items-center gap-2">
+            <button
+              id="btnCheckTranscript"
+              class="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
+              onclick="checkTranscript()"
+            >
+              <i data-lucide="search" class="w-3 h-3"></i>
+              Check Transcript
+            </button>
+            <span class="text-xs text-slate-400"
+              >Cek apakah video bisa auto-transcript</span
+            >
+          </div>
+
+          <!-- Transcript Status (NEW) -->
+          <div id="transcriptStatus" class="mt-3"></div>
+
           <div class="mt-4">
-            <label class="media-label">Catatan / poin penting</label>
+            <label class="media-label flex items-center gap-2">
+              <span>Catatan / poin penting</span>
+              <span class="text-xs text-emerald-400 opacity-70"
+                >(Opsional - akan auto-fetch transcript jika kosong)</span
+              >
+            </label>
             <textarea
               id="mediaNotes"
               class="media-textarea"
-              placeholder="Tuliskan ringkasan atau poin video di sini..."
+              placeholder="Kosongkan untuk auto-fetch transcript, atau tulis catatan manual di sini..."
             ></textarea>
           </div>
-          <div class="mt-3 flex items-center gap-3">
+          <div
+            class="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+          >
             <button id="btnAnalyze" class="btn-analyze">
-              Analisis AI (Demo)
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              Analisis AI
             </button>
-            <span class="text-xs text-slate-400">*Simulasi tanpa server.</span>
+            <div class="text-xs text-slate-400 space-y-1">
+              <div class="flex items-center gap-1">
+                <i data-lucide="info" class="w-3 h-3"></i>
+                <span
+                  >Akan otomatis ambil transcript YouTube jika tersedia</span
+                >
+              </div>
+              <div class="flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3 h-3"></i>
+                <span>Powered by Gemini AI + Dalil Shahih</span>
+              </div>
+            </div>
           </div>
         </section>
 

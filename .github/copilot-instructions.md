@@ -11,13 +11,14 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 
 ### Frontend (Multi-Page Pattern)
 
-**Seven HTML pages with organized CSS/JS (moved to folders):**
+**Eight HTML pages with organized CSS/JS (moved to folders):**
 
 - **`index.html`**: Journey tracking (6 units) - uses `localStorage` for state
 - **`booking.html`**: Appointment + promo validation - calls `/api/bookings`, `/api/coupons/validate`
 - **`events.html`**: Webinar listings - fetches from `/api/events` (falls back to mock `EVENTS_DATA`)
 - **`insight.html`**: Articles - fetches from `/api/insight` (falls back to mock `INSIGHT_DATA`)
 - **`media.html`**: YouTube/podcast player + AI analysis via `/api/summarize` (Gemini)
+- **`ai-advisor.html`**: AI health advisor with Qur'an/Sunnah context - calls `/api/ai-advisor` (Gemini)
 - **`admin-dashboard.html`**: CRUD for bookings/events/articles/coupons - uses `sessionStorage` auth
 - **`services.html`**: Services listing
 
@@ -27,14 +28,16 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 - **`js/script.js`**: 1860 lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Page inits: 664+)
 - **`js/admin-dashboard.js`**: 875 lines for admin (Auth check: line 18, Event listeners: 50-92, Tab switching: 117)
 
-**All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or `js/admin-dashboard.js` for admin)
+**All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or `js/admin-dashboard.js` for admin)  
+**Exception**: `ai-advisor.html` contains inline JavaScript (~570 lines) for AI analysis logic
 
 ### Backend (Express + MySQL)
 
 **API server with auto-initializing database:**
 
-- **`backend/server.mjs`**: Main server (231 lines) - mounts 4 routers, serves static files from root, Gemini endpoint
+- **`backend/server.mjs`**: Main server (627 lines) - mounts 4 routers, serves static files from root, 2 Gemini endpoints (`/api/summarize`, `/api/ai-advisor`)
 - **`backend/db.mjs`**: Connection pool (149 lines) - creates 4 tables on startup if missing
+- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs (each ~200-280 lines)
 - **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs (each ~200-280 lines)
 
 **Database Tables** (auto-created):
@@ -74,7 +77,8 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 
 **Applied in admin-dashboard.js** (lines 54, 68, 82): `openArticleModal()`, `openEventModal()`, `openCouponModal()`
 
-**Exception**: `insight.html` uses inline `onclick="summarizeArticle(0)"` on article buttons (legacy pattern, accepted)
+**Exception**: `insight.html` uses inline `onclick="summarizeArticle(0)"` on article buttons (legacy pattern, accepted)  
+**Exception**: `ai-advisor.html` uses inline `<script>` tag for all logic (~570 lines) - architectural decision for self-contained AI feature
 
 ### 2. String Safety (Escape quotes!)
 
@@ -313,6 +317,15 @@ const requests = await page.evaluate(() =>
 **YouTube**: Supports youtube.com/watch?v=, youtu.be/, embed URLs (iframe injection)  
 **AI Analysis**: Sends notes to `/api/summarize` (Gemini), checks alignment with Qur'an/Sunnah (+3 points)
 
+### AI Advisor Page (ai-advisor.html)
+
+**State**: Inline JavaScript with `SAMPLES` (3 sample questions), `DALIL_DATABASE` (8 dalil entries)  
+**Key functions**: `analyzeQuestion()` (async), `renderStructuredResponse()`, `renderFallbackResponse()`, `pickRelevantDalil()`  
+**Pattern**: Uses inline `<script>` tag (~570 lines) instead of separate JS file - **architectural exception**  
+**API integration**: `POST /api/ai-advisor` with JSON prompt engineering for structured output (verdict, recommendations, NBSN analysis)  
+**Fallback**: Local analysis using keyword matching if API fails or quota exceeded  
+**Points**: +3 points when AI analysis completes successfully
+
 ### Admin Dashboard (admin-dashboard.html)
 
 **Authentication**: Simple sessionStorage-based (`admin_session` key), credentials: `admin/docterbee2025`  
@@ -362,10 +375,11 @@ await page.click('#couponForm button[type="submit"]');
 3. **Edit operations**: Verify modal pre-fills with existing data
 4. **Network inspection**: Check PATCH/POST URLs don't contain event objects
 5. **localStorage state**: Verify `db_units`, `db_points` persist correctly
+6. ❌ Don't forget to update ALL 8 HTML pages when changing shared components (header/footer/nav)
 
 ## Common Pitfalls to Avoid
 
-1. ❌ Don't add inline onclick handlers to HTML (except `summarizeArticle()` on insight page buttons)
+1. ❌ Don't add inline onclick handlers to HTML (except `summarizeArticle()` on insight page buttons and `analyzeQuestion()` on ai-advisor)
 2. ❌ Don't add inline styles to HTML - all styling in `css/style.css`
 3. ❌ Don't forget to escape quotes in UNITS array strings with `\'`
 4. ❌ Don't skip XSS escaping when inserting dynamic content - use `escapeHtml()`
@@ -396,15 +410,6 @@ docterbee_units/
 │   └── admin-dashboard.js # 875 lines, admin CRUD
 ├── docs/                # All documentation
 │   ├── QUICKSTART.md
-│   ├── SETUP_GUIDE.md
-│   ├── DATABASE_SCHEMA.md
-│   └── ...
-├── *.html               # 7 pages (index, booking, events, insight, media, services, admin-dashboard)
-├── .env                 # Config (gitignored, contains DB_PORT=3307, GEMINI_API_KEY)
-├── .env.example         # Config template
-└── package.json         # Dependencies + scripts
-```
-
 **Current pages**:
 
 - **`index.html`** - Journey tracking (6 units with daily questions)
@@ -412,10 +417,20 @@ docterbee_units/
 - **`events.html`** - Webinar & workshop listings
 - **`insight.html`** - Educational articles with AI summaries
 - **`media.html`** - YouTube player, podcast audio, AI content analysis
+- **`ai-advisor.html`** - AI health advisor with Islamic context (NEW)
 - **`services.html`** - Services listing
 - **`admin-dashboard.html`** - Admin control panel (protected)
 
-**Navigation pattern**: Five-page public nav (Journey, Booking, Events, Insight, Media)  
+**Navigation pattern**: Six-page public nav (Journey, Services, Booking, Events, Insight, Media, AI Advisor)
+When modifying header/footer, update ALL 8 HTML files for consistency.
+- **`booking.html`** - Appointment booking with promo validation
+- **`events.html`** - Webinar & workshop listings
+- **`insight.html`** - Educational articles with AI summaries
+- **`media.html`** - YouTube player, podcast audio, AI content analysis
+- **`services.html`** - Services listing
+- **`admin-dashboard.html`** - Admin control panel (protected)
+
+**Navigation pattern**: Five-page public nav (Journey, Booking, Events, Insight, Media)
 When modifying header/footer, update ALL 7 HTML files for consistency.
 
 ## Language & Content
@@ -424,3 +439,4 @@ When modifying header/footer, update ALL 7 HTML files for consistency.
 - **Islamic terms**: Keep Arabic terminology (Subuh, Zuhur, Qur'an, etc.)
 - **Tone**: Friendly, educational, faith-integrated wellness
 - **API responses**: JSON with `success`, `data`, `error` fields
+```
