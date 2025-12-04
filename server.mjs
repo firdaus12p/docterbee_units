@@ -49,7 +49,7 @@ app.post("/api/summarize", async (req, res) => {
     const model = genAI.getGenerativeModel({ model: modelName });
 
     // Construct prompt with Islamic health context
-    const prompt = `Kamu adalah asisten AI untuk aplikasi kesehatan Islami "Docterbee" yang menggabungkan ajaran Qur'an & Sunnah, sains modern, dan framework NBSN (Neuron, Biomolekul, Sensorik, Nature).
+    const prompt = `Kamu adalah asisten AI untuk aplikasi kesehatan Islami "Docterbee" yang menggabungkan ajaran Qur'an & Sunnah yang benar benar shahih, sains modern, dan framework NBSN (Neuron, Biomolekul, Sensorik, Nature).
 
 CATATAN/TOPIK PENGGUNA:
 ${notes || "Tidak ada catatan"}

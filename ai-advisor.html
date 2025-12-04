@@ -89,10 +89,10 @@
           catatan biomolekuler berdasarkan framework NBSN.
         </p>
         <div
-          class="mt-4 inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-lg px-4 py-2 text-sm text-amber-300"
+          class="mt-4 inline-flex items-center gap-2 bg-emerald-400/10 border border-emerald-400/30 rounded-lg px-4 py-2 text-sm text-emerald-300"
         >
-          <i data-lucide="info" class="w-4 h-4"></i>
-          <span>Demo ini berjalan secara lokal (tanpa koneksi server)</span>
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Powered by Gemini AI dengan fallback algoritma lokal</span>
         </div>
       </section>
 
@@ -223,6 +223,18 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="js/script.js"></script>
     <script>
+      // Helper function for XSS prevention
+      function escapeHtml(text) {
+        const map = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        };
+        return text.replace(/[&<>"']/g, (m) => map[m]);
+      }
+
       // Sample questions
       const SAMPLES = [
         "Saya sering begadang sampai jam 1–2 pagi, minum kopi manis 3 gelas sehari, dan jarang olahraga. Bagaimana menurunkannya menurut Qur'an dan kesehatan?",
@@ -300,16 +312,291 @@
         return scored.slice(0, 2).map((s) => s.dalil);
       }
 
-      function analyzeQuestion() {
-        const question = document
-          .getElementById("questionInput")
-          .value.toLowerCase()
-          .trim();
+      async function analyzeQuestion() {
+        const question = document.getElementById("questionInput").value.trim();
 
         if (!question) {
           alert("Tolong tulis pertanyaan/perilaku terlebih dahulu.");
           return;
         }
+
+        // Show loading state
+        const resultDiv = document.getElementById("analysisResult");
+        resultDiv.innerHTML = `
+          <div class="flex items-center justify-center py-12">
+            <div class="text-center">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-400 border-t-transparent mb-4"></div>
+              <p class="text-slate-300">AI sedang menganalisis pertanyaan Anda...</p>
+              <p class="text-xs text-slate-500 mt-2">Mohon tunggu 5-10 detik</p>
+            </div>
+          </div>
+        `;
+
+        try {
+          // Call backend API
+          const response = await fetch("http://localhost:3000/api/ai-advisor", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || "Gagal menganalisis pertanyaan");
+          }
+
+          // Check if fallback mode (non-JSON response)
+          if (result.fallbackMode) {
+            renderFallbackResponse(result.rawText);
+            return;
+          }
+
+          // Render structured response
+          renderStructuredResponse(result.data);
+
+          // Add points for using AI Advisor
+          addPoints(3);
+
+          // Smooth scroll to result
+          resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } catch (error) {
+          console.error("Error:", error);
+
+          // Check if it's quota error
+          if (
+            error.message.includes("quota") ||
+            error.message.includes("429")
+          ) {
+            renderErrorWithFallback(
+              "Quota API tercapai. Menggunakan analisis lokal...",
+              question
+            );
+          } else if (error.message.includes("Failed to fetch")) {
+            renderErrorWithFallback(
+              "Tidak dapat terhubung ke server. Menggunakan analisis lokal...",
+              question
+            );
+          } else {
+            renderErrorWithFallback(
+              "Terjadi kesalahan. Menggunakan analisis lokal...",
+              question
+            );
+          }
+        }
+      }
+
+      function renderStructuredResponse(data) {
+        const { verdict, recommendations, nbsnAnalysis } = data;
+
+        // Determine badge color
+        let badgeClass = "bg-yellow-400 text-slate-900";
+        if (verdict.status === "Benar") {
+          badgeClass = "bg-emerald-400 text-slate-900";
+        } else if (verdict.status === "Salah") {
+          badgeClass = "bg-rose-500 text-white";
+        }
+
+        // Build HTML for steps
+        const stepsHtml = recommendations.steps
+          .map((step) => `<li>${escapeHtml(step)}</li>`)
+          .join("");
+
+        // Build HTML for dalil
+        const dalilHtml = recommendations.dalil
+          .map(
+            (d) => `
+          <li class="mb-3">
+            <div class="font-semibold text-amber-300">${escapeHtml(
+              d.type
+            )} — ${escapeHtml(d.ref)}</div>
+            <div class="opacity-90 mt-1">"${escapeHtml(d.text)}"</div>
+            ${
+              d.relevance
+                ? `<div class="text-xs opacity-70 mt-1 italic">→ ${escapeHtml(
+                    d.relevance
+                  )}</div>`
+                : ""
+            }
+          </li>
+        `
+          )
+          .join("");
+
+        // Build HTML for NBSN
+        const nbsnItems = [
+          {
+            icon: "brain",
+            label: "Neuron",
+            content: nbsnAnalysis.neuron,
+            color: "text-purple-400",
+          },
+          {
+            icon: "flask-conical",
+            label: "Biomolekul",
+            content: nbsnAnalysis.biomolekul,
+            color: "text-blue-400",
+          },
+          {
+            icon: "activity",
+            label: "Sensorik",
+            content: nbsnAnalysis.sensorik,
+            color: "text-green-400",
+          },
+          {
+            icon: "leaf",
+            label: "Nature",
+            content: nbsnAnalysis.nature,
+            color: "text-emerald-400",
+          },
+        ];
+
+        const nbsnHtml = nbsnItems
+          .map(
+            (item) => `
+          <div class="flex gap-3">
+            <i data-lucide="${item.icon}" class="w-5 h-5 ${
+              item.color
+            } flex-shrink-0 mt-0.5"></i>
+            <div>
+              <div class="font-semibold mb-1">${item.label}</div>
+              <div class="text-slate-200/90">${escapeHtml(item.content)}</div>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+
+        document.getElementById("analysisResult").innerHTML = `
+          <div class="flex items-center gap-3 mb-4">
+            <span class="rounded-lg px-3 py-1.5 text-sm font-bold ${badgeClass}">
+              ${escapeHtml(verdict.status)}
+            </span>
+            <span class="text-xs opacity-70">Skor: ${verdict.score}</span>
+            <span class="text-xs text-slate-400 ml-auto">✨ Powered by AI</span>
+          </div>
+
+          ${
+            verdict.explanation
+              ? `
+          <div class="mb-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+            <p class="text-sm text-slate-200">${escapeHtml(
+              verdict.explanation
+            )}</p>
+          </div>
+          `
+              : ""
+          }
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2">
+                <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
+                Langkah yang Disarankan
+              </div>
+              <ul class="list-decimal pl-5 space-y-2 text-slate-200/90 text-sm">
+                ${stepsHtml}
+              </ul>
+            </div>
+
+            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+                Dalil Syar'i
+              </div>
+              <ul class="space-y-2 text-sm">
+                ${dalilHtml}
+              </ul>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mt-4">
+            <div class="font-semibold mb-4 flex items-center gap-2">
+              <i data-lucide="microscope" class="w-4 h-4 text-sky-400"></i>
+              Analisis NBSN Framework
+            </div>
+            <div class="space-y-4 text-sm">
+              ${nbsnHtml}
+            </div>
+          </div>
+
+          <div class="mt-5 p-4 rounded-lg bg-amber-400/10 border border-amber-400/30">
+            <div class="flex gap-3">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-amber-200">
+                <b>Disclaimer:</b> Analisis ini untuk tujuan edukasi berdasarkan AI.
+                Untuk kasus serius atau keluhan medis, <b>mohon konsultasi dengan praktisi profesional</b>.
+              </p>
+            </div>
+          </div>
+        `;
+
+        // Re-create icons
+        lucide.createIcons();
+      }
+
+      function renderFallbackResponse(rawText) {
+        document.getElementById("analysisResult").innerHTML = `
+          <div class="p-5 rounded-lg bg-slate-800/50 border border-slate-700">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="info" class="w-5 h-5 text-sky-400"></i>
+              <div class="font-semibold">Hasil Analisis AI</div>
+            </div>
+            <div class="prose prose-invert max-w-none text-sm text-slate-200 whitespace-pre-wrap">
+              ${escapeHtml(rawText)}
+            </div>
+          </div>
+          
+          <div class="mt-4 p-4 rounded-lg bg-amber-400/10 border border-amber-400/30">
+            <div class="flex gap-3">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-amber-200">
+                <b>Disclaimer:</b> Analisis ini untuk tujuan edukasi.
+                Untuk kasus serius, <b>mohon konsultasi dengan praktisi profesional</b>.
+              </p>
+            </div>
+          </div>
+        `;
+
+        lucide.createIcons();
+        addPoints(3);
+      }
+
+      function renderErrorWithFallback(errorMessage, question) {
+        // Use local algorithm as fallback
+        console.log("Using local algorithm as fallback");
+
+        // Show error message briefly
+        const resultDiv = document.getElementById("analysisResult");
+        resultDiv.innerHTML = `
+          <div class="p-4 rounded-lg bg-amber-400/10 border border-amber-400/30 mb-4">
+            <div class="flex gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+              <div class="text-sm text-amber-200">
+                <b>${escapeHtml(errorMessage)}</b>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-center py-8">
+            <div class="text-center">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-600 border-t-transparent mb-2"></div>
+              <p class="text-slate-400 text-sm">Memproses dengan algoritma lokal...</p>
+            </div>
+          </div>
+        `;
+
+        lucide.createIcons();
+
+        // Wait a bit then use local algorithm
+        setTimeout(() => {
+          analyzeQuestionLocal(question);
+        }, 800);
+      }
+
+      function analyzeQuestionLocal(question) {
+        const questionLower = question.toLowerCase();
 
         // Simple scoring algorithm
         let score = 0;
@@ -317,54 +604,69 @@
 
         // Negative behaviors
         if (
-          question.includes("begadang") ||
-          question.includes("tidur kurang")
+          questionLower.includes("begadang") ||
+          questionLower.includes("tidur kurang")
         ) {
           score -= 2;
           keywords.push("tidur");
         }
         if (
-          question.includes("kopi manis") ||
-          question.includes("gula") ||
-          question.includes("manis berlebih")
+          questionLower.includes("kopi manis") ||
+          questionLower.includes("gula") ||
+          questionLower.includes("manis berlebih")
         ) {
           score -= 1;
           keywords.push("food", "balance");
         }
-        if (question.includes("marah") || question.includes("emosi")) {
+        if (
+          questionLower.includes("marah") ||
+          questionLower.includes("emosi")
+        ) {
           score -= 1;
           keywords.push("heart", "spiritual");
         }
-        if (question.includes("rokok") || question.includes("merokok")) {
+        if (
+          questionLower.includes("rokok") ||
+          questionLower.includes("merokok")
+        ) {
           score -= 2;
           keywords.push("health");
         }
         if (
-          question.includes("skip") ||
-          question.includes("melewatkan shalat")
+          questionLower.includes("skip") ||
+          questionLower.includes("melewatkan shalat")
         ) {
           score -= 2;
           keywords.push("worship");
         }
 
         // Positive behaviors
-        if (question.includes("olahraga") || question.includes("exercise")) {
+        if (
+          questionLower.includes("olahraga") ||
+          questionLower.includes("exercise")
+        ) {
           score += 1;
           keywords.push("health");
         }
-        if (question.includes("puasa")) {
+        if (questionLower.includes("puasa")) {
           score += 2;
           keywords.push("fasting", "taqwa");
         }
-        if (question.includes("madu")) {
+        if (questionLower.includes("madu")) {
           score += 1;
           keywords.push("honey", "healing");
         }
-        if (question.includes("shalat") || question.includes("salat")) {
+        if (
+          questionLower.includes("shalat") ||
+          questionLower.includes("salat")
+        ) {
           score += 2;
           keywords.push("worship", "spiritual");
         }
-        if (question.includes("dzikir") || question.includes("zikir")) {
+        if (
+          questionLower.includes("dzikir") ||
+          questionLower.includes("zikir")
+        ) {
           score += 1;
           keywords.push("spiritual");
         }
@@ -418,12 +720,14 @@
         const stepsHtml = steps.map((s) => `<li>${s}</li>`).join("");
         const bioHtml = bioNotes.map((n) => `<li>${n}</li>`).join("");
 
-        document.getElementById("analysisResult").innerHTML = `
+        const resultDiv = document.getElementById("analysisResult");
+        resultDiv.innerHTML = `
           <div class="flex items-center gap-3 mb-4">
             <span class="rounded-lg px-3 py-1.5 text-sm font-bold ${badgeClass}">
-              ${verdict}
+              ${escapeHtml(verdict)}
             </span>
             <span class="text-xs opacity-70">Skor analisis: ${score}</span>
+            <span class="text-xs text-slate-500 ml-auto">🔄 Algoritma Lokal</span>
           </div>
 
           <div class="grid md:grid-cols-2 gap-4">
@@ -442,7 +746,7 @@
                 <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
                 Dalil Syar'i
               </div>
-              <ul class="list-disc pl-5 space-y-2 text-slate-200/90 text-sm">
+              <ul class="space-y-2 text-slate-200/90 text-sm">
                 ${dalilHtml}
               </ul>
             </div>
@@ -476,9 +780,7 @@
         addPoints(3);
 
         // Smooth scroll to result
-        document
-          .getElementById("analysisResult")
-          .scrollIntoView({ behavior: "smooth", block: "nearest" });
+        resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
       // Initialize
