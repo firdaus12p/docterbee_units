@@ -289,6 +289,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // GET /api/bookings/prices/:serviceName - Get service price
+// IMPORTANT: This must be before /:id routes to avoid conflict
 router.get("/prices/:serviceName", (req, res) => {
   try {
     const { serviceName } = req.params;
@@ -314,6 +315,38 @@ router.get("/prices/:serviceName", (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal mengambil harga service",
+    });
+  }
+});
+
+// DELETE /api/bookings/:id - Delete booking permanently
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if booking exists
+    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [
+      id,
+    ]);
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        error: "Booking tidak ditemukan",
+      });
+    }
+
+    // Hard delete
+    await query("DELETE FROM bookings WHERE id = ?", [id]);
+
+    res.json({
+      success: true,
+      message: "Booking berhasil dihapus secara permanen",
+    });
+  } catch (error) {
+    console.error("Error deleting booking:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal menghapus booking",
     });
   }
 });

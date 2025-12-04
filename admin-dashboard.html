@@ -2,7 +2,21 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+    />
+    <meta
+      name="description"
+      content="Admin Dashboard untuk mengelola booking, artikel, event, dan kupon Docterbee"
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <title>Admin Dashboard - Docterbee</title>
 
     <!-- External Stylesheets -->
@@ -175,7 +189,7 @@
               </thead>
               <tbody id="bookingsTableBody">
                 <tr>
-                  <td colspan="13" class="text-center p-6 text-slate-400">
+                  <td colspan="14" class="text-center p-6 text-slate-400">
                     Loading...
                   </td>
                 </tr>
@@ -186,18 +200,20 @@
 
         <!-- Section: Insight Manager -->
         <section id="section-insight" class="dashboard-section hidden">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold">Insight Manager</h2>
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold">Insight Manager</h2>
             <button
               id="btnNewArticle"
-              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
             >
               + Artikel Baru
             </button>
           </div>
           <div
             id="articlesGrid"
-            class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           >
             <div class="booking-container p-6 text-center text-slate-400">
               Loading...
@@ -294,16 +310,21 @@
 
         <!-- Section: Events Manager -->
         <section id="section-events" class="dashboard-section hidden">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold">Events Manager</h2>
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold">Events Manager</h2>
             <button
               id="btnNewEvent"
-              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
             >
               + Event Baru
             </button>
           </div>
-          <div id="eventsGrid" class="grid gap-4 md:grid-cols-2">
+          <div
+            id="eventsGrid"
+            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2"
+          >
             <div class="booking-container p-6 text-center text-slate-400">
               Loading...
             </div>
@@ -339,7 +360,7 @@
                     required
                   />
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm mb-2">Tanggal</label>
                     <input
@@ -414,18 +435,20 @@
 
         <!-- Section: Coupon Manager -->
         <section id="section-coupons" class="dashboard-section hidden">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold">Coupon Manager</h2>
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold">Coupon Manager</h2>
             <button
               id="btnNewCoupon"
-              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500"
+              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
             >
               + Kode Promo Baru
             </button>
           </div>
           <div
             id="couponsGrid"
-            class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           >
             <div class="booking-container p-6 text-center text-slate-400">
               Loading...
@@ -472,7 +495,7 @@
                     placeholder="Diskon selamat datang 15%"
                   />
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm mb-2">Tipe Diskon</label>
                     <select
@@ -579,28 +602,66 @@
               <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
             </div>
             <div>
-              <h3 class="text-xl font-bold text-red-400">Konfirmasi Hapus</h3>
-              <p class="text-sm text-slate-400">
+              <h3 class="text-lg sm:text-xl font-bold text-red-400">
+                Konfirmasi Hapus
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-400">
                 Tindakan ini tidak dapat dibatalkan
               </p>
             </div>
           </div>
-          <p class="text-slate-300 mb-6" id="deleteModalMessage">
+          <p
+            class="text-sm sm:text-base text-slate-300 mb-6"
+            id="deleteModalMessage"
+          >
             Apakah Anda yakin ingin menghapus item ini secara permanen?
           </p>
-          <div class="flex gap-3">
+          <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               id="confirmDelete"
-              class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors"
+              class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 sm:py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors"
             >
               Ya, Hapus Permanen
             </button>
             <button
               id="cancelDelete"
-              class="flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg transition-colors"
+              class="flex-1 bg-slate-800 hover:bg-slate-700 py-2.5 sm:py-2 rounded-lg text-sm sm:text-base transition-colors"
             >
               Batal
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success Notification Modal -->
+      <div
+        id="successModal"
+        class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-slate-900 border border-emerald-800 rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95 opacity-0"
+          id="successModalContent"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center"
+            >
+              <i
+                data-lucide="check-circle"
+                class="w-6 h-6 text-emerald-400"
+              ></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg sm:text-xl font-bold text-emerald-400">
+                Berhasil!
+              </h3>
+              <p
+                class="text-xs sm:text-sm text-slate-300"
+                id="successModalMessage"
+              >
+                Operasi berhasil dilakukan
+              </p>
+            </div>
           </div>
         </div>
       </div>

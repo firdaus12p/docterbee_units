@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docterbee – AI Advisor Qur'ani (Preview)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}</style>
+</head>
+<body class="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 selection:bg-amber-400/30">
+<header class="sticky top-0 z-50 bg-slate-950/70 backdrop-blur border-b border-slate-800/60">
+  <div class="mx-auto max-w-5xl px-4 md:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-2"><div class="h-8 w-8 rounded-xl bg-amber-400/90 shadow-lg shadow-amber-400/30"></div><span class="font-semibold">Docterbee</span></div>
+    <nav class="hidden md:flex gap-6 text-sm">
+      <a href="docterbee_home_preview.html" class="opacity-90 hover:opacity-100">Home</a>
+      <a href="#" class="opacity-100">AI Advisor</a>
+      <a href="docterbee_booking.html" class="opacity-90 hover:opacity-100">Booking Praktisi</a>
+    </nav>
+  </div>
+</header>
+
+<main class="mx-auto max-w-5xl px-4 md:px-6 py-10">
+  <div class="mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold mb-2">AI Advisor Qur’ani</h1>
+    <p class="text-slate-300/85 max-w-2xl">Tanyakan perilaku/kebiasaan, dapatkan <b>verdict</b> (Benar / Salah / Hati‑hati) dengan <b>dalil</b> Qur’an & Hadis serta catatan biomolekuler. *Demo ini berjalan lokal (tanpa server).*</p>
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-3">
+    <div class="md:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <label class="text-xs opacity-70">Pertanyaan / Perilaku</label>
+      <textarea id="q" class="mt-1 w-full rounded-lg bg-slate-900/60 border border-slate-800 px-3 py-2 h-28" placeholder="Contoh: Saya sering begadang, jarang shalat malam, dan minum kopi manis 3 gelas sehari. Bagaimana menurut syariat dan kesehatan?"></textarea>
+      <div class="mt-4 flex gap-3">
+        <button onclick="analyze()" class="rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold">Analisis</button>
+        <button onclick="sample(0)" class="rounded-lg border border-slate-700 px-3 py-2 text-sm">Contoh 1</button>
+        <button onclick="sample(1)" class="rounded-lg border border-slate-700 px-3 py-2 text-sm">Contoh 2</button>
+        <button onclick="sample(2)" class="rounded-lg border border-slate-700 px-3 py-2 text-sm">Contoh 3</button>
+      </div>
+    </div>
+
+    <aside class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 text-sm">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="shield-check" class="w-4 h-4 text-amber-300"></i><b>Guardrails</b></div>
+      <ul class="list-disc pl-5 text-slate-300/85 space-y-1">
+        <li>AI untuk edukasi, bukan diagnosis.</li>
+        <li>Jika bergejala berat → konsultasi praktisi.</li>
+        <li>Rujukan dalil diambil dari korpus ringkas.</li>
+      </ul>
+      <div class="mt-4 flex items-center gap-2"><i data-lucide="book-open-check" class="w-4 h-4 text-sky-300"></i><b>NBSN</b></div>
+      <p class="text-slate-300/80">Neuron–Biomolekul–Sensorik–Nature sebagai kerangka nasihat.</p>
+    </aside>
+  </div>
+
+  <section class="mt-8 grid gap-6 md:grid-cols-3">
+    <div class="md:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/60">
+      <div class="p-5 border-b border-slate-800"><div class="text-lg font-semibold">Hasil Analisis</div></div>
+      <div id="result" class="p-5 text-sm text-slate-200 space-y-4">
+        <p class="opacity-70">Tulis pertanyaan lalu klik <b>Analisis</b> untuk melihat hasil.</p>
+      </div>
+    </div>
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i><b>Tips</b></div>
+      <ul class="list-disc pl-5 text-slate-300/85 space-y-1">
+        <li>Gunakan kalimat spesifik & jujur.</li>
+        <li>Sertakan kebiasaan: tidur, makan, ibadah.</li>
+        <li>Tulis target perbaikan 7 hari ke depan.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="mt-10 border-t border-slate-800 text-center text-xs text-slate-500 py-6">© <span id="year"></span> Docterbee</footer>
+
+<script>
+const samples = [
+  "Saya sering begadang sampai jam 1–2 pagi, minum kopi manis 3 gelas sehari, dan jarang olahraga. Bagaimana menurunkannya menurut Qur'an dan kesehatan?",
+  "Saya ingin mulai puasa Senin-Kamis dan rutin minum madu 20ml pagi hari. Apakah sudah benar dan ada saran tambahan?",
+  "Saya gampang marah di kantor dan sering melewatkan shalat tepat waktu. Apa langkah perbaikan yang disarankan?"
+];
+function sample(i){ document.getElementById('q').value = samples[i]; }
+
+const DALIL = [
+  {type:"Quran", ref:"QS Al-Isra': 82", text:"Al-Qur’an sebagai penawar dan rahmat."},
+  {type:"Hadis", ref:"HR. Bukhari", text:"Di dalam tubuh ada segumpal daging..." },
+  {type:"Quran", ref:"QS Al-A'raf: 31", text:"Makan dan minumlah, dan jangan berlebih-lebihan."},
+  {type:"Hadis", ref:"HR. Tirmidzi", text:"Puasa adalah perisai."},
+];
+function pickDalil(keys){
+  const arr = DALIL.filter(d => keys.length===0 || keys.some(k=>d.text.toLowerCase().includes(k)));
+  return (arr.length?arr:DALIL).slice(0,2);
+}
+
+function analyze(){
+  const q = (document.getElementById('q').value || "").toLowerCase();
+  if(!q.trim()){ alert("Tolong tulis pertanyaan/perilaku terlebih dahulu."); return; }
+
+  let score = 0, keys=[];
+  if(q.includes("begadang") || (q.includes("tidur") && q.includes("kurang"))) { score -= 2; keys.push("tidur"); }
+  if(q.includes("kopi") || q.includes("gula") || q.includes("manis")) { score -= 1; keys.push("makan"); }
+  if(q.includes("olahraga")) score += 1;
+  if(q.includes("puasa")) { score += 2; keys.push("puasa"); }
+  if(q.includes("madu")) { score += 1; keys.push("madu"); }
+  if(q.includes("shalat") || q.includes("salat")) { score += 2; keys.push("shalat"); }
+  if(q.includes("marah")) score -= 1;
+  if(q.includes("rokok")) score -= 2;
+
+  let verdict = "Hati‑hati", badge="bg-yellow-400 text-slate-900";
+  if(score >= 3) { verdict = "Benar"; badge="bg-emerald-400 text-slate-900"; }
+  if(score <= -1) { verdict = "Salah"; badge="bg-rose-500 text-white"; }
+
+  const dalil = pickDalil(keys).map(d=>`<li><b>${d.type}</b> — ${d.ref}: <span class="opacity-80">${d.text}</span></li>`).join("");
+  const steps = [
+    "Perbaiki tidur (target 7–8 jam); matikan layar 60 menit sebelum tidur.",
+    "Ganti manis rafinasi → madu murni 1–2 sdm/hari; perbanyak air putih.",
+    "Rutinkan shalat tepat waktu dan dzikir pagi–petang.",
+    "Tambahkan puasa sunnah / olahraga ringan 20–30 menit.",
+    "Cek kondisi jika keluhan berat → konsultasi praktisi."
+  ];
+
+  const bio = [
+    "Tidur cukup menurunkan kortisol → menstabilkan sistem limbik.",
+    "Madu mengandung enzim & flavonoid → membantu antioksidan endogen.",
+    "Puasa meningkatkan autofagi & sensitivitas insulin.",
+  ];
+
+  document.getElementById('result').innerHTML = `
+    <div class="flex items-center gap-3">
+      <span class="rounded-lg px-2.5 py-1 text-xs font-semibold ${badge}">${verdict}</span>
+      <span class="opacity-70">Skor demo: ${score}</span>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4 mt-3">
+      <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <div class="font-semibold mb-1">Langkah Disarankan</div>
+        <ul class="list-disc pl-5 space-y-1 text-slate-200/85">${steps.map(s=>`<li>${s}</li>`).join("")}</ul>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <div class="font-semibold mb-1">Dalil</div>
+        <ul class="list-disc pl-5 space-y-1 text-slate-200/85">${dalil}</ul>
+      </div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4 mt-4">
+      <div class="font-semibold mb-1">Catatan Biomolekuler</div>
+      <ul class="list-disc pl-5 space-y-1 text-slate-200/85">${bio.map(s=>`<li>${s}</li>`).join("")}</ul>
+    </div>
+    <div class="mt-4 text-xs text-slate-400">*Demo lokal. Untuk kasus serius, mohon konsultasi dengan praktisi.</div>
+  `;
+}
+
+document.getElementById('year').textContent = new Date().getFullYear();
+lucide.createIcons();
+</script>
+</body>
+</html>

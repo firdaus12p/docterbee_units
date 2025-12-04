@@ -280,13 +280,22 @@ async function loadBookings() {
             </select>
           </td>
           <td class="p-3">
-            <button 
-              data-action="view-booking"
-              data-id="${booking.id}"
-              class="text-amber-400 hover:text-amber-300 text-xs"
-            >
-              Detail
-            </button>
+            <div class="flex gap-2">
+              <button 
+                data-action="view-booking"
+                data-id="${booking.id}"
+                class="text-amber-400 hover:text-amber-300 text-xs"
+              >
+                Detail
+              </button>
+              <button 
+                data-action="delete-booking"
+                data-id="${booking.id}"
+                class="text-red-400 hover:text-red-300 text-xs"
+              >
+                Hapus
+              </button>
+            </div>
           </td>
         </tr>
       `
@@ -301,16 +310,25 @@ async function loadBookings() {
         });
       });
 
+      tbody
+        .querySelectorAll('[data-action="delete-booking"]')
+        .forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const id = this.getAttribute("data-id");
+            deleteBooking(parseInt(id));
+          });
+        });
+
       // Check if table actually overflows and adjust scrollbar visibility
       checkTableOverflow();
     } else {
       tbody.innerHTML =
-        '<tr><td colspan="13" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
+        '<tr><td colspan="14" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
     }
   } catch (error) {
     console.error("Error loading bookings:", error);
     tbody.innerHTML =
-      '<tr><td colspan="13" class="text-center p-6 text-red-400">Error loading data</td></tr>';
+      '<tr><td colspan="14" class="text-center p-6 text-red-400">Error loading data</td></tr>';
   }
 }
 
@@ -339,6 +357,32 @@ function checkTableOverflow() {
     window.addEventListener("resize", checkTableOverflow);
     window.hasOverflowListener = true;
   }
+}
+
+async function deleteBooking(id) {
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus booking ini secara permanen? Data booking dan riwayat pelanggan akan hilang selamanya.",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/bookings/${id}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          showSuccessModal("Booking berhasil dihapus secara permanen");
+          loadBookings();
+        } else {
+          alert(
+            "Gagal menghapus booking: " + (result.error || "Unknown error")
+          );
+        }
+      } catch (error) {
+        console.error("Error deleting booking:", error);
+        alert("Gagal menghapus booking");
+      }
+    }
+  );
 }
 
 async function updateBookingStatus(id, status) {
@@ -635,7 +679,9 @@ async function handleArticleSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      alert(id ? "Artikel berhasil diupdate" : "Artikel berhasil dibuat");
+      showSuccessModal(
+        id ? "Artikel berhasil diupdate" : "Artikel berhasil dibuat"
+      );
       closeArticleModal();
       loadArticles();
     } else {
@@ -670,22 +716,29 @@ async function editArticle(id) {
 }
 
 async function deleteArticle(id) {
-  if (!confirm("Yakin ingin menghapus artikel ini?")) return;
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus artikel ini secara permanen? Data artikel akan hilang selamanya.",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/insight/${id}`, {
+          method: "DELETE",
+        });
 
-  try {
-    const response = await fetch(`${API_BASE}/insight/${id}`, {
-      method: "DELETE",
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      alert("Artikel berhasil dihapus");
-      loadArticles();
+        const result = await response.json();
+        if (result.success) {
+          showSuccessModal("Artikel berhasil dihapus secara permanen");
+          loadArticles();
+        } else {
+          alert(
+            "Gagal menghapus artikel: " + (result.error || "Unknown error")
+          );
+        }
+      } catch (error) {
+        console.error("Error deleting article:", error);
+        alert("Gagal menghapus artikel");
+      }
     }
-  } catch (error) {
-    console.error("Error deleting article:", error);
-    alert("Gagal menghapus artikel");
-  }
+  );
 }
 
 // ========== EVENTS ==========
@@ -817,7 +870,9 @@ async function handleEventSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      alert(id ? "Event berhasil diupdate" : "Event berhasil dibuat");
+      showSuccessModal(
+        id ? "Event berhasil diupdate" : "Event berhasil dibuat"
+      );
       closeEventModal();
       loadEvents();
     } else {
@@ -867,7 +922,7 @@ async function deleteEvent(id) {
 
         const result = await response.json();
         if (result.success) {
-          alert("Event berhasil dihapus permanen");
+          showSuccessModal("Event berhasil dihapus secara permanen");
           loadEvents();
         } else {
           alert(result.error || "Gagal menghapus event");
@@ -1028,7 +1083,9 @@ async function handleCouponSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      alert(id ? "Kode promo berhasil diupdate" : "Kode promo berhasil dibuat");
+      showSuccessModal(
+        id ? "Kode promo berhasil diupdate" : "Kode promo berhasil dibuat"
+      );
       closeCouponModal();
       loadCoupons();
     } else {
@@ -1085,7 +1142,7 @@ async function deleteCoupon(id) {
 
         const result = await response.json();
         if (result.success) {
-          alert("Kode promo berhasil dihapus permanen");
+          showSuccessModal("Kode promo berhasil dihapus secara permanen");
           loadCoupons();
         } else {
           alert(result.error || "Gagal menghapus kode promo");
@@ -1123,6 +1180,65 @@ function closeDeleteModal() {
   if (modal) {
     modal.classList.add("hidden");
     deleteCallback = null;
+  }
+}
+
+// ========== SUCCESS MODAL ==========
+
+let successTimeout = null;
+
+function showSuccessModal(message) {
+  const modal = document.getElementById("successModal");
+  const content = document.getElementById("successModalContent");
+  const messageEl = document.getElementById("successModalMessage");
+
+  if (modal && messageEl && content) {
+    messageEl.textContent = message;
+    modal.classList.remove("hidden");
+
+    // Animate in
+    setTimeout(() => {
+      content.classList.remove("scale-95", "opacity-0");
+      content.classList.add("scale-100", "opacity-100");
+    }, 10);
+
+    // Auto close after 2 seconds
+    if (successTimeout) clearTimeout(successTimeout);
+    successTimeout = setTimeout(() => {
+      closeSuccessModal();
+    }, 2000);
+
+    // Close on click outside
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeSuccessModal();
+      }
+    };
+
+    // Refresh icons
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  }
+}
+
+function closeSuccessModal() {
+  const modal = document.getElementById("successModal");
+  const content = document.getElementById("successModalContent");
+
+  if (modal && content) {
+    // Animate out
+    content.classList.remove("scale-100", "opacity-100");
+    content.classList.add("scale-95", "opacity-0");
+
+    setTimeout(() => {
+      modal.classList.add("hidden");
+    }, 300);
+
+    if (successTimeout) {
+      clearTimeout(successTimeout);
+      successTimeout = null;
+    }
   }
 }
 
