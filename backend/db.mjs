@@ -201,6 +201,27 @@ async function initializeTables() {
     `);
     console.log("✅ Table: coupons");
 
+    // Create services table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        category ENUM('manual', 'klinis', 'konsultasi', 'perawatan') NOT NULL,
+        price DECIMAL(10, 2) NOT NULL,
+        description TEXT NOT NULL,
+        branch VARCHAR(255) NOT NULL COMMENT 'Comma-separated branches: Kolaka, Makassar, Kendari',
+        mode ENUM('online', 'offline', 'both') NOT NULL DEFAULT 'both',
+        practitioner VARCHAR(255) DEFAULT NULL,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_category (category),
+        INDEX idx_active (is_active),
+        INDEX idx_mode (mode)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: services");
+
     console.log("📦 All tables initialized successfully");
   } catch (error) {
     console.error("❌ Error initializing tables:", error.message);

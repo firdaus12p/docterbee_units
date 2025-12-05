@@ -20,12 +20,12 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 - **`media.html`**: YouTube/podcast player + AI analysis via `/api/summarize` (Gemini)
 - **`ai-advisor.html`**: AI health advisor with Qur'an/Sunnah context - calls `/api/ai-advisor` (Gemini)
 - **`admin-dashboard.html`**: CRUD for bookings/events/articles/coupons - uses `sessionStorage` auth
-- **`services.html`**: Services listing
+- **`services.html`**: Services listing - fetches from `/api/services` with filters (branch, mode, category)
 
 **File Organization** (critical - paths changed from root):
 
 - **`css/style.css`**: 1669 lines (Header: 119, Hero: 227, Booking: 697, Events: 1102, Insight: 1200, Media: 1339)
-- **`js/script.js`**: 1860 lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Page inits: 664+)
+- **`js/script.js`**: 2500+ lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Services: ~2350, Page inits: 664+)
 - **`js/admin-dashboard.js`**: 875 lines for admin (Auth check: line 18, Event listeners: 50-92, Tab switching: 117)
 
 **All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or `js/admin-dashboard.js` for admin)  
@@ -36,9 +36,8 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 **API server with auto-initializing database:**
 
 - **`backend/server.mjs`**: Main server (627 lines) - mounts 4 routers, serves static files from root, 2 Gemini endpoints (`/api/summarize`, `/api/ai-advisor`)
-- **`backend/db.mjs`**: Connection pool (149 lines) - creates 4 tables on startup if missing
-- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs (each ~200-280 lines)
-- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs (each ~200-280 lines)
+- **`backend/db.mjs`**: Connection pool (250+ lines) - creates 5 tables on startup if missing
+- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs, services.mjs (each ~200-310 lines)
 
 **Database Tables** (auto-created):
 
@@ -46,6 +45,7 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 2. `events` - title, event_date, mode (enum: online/offline), topic, description, speaker, registration_fee, registration_deadline, location, link, is_active (soft delete)
 3. `articles` - title, slug (unique), content, image_url, is_published (soft delete)
 4. `coupons` - code (unique), discount_type (enum: percentage/fixed), value, usage_limit, is_active
+5. `services` - name, category (enum: manual/klinis/konsultasi/perawatan), price, description, branch (comma-separated), mode (enum: online/offline/both), practitioner, is_active (soft delete)
 
 **Critical**: MySQL runs on port **3307** (not default 3306) - XAMPP configuration. Set `DB_PORT=3307` in `.env`
 
@@ -90,15 +90,33 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 
 **Critical**: When adding questions to `UNITS` array in `js/script.js`, escape single quotes with `\'`
 
-### 3. XSS Prevention (Frontend)
+### 3. XSS Prevention & Markdown Rendering (Frontend)
 
-All user-facing content uses `escapeHtml()` function (~line 380 in js/script.js):
+**Security**: All user-facing content uses `escapeHtml()` function (~line 380 in js/script.js) before inserting into DOM.
+
+**Markdown Support**: For AI-generated content, use `markdownToHtml()` function (~line 2120 in js/script.js) which safely converts markdown formatting to HTML:
 
 ```javascript
+// ✅ CORRECT: For AI responses with markdown (**, *, `)
+<p class="text-slate-200/85">${markdownToHtml(aiResponse)}</p>
+
+// ✅ CORRECT: For user input without markdown
 <div class="font-semibold">${escapeHtml(item.q)}</div>
 ```
 
-Never insert raw strings into innerHTML without escaping.
+**`markdownToHtml()` features**:
+
+- Converts `**bold**` → `<strong class='font-semibold text-slate-100'>`
+- Converts `*italic*` → `<em class='italic text-slate-200'>`
+- Converts `` `code` `` → `<code class='px-1.5 py-0.5 rounded bg-slate-800 text-amber-300'>`
+- Automatically escapes HTML first for XSS protection
+
+**Usage locations**:
+
+- `js/script.js`: `formatAISummary()` for media analysis, `summarizeArticleById()` for insight
+- `ai-advisor.html`: All AI response rendering (verdict, steps, dalil, NBSN analysis)
+
+Never insert raw strings into innerHTML without escaping or markdown processing.
 
 ### 4. SQL Injection Prevention (Backend)
 
@@ -326,17 +344,25 @@ const requests = await page.evaluate(() =>
 **Fallback**: Local analysis using keyword matching if API fails or quota exceeded  
 **Points**: +3 points when AI analysis completes successfully
 
+### Services Page (services.html)
+
+**State**: Fetches from `/api/services` with filters (branch, mode, category)  
+**Key functions**: `renderServices()` (async), `getCategoryBadgeHTML()`, `getModeInfoHTML()`, `formatPrice()`, `initServices()`  
+**Filter IDs**: `branchFilter` (Kolaka/Makassar/Kendari), `modeFilter` (online/offline), category checkboxes  
+**Dynamic rendering**: Replaces static HTML cards with API data from database  
+**Integration**: Services managed via admin dashboard appear on public page automatically
+
 ### Admin Dashboard (admin-dashboard.html)
 
 **Authentication**: Simple sessionStorage-based (`admin_session` key), credentials: `admin/docterbee2025`  
-**Structure**: 4 sections with tab navigation (Bookings, Events, Insight, Coupons)  
+**Structure**: 5 sections with tab navigation (Bookings, Events, Insight, Coupons, Services)  
 **Key patterns**:
 
 - `sessionStorage` check on load (line 18 in js/admin-dashboard.js)
 - All CRUD uses fetch API to backend (`API_BASE = "http://localhost:3000/api"`)
 - Modal-based editing (open/close functions per section)
 - Status dropdown for bookings (pending/confirmed/completed/cancelled)
-- Soft delete for events/articles (sets `is_active=0` or `is_published=0`)
+- Soft delete for events/articles/services (sets `is_active=0` or `is_published=0`)
 
 **Critical functions per section**:
 
@@ -344,6 +370,7 @@ const requests = await page.evaluate(() =>
 - Events: `loadEvents()`, `openEventModal()`, `handleEventSubmit()`, `deleteEvent()`
 - Insight: `loadArticles()`, `openArticleModal()`, `handleArticleSubmit()`, `deleteArticle()`
 - Coupons: `loadCoupons()`, `openCouponModal()`, `handleCouponSubmit()`, `deleteCoupon()`
+- Services: `loadServices()`, `openServiceModal()`, `handleServiceSubmit()`, `editService()`, `confirmDeleteService()`
 
 ## Testing & Validation
 
@@ -382,14 +409,15 @@ await page.click('#couponForm button[type="submit"]');
 1. ❌ Don't add inline onclick handlers to HTML (except `summarizeArticle()` on insight page buttons and `analyzeQuestion()` on ai-advisor)
 2. ❌ Don't add inline styles to HTML - all styling in `css/style.css`
 3. ❌ Don't forget to escape quotes in UNITS array strings with `\'`
-4. ❌ Don't skip XSS escaping when inserting dynamic content - use `escapeHtml()`
-5. ❌ Don't use string concatenation in SQL queries - always use parameterized statements
-6. ❌ Don't hard delete database records - use soft delete flags (`is_active`, `is_published`)
-7. ❌ Don't forget to update ALL 7 HTML pages when changing shared components (header/footer/nav)
-8. ❌ Don't forget `initMobileMenu()` call when creating new pages
-9. ❌ Don't assume MySQL default port 3306 - this project uses 3307 (XAMPP config)
-10. ❌ Don't use `require()` in backend - this project uses ES Modules (`import/export`)
-11. ❌ Don't pass functions directly to addEventListener if they have optional parameters - use arrow functions
+4. ❌ Don't skip XSS escaping when inserting dynamic content - use `escapeHtml()` for plain text or `markdownToHtml()` for AI responses
+5. ❌ Don't display raw markdown symbols (\*_, _, `) in AI responses - always use `markdownToHtml()` for proper formatting
+6. ❌ Don't use string concatenation in SQL queries - always use parameterized statements
+7. ❌ Don't hard delete database records - use soft delete flags (`is_active`, `is_published`)
+8. ❌ Don't forget to update ALL 8 HTML pages when changing shared components (header/footer/nav)
+9. ❌ Don't forget `initMobileMenu()` call when creating new pages
+10. ❌ Don't assume MySQL default port 3306 - this project uses 3307 (XAMPP config)
+11. ❌ Don't use `require()` in backend - this project uses ES Modules (`import/export`)
+12. ❌ Don't pass functions directly to addEventListener if they have optional parameters - use arrow functions
 
 ## Project Structure
 
@@ -402,12 +430,13 @@ docterbee_units/
 │       ├── bookings.mjs
 │       ├── events.mjs
 │       ├── insight.mjs
-│       └── coupons.mjs
+│       ├── coupons.mjs
+│       └── services.mjs
 ├── css/                 # Organized stylesheets
 │   └── style.css        # 1669 lines, component-organized
 ├── js/                  # Organized JavaScript
-│   ├── script.js        # 1860 lines, public pages logic
-│   └── admin-dashboard.js # 875 lines, admin CRUD
+│   ├── script.js        # 2500+ lines, public pages logic
+│   └── admin-dashboard.js # 1573 lines, admin CRUD
 ├── docs/                # All documentation
 │   ├── QUICKSTART.md
 **Current pages**:

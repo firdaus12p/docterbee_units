@@ -141,6 +141,14 @@
             <span class="hidden sm:inline">Coupon Manager</span>
             <span class="sm:hidden">Coupon</span>
           </button>
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="services"
+          >
+            <i data-lucide="briefcase" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Services Manager</span>
+            <span class="sm:hidden">Services</span>
+          </button>
         </div>
 
         <!-- Section: Booking Monitor -->
@@ -419,12 +427,10 @@
                       >Biaya Pendaftaran (Rp)</label
                     >
                     <input
-                      type="number"
+                      type="text"
                       id="eventRegistrationFee"
                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
                       placeholder="0 = Gratis"
-                      min="0"
-                      step="1000"
                       value="0"
                     />
                   </div>
@@ -568,12 +574,11 @@
                     >Min. Nilai Booking (Rp)</label
                   >
                   <input
-                    type="number"
+                    type="text"
                     id="couponMinBookingValue"
                     class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
                     placeholder="0"
                     value="0"
-                    step="1000"
                   />
                   <small class="text-slate-400"
                     >Minimal nilai booking untuk menggunakan kupon (0 = tidak
@@ -620,6 +625,206 @@
                   <button
                     type="button"
                     id="cancelCoupon"
+                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Services Manager -->
+        <section id="section-services" class="dashboard-section hidden">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold">Services Manager</h2>
+            <button
+              id="btnNewService"
+              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-amber-500 flex items-center gap-2 justify-center sm:justify-start"
+            >
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Tambah Service</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table
+              id="servicesTable"
+              class="w-full text-sm border border-slate-800 rounded-lg overflow-hidden"
+            >
+              <thead class="bg-slate-800">
+                <tr>
+                  <th class="px-3 py-3 text-left">ID</th>
+                  <th class="px-3 py-3 text-left">Nama Layanan</th>
+                  <th class="px-3 py-3 text-left">Kategori</th>
+                  <th class="px-3 py-3 text-left">Harga</th>
+                  <th class="px-3 py-3 text-left">Cabang</th>
+                  <th class="px-3 py-3 text-left">Mode</th>
+                  <th class="px-3 py-3 text-left">Status</th>
+                  <th class="px-3 py-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="servicesTableBody">
+                <tr>
+                  <td colspan="8" class="text-center py-8 text-slate-400">
+                    Loading...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Service Modal -->
+          <div
+            id="serviceModal"
+            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+          >
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            >
+              <h3 id="serviceModalTitle" class="text-xl font-bold mb-4">
+                Tambah Service Baru
+              </h3>
+              <form id="serviceForm" class="space-y-4">
+                <input type="hidden" id="serviceId" />
+
+                <div>
+                  <label class="block text-sm mb-2">Nama Layanan *</label>
+                  <input
+                    type="text"
+                    id="serviceName"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Contoh: Bekam Profesional"
+                    required
+                  />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm mb-2">Kategori *</label>
+                    <select
+                      id="serviceCategory"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    >
+                      <option value="">Pilih Kategori</option>
+                      <option value="manual">Manual Therapy</option>
+                      <option value="klinis">Layanan Klinis</option>
+                      <option value="konsultasi">Konsultasi</option>
+                      <option value="perawatan">Perawatan</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Harga (Rp) *</label>
+                    <input
+                      type="text"
+                      id="servicePrice"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="150.000"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm mb-2">Deskripsi *</label>
+                  <textarea
+                    id="serviceDescription"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Terapi hijamah sesuai SOP medis & hygiene. Berdasarkan hadis shahih."
+                    rows="3"
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm mb-2">Cabang/Kota *</label>
+                    <div
+                      class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 space-y-2"
+                    >
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="serviceBranch"
+                          value="Kolaka"
+                          class="w-4 h-4 rounded"
+                        />
+                        <span class="text-sm">Kolaka</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="serviceBranch"
+                          value="Makassar"
+                          class="w-4 h-4 rounded"
+                        />
+                        <span class="text-sm">Makassar</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="serviceBranch"
+                          value="Kendari"
+                          class="w-4 h-4 rounded"
+                        />
+                        <span class="text-sm">Kendari</span>
+                      </label>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">
+                      Pilih minimal satu cabang
+                    </p>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Mode *</label>
+                    <select
+                      id="serviceMode"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    >
+                      <option value="">Pilih Mode</option>
+                      <option value="online">Online</option>
+                      <option value="offline">Offline</option>
+                      <option value="both">Online & Offline</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm mb-2">Praktisi (Opsional)</label>
+                  <input
+                    type="text"
+                    id="servicePractitioner"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="dr. Ahmad, SpGZ"
+                  />
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="serviceIsActive"
+                    class="w-4 h-4"
+                    checked
+                  />
+                  <label class="text-sm">Aktif</label>
+                </div>
+
+                <div class="flex gap-2">
+                  <button
+                    type="submit"
+                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    id="cancelService"
                     class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
                   >
                     Batal

@@ -1627,7 +1627,7 @@ async function summarizeArticleById(slug) {
       <div class="grid md:grid-cols-2 gap-4">
         <div class="nbsn-card">
           <div class="font-semibold mb-1">Ringkasan</div>
-          <p class="text-slate-200/85">${escapeHtml(
+          <p class="text-slate-200/85">${markdownToHtml(
             article.excerpt || article.content.substring(0, 300) + "..."
           )}</p>
         </div>
@@ -1729,16 +1729,31 @@ function renderPodcastList() {
  * @param {string} url - Podcast URL
  */
 function playPodcast(title, url) {
+  // Update both nowPlaying displays (YouTube section and Podcast section)
   const nowPlaying = document.getElementById("nowPlaying");
-  const audioPlayer = document.getElementById("audioPlayer");
+  const nowPlayingPodcast = document.getElementById("nowPlayingPodcast");
 
   if (nowPlaying) {
     nowPlaying.textContent = title;
   }
+  if (nowPlayingPodcast) {
+    nowPlayingPodcast.textContent = title;
+  }
+
+  // Update both audio players (keep them in sync)
+  const audioPlayer = document.getElementById("audioPlayer");
+  const audioPlayerPodcast = document.getElementById("audioPlayerPodcast");
 
   if (audioPlayer) {
     audioPlayer.src = url;
     audioPlayer.play().catch(() => {
+      console.log("Audio autoplay prevented");
+    });
+  }
+
+  if (audioPlayerPodcast) {
+    audioPlayerPodcast.src = url;
+    audioPlayerPodcast.play().catch(() => {
       console.log("Audio autoplay prevented");
     });
   }
@@ -2102,6 +2117,36 @@ async function analyzeMedia() {
 /**
  * Format AI summary from Gemini API response to styled HTML
  */
+/**
+ * Convert markdown formatting to HTML
+ */
+function markdownToHtml(text) {
+  if (!text) return "";
+
+  // Escape HTML first
+  let html = escapeHtml(text);
+
+  // Convert **bold** to <strong>
+  html = html.replace(
+    /\*\*(.+?)\*\*/g,
+    "<strong class='font-semibold text-slate-100'>$1</strong>"
+  );
+
+  // Convert *italic* to <em> (only if not part of **bold**)
+  html = html.replace(
+    /(?<!\*)\*([^*]+?)\*(?!\*)/g,
+    "<em class='italic text-slate-200'>$1</em>"
+  );
+
+  // Convert `code` to <code>
+  html = html.replace(
+    /`(.+?)`/g,
+    "<code class='px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-sm font-mono'>$1</code>"
+  );
+
+  return html;
+}
+
 function formatAISummary(text, metadata = {}) {
   if (!text) return "<p class='text-slate-400'>Tidak ada hasil analisis.</p>";
 
@@ -2186,12 +2231,12 @@ function formatAISummary(text, metadata = {}) {
     // Detect numbered lists (1. 2. 3.)
     else if (/^\d+\.\s/.test(trimmed)) {
       const content = trimmed.replace(/^\d+\.\s/, "");
-      currentList.push(`<li>${escapeHtml(content)}</li>`);
+      currentList.push(`<li>${markdownToHtml(content)}</li>`);
     }
     // Detect bullet points (- or *)
     else if (trimmed.startsWith("-") || trimmed.startsWith("*")) {
       const content = trimmed.substring(1).trim();
-      currentList.push(`<li>${escapeHtml(content)}</li>`);
+      currentList.push(`<li>${markdownToHtml(content)}</li>`);
     }
     // Regular paragraph
     else if (trimmed) {
@@ -2201,7 +2246,7 @@ function formatAISummary(text, metadata = {}) {
         )}</ul>`;
         currentList = [];
       }
-      html += `<p class="text-slate-200/85">${escapeHtml(trimmed)}</p>`;
+      html += `<p class="text-slate-200/85">${markdownToHtml(trimmed)}</p>`;
     }
   });
 
@@ -2225,6 +2270,42 @@ function formatAISummary(text, metadata = {}) {
 /**
  * Initialize media page
  */
+/**
+ * Switch between YouTube & AI and Podcast tabs
+ */
+function switchTab(tab) {
+  const sectionYouTube = document.getElementById("sectionYouTube");
+  const sectionPodcast = document.getElementById("sectionPodcast");
+  const aiResultSection = document.getElementById("aiResultSection");
+  const tabYouTube = document.getElementById("tabYouTube");
+  const tabPodcast = document.getElementById("tabPodcast");
+
+  if (tab === "youtube") {
+    // Show YouTube & AI section
+    sectionYouTube.classList.remove("hidden");
+    aiResultSection.classList.remove("hidden");
+    sectionPodcast.classList.add("hidden");
+
+    // Update tab buttons - use .active class
+    tabYouTube.classList.add("active");
+    tabPodcast.classList.remove("active");
+  } else if (tab === "podcast") {
+    // Show Podcast section
+    sectionYouTube.classList.add("hidden");
+    aiResultSection.classList.add("hidden");
+    sectionPodcast.classList.remove("hidden");
+
+    // Update tab buttons - use .active class
+    tabPodcast.classList.add("active");
+    tabYouTube.classList.remove("active");
+  }
+
+  // Re-initialize Lucide icons after DOM changes
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+}
+
 function initMedia() {
   // Set current year in footer
   const yearElement = document.getElementById("year");
@@ -2263,6 +2344,198 @@ function initMedia() {
   refreshNav();
 }
 
+// ==================== SERVICES PAGE ====================
+
+/**
+ * Render services from API with filters
+ */
+async function renderServices() {
+  const grid = document.getElementById("servicesGrid");
+  if (!grid) return;
+
+  // Get filter values
+  const branchFilter = document.getElementById("branchFilter")?.value || "all";
+  const modeFilter = document.getElementById("modeFilter")?.value || "all";
+
+  try {
+    // Build query params
+    const params = new URLSearchParams();
+    if (branchFilter !== "all") params.append("branch", branchFilter);
+    if (modeFilter !== "all") params.append("mode", modeFilter);
+    params.append("is_active", "1"); // Only show active services
+
+    const response = await fetch(
+      `http://localhost:3000/api/services?${params.toString()}`
+    );
+    const result = await response.json();
+
+    if (!result.success) {
+      grid.innerHTML = `
+        <div class="md:col-span-2 text-center py-12">
+          <p class="text-slate-400">Gagal memuat layanan</p>
+        </div>
+      `;
+      return;
+    }
+
+    const services = result.data;
+
+    if (services.length === 0) {
+      grid.innerHTML = `
+        <div class="md:col-span-2 text-center py-12">
+          <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 text-slate-600"></i>
+          <p class="text-slate-400">Tidak ada layanan yang sesuai dengan filter</p>
+        </div>
+      `;
+      if (typeof lucide !== "undefined") lucide.createIcons();
+      return;
+    }
+
+    // Render services
+    grid.innerHTML = services
+      .map((service) => {
+        const categoryBadge = getCategoryBadgeHTML(service.category);
+        const modeInfo = getModeInfoHTML(service.mode);
+        const price = formatPrice(service.price);
+
+        return `
+          <div class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-amber-400/40 transition-all">
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-lg font-semibold">${escapeHtml(
+                service.name
+              )}</div>
+              ${categoryBadge}
+            </div>
+            <p class="text-sm text-slate-300/85 mb-4">
+              ${escapeHtml(service.description)}
+            </p>
+            ${
+              service.practitioner
+                ? `<div class="flex items-center gap-2 mb-3 text-xs text-slate-400">
+                <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                <span>${escapeHtml(service.practitioner)}</span>
+              </div>`
+                : ""
+            }
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="tag" class="w-4 h-4 text-amber-400"></i>
+              <span class="text-lg font-bold text-amber-300">${price}</span>
+            </div>
+            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+              <span>${escapeHtml(service.branch)}</span>
+            </div>
+            ${modeInfo}
+            <a
+              href="booking.html?service=${encodeURIComponent(service.name)}"
+              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+            >
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              Booking Sekarang
+            </a>
+          </div>
+        `;
+      })
+      .join("");
+
+    // Reinitialize Lucide icons
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  } catch (error) {
+    console.error("Error loading services:", error);
+    grid.innerHTML = `
+      <div class="md:col-span-2 text-center py-12">
+        <p class="text-slate-400">Gagal memuat layanan. Silakan coba lagi.</p>
+      </div>
+    `;
+  }
+}
+
+/**
+ * Get category badge HTML
+ */
+function getCategoryBadgeHTML(category) {
+  const badges = {
+    manual:
+      '<span class="text-xs rounded-full bg-amber-400/10 border border-amber-400/40 px-2 py-1 text-amber-300">Manual</span>',
+    klinis:
+      '<span class="text-xs rounded-full bg-sky-400/10 border border-sky-400/40 px-2 py-1 text-sky-300">Klinis</span>',
+    konsultasi:
+      '<span class="text-xs rounded-full bg-purple-400/10 border border-purple-400/40 px-2 py-1 text-purple-300">Konsultasi</span>',
+    perawatan:
+      '<span class="text-xs rounded-full bg-emerald-400/10 border border-emerald-400/40 px-2 py-1 text-emerald-300">Perawatan</span>',
+  };
+  return badges[category] || "";
+}
+
+/**
+ * Get mode info HTML
+ */
+function getModeInfoHTML(mode) {
+  const icons = {
+    online: "video",
+    offline: "home",
+    both: "video",
+  };
+  const labels = {
+    online: "Online",
+    offline: "Offline",
+    both: "Online & Offline",
+  };
+
+  return `
+    <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+      <i data-lucide="${icons[mode] || "video"}" class="w-3.5 h-3.5"></i>
+      <span>${labels[mode] || mode}</span>
+    </div>
+  `;
+}
+
+/**
+ * Format price to Indonesian Rupiah
+ */
+function formatPrice(price) {
+  return `Rp ${parseInt(price).toLocaleString("id-ID")}`;
+}
+
+/**
+ * Initialize services page
+ */
+function initServices() {
+  // Set current year in footer
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+
+  // Render services
+  renderServices();
+
+  // Attach filter listeners
+  const branchFilter = document.getElementById("branchFilter");
+  const modeFilter = document.getElementById("modeFilter");
+
+  if (branchFilter) {
+    branchFilter.addEventListener("change", renderServices);
+  }
+
+  if (modeFilter) {
+    modeFilter.addEventListener("change", renderServices);
+  }
+
+  // Initialize mobile menu
+  initMobileMenu();
+
+  // Initialize Lucide icons
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+
+  // Refresh navigation points
+  refreshNav();
+}
+
 // ==================== APP STARTUP ====================
 
 // Initialize on DOM ready
@@ -2277,6 +2550,8 @@ if (document.readyState === "loading") {
       initInsight();
     } else if (document.getElementById("ytPlayer")) {
       initMedia();
+    } else if (document.getElementById("servicesGrid")) {
+      initServices();
     } else {
       init();
     }
@@ -2291,6 +2566,8 @@ if (document.readyState === "loading") {
     initInsight();
   } else if (document.getElementById("ytPlayer")) {
     initMedia();
+  } else if (document.getElementById("servicesGrid")) {
+    initServices();
   } else {
     init();
   }

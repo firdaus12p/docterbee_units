@@ -8,6 +8,7 @@ import bookingsRouter from "./routes/bookings.mjs";
 import eventsRouter from "./routes/events.mjs";
 import insightRouter from "./routes/insight.mjs";
 import couponsRouter from "./routes/coupons.mjs";
+import servicesRouter from "./routes/services.mjs";
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +52,7 @@ app.use("/api/bookings", bookingsRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/insight", insightRouter);
 app.use("/api/coupons", couponsRouter);
+app.use("/api/services", servicesRouter);
 
 // Helper function to clean YouTube URL (remove tracking parameters)
 function cleanYoutubeUrl(url) {

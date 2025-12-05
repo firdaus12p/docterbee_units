@@ -85,9 +85,30 @@
           Putar <b>podcast audio</b> atau <b>video YouTube</b>, lalu minta AI
           menganalisis kesesuaian dengan Qur'an, Hadis, Docterbee, dan sains.
         </p>
+
+        <!-- Toggle Tabs -->
+        <div class="flex gap-3 mt-6">
+          <button
+            id="tabYouTube"
+            class="media-tab active"
+            onclick="switchTab('youtube')"
+          >
+            <i data-lucide="youtube" class="w-4 h-4 inline-block mr-2"></i>
+            YouTube & AI
+          </button>
+          <button
+            id="tabPodcast"
+            class="media-tab"
+            onclick="switchTab('podcast')"
+          >
+            <i data-lucide="headphones" class="w-4 h-4 inline-block mr-2"></i>
+            Podcast Audio
+          </button>
+        </div>
       </div>
 
-      <div class="grid gap-6 md:grid-cols-3">
+      <!-- YouTube & AI Section -->
+      <div id="sectionYouTube" class="grid gap-6 md:grid-cols-3">
         <!-- Left: YouTube -->
         <section class="media-container md:col-span-2">
           <div class="flex items-center gap-2 mb-3">
@@ -162,45 +183,10 @@
             </div>
           </div>
         </section>
-
-        <!-- Right: Podcast -->
-        <aside class="media-sidebar">
-          <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="podcast" class="w-4 h-4 text-amber-300"></i>
-            <b>Podcast Audio</b>
-          </div>
-          <p class="text-slate-300/85 mb-2">Pilih episode untuk diputar:</p>
-
-          <div id="podcastList" class="space-y-2"></div>
-
-          <div class="podcast-now-playing">
-            <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="mic" class="w-4 h-4 text-sky-300"></i>
-              <b>Sekarang Diputar</b>
-            </div>
-            <div id="nowPlaying" class="text-slate-200/90 text-sm mb-2">—</div>
-            <audio id="audioPlayer" controls class="w-full"></audio>
-          </div>
-
-          <div class="mt-4">
-            <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="upload" class="w-4 h-4 text-emerald-300"></i>
-              <b>Muat audio Anda sendiri</b>
-            </div>
-            <input
-              id="customAudioUrl"
-              class="media-input-sm mb-2"
-              placeholder="Tempel URL .mp3"
-            />
-            <button id="btnLoadCustomAudio" class="btn-secondary-sm">
-              Putar
-            </button>
-          </div>
-        </aside>
       </div>
 
       <!-- AI Result -->
-      <section class="mt-8 booking-container">
+      <section id="aiResultSection" class="mt-8 booking-container">
         <div class="p-5 border-b border-slate-800">
           <div class="text-lg font-semibold">Hasil Analisis AI</div>
         </div>
@@ -210,6 +196,91 @@
           </p>
         </div>
       </section>
+
+      <!-- Podcast Section -->
+      <div id="sectionPodcast" class="hidden">
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- Podcast List -->
+          <aside class="media-sidebar">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="podcast" class="w-4 h-4 text-amber-300"></i>
+              <b>Podcast Audio</b>
+            </div>
+            <p class="text-slate-300/85 mb-2">Pilih episode untuk diputar:</p>
+
+            <div id="podcastList" class="space-y-2"></div>
+
+            <div class="podcast-now-playing">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="mic" class="w-4 h-4 text-sky-300"></i>
+                <b>Sekarang Diputar</b>
+              </div>
+              <div id="nowPlaying" class="text-slate-200/90 text-sm mb-2">
+                —
+              </div>
+              <audio id="audioPlayer" controls class="w-full"></audio>
+            </div>
+
+            <div class="mt-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="upload" class="w-4 h-4 text-emerald-300"></i>
+                <b>Muat audio Anda sendiri</b>
+              </div>
+              <input
+                id="customAudioUrl"
+                class="media-input-sm mb-2"
+                placeholder="Tempel URL .mp3"
+              />
+              <button id="btnLoadCustomAudio" class="btn-secondary-sm">
+                Putar
+              </button>
+            </div>
+          </aside>
+
+          <!-- Now Playing (Right) -->
+          <div class="media-container">
+            <div class="podcast-now-playing">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="mic" class="w-4 h-4 text-sky-300"></i>
+                <b>Sekarang Diputar</b>
+              </div>
+              <div
+                id="nowPlayingPodcast"
+                class="text-slate-200/90 text-sm mb-2"
+              >
+                —
+              </div>
+              <audio id="audioPlayerPodcast" controls class="w-full"></audio>
+            </div>
+
+            <div
+              class="mt-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700"
+            >
+              <div class="flex items-center gap-2 mb-3">
+                <i data-lucide="info" class="w-4 h-4 text-amber-400"></i>
+                <span class="font-semibold text-sm">Tips</span>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-1.5">
+                <li class="flex items-start gap-2">
+                  <span class="text-amber-400">•</span>
+                  <span
+                    >Dengarkan podcast sambil belajar konsep kesehatan
+                    Islami</span
+                  >
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-amber-400">•</span>
+                  <span>Simpan catatan penting untuk referensi nanti</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-amber-400">•</span>
+                  <span>Untuk analisis AI, gunakan tab "YouTube & AI"</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Footer -->

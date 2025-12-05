@@ -90,6 +90,37 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("couponForm")
     .addEventListener("submit", handleCouponSubmit);
 
+  // Services section
+  document
+    .getElementById("btnNewService")
+    .addEventListener("click", () => openServiceModal());
+  document
+    .getElementById("cancelService")
+    .addEventListener("click", closeServiceModal);
+  document
+    .getElementById("serviceForm")
+    .addEventListener("submit", handleServiceSubmit);
+
+  // Price input formatters for all price fields
+  const priceInputs = [
+    "servicePrice",
+    "eventRegistrationFee",
+    "couponMinBookingValue",
+  ];
+
+  priceInputs.forEach((inputId) => {
+    const input = document.getElementById(inputId);
+    if (input) {
+      input.addEventListener("input", formatPriceInput);
+      input.addEventListener("keypress", (e) => {
+        // Only allow numbers
+        if (!/[0-9]/.test(e.key)) {
+          e.preventDefault();
+        }
+      });
+    }
+  });
+
   // Delete modal
   document.getElementById("confirmDelete").addEventListener("click", () => {
     if (deleteCallback) {
@@ -184,6 +215,8 @@ function switchSection(section) {
     loadEvents();
   } else if (section === "coupons") {
     loadCoupons();
+  } else if (section === "services") {
+    loadServices();
   }
 }
 
@@ -856,7 +889,9 @@ async function handleEventSubmit(e) {
     topic: document.getElementById("eventTopic").value,
     description: document.getElementById("eventDescription").value,
     speaker: document.getElementById("eventSpeaker").value,
-    registrationFee: document.getElementById("eventRegistrationFee").value,
+    registrationFee: parsePriceInput(
+      document.getElementById("eventRegistrationFee").value
+    ),
     registrationDeadline: document.getElementById("eventRegistrationDeadline")
       .value,
     location: document.getElementById("eventLocation").value,
@@ -924,8 +959,10 @@ async function editEvent(id) {
       document.getElementById("eventDescription").value =
         event.description || "";
       document.getElementById("eventSpeaker").value = event.speaker || "";
-      document.getElementById("eventRegistrationFee").value =
-        event.registration_fee || 0;
+      // Format registration fee with thousand separator
+      document.getElementById("eventRegistrationFee").value = parseInt(
+        event.registration_fee || 0
+      ).toLocaleString("id-ID");
       document.getElementById("eventRegistrationDeadline").value =
         formatDateForInput(event.registration_deadline);
       document.getElementById("eventLocation").value = event.location || "";
@@ -1089,8 +1126,8 @@ async function handleCouponSubmit(e) {
     discountValue: parseFloat(
       document.getElementById("couponDiscountValue").value
     ),
-    minBookingValue: parseFloat(
-      document.getElementById("couponMinBookingValue")?.value || 0
+    minBookingValue: parsePriceInput(
+      document.getElementById("couponMinBookingValue")?.value || "0"
     ),
     maxUses: document.getElementById("couponMaxUses").value || null,
     expiresAt: document.getElementById("couponExpiresAt").value || null,
@@ -1138,8 +1175,10 @@ async function editCoupon(id) {
         coupon.discount_type;
       document.getElementById("couponDiscountValue").value =
         coupon.discount_value;
-      document.getElementById("couponMinBookingValue").value =
-        coupon.min_booking_value || 0;
+      // Format min booking value with thousand separator
+      document.getElementById("couponMinBookingValue").value = parseInt(
+        coupon.min_booking_value || 0
+      ).toLocaleString("id-ID");
       document.getElementById("couponMaxUses").value = coupon.max_uses || "";
       if (coupon.expires_at) {
         document.getElementById("couponExpiresAt").value = coupon.expires_at
@@ -1268,6 +1307,301 @@ function closeSuccessModal() {
   }
 }
 
+// ========== SERVICES FUNCTIONS ==========
+
+async function loadServices() {
+  const tbody = document.getElementById("servicesTableBody");
+  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Loading...</td></tr>`;
+
+  try {
+    const response = await fetch(`${API_BASE}/services?is_active=1`);
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal memuat data");
+    }
+
+    const services = result.data;
+
+    if (services.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Belum ada layanan</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = services
+      .map(
+        (service) => `
+        <tr class="border-t border-slate-800 hover:bg-slate-800/50">
+          <td class="px-3 py-3">${service.id}</td>
+          <td class="px-3 py-3 font-semibold">${escapeHtml(service.name)}</td>
+          <td class="px-3 py-3">
+            <span class="text-xs rounded-full px-2 py-1 ${getCategoryBadgeClass(
+              service.category
+            )}">
+              ${getCategoryLabel(service.category)}
+            </span>
+          </td>
+          <td class="px-3 py-3">Rp ${formatNumber(service.price)}</td>
+          <td class="px-3 py-3 text-xs">${escapeHtml(service.branch)}</td>
+          <td class="px-3 py-3">
+            <span class="text-xs rounded-full px-2 py-1 ${getModeBadgeClass(
+              service.mode
+            )}">
+              ${getModeLabel(service.mode)}
+            </span>
+          </td>
+          <td class="px-3 py-3">
+            <span class="text-xs rounded-full px-2 py-1 ${
+              service.is_active
+                ? "bg-emerald-400/10 border border-emerald-400/40 text-emerald-300"
+                : "bg-slate-700 text-slate-400"
+            }">
+              ${service.is_active ? "Aktif" : "Nonaktif"}
+            </span>
+          </td>
+          <td class="px-3 py-3 text-center">
+            <div class="flex gap-1 justify-center">
+              <button
+                onclick="editService(${service.id})"
+                class="px-2 py-1 bg-amber-400/10 border border-amber-400/40 text-amber-300 rounded hover:bg-amber-400/20 text-xs"
+                title="Edit"
+              >
+                Edit
+              </button>
+              <button
+                onclick="deleteService(${service.id}, '${escapeHtml(
+          service.name
+        ).replace(/'/g, "\\'")}')"
+                class="px-2 py-1 bg-red-400/10 border border-red-400/40 text-red-300 rounded hover:bg-red-400/20 text-xs"
+                title="Hapus"
+              >
+                Hapus
+              </button>
+            </div>
+          </td>
+        </tr>
+      `
+      )
+      .join("");
+
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  } catch (error) {
+    console.error("Error loading services:", error);
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-400">Error: ${error.message}</td></tr>`;
+  }
+}
+
+function getCategoryLabel(category) {
+  const labels = {
+    manual: "Manual Therapy",
+    klinis: "Layanan Klinis",
+    konsultasi: "Konsultasi",
+    perawatan: "Perawatan",
+  };
+  return labels[category] || category;
+}
+
+function getCategoryBadgeClass(category) {
+  const classes = {
+    manual: "bg-amber-400/10 border border-amber-400/40 text-amber-300",
+    klinis: "bg-sky-400/10 border border-sky-400/40 text-sky-300",
+    konsultasi: "bg-purple-400/10 border border-purple-400/40 text-purple-300",
+    perawatan:
+      "bg-emerald-400/10 border border-emerald-400/40 text-emerald-300",
+  };
+  return classes[category] || "bg-slate-700 text-slate-300";
+}
+
+function getModeLabel(mode) {
+  const labels = {
+    online: "Online",
+    offline: "Offline",
+    both: "Online & Offline",
+  };
+  return labels[mode] || mode;
+}
+
+function getModeBadgeClass(mode) {
+  const classes = {
+    online: "bg-blue-400/10 border border-blue-400/40 text-blue-300",
+    offline: "bg-green-400/10 border border-green-400/40 text-green-300",
+    both: "bg-purple-400/10 border border-purple-400/40 text-purple-300",
+  };
+  return classes[mode] || "bg-slate-700 text-slate-300";
+}
+
+function openServiceModal(id = null) {
+  const modal = document.getElementById("serviceModal");
+  const title = document.getElementById("serviceModalTitle");
+  const form = document.getElementById("serviceForm");
+
+  form.reset();
+  document.getElementById("serviceId").value = "";
+  document.getElementById("serviceIsActive").checked = true;
+
+  // Uncheck all branch checkboxes
+  document
+    .querySelectorAll('input[name="serviceBranch"]')
+    .forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+
+  if (id) {
+    title.textContent = "Edit Service";
+    // Load service data will be done in editService function
+  } else {
+    title.textContent = "Tambah Service Baru";
+  }
+
+  modal.classList.remove("hidden");
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function closeServiceModal() {
+  const modal = document.getElementById("serviceModal");
+  modal.classList.add("hidden");
+}
+
+async function handleServiceSubmit(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("serviceId").value;
+  const name = document.getElementById("serviceName").value.trim();
+  const category = document.getElementById("serviceCategory").value;
+  const priceFormatted = document.getElementById("servicePrice").value;
+  const description = document
+    .getElementById("serviceDescription")
+    .value.trim();
+
+  // Get selected branches from checkboxes
+  const branchCheckboxes = document.querySelectorAll(
+    'input[name="serviceBranch"]:checked'
+  );
+  const selectedBranches = Array.from(branchCheckboxes).map((cb) => cb.value);
+  const branch = selectedBranches.join(", ");
+
+  // Validation: at least one branch must be selected
+  if (selectedBranches.length === 0) {
+    alert("Pilih minimal satu cabang/kota");
+    return;
+  }
+
+  const mode = document.getElementById("serviceMode").value;
+  const practitioner = document
+    .getElementById("servicePractitioner")
+    .value.trim();
+  const is_active = document.getElementById("serviceIsActive").checked;
+
+  const data = {
+    name,
+    category,
+    price: parsePriceInput(priceFormatted),
+    description,
+    branch,
+    mode,
+    practitioner: practitioner || null,
+    is_active: is_active ? 1 : 0,
+  };
+
+  try {
+    const url = id ? `${API_BASE}/services/${id}` : `${API_BASE}/services`;
+    const method = id ? "PATCH" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal menyimpan data");
+    }
+
+    showSuccessModal(
+      id ? "Layanan berhasil diupdate" : "Layanan berhasil dibuat"
+    );
+    closeServiceModal();
+    loadServices();
+  } catch (error) {
+    console.error("Error saving service:", error);
+    alert("Error: " + error.message);
+  }
+}
+
+async function editService(id) {
+  try {
+    const response = await fetch(`${API_BASE}/services/${id}`);
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal memuat data");
+    }
+
+    const service = result.data;
+
+    // Open modal first
+    openServiceModal(id);
+
+    // Then populate fields
+    document.getElementById("serviceId").value = service.id;
+    document.getElementById("serviceName").value = service.name;
+    document.getElementById("serviceCategory").value = service.category;
+    // Format price with thousand separator
+    document.getElementById("servicePrice").value = parseInt(
+      service.price
+    ).toLocaleString("id-ID");
+    document.getElementById("serviceDescription").value = service.description;
+
+    // Parse branch string and check appropriate checkboxes
+    const branches = service.branch.split(",").map((b) => b.trim());
+    document
+      .querySelectorAll('input[name="serviceBranch"]')
+      .forEach((checkbox) => {
+        checkbox.checked = branches.includes(checkbox.value);
+      });
+    document.getElementById("serviceMode").value = service.mode;
+    document.getElementById("servicePractitioner").value =
+      service.practitioner || "";
+    document.getElementById("serviceIsActive").checked =
+      service.is_active === 1;
+  } catch (error) {
+    console.error("Error loading service:", error);
+    alert("Error: " + error.message);
+  }
+}
+
+function deleteService(id, name) {
+  showDeleteModal(
+    `Apakah Anda yakin ingin menghapus layanan "${name}"? Layanan akan dihapus dari sistem (soft delete).`,
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/services/${id}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showSuccessModal("Layanan berhasil dihapus");
+          loadServices();
+        } else {
+          alert(result.error || "Gagal menghapus layanan");
+        }
+      } catch (error) {
+        console.error("Error deleting service:", error);
+        alert("Gagal menghapus layanan");
+      }
+    }
+  );
+}
+
 // ========== UTILITIES ==========
 
 function escapeHtml(text) {
@@ -1293,4 +1627,31 @@ function formatDate(dateString) {
 
 function formatNumber(num) {
   return new Intl.NumberFormat("id-ID").format(num);
+}
+
+/**
+ * Format price input with thousand separator (dots)
+ * Example: 150000 -> 150.000
+ */
+function formatPriceInput(e) {
+  let value = e.target.value;
+
+  // Remove all non-numeric characters
+  value = value.replace(/\D/g, "");
+
+  // Format with thousand separator (dots)
+  if (value) {
+    value = parseInt(value).toLocaleString("id-ID");
+  }
+
+  e.target.value = value;
+}
+
+/**
+ * Parse formatted price to number
+ * Example: 150.000 -> 150000
+ */
+function parsePriceInput(formattedPrice) {
+  if (!formattedPrice) return 0;
+  return parseInt(formattedPrice.replace(/\./g, "")) || 0;
 }
