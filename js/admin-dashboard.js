@@ -855,6 +855,11 @@ async function handleEventSubmit(e) {
     mode: document.getElementById("eventMode").value,
     topic: document.getElementById("eventTopic").value,
     description: document.getElementById("eventDescription").value,
+    speaker: document.getElementById("eventSpeaker").value,
+    registrationFee: document.getElementById("eventRegistrationFee").value,
+    registrationDeadline: document.getElementById("eventRegistrationDeadline")
+      .value,
+    location: document.getElementById("eventLocation").value,
     link: document.getElementById("eventLink").value,
   };
 
@@ -894,16 +899,37 @@ async function editEvent(id) {
 
     if (result.success) {
       const event = result.data;
+
+      // Helper function to format date for input[type="date"]
+      const formatDateForInput = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
+      // Open modal first (this will reset the form)
+      openEventModal(id);
+
+      // Then populate with data AFTER opening
       document.getElementById("eventId").value = event.id;
-      document.getElementById("eventTitle").value = event.title;
-      document.getElementById("eventDate").value = event.event_date;
-      document.getElementById("eventMode").value = event.mode;
-      document.getElementById("eventTopic").value = event.topic;
+      document.getElementById("eventTitle").value = event.title || "";
+      document.getElementById("eventDate").value = formatDateForInput(
+        event.event_date
+      );
+      document.getElementById("eventMode").value = event.mode || "online";
+      document.getElementById("eventTopic").value = event.topic || "quranic";
       document.getElementById("eventDescription").value =
         event.description || "";
+      document.getElementById("eventSpeaker").value = event.speaker || "";
+      document.getElementById("eventRegistrationFee").value =
+        event.registration_fee || 0;
+      document.getElementById("eventRegistrationDeadline").value =
+        formatDateForInput(event.registration_deadline);
+      document.getElementById("eventLocation").value = event.location || "";
       document.getElementById("eventLink").value = event.link || "";
-
-      openEventModal(id);
     }
   } catch (error) {
     console.error("Error loading event:", error);

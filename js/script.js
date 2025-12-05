@@ -1354,14 +1354,64 @@ async function renderEvents() {
     result.data.forEach((event) => {
       const card = document.createElement("div");
       card.className = "event-card";
+
+      // Format registration fee
+      const feeText =
+        event.registration_fee && event.registration_fee > 0
+          ? `Rp ${new Intl.NumberFormat("id-ID").format(
+              event.registration_fee
+            )}`
+          : "GRATIS";
+
+      // Format registration deadline
+      let deadlineText = "";
+      if (event.registration_deadline) {
+        const deadline = new Date(event.registration_deadline);
+        deadlineText = `
+          <div class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+            <i data-lucide="clock" class="w-3 h-3"></i>
+            Daftar sebelum: ${deadline.toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </div>
+        `;
+      }
+
+      // Format location for offline events
+      let locationText = "";
+      if (event.mode === "offline" && event.location) {
+        locationText = `
+          <div class="text-xs text-slate-300 mt-1 flex items-center gap-1">
+            <i data-lucide="map-pin" class="w-3 h-3 text-amber-400"></i>
+            ${escapeHtml(event.location)}
+          </div>
+        `;
+      }
+
       card.innerHTML = `
         <div class="text-lg font-semibold">${escapeHtml(event.title)}</div>
         <div class="text-xs text-amber-300 mt-1">${escapeHtml(
           event.mode.toUpperCase()
         )} · ${escapeHtml(event.topic)}</div>
-        <div class="text-sm text-slate-400 mt-1">${formatEventDate(
-          event.event_date
-        )}</div>
+        <div class="text-sm text-slate-400 mt-1 flex items-center gap-1">
+          <i data-lucide="calendar" class="w-3 h-3"></i>
+          ${formatEventDate(event.event_date)}
+        </div>
+        ${
+          event.speaker
+            ? `
+          <div class="text-xs text-emerald-300 mt-1 flex items-center gap-1">
+            <i data-lucide="user" class="w-3 h-3"></i>
+            Pemateri: ${escapeHtml(event.speaker)}
+          </div>
+        `
+            : ""
+        }
+        ${locationText}
+        ${deadlineText}
+        <div class="text-sm font-semibold text-amber-400 mt-2">${feeText}</div>
         <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
@@ -1373,12 +1423,17 @@ async function renderEvents() {
             event.link
               ? `<a href="${escapeHtml(
                   event.link
-                )}" target="_blank" class="btn-secondary-sm">Link</a>`
+                )}" target="_blank" class="btn-secondary-sm">Info</a>`
               : ""
           }
         </div>
       `;
       eventsContainer.appendChild(card);
+
+      // Re-initialize Lucide icons for the newly added card
+      if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
     });
   } catch (error) {
     console.error("Error loading events:", error);

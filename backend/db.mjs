@@ -125,6 +125,10 @@ async function initializeTables() {
         topic VARCHAR(100) NOT NULL,
         description TEXT,
         link VARCHAR(500),
+        speaker VARCHAR(255) DEFAULT NULL COMMENT 'Nama pemateri/host',
+        registration_fee DECIMAL(10, 2) DEFAULT 0 COMMENT 'Biaya pendaftaran (0 = gratis)',
+        registration_deadline DATE DEFAULT NULL COMMENT 'Tanggal akhir pendaftaran',
+        location VARCHAR(500) DEFAULT NULL COMMENT 'Lokasi offline atau link Zoom',
         is_active TINYINT(1) DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -134,6 +138,29 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: events");
+
+    // Add new columns if not exist (for existing databases)
+    try {
+      const [speakerCol] = await connection.query(
+        "SHOW COLUMNS FROM events LIKE 'speaker'"
+      );
+
+      if (speakerCol.length === 0) {
+        console.log("⚙️  Adding new event columns...");
+
+        await connection.query(`
+          ALTER TABLE events
+          ADD COLUMN speaker VARCHAR(255) DEFAULT NULL COMMENT 'Nama pemateri/host' AFTER link,
+          ADD COLUMN registration_fee DECIMAL(10, 2) DEFAULT 0 COMMENT 'Biaya pendaftaran (0 = gratis)' AFTER speaker,
+          ADD COLUMN registration_deadline DATE DEFAULT NULL COMMENT 'Tanggal akhir pendaftaran' AFTER registration_fee,
+          ADD COLUMN location VARCHAR(500) DEFAULT NULL COMMENT 'Lokasi offline atau link Zoom' AFTER registration_deadline
+        `);
+
+        console.log("✅ Event columns added successfully");
+      }
+    } catch (eventColError) {
+      console.log("ℹ️  Event columns check:", eventColError.message);
+    }
 
     // Create articles table
     await connection.query(`

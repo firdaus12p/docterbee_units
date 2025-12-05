@@ -81,7 +81,18 @@ router.get("/:id", async (req, res) => {
 // POST /api/events - Create new event (admin only)
 router.post("/", async (req, res) => {
   try {
-    const { title, eventDate, mode, topic, description, link } = req.body;
+    const {
+      title,
+      eventDate,
+      mode,
+      topic,
+      description,
+      speaker,
+      registrationFee,
+      registrationDeadline,
+      location,
+      link,
+    } = req.body;
 
     // Validation
     if (!title || !eventDate || !mode || !topic) {
@@ -94,9 +105,20 @@ router.post("/", async (req, res) => {
     // Insert event
     const result = await query(
       `INSERT INTO events 
-       (title, event_date, mode, topic, description, link)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [title, eventDate, mode, topic, description || null, link || null]
+       (title, event_date, mode, topic, description, speaker, registration_fee, registration_deadline, location, link)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        title,
+        eventDate,
+        mode,
+        topic,
+        description || null,
+        speaker || null,
+        registrationFee || 0,
+        registrationDeadline || null,
+        location || null,
+        link || null,
+      ]
     );
 
     res.status(201).json({
@@ -123,8 +145,19 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, eventDate, mode, topic, description, link, isActive } =
-      req.body;
+    const {
+      title,
+      eventDate,
+      mode,
+      topic,
+      description,
+      speaker,
+      registrationFee,
+      registrationDeadline,
+      location,
+      link,
+      isActive,
+    } = req.body;
 
     // Check if event exists
     const existing = await queryOne("SELECT id FROM events WHERE id = ?", [id]);
@@ -157,6 +190,22 @@ router.patch("/:id", async (req, res) => {
     if (description !== undefined) {
       updates.push("description = ?");
       params.push(description);
+    }
+    if (speaker !== undefined) {
+      updates.push("speaker = ?");
+      params.push(speaker);
+    }
+    if (registrationFee !== undefined) {
+      updates.push("registration_fee = ?");
+      params.push(registrationFee);
+    }
+    if (registrationDeadline !== undefined) {
+      updates.push("registration_deadline = ?");
+      params.push(registrationDeadline);
+    }
+    if (location !== undefined) {
+      updates.push("location = ?");
+      params.push(location);
     }
     if (link !== undefined) {
       updates.push("link = ?");

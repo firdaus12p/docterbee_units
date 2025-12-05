@@ -336,7 +336,7 @@
             class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
           >
             <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl"
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
             >
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold" id="eventModalTitle">
@@ -405,12 +405,56 @@
                   ></textarea>
                 </div>
                 <div>
-                  <label class="block text-sm mb-2">Link (Zoom/Lokasi)</label>
+                  <label class="block text-sm mb-2">Pemateri / Host</label>
+                  <input
+                    type="text"
+                    id="eventSpeaker"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Nama pemateri atau host acara"
+                  />
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Biaya Pendaftaran (Rp)</label
+                    >
+                    <input
+                      type="number"
+                      id="eventRegistrationFee"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="0 = Gratis"
+                      min="0"
+                      step="1000"
+                      value="0"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Akhir Pendaftaran</label>
+                    <input
+                      type="date"
+                      id="eventRegistrationDeadline"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm mb-2">Lokasi / Link Zoom</label>
+                  <input
+                    type="text"
+                    id="eventLocation"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Offline: Alamat lengkap | Online: https://zoom.us/..."
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm mb-2"
+                    >Link Tambahan (Opsional)</label
+                  >
                   <input
                     type="text"
                     id="eventLink"
                     class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="https://zoom.us/... atau alamat lokasi"
+                    placeholder="Link materi, pendaftaran, atau info lainnya"
                   />
                 </div>
                 <div class="flex gap-2">
@@ -461,7 +505,7 @@
             class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
           >
             <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl"
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
             >
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold" id="couponModalTitle">

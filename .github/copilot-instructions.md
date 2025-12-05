@@ -42,8 +42,8 @@ Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), moder
 
 **Database Tables** (auto-created):
 
-1. `bookings` - service_name, booking_date, booking_time, promo_code, status (enum), indexed
-2. `events` - title, event_date, mode (enum: online/offline), topic, is_active (soft delete)
+1. `bookings` - service_name, booking_date, booking_time, promo_code, status (enum), price, discount_amount, final_price, customer data (name, phone, age, gender, address), indexed
+2. `events` - title, event_date, mode (enum: online/offline), topic, description, speaker, registration_fee, registration_deadline, location, link, is_active (soft delete)
 3. `articles` - title, slug (unique), content, image_url, is_published (soft delete)
 4. `coupons` - code (unique), discount_type (enum: percentage/fixed), value, usage_limit, is_active
 
