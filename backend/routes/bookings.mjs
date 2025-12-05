@@ -290,11 +290,24 @@ router.patch("/:id", async (req, res) => {
 
 // GET /api/bookings/prices/:serviceName - Get service price
 // IMPORTANT: This must be before /:id routes to avoid conflict
-router.get("/prices/:serviceName", (req, res) => {
+router.get("/prices/:serviceName", async (req, res) => {
   try {
     const { serviceName } = req.params;
     const decodedServiceName = decodeURIComponent(serviceName);
-    const price = getServicePrice(decodedServiceName);
+
+    // Try to get price from services table first
+    const service = await queryOne(
+      "SELECT price FROM services WHERE name = ? AND is_active = 1 LIMIT 1",
+      [decodedServiceName]
+    );
+
+    let price = 0;
+    if (service && service.price) {
+      price = service.price;
+    } else {
+      // Fallback to hardcoded prices if not in database
+      price = getServicePrice(decodedServiceName);
+    }
 
     if (price === 0) {
       return res.status(404).json({

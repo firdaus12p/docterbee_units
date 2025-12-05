@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docterbee Health System – Store • Points • Wellness</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;}
+    .tab-active { background-color: rgb(250 204 21); color: rgb(15 23 42); }
+    .tab-inactive { background-color: rgb(15 23 42); color: rgb(148 163 184); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
+
+<!-- NAVBAR -->
+<header class="bg-slate-900 text-slate-100 border-b border-slate-800">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="h-8 w-8 rounded-xl bg-amber-400 shadow-lg shadow-amber-400/40"></div>
+      <span class="font-semibold tracking-wide">Docterbee</span>
+    </div>
+
+    <div class="flex items-center gap-2 text-xs md:text-sm">
+      <button id="tabStore" onclick="showPage('store')" class="px-3 py-1 rounded-full tab-active">
+        Store
+      </button>
+      <button id="tabPoints" onclick="showPage('points')" class="px-3 py-1 rounded-full tab-inactive">
+        Points
+      </button>
+      <button id="tabLocator" onclick="showPage('locator')" class="px-3 py-1 rounded-full tab-inactive">
+        Wellness
+      </button>
+    </div>
+
+    <div class="flex items-center gap-3 text-xs md:text-sm">
+      <span class="rounded-lg border border-slate-700 px-2 py-1">
+        Poin: <b id="navPoints">0</b>
+      </span>
+      <span class="rounded-lg border border-slate-700 px-2 py-1">
+        Cart: <b id="navCartCount">0</b>
+      </span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+
+  <!-- =============== STORE PAGE =============== -->
+  <section id="page-store" class="space-y-6">
+    <section class="space-y-3">
+      <h1 class="text-2xl md:text-3xl font-bold mb-1">Store Docterbee</h1>
+      <p class="text-slate-300 text-sm md:text-base">
+        Pilih produk dari Zona Sunnah, Rempah, Honey, Cold-Pressed, CoffeeBee, TeaBee, Susu Kurma, dan Buah Lokal.
+        Tambahkan ke keranjang atau ambil instan via Grab & Go.
+      </p>
+
+      <!-- PILIH MODE ORDER -->
+      <div class="mt-3 border border-slate-800 rounded-2xl bg-slate-900/60 p-3">
+        <p class="text-xs md:text-sm text-slate-300 mb-2 font-medium">
+          Mode Order:
+        </p>
+        <div class="flex flex-wrap gap-2 text-xs md:text-sm">
+          <button id="btnModeGrab"
+                  onclick="setOrderMode('grab')"
+                  class="px-3 py-1 rounded-full border border-slate-700 bg-amber-400 text-slate-900">
+            Grab &amp; Go
+          </button>
+          <button id="btnModeDine"
+                  onclick="setOrderMode('dine')"
+                  class="px-3 py-1 rounded-full border border-slate-700 bg-slate-800 text-slate-200">
+            Dine In
+          </button>
+          <button id="btnModeDelivery"
+                  onclick="setOrderMode('delivery')"
+                  class="px-3 py-1 rounded-full border border-slate-700 bg-slate-800 text-slate-200">
+            Delivery
+          </button>
+        </div>
+        <p class="mt-2 text-[11px] text-slate-400" id="orderModeDescStore"></p>
+      </div>
+    </section>
+
+    <section class="space-y-3">
+      <!-- FILTER KATEGORI -->
+      <div class="flex flex-wrap gap-2 text-xs md:text-sm">
+        <button class="px-3 py-1 rounded-full bg-amber-400 text-slate-900" onclick="filterCategory('all')">Semua</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('Zona Sunnah')">Zona Sunnah</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('Zona 1001 Rempah')">Zona 1001 Rempah</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('Zona Honey')">Zona Honey</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('Cold-Pressed')">Cold-Pressed</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('CoffeeBee')">CoffeeBee</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('TeaBee')">TeaBee</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('Susu Kurma')">Susu Kurma</button>
+        <button class="px-3 py-1 rounded-full bg-slate-800" onclick="filterCategory('Buah Lokal')">Buah Lokal</button>
+      </div>
+
+      <!-- GRID PRODUK -->
+      <div id="productGrid" class="grid gap-4 md:grid-cols-3 lg:grid-cols-4"></div>
+    </section>
+
+    <!-- GRAB & GO + KONSULTASI -->
+    <section class="border-t border-slate-800 pt-6 grid gap-4 md:grid-cols-2">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+        <h2 class="font-semibold mb-1">Grab & Go – Wellness Chart</h2>
+        <p class="text-sm text-slate-300 mb-3">
+          Pesan dan ambil produk instan di titik Docterbee terdekat.
+        </p>
+        <button onclick="showPage('locator')" class="inline-block px-3 py-2 rounded-lg bg-amber-400 text-slate-900 text-sm font-semibold">
+          Buka Wellness Chart
+        </button>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+        <h2 class="font-semibold mb-1">Konsultasi Kesehatan</h2>
+        <p class="text-sm text-slate-300 mb-3">
+          Booking konsultasi dengan Docterbee Praktisi (demo).
+        </p>
+        <button class="px-3 py-2 rounded-lg border border-amber-400 text-amber-300 text-sm">
+          Booking Konsultasi (Demo)
+        </button>
+      </div>
+    </section>
+
+    <!-- MENU CAFE SEHAT -->
+    <section class="border-t border-slate-800 pt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 space-y-4">
+      <h2 class="text-xl font-semibold">Menu Café Sehat Docterbee</h2>
+      <p class="text-sm text-slate-300">
+        Nikmati minuman modern yang segar, nikmat, dan insyaAllah lebih sehat. 
+        Semua diracik dengan konsep hidup sehat Rasulullah: seimbang, tidak berlebihan, 
+        dan memaksimalkan kebaikan madu, kurma, rempah, dan buah lokal.
+      </p>
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-sm">
+        <!-- CoffeeBee -->
+        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-3 space-y-1">
+          <div class="h-20 w-full rounded-lg bg-slate-800/80 mb-2 flex items-center justify-center text-3xl">
+            ☕
+          </div>
+          <h3 class="font-semibold text-amber-300">CoffeeBee</h3>
+          <p class="text-slate-200">Kopi + madu, tanpa gula putih.</p>
+          <ul class="text-xs text-slate-300 list-disc pl-4">
+            <li>Honey Latte</li>
+            <li>Espresso Madu</li>
+          </ul>
+          <p class="text-[11px] text-slate-400 mt-1">Cocok untuk fokus kerja & belajar.</p>
+        </div>
+
+        <!-- TeaBee -->
+        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-3 space-y-1">
+          <div class="h-20 w-full rounded-lg bg-slate-800/80 mb-2 flex items-center justify-center text-3xl">
+            🍵
+          </div>
+          <h3 class="font-semibold text-amber-300">TeaBee</h3>
+          <p class="text-slate-200">Teh hangat/dingin dengan madu dan rempah.</p>
+          <ul class="text-xs text-slate-300 list-disc pl-4">
+            <li>Ginger Honey Tea</li>
+            <li>Mint Honey Tea</li>
+          </ul>
+          <p class="text-[11px] text-slate-400 mt-1">Teman santai, bantu hangatkan badan.</p>
+        </div>
+
+        <!-- Susu Kurma -->
+        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-3 space-y-1">
+          <div class="h-20 w-full rounded-lg bg-slate-800/80 mb-2 flex items-center justify-center text-3xl">
+            🥛
+          </div>
+          <h3 class="font-semibold text-amber-300">Susu Kurma</h3>
+          <p class="text-slate-200">Susu + kurma + madu, tanpa tambahan gula.</p>
+          <ul class="text-xs text-slate-300 list-disc pl-4">
+            <li>Susu Kurma Classic</li>
+            <li>Susu Kurma Cokelat</li>
+          </ul>
+          <p class="text-[11px] text-slate-400 mt-1">Pilihan aman untuk anak & dewasa.</p>
+        </div>
+
+        <!-- Cold-Pressed -->
+        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-3 space-y-1">
+          <div class="h-20 w-full rounded-lg bg-slate-800/80 mb-2 flex items-center justify-center text-3xl">
+            🥤
+          </div>
+          <h3 class="font-semibold text-amber-300">Cold-Pressed Juice</h3>
+          <p class="text-slate-200">Jus buah & sayur tanpa gula, kaya enzim.</p>
+          <ul class="text-xs text-slate-300 list-disc pl-4">
+            <li>Aurora Gold (apel–wortel–madu)</li>
+            <li>Vital Reset (detoks ringan)</li>
+          </ul>
+          <p class="text-[11px] text-slate-400 mt-1">Untuk reset tubuh dari dalam.</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        Catatan: harga & varian bisa disesuaikan per cabang. Versi ini hanya demo alur menu Café Sehat.
+      </p>
+    </section>
+  </section>
+
+  <!-- =============== POINTS PAGE =============== -->
+  <section id="page-points" class="space-y-6 hidden">
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <h1 class="text-2xl md:text-3xl font-bold mb-2">Poin & Rewards</h1>
+      <p class="text-slate-300 text-sm md:text-base">
+        Dapatkan poin dari pembelian, check-in di Wellness Chart, dan aktivitas sehat.
+        Tukarkan dengan kelas, workshop, konsultasi, atau minuman sehat.
+      </p>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-2">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+        <h2 class="font-semibold mb-2">Dompet Poin</h2>
+        <p class="text-sm text-slate-300 mb-3">Poin milik kamu saat ini:</p>
+        <div class="text-4xl font-bold text-amber-300 mb-3" id="pointsBig">0</div>
+        <button onclick="addDemoPoints()" class="px-3 py-2 rounded-lg bg-slate-800 text-xs text-slate-200 border border-slate-700">
+          +10 poin demo (testing)
+        </button>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-300 space-y-1">
+        <h2 class="font-semibold mb-2">Cara Mendapatkan Poin (Demo)</h2>
+        <ul class="list-disc pl-4 space-y-1">
+          <li>1 poin setiap ± Rp 10.000 transaksi di Store</li>
+          <li>+3 poin check-in di Wellness Chart</li>
+          <li>Bonus poin dari event, webinar, program khusus, dll.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+      <h2 class="font-semibold mb-3 text-lg">Tukar Poin</h2>
+      <div class="grid gap-3 md:grid-cols-2 text-sm">
+
+        <div class="border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div>
+            <p class="font-semibold">Kelas Online Belajar Sehat 1x</p>
+            <p class="text-slate-300 text-xs mb-2">
+              Belajar pola hidup sehat ala Rasulullah + sains.
+            </p>
+            <p class="text-amber-300 text-sm font-semibold">50 poin</p>
+          </div>
+          <button onclick="redeem(50, 'Kelas Online Sehat 1x')" class="mt-2 px-3 py-1.5 rounded-lg bg-amber-400 text-slate-900 text-xs font-semibold">
+            Tukar
+          </button>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div>
+            <p class="font-semibold">Diskon Konsultasi Docterbee</p>
+            <p class="text-slate-300 text-xs mb-2">
+              Potongan biaya konsultasi dengan praktisi.
+            </p>
+            <p class="text-amber-300 text-sm font-semibold">80 poin</p>
+          </div>
+          <button onclick="redeem(80, 'Diskon Konsultasi')" class="mt-2 px-3 py-1.5 rounded-lg bg-amber-400 text-slate-900 text-xs font-semibold">
+            Tukar
+          </button>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div>
+            <p class="font-semibold">Free Cold-Pressed Aurora Gold</p>
+            <p class="text-slate-300 text-xs mb-2">
+              1 botol minuman sehat gratis (ambil di Wellness Chart).
+            </p>
+            <p class="text-amber-300 text-sm font-semibold">60 poin</p>
+          </div>
+          <button onclick="redeem(60, 'Aurora Gold Gratis')" class="mt-2 px-3 py-1.5 rounded-lg bg-amber-400 text-slate-900 text-xs font-semibold">
+            Tukar
+          </button>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div>
+            <p class="font-semibold">Workshop Offline Hidup Sehat</p>
+            <p class="text-slate-300 text-xs mb-2">
+              Ikuti sesi workshop di ZE Center terpilih.
+            </p>
+            <p class="text-amber-300 text-sm font-semibold">120 poin</p>
+          </div>
+          <button onclick="redeem(120, 'Workshop Offline')" class="mt-2 px-3 py-1.5 rounded-lg bg-amber-400 text-slate-900 text-xs font-semibold">
+            Tukar
+          </button>
+        </div>
+
+      </div>
+      <p class="mt-4 text-xs text-slate-400" id="redeemInfo"></p>
+    </section>
+  </section>
+
+  <!-- =============== LOCATOR PAGE =============== -->
+  <section id="page-locator" class="space-y-6 hidden">
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <h1 class="text-2xl md:text-3xl font-bold mb-2">Wellness Chart & Grab & Go</h1>
+      <p class="text-slate-300 text-sm md:text-base">
+        Pilih titik terdekat untuk ambil pesanan (Grab & Go), check-in untuk menambah poin,
+        dan lihat ringkasan keranjang kamu untuk Quick Order.
+      </p>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-3 text-sm" id="locationGrid"></section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+      <h2 class="font-semibold text-lg">Quick Order dari Keranjang</h2>
+      <p class="text-slate-300 text-sm">
+        Mode order saat ini:
+        <span id="orderModeLabel" class="font-semibold text-amber-300"></span>
+      </p>
+      <p class="text-[11px] text-slate-400" id="orderModeDescLocator"></p>
+
+      <!-- FORM NAMA & ALAMAT DELIVERY -->
+      <div class="grid gap-3 md:grid-cols-2 text-xs mt-3">
+        <div class="space-y-1">
+          <label for="inputName" class="text-slate-300 font-medium">Nama Pemesan</label>
+          <input id="inputName"
+                 class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1"
+                 placeholder="cth: Hakan / Ust. Ahmad" />
+        </div>
+        <div class="space-y-1" id="addressWrapper">
+          <label for="inputAddress" class="text-slate-300 font-medium">
+            Alamat Singkat (khusus Delivery)
+          </label>
+          <textarea id="inputAddress"
+                    class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1 min-h-[40px]"
+                    placeholder="cth: Perum BTN Blok B3 No.7, dekat masjid..."></textarea>
+        </div>
+      </div>
+
+      <div id="cartList" class="space-y-1 text-xs text-slate-200 mt-4"></div>
+
+      <!-- QR & ORDER SUMMARY -->
+      <div class="mt-4 flex flex-col md:flex-row gap-4 items-start">
+        <div class="flex-1">
+          <button onclick="generateOrder()"
+                  class="px-3 py-2 rounded-lg bg-amber-400 text-slate-900 text-xs font-semibold">
+            Buat QR & Ringkasan Order (Demo)
+          </button>
+          <p class="mt-2 text-[11px] text-slate-400">
+            Hasil ringkasan ini bisa dibaca kasir atau dikirim via WhatsApp di versi produksi.
+          </p>
+          <pre id="orderSummary"
+               class="mt-3 text-[11px] whitespace-pre-wrap bg-slate-900/70 border border-slate-800 rounded-lg p-3 text-slate-200"></pre>
+        </div>
+        <div class="w-[120px] h-[120px] border border-slate-700 rounded-xl bg-slate-900/70 flex items-center justify-center text-[11px] text-center px-2"
+             id="qrBox">
+          QR Order<br/>akan tampil di sini<br/>(demo kode teks)
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<script>
+// ===== UTIL LOCALSTORAGE =====
+function dbGet(name, fallback) {
+  try { return JSON.parse(localStorage.getItem(name)) || fallback; }
+  catch { return fallback; }
+}
+function dbSet(name, val) { localStorage.setItem(name, JSON.stringify(val)); }
+
+function refreshNav() {
+  const cart = dbGet("db_cart", []);
+  const pts = dbGet("db_points", {value:0}).value;
+  const navCart = document.getElementById("navCartCount");
+  const navPts = document.getElementById("navPoints");
+  if (navCart) navCart.textContent = cart.length;
+  if (navPts) navPts.textContent = pts;
+}
+
+// ===== ORDER MODE (GRAB, DINE, DELIVERY) =====
+function getOrderMode() {
+  return dbGet("db_order_mode", "grab");
+}
+
+function setOrderMode(mode) {
+  dbSet("db_order_mode", mode);
+  refreshOrderModeUI();
+}
+
+function refreshOrderModeUI() {
+  const mode = getOrderMode();
+
+  const btnGrab = document.getElementById("btnModeGrab");
+  const btnDine = document.getElementById("btnModeDine");
+  const btnDel  = document.getElementById("btnModeDelivery");
+  const descStore = document.getElementById("orderModeDescStore");
+  const labelLocator = document.getElementById("orderModeLabel");
+  const descLocator = document.getElementById("orderModeDescLocator");
+  const addressWrapper = document.getElementById("addressWrapper");
+
+  // Reset button styles
+  const allButtons = [btnGrab, btnDine, btnDel];
+  allButtons.forEach(btn => {
+    if (!btn) return;
+    btn.classList.remove("bg-amber-400", "text-slate-900");
+    btn.classList.add("bg-slate-800", "text-slate-200");
+  });
+
+  // Set active button & descriptions
+  let labelText = "";
+  let descText = "";
+
+  if (mode === "grab") {
+    if (btnGrab) {
+      btnGrab.classList.add("bg-amber-400", "text-slate-900");
+      btnGrab.classList.remove("bg-slate-800", "text-slate-200");
+    }
+    labelText = "Grab & Go";
+    descText = "Pesan lewat Docterbee, lalu ambil langsung di titik Wellness Chart terdekat.";
+  } else if (mode === "dine") {
+    if (btnDine) {
+      btnDine.classList.add("bg-amber-400", "text-slate-900");
+      btnDine.classList.remove("bg-slate-800", "text-slate-200");
+    }
+    labelText = "Dine In";
+    descText = "Pesan untuk dinikmati langsung di Café Sehat Docterbee.";
+  } else if (mode === "delivery") {
+    if (btnDel) {
+      btnDel.classList.add("bg-amber-400", "text-slate-900");
+      btnDel.classList.remove("bg-slate-800", "text-slate-200");
+    }
+    labelText = "Delivery";
+    descText = "Pesan diantar ke rumah/kantor. Alamat singkat dibutuhkan untuk kurir.";
+  }
+
+  if (descStore) descStore.textContent = descText;
+  if (labelLocator) labelLocator.textContent = labelText;
+  if (descLocator) descLocator.textContent = descText;
+
+  // Alamat hanya relevan jika Delivery
+  if (addressWrapper) {
+    if (mode === "delivery") addressWrapper.classList.remove("hidden");
+    else addressWrapper.classList.add("hidden");
+  }
+}
+
+// ===== ROUTING / PAGE SWITCH =====
+function showPage(name) {
+  const pages = {
+    store: document.getElementById("page-store"),
+    points: document.getElementById("page-points"),
+    locator: document.getElementById("page-locator")
+  };
+  const tabs = {
+    store: document.getElementById("tabStore"),
+    points: document.getElementById("tabPoints"),
+    locator: document.getElementById("tabLocator")
+  };
+
+  for (const key in pages) {
+    if (key === name) pages[key].classList.remove("hidden");
+    else pages[key].classList.add("hidden");
+  }
+
+  for (const key in tabs) {
+    if (key === name) {
+      tabs[key].classList.remove("tab-inactive");
+      tabs[key].classList.add("tab-active");
+    } else {
+      tabs[key].classList.remove("tab-active");
+      tabs[key].classList.add("tab-inactive");
+    }
+  }
+
+  refreshNav();
+  refreshOrderModeUI();
+  if (name === "points") updatePointsView();
+  if (name === "locator") { renderLocations(); renderCart(); }
+}
+
+// ===== DATA PRODUK (INCLUDE SUSU KURMA) =====
+const PRODUCTS = [
+  { id:1,  name:"Paket Zona Sunnah",      cat:"Zona Sunnah",      price:150000 },
+  { id:2,  name:"Cuka Apel Premium",      cat:"Zona Sunnah",      price:90000 },
+  { id:3,  name:"Kurma Ajwa",             cat:"Zona Sunnah",      price:120000 },
+
+  { id:4,  name:"Mix Rempah 1001 Spice",  cat:"Zona 1001 Rempah", price:65000 },
+  { id:5,  name:"Jahe Merah Bubuk",       cat:"Zona 1001 Rempah", price:45000 },
+
+  { id:6,  name:"Madu 3–5mm Grade A",     cat:"Zona Honey",       price:250000 },
+  { id:7,  name:"Madu Flora Manis",       cat:"Zona Honey",       price:170000 },
+
+  { id:8,  name:"Aurora Gold",            cat:"Cold-Pressed",     price:38000 },
+  { id:9,  name:"Vital Reset",            cat:"Cold-Pressed",     price:42000 },
+
+  { id:10, name:"Honey Latte",            cat:"CoffeeBee",        price:28000 },
+  { id:11, name:"Espresso Madu",          cat:"CoffeeBee",        price:26000 },
+
+  { id:12, name:"Ginger Honey Tea",       cat:"TeaBee",           price:22000 },
+  { id:13, name:"Mint Honey Tea",         cat:"TeaBee",           price:22000 },
+
+  { id:14, name:"Buah Lokal Seasonal",    cat:"Buah Lokal",       price:20000 },
+
+  { id:15, name:"Susu Kurma Classic",     cat:"Susu Kurma",       price:25000 },
+  { id:16, name:"Susu Kurma Cokelat",     cat:"Susu Kurma",       price:27000 }
+];
+
+let currentCategory = "all";
+
+// Helper thumbnail untuk kategori produk
+function getThumbEmoji(cat) {
+  switch (cat) {
+    case "Zona Sunnah":        return "🌙";
+    case "Zona 1001 Rempah":   return "🧂";
+    case "Zona Honey":         return "🍯";
+    case "Cold-Pressed":       return "🥤";
+    case "CoffeeBee":          return "☕";
+    case "TeaBee":             return "🍵";
+    case "Susu Kurma":         return "🥛";
+    case "Buah Lokal":         return "🍎";
+    default:                   return "🩺";
+  }
+}
+
+function renderProducts() {
+  const grid = document.getElementById("productGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const filtered = PRODUCTS.filter(p => currentCategory === "all" || p.cat === currentCategory);
+
+  filtered.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between";
+
+    const icon = getThumbEmoji(p.cat);
+
+    div.innerHTML = `
+      <div class="space-y-2">
+        <div class="h-20 w-full rounded-lg bg-slate-800/80 flex items-center justify-center text-3xl mb-1">
+          ${icon}
+        </div>
+        <div class="space-y-1">
+          <div class="text-[11px] uppercase tracking-wide text-amber-300">${p.cat}</div>
+          <h3 class="font-semibold text-sm">${p.name}</h3>
+          <p class="text-sm text-slate-300">Rp ${p.price.toLocaleString("id-ID")}</p>
+        </div>
+      </div>
+      <button class="mt-3 w-full rounded-lg bg-amber-400 text-slate-900 text-sm py-1.5 font-semibold">
+        Tambah ke Keranjang
+      </button>
+    `;
+
+    div.querySelector("button").onclick = () => addToCart(p);
+    grid.appendChild(div);
+  });
+}
+
+function filterCategory(cat) {
+  currentCategory = cat;
+  renderProducts();
+}
+
+function addToCart(product) {
+  const cart = dbGet("db_cart", []);
+  cart.push(product);
+  dbSet("db_cart", cart);
+
+  const pts = dbGet("db_points", {value:0});
+  pts.value += 1; // 1 poin per item (demo)
+  dbSet("db_points", pts);
+
+  refreshNav();
+  alert(`Ditambahkan: ${product.name}`);
+}
+
+// ===== POINTS LOGIC =====
+function updatePointsView() {
+  const el = document.getElementById("pointsBig");
+  if (!el) return;
+  el.textContent = dbGet("db_points", {value:0}).value;
+  refreshNav();
+}
+
+function addDemoPoints() {
+  const pts = dbGet("db_points", {value:0});
+  pts.value += 10;
+  dbSet("db_points", pts);
+  updatePointsView();
+}
+
+function redeem(cost, label) {
+  const pts = dbGet("db_points", {value:0});
+  if (pts.value < cost) {
+    alert("Poin belum cukup untuk: " + label);
+    return;
+  }
+  pts.value -= cost;
+  dbSet("db_points", pts);
+  updatePointsView();
+  const info = document.getElementById("redeemInfo");
+  if (info) {
+    info.textContent =
+      "Berhasil menukar: " + label +
+      ". Di versi produksi akan dibuat QR/e-ticket sebagai bukti.";
+  }
+}
+
+// ===== WELLNESS LOCATIONS =====
+const LOCATIONS = [
+  { id: 1, name: "Kolaka – ZE Center",    desc: "ZonaEnglish & Docterbee Hub",  address: "Pusat kota Kolaka" },
+  { id: 2, name: "Makassar – Pettarani",  desc: "ZE City & Docterbee Café",     address: "Jl. Pettarani, Makassar" },
+  { id: 3, name: "Kendari – ByPass",      desc: "Pickup point Docterbee",       address: "Jl. ByPass, Kendari" }
+];
+
+function renderLocations() {
+  const grid = document.getElementById("locationGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  LOCATIONS.forEach(loc => {
+    const card = document.createElement("div");
+    card.className = "rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between";
+    card.innerHTML = `
+      <div>
+        <h3 class="font-semibold mb-1">${loc.name}</h3>
+        <p class="text-slate-300 text-xs mb-1">${loc.desc}</p>
+        <p class="text-slate-400 text-xs">${loc.address}</p>
+      </div>
+      <div class="mt-3 flex flex-col gap-2">
+        <button class="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-900 text-xs font-semibold">
+          Check-in (Demo +3 poin)
+        </button>
+        <button class="px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+          Tandai sebagai Pickup
+        </button>
+      </div>
+    `;
+
+    const [btnCheckIn, btnPickup] = card.querySelectorAll("button");
+    btnCheckIn.onclick = () => checkIn(loc);
+    btnPickup.onclick = () => setPickup(loc);
+
+    grid.appendChild(card);
+  });
+}
+
+function checkIn(loc) {
+  const pts = dbGet("db_points", {value:0});
+  pts.value += 3;
+  dbSet("db_points", pts);
+  refreshNav();
+  alert("Check-in di " + loc.name + " berhasil. +3 poin (demo).");
+}
+
+function setPickup(loc) {
+  dbSet("db_pickup", loc);
+  alert("Pickup diset ke: " + loc.name);
+  renderCart();
+}
+
+function renderCart() {
+  const cart = dbGet("db_cart", []);
+  const pickup = dbGet("db_pickup", null);
+  const wrap = document.getElementById("cartList");
+  if (!wrap) return;
+
+  if (cart.length === 0) {
+    wrap.textContent = "Keranjang masih kosong.";
+    return;
+  }
+
+  let html = "";
+
+  const mode = getOrderMode();
+  if (pickup && mode === "grab") {
+    html += `<p class="mb-1 text-amber-300">Pickup: ${pickup.name}</p>`;
+  } else if (pickup && mode === "dine") {
+    html += `<p class="mb-1 text-amber-300">Dine In di: ${pickup.name}</p>`;
+  } else if (pickup) {
+    html += `<p class="mb-1 text-amber-300">Area Delivery sekitar: ${pickup.name}</p>`;
+  } else {
+    html += `<p class="mb-1 text-slate-300">Pickup/lokasi belum dipilih.</p>`;
+  }
+
+  cart.forEach((item, idx) => {
+    html += `<div>• ${idx + 1}. ${item.name} – Rp ${item.price.toLocaleString("id-ID")}</div>`;
+  });
+
+  html += `<p class="mt-2 text-[10px] text-slate-400">
+    Demo: di versi produksi, akan ada tombol "Kirim ke Kasir" atau "Kirim via WhatsApp"
+    lengkap dengan mode order (Grab & Go / Dine In / Delivery).
+  </p>`;
+
+  wrap.innerHTML = html;
+}
+
+// ===== ORDER GENERATION (QR + SUMMARY) =====
+function generateOrder() {
+  const cart = dbGet("db_cart", []);
+  if (!cart.length) {
+    alert("Keranjang masih kosong. Tambahkan produk terlebih dahulu.");
+    return;
+  }
+
+  const mode = getOrderMode();
+  const pickup = dbGet("db_pickup", null);
+  const name = (document.getElementById("inputName")?.value || "").trim();
+  const address = (document.getElementById("inputAddress")?.value || "").trim();
+
+  if (!name) {
+    alert("Mohon isi nama pemesan.");
+    return;
+  }
+
+  if (mode === "delivery" && !address) {
+    alert("Untuk delivery, mohon isi alamat singkat.");
+    return;
+  }
+
+  // Buat kode order sederhana
+  const code = "DB-" + Date.now().toString(36).toUpperCase().slice(-6);
+
+  let lines = [];
+  lines.push("Kode Order: " + code);
+  lines.push("Nama: " + name);
+  lines.push("Mode: " + (mode === "grab" ? "Grab & Go" : mode === "dine" ? "Dine In" : "Delivery"));
+
+  if (pickup) {
+    lines.push("Lokasi: " + pickup.name);
+  } else {
+    lines.push("Lokasi: (belum dipilih)");
+  }
+
+  if (mode === "delivery") {
+    lines.push("Alamat singkat: " + address);
+  }
+
+  lines.push("");
+  lines.push("Item:");
+
+  let total = 0;
+  cart.forEach((item, idx) => {
+    total += item.price;
+    lines.push(
+      (idx + 1) + ". " +
+      item.name +
+      " – Rp " + item.price.toLocaleString("id-ID")
+    );
+  });
+
+  lines.push("");
+  lines.push("Total (perkiraan): Rp " + total.toLocaleString("id-ID"));
+  lines.push("");
+  lines.push("Catatan untuk kasir:");
+  lines.push("- Scan / baca kode order di atas");
+  lines.push("- Cocokkan dengan cart sistem kasir");
+  lines.push("- Pastikan mode order & lokasi sesuai");
+  if (mode === "delivery") {
+    lines.push("- Konfirmasi alamat & ongkir ke pelanggan");
+  }
+
+  const summaryEl = document.getElementById("orderSummary");
+  if (summaryEl) summaryEl.textContent = lines.join("\n");
+
+  const qrBox = document.getElementById("qrBox");
+  if (qrBox) {
+    qrBox.textContent = "";
+    const inner = document.createElement("div");
+    inner.className = "text-[10px] text-center leading-tight";
+    inner.innerHTML = `
+      QR DEMO<br/>
+      (kode teks)<br/><br/>
+      <span class="font-mono">${code}</span>
+    `;
+    qrBox.appendChild(inner);
+  }
+
+  // Simpan order terakhir (demo)
+  dbSet("db_last_order", {
+    code,
+    name,
+    mode,
+    pickup,
+    address,
+    items: cart,
+    total
+  });
+
+  alert("Order demo dibuat.\nKasir bisa membaca kode: " + code);
+}
+
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", () => {
+  refreshNav();
+  renderProducts();
+  updatePointsView();
+  renderLocations();
+  renderCart();
+  refreshOrderModeUI();
+  showPage("store");
+});
+</script>
+
+</body>
+</html>
