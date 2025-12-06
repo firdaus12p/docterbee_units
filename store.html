@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docterbee – Health Store & Wellness</title>
+
+    <!-- External Stylesheets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-slate-950 text-slate-100">
+    <!-- Header Navigation (Consistent with other pages) -->
+    <header
+      class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+    >
+      <div
+        class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="logo-box"></div>
+          <span class="font-semibold">Docterbee</span>
+        </a>
+        <nav class="hidden md:flex gap-6 text-sm">
+          <a href="index.html" class="nav-link">Journey</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="store.html" class="nav-link active">Store</a>
+          <a href="events.html" class="nav-link">Events</a>
+          <a href="insight.html" class="nav-link">Insight</a>
+          <a href="media.html" class="nav-link">Media</a>
+          <a href="ai-advisor.html" class="nav-link">AI Advisor</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 text-xs">
+            <i data-lucide="shopping-cart" class="w-4 h-4 text-amber-300"></i>
+            <span id="navCartCount" class="font-semibold">0</span>
+          </div>
+          <span class="points-display"> Points: <b id="navPoints">0</b> </span>
+          <button
+            id="hamburgerBtn"
+            class="md:hidden hamburger-btn"
+            aria-label="Toggle menu"
+          >
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <span class="font-semibold">Menu</span>
+        <button
+          id="closeMobileMenu"
+          class="close-menu-btn"
+          aria-label="Close menu"
+        >
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <nav class="mobile-menu-nav">
+        <a href="index.html" class="mobile-nav-link">Journey</a>
+        <a href="services.html" class="mobile-nav-link">Services</a>
+        <a href="store.html" class="mobile-nav-link">Store</a>
+        <a href="events.html" class="mobile-nav-link">Events</a>
+        <a href="insight.html" class="mobile-nav-link">Insight</a>
+        <a href="media.html" class="mobile-nav-link">Media</a>
+        <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <div class="flex items-center justify-between">
+          <span class="points-display">
+            Points: <b id="mobileNavPoints">0</b>
+          </span>
+          <span class="text-xs text-slate-400">
+            <i data-lucide="shopping-cart" class="w-3 h-3 inline"></i>
+            <span id="mobileCartCount">0</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="mx-auto max-w-6xl px-4 md:px-6 py-10">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+          Docterbee Health Store
+        </h1>
+        <p class="text-slate-300/85">
+          Produk kesehatan berbasis Sunnah & Sains. Belanja, kumpulkan poin,
+          tukar reward wellness.
+        </p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div
+        class="flex gap-2 mb-6 overflow-x-auto pb-2"
+        style="scrollbar-width: thin"
+      >
+        <button
+          id="tabStore"
+          onclick="showStoreTab('store')"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-amber-400 text-slate-900"
+        >
+          <i data-lucide="shopping-bag" class="w-4 h-4 inline mr-1"></i>
+          Store & Products
+        </button>
+        <button
+          id="tabDineIn"
+          onclick="showStoreTab('dinein')"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-slate-800 text-slate-300 hover:bg-slate-700"
+        >
+          <i data-lucide="utensils" class="w-4 h-4 inline mr-1"></i>
+          Dine-In Menu
+        </button>
+        <button
+          id="tabPoints"
+          onclick="showStoreTab('points')"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-slate-800 text-slate-300 hover:bg-slate-700"
+        >
+          <i data-lucide="award" class="w-4 h-4 inline mr-1"></i>
+          My Points & Rewards
+        </button>
+        <button
+          id="tabLocator"
+          onclick="showStoreTab('locator')"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-slate-800 text-slate-300 hover:bg-slate-700"
+        >
+          <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+          Locations & Pickup
+        </button>
+      </div>
+
+      <!-- =============== STORE TAB =============== -->
+      <section id="page-store" class="space-y-6">
+        <!-- Hero Banner -->
+        <div
+          class="rounded-2xl border-2 border-amber-400/40 bg-gradient-to-r from-amber-900/20 to-slate-900/60 p-6"
+        >
+          <h2 class="text-xl font-bold text-amber-300 mb-2">
+            🌙 Zona Sunnah · 🧂 1001 Rempah · 🍯 Honey Premium
+          </h2>
+          <p class="text-slate-300/85 text-sm">
+            Semua produk kami dipilih sesuai prinsip Qur'an, Sunnah, dan
+            kesehatan holistik. Gratis konsultasi untuk member aktif.
+          </p>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-2">
+          <button
+            onclick="filterStoreCategory('all')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900"
+          >
+            Semua Produk
+          </button>
+          <button
+            onclick="filterStoreCategory('Zona Sunnah')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          >
+            🌙 Zona Sunnah
+          </button>
+          <button
+            onclick="filterStoreCategory('Zona 1001 Rempah')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          >
+            🧂 1001 Rempah
+          </button>
+          <button
+            onclick="filterStoreCategory('Zona Honey')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          >
+            🍯 Zona Honey
+          </button>
+          <button
+            onclick="filterStoreCategory('Cold-Pressed')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          >
+            🥤 Cold-Pressed
+          </button>
+        </div>
+
+        <!-- Products Grid -->
+        <div
+          id="productGrid"
+          class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        ></div>
+
+        <!-- Grab & Go + Konsultasi Info -->
+        <div class="border-t border-slate-800 pt-6 grid gap-4 md:grid-cols-2">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-2"
+          >
+            <div class="flex items-center gap-2 text-amber-300 font-semibold">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>Grab & Go</span>
+            </div>
+            <p class="text-sm text-slate-300/85">
+              Ambil langsung di cabang terdekat tanpa antri. Pre-order via
+              WhatsApp atau langsung datang.
+            </p>
+          </div>
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-2"
+          >
+            <div class="flex items-center gap-2 text-emerald-300 font-semibold">
+              <i data-lucide="stethoscope" class="w-5 h-5"></i>
+              <span>Konsultasi Gratis</span>
+            </div>
+            <p class="text-sm text-slate-300/85">
+              Member dengan poin ≥50 dapat konsultasi produk kesehatan gratis
+              dengan praktisi kami.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============== DINE-IN MENU TAB =============== -->
+      <section id="page-dinein" class="space-y-6 hidden">
+        <div
+          class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-4"
+        >
+          <h2 class="text-xl font-bold text-amber-300">
+            <i data-lucide="coffee" class="w-5 h-5 inline mr-2"></i>
+            Menu Café Sehat Docterbee
+          </h2>
+          <p class="text-sm text-slate-300/85">
+            Nikmati minuman & makanan sehat di café kami. Semua bahan premium,
+            tanpa MSG, gula rendah, dan cocok untuk diet seimbang.
+          </p>
+
+          <!-- Menu Categories -->
+          <div class="space-y-4 mt-4">
+            <!-- CoffeeBee -->
+            <div>
+              <h3 class="font-semibold text-amber-300 mb-2">
+                ☕ CoffeeBee Series
+              </h3>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Honey Latte</span>
+                    <span class="text-amber-300">Rp 28.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Latte dengan madu asli, tanpa gula tambahan
+                  </p>
+                </div>
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Espresso Madu</span>
+                    <span class="text-amber-300">Rp 26.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Espresso murni dengan sentuhan madu
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- TeaBee -->
+            <div>
+              <h3 class="font-semibold text-emerald-300 mb-2">
+                🍵 TeaBee Herbal
+              </h3>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Ginger Honey Tea</span>
+                    <span class="text-emerald-300">Rp 22.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Teh jahe dengan madu hangat
+                  </p>
+                </div>
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Mint Honey Tea</span>
+                    <span class="text-emerald-300">Rp 22.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Teh mint segar dengan madu
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cold-Pressed Juice -->
+            <div>
+              <h3 class="font-semibold text-sky-300 mb-2">
+                🥤 Cold-Pressed Juice
+              </h3>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Aurora Gold</span>
+                    <span class="text-sky-300">Rp 38.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Jeruk, wortel, kunyit – antioksidan tinggi
+                  </p>
+                </div>
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Vital Reset</span>
+                    <span class="text-sky-300">Rp 42.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Bayam, apel, timun – detox alami
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Susu Kurma -->
+            <div>
+              <h3 class="font-semibold text-purple-300 mb-2">
+                🥛 Susu Kurma Signature
+              </h3>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Susu Kurma Classic</span>
+                    <span class="text-purple-300">Rp 25.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Kurma Ajwa blend susu segar
+                  </p>
+                </div>
+                <div
+                  class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+                >
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-semibold">Susu Kurma Cokelat</span>
+                    <span class="text-purple-300">Rp 27.000</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Varian cokelat dengan kurma premium
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buah Lokal -->
+            <div>
+              <h3 class="font-semibold text-rose-300 mb-2">
+                🍎 Buah Lokal Seasonal
+              </h3>
+              <div
+                class="rounded-lg border border-slate-700 bg-slate-800/40 p-3"
+              >
+                <div class="flex justify-between items-start mb-1">
+                  <span class="font-semibold">Buah Segar Pilihan</span>
+                  <span class="text-rose-300">Rp 20.000</span>
+                </div>
+                <p class="text-xs text-slate-400">
+                  Buah lokal segar musiman (papaya, pisang, dll)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dine-In Info -->
+          <div
+            class="mt-6 rounded-xl border border-amber-400/30 bg-amber-900/10 p-4"
+          >
+            <div class="flex items-start gap-3">
+              <i data-lucide="info" class="w-5 h-5 text-amber-300 mt-0.5"></i>
+              <div class="text-sm text-slate-300">
+                <p class="font-semibold text-amber-300 mb-1">Info Dine-In:</p>
+                <ul class="space-y-1 text-xs">
+                  <li>• Tersedia di Docterbee Café (Kolaka & Makassar)</li>
+                  <li>• Buka: Senin–Sabtu, 09.00–20.00 WITA</li>
+                  <li>• Free WiFi & area kerja nyaman</li>
+                  <li>• Setiap pembelian dapat 1 poin loyalty</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============== POINTS TAB =============== -->
+      <section id="page-points" class="space-y-6 hidden">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-center">
+            <div class="text-sm text-slate-400 mb-2">Total Poin Anda</div>
+            <div id="pointsBig" class="text-5xl font-bold text-amber-300 mb-4">
+              0
+            </div>
+            <button
+              onclick="addDemoPoints(10)"
+              class="text-xs px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
+            >
+              + Simulasi Tambah 10 Poin
+            </button>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <!-- Cara Dapat Poin -->
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+            <h3 class="font-semibold text-amber-300 mb-3">
+              Cara Mendapat Poin
+            </h3>
+            <ul class="text-sm text-slate-300/85 space-y-2">
+              <li>✅ Belanja produk: +1 poin per item</li>
+              <li>✅ Dine-in di café: +1 poin per transaksi</li>
+              <li>✅ Check-in di cabang: +3 poin</li>
+              <li>✅ Complete journey units: +bonus poin</li>
+              <li>✅ Ikut event/webinar: +5 poin</li>
+            </ul>
+          </div>
+
+          <!-- Tukar Poin -->
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+            <h3 class="font-semibold text-emerald-300 mb-3">Tukar Poin</h3>
+            <ul class="text-sm text-slate-300/85 space-y-2">
+              <li>🎁 Diskon 10%: 20 poin</li>
+              <li>🎁 Konsultasi gratis: 50 poin</li>
+              <li>🎁 Free product kecil: 80 poin</li>
+              <li>🎁 Voucher Rp 50K: 100 poin</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Redeem Rewards -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+          <h3 class="font-semibold text-amber-300 mb-4">
+            Tukar Reward Sekarang
+          </h3>
+          <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            <button
+              onclick="redeemReward(20, 'Diskon 10%')"
+              class="rounded-lg border border-slate-700 bg-slate-800/40 p-3 hover:bg-slate-700 transition text-left"
+            >
+              <div class="text-xs text-slate-400 mb-1">20 poin</div>
+              <div class="font-semibold text-sm">Diskon 10%</div>
+            </button>
+            <button
+              onclick="redeemReward(50, 'Konsultasi Gratis')"
+              class="rounded-lg border border-slate-700 bg-slate-800/40 p-3 hover:bg-slate-700 transition text-left"
+            >
+              <div class="text-xs text-slate-400 mb-1">50 poin</div>
+              <div class="font-semibold text-sm">Konsultasi Gratis</div>
+            </button>
+            <button
+              onclick="redeemReward(80, 'Free Product Kecil')"
+              class="rounded-lg border border-slate-700 bg-slate-800/40 p-3 hover:bg-slate-700 transition text-left"
+            >
+              <div class="text-xs text-slate-400 mb-1">80 poin</div>
+              <div class="font-semibold text-sm">Free Product Kecil</div>
+            </button>
+            <button
+              onclick="redeemReward(100, 'Voucher Rp 50K')"
+              class="rounded-lg border border-slate-700 bg-slate-800/40 p-3 hover:bg-slate-700 transition text-left"
+            >
+              <div class="text-xs text-slate-400 mb-1">100 poin</div>
+              <div class="font-semibold text-sm">Voucher Rp 50K</div>
+            </button>
+          </div>
+          <div
+            id="redeemInfo"
+            class="mt-4 text-sm text-emerald-400 hidden"
+          ></div>
+        </div>
+      </section>
+
+      <!-- =============== LOCATOR TAB =============== -->
+      <section id="page-locator" class="space-y-6 hidden">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <h2 class="text-xl font-bold text-amber-300 mb-2">
+            <i data-lucide="map-pin" class="w-5 h-5 inline mr-2"></i>
+            Lokasi & Pickup Point
+          </h2>
+          <p class="text-sm text-slate-300/85">
+            Pilih lokasi untuk check-in atau atur pickup point untuk pesanan
+            Anda.
+          </p>
+        </div>
+
+        <div id="locationGrid" class="grid gap-4 md:grid-cols-3"></div>
+
+        <!-- Shopping Cart -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+          <h3 class="font-semibold text-amber-300 mb-3">
+            <i data-lucide="shopping-bag" class="w-4 h-4 inline mr-1"></i>
+            Keranjang Belanja
+          </h3>
+          <div id="cartList" class="text-sm text-slate-300/85">
+            <p class="text-slate-400">Belum ada item di keranjang.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="mt-16 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+    >
+      <p>
+        © <span id="year"></span> Docterbee – Kesehatan berbasis Qur'an & Sunnah
+      </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+    <script>
+      // Initialize year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Initialize Lucide icons
+      if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
+
+      // Initialize mobile menu
+      if (typeof initMobileMenu === "function") {
+        initMobileMenu();
+      }
+
+      // Initialize store page
+      if (typeof initStorePage === "function") {
+        initStorePage();
+      }
+
+      // Refresh navigation points
+      if (typeof refreshNav === "function") {
+        refreshNav();
+      }
+    </script>
+  </body>
+</html>

@@ -2536,6 +2536,511 @@ function initServices() {
   refreshNav();
 }
 
+// ==================== STORE / POINTS / WELLNESS PAGE ====================
+
+// ========================================
+// STORE PAGE - DOCTERBEE HEALTH STORE & CAFÉ
+// ========================================
+
+// Product catalog dengan 16 items across 8 categories
+const PRODUCTS = [
+  // Zona Sunnah
+  {
+    id: "zs-kurma",
+    name: "Kurma Ajwa Premium",
+    cat: "zona-sunnah",
+    price: 85000,
+  },
+  {
+    id: "zs-zaitun",
+    name: "Minyak Zaitun Extra Virgin",
+    cat: "zona-sunnah",
+    price: 125000,
+  },
+
+  // 1001 Rempah
+  {
+    id: "rp-jintan",
+    name: "Jintan Hitam Habbatussauda",
+    cat: "rempah",
+    price: 45000,
+  },
+  { id: "rp-jahe", name: "Jahe Merah Original", cat: "rempah", price: 35000 },
+
+  // Zona Honey
+  { id: "hn-murni", name: "Madu Murni 500ml", cat: "honey", price: 150000 },
+  {
+    id: "hn-forest",
+    name: "Madu Hutan Sumbawa 250ml",
+    cat: "honey",
+    price: 95000,
+  },
+
+  // Cold-Pressed Juice
+  {
+    id: "cp-green",
+    name: "Green Detox Juice",
+    cat: "cold-pressed",
+    price: 42000,
+  },
+  {
+    id: "cp-beet",
+    name: "Beetroot Energy Juice",
+    cat: "cold-pressed",
+    price: 38000,
+  },
+
+  // CoffeeBee
+  {
+    id: "cf-arabica",
+    name: "Arabica Single Origin",
+    cat: "coffeebee",
+    price: 28000,
+  },
+  {
+    id: "cf-robusta",
+    name: "Robusta Strong Blend",
+    cat: "coffeebee",
+    price: 26000,
+  },
+
+  // TeaBee
+  { id: "tb-green", name: "Green Tea Jasmine", cat: "teabee", price: 22000 },
+  {
+    id: "tb-chamomile",
+    name: "Chamomile Relax Tea",
+    cat: "teabee",
+    price: 24000,
+  },
+
+  // Susu Kurma
+  {
+    id: "sk-original",
+    name: "Susu Kurma Original 500ml",
+    cat: "susu-kurma",
+    price: 27000,
+  },
+  {
+    id: "sk-premium",
+    name: "Susu Kurma Premium 1L",
+    cat: "susu-kurma",
+    price: 50000,
+  },
+
+  // Buah Lokal
+  {
+    id: "bl-alpukat",
+    name: "Jus Alpukat Segar",
+    cat: "buah-lokal",
+    price: 18000,
+  },
+  {
+    id: "bl-mangga",
+    name: "Jus Mangga Manis",
+    cat: "buah-lokal",
+    price: 15000,
+  },
+];
+
+// Location data untuk 3 branches
+const LOCATIONS = [
+  {
+    id: "kolaka",
+    name: "Docterbee Kolaka ZE Center",
+    address: "Jl. DI Panjaitan No. 88, Kolaka",
+    phone: "0821-8808-0688",
+    hours: "08:00 - 20:00 WIB",
+  },
+  {
+    id: "makassar",
+    name: "Docterbee Makassar Pettarani",
+    address: "Jl. A.P. Pettarani No. 45, Makassar",
+    phone: "0821-8808-0689",
+    hours: "08:00 - 21:00 WITA",
+  },
+  {
+    id: "kendari",
+    name: "Docterbee Kendari ByPass",
+    address: "Jl. By Pass No. 123, Kendari",
+    phone: "0821-8808-0690",
+    hours: "08:00 - 20:00 WITA",
+  },
+];
+
+// LocalStorage helpers for store
+function _storeGet(key, defaultValue) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : defaultValue;
+  } catch (e) {
+    return defaultValue;
+  }
+}
+
+function _storeSet(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+// Tab switching untuk 4 sections
+function showStoreTab(tabName) {
+  // Hide all sections
+  const sections = ["page-store", "page-dinein", "page-points", "page-locator"];
+  sections.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+
+  // Remove active styles dari semua tabs
+  const tabs = ["tabStore", "tabDineIn", "tabPoints", "tabLocator"];
+  tabs.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove("bg-amber-400", "text-slate-900");
+      el.classList.add("bg-slate-800", "text-slate-300");
+    }
+  });
+
+  // Show selected section
+  const sectionMap = {
+    store: "page-store",
+    dinein: "page-dinein",
+    points: "page-points",
+    locator: "page-locator",
+  };
+
+  const tabMap = {
+    store: "tabStore",
+    dinein: "tabDineIn",
+    points: "tabPoints",
+    locator: "tabLocator",
+  };
+
+  const targetSection = document.getElementById(sectionMap[tabName]);
+  const targetTab = document.getElementById(tabMap[tabName]);
+
+  if (targetSection) targetSection.classList.remove("hidden");
+  if (targetTab) {
+    targetTab.classList.remove("bg-slate-800", "text-slate-300");
+    targetTab.classList.add("bg-amber-400", "text-slate-900");
+  }
+}
+
+// Filter products by category
+function filterStoreCategory(category) {
+  const grid = document.getElementById("productGrid");
+  if (!grid) return;
+
+  let filtered = PRODUCTS;
+  if (category && category !== "all") {
+    filtered = PRODUCTS.filter((p) => p.cat === category);
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML =
+      '<div class="col-span-full text-center text-slate-400 py-8">Belum ada produk di kategori ini</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered
+    .map(
+      (p) => `
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+      <div>
+        <div class="text-xs uppercase tracking-wider text-amber-300/70 mb-1">${getCategoryLabel(
+          p.cat
+        )}</div>
+        <div class="font-semibold text-slate-100">${escapeHtml(p.name)}</div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="text-amber-300 font-bold">Rp ${p.price.toLocaleString(
+          "id-ID"
+        )}</div>
+        <button class="btn-primary-sm" onclick="addToCart('${p.id}')">
+          <i data-lucide="plus" class="w-3 h-3"></i>
+          Tambah
+        </button>
+      </div>
+    </div>
+  `
+    )
+    .join("");
+
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+}
+
+function getCategoryLabel(cat) {
+  const labels = {
+    "zona-sunnah": "Zona Sunnah",
+    rempah: "1001 Rempah",
+    honey: "Zona Honey",
+    "cold-pressed": "Cold-Pressed",
+    coffeebee: "CoffeeBee",
+    teabee: "TeaBee",
+    "susu-kurma": "Susu Kurma",
+    "buah-lokal": "Buah Lokal",
+  };
+  return labels[cat] || cat;
+}
+
+// Add product to cart
+function addToCart(productId) {
+  const product = PRODUCTS.find((p) => p.id === productId);
+  if (!product) return;
+
+  const cart = _storeGet("db_cart", []);
+  const existing = cart.find((item) => item.id === productId);
+
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      qty: 1,
+    });
+  }
+
+  _storeSet("db_cart", cart);
+  updateCartDisplay();
+  updatePointsView();
+
+  // Show feedback
+  const btn = event.target.closest("button");
+  if (btn) {
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> OK';
+    btn.classList.add("bg-emerald-600");
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.classList.remove("bg-emerald-600");
+      if (typeof lucide !== "undefined" && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }, 800);
+  }
+}
+
+// Update cart display in locator section
+function updateCartDisplay() {
+  const cartContainer = document.getElementById("cartList");
+  if (!cartContainer) return;
+
+  const cart = _storeGet("db_cart", []);
+  const cartCount = document.getElementById("cartCount");
+
+  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+  if (cartCount) {
+    cartCount.textContent = totalItems;
+    cartCount.classList.toggle("hidden", totalItems === 0);
+  }
+
+  if (cart.length === 0) {
+    cartContainer.innerHTML =
+      '<div class="text-sm text-slate-400">Keranjang masih kosong</div>';
+    return;
+  }
+
+  let total = 0;
+  const rows = cart
+    .map((item) => {
+      const subtotal = item.price * item.qty;
+      total += subtotal;
+      return `
+      <div class="flex items-center justify-between text-sm border-b border-slate-800 pb-2">
+        <div class="flex-1">
+          <div class="font-medium text-slate-200">${escapeHtml(item.name)}</div>
+          <div class="text-xs text-slate-400">${
+            item.qty
+          } × Rp ${item.price.toLocaleString("id-ID")}</div>
+        </div>
+        <div class="font-semibold text-amber-300">Rp ${subtotal.toLocaleString(
+          "id-ID"
+        )}</div>
+      </div>
+    `;
+    })
+    .join("");
+
+  cartContainer.innerHTML = `
+    <div class="space-y-2">
+      ${rows}
+      <div class="flex items-center justify-between pt-2 font-bold">
+        <span class="text-slate-300">Total</span>
+        <span class="text-amber-300">Rp ${total.toLocaleString("id-ID")}</span>
+      </div>
+    </div>
+  `;
+}
+
+// Update points display
+function updatePointsView() {
+  const data = _db("db_points");
+  const points = data.value || 0;
+
+  // Update big display in points section
+  const bigPoints = document.getElementById("pointsBig");
+  if (bigPoints) bigPoints.textContent = points;
+
+  // Update mobile nav badge (cart count)
+  const cart = _storeGet("db_cart", []);
+  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+  const mobileBadge = document.querySelector(".mobile-cart-badge");
+  if (mobileBadge) {
+    mobileBadge.textContent = totalItems;
+    mobileBadge.classList.toggle("hidden", totalItems === 0);
+  }
+}
+
+// Add demo points for testing
+function addDemoPoints(amount) {
+  const data = _db("db_points");
+  const newValue = (data.value || 0) + amount;
+  _db("db_points", { value: newValue });
+  addPoints(0); // Trigger nav refresh
+  updatePointsView();
+}
+
+// Redeem rewards
+function redeemReward(cost, rewardName) {
+  const data = _db("db_points");
+  const current = data.value || 0;
+
+  if (current < cost) {
+    alert(
+      `Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`
+    );
+    return;
+  }
+
+  const newValue = current - cost;
+  _db("db_points", { value: newValue });
+  addPoints(0); // Trigger nav refresh
+  updatePointsView();
+  alert(
+    `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
+  );
+}
+
+// Render locations
+function renderLocations() {
+  const grid = document.getElementById("locationGrid");
+  if (!grid) return;
+
+  grid.innerHTML = LOCATIONS.map(
+    (loc) => `
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+      <div class="flex items-start gap-3">
+        <div class="mt-1">
+          <i data-lucide="map-pin" class="w-5 h-5 text-amber-300"></i>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold text-slate-100 mb-1">${escapeHtml(
+            loc.name
+          )}</div>
+          <div class="text-xs text-slate-400 mb-2">${escapeHtml(
+            loc.address
+          )}</div>
+          <div class="text-xs text-slate-500 space-y-1">
+            <div><i data-lucide="phone" class="w-3 h-3 inline"></i> ${escapeHtml(
+              loc.phone
+            )}</div>
+            <div><i data-lucide="clock" class="w-3 h-3 inline"></i> ${escapeHtml(
+              loc.hours
+            )}</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn-secondary-sm flex-1" onclick="checkIn('${loc.id}')">
+          <i data-lucide="map-pin-check" class="w-3 h-3"></i>
+          Check-in
+        </button>
+        <button class="btn-primary-sm flex-1" onclick="setPickup('${loc.id}')">
+          <i data-lucide="shopping-bag" class="w-3 h-3"></i>
+          Pickup
+        </button>
+      </div>
+    </div>
+  `
+  ).join("");
+
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+}
+
+// Check-in at location (earn points)
+function checkIn(locationId) {
+  const loc = LOCATIONS.find((l) => l.id === locationId);
+  if (!loc) return;
+
+  // Tambah 5 points untuk check-in
+  addDemoPoints(5);
+  alert(`Check-in berhasil di ${loc.name}! +5 points`);
+}
+
+// Set pickup location
+function setPickup(locationId) {
+  const loc = LOCATIONS.find((l) => l.id === locationId);
+  if (!loc) return;
+
+  _storeSet("db_pickup", loc);
+
+  const pickupInfo = document.getElementById("pickupLocation");
+  if (pickupInfo) {
+    pickupInfo.innerHTML = `
+      <div class="text-sm space-y-1">
+        <div class="flex items-center gap-2 text-emerald-300">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span class="font-semibold">Pickup dipilih</span>
+        </div>
+        <div class="text-slate-300">${escapeHtml(loc.name)}</div>
+        <div class="text-xs text-slate-400">${escapeHtml(loc.address)}</div>
+      </div>
+    `;
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  }
+
+  alert(`Lokasi pickup diset ke ${loc.name}`);
+}
+
+// Initialize store page
+function initStorePage() {
+  // Set tahun footer
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+
+  // Event listener untuk category filter
+  const categoryFilter = document.getElementById("categoryFilter");
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", (e) => {
+      filterStoreCategory(e.target.value);
+    });
+  }
+
+  // Render initial data
+  filterStoreCategory("all"); // Show all products
+  renderLocations();
+  updateCartDisplay();
+  updatePointsView();
+  showStoreTab("store"); // Default tab
+
+  // Init mobile menu
+  initMobileMenu();
+
+  // Init Lucide icons
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+}
+
 // ==================== APP STARTUP ====================
 
 // Initialize on DOM ready
@@ -2550,6 +3055,8 @@ if (document.readyState === "loading") {
       initInsight();
     } else if (document.getElementById("ytPlayer")) {
       initMedia();
+    } else if (document.getElementById("storePageRoot")) {
+      initStorePage();
     } else if (document.getElementById("servicesGrid")) {
       initServices();
     } else {
@@ -2566,6 +3073,8 @@ if (document.readyState === "loading") {
     initInsight();
   } else if (document.getElementById("ytPlayer")) {
     initMedia();
+  } else if (document.getElementById("page-store")) {
+    initStorePage();
   } else if (document.getElementById("servicesGrid")) {
     initServices();
   } else {
