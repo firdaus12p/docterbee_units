@@ -8,7 +8,7 @@ const UNITS = [
   {
     id: "u1",
     title: "Unit 1 · 24 Jam Sehari",
-    color: "text-amber-300",
+    color: "text-amber-500",
     items: [
       {
         key: "subuh",
@@ -58,7 +58,7 @@ const UNITS = [
   {
     id: "u2",
     title: "Unit 2 · Bersosialisasi",
-    color: "text-emerald-300",
+    color: "text-emerald-500",
     items: [
       {
         key: "senyum",
@@ -86,7 +86,7 @@ const UNITS = [
   {
     id: "u3",
     title: "Unit 3 · Mencari Rezeki",
-    color: "text-sky-300",
+    color: "text-sky-500",
     items: [
       {
         key: "niatKerja",
@@ -114,7 +114,7 @@ const UNITS = [
   {
     id: "u4",
     title: "Unit 4 · Makan & Minum",
-    color: "text-fuchsia-300",
+    color: "text-fuchsia-500",
     items: [
       {
         key: "porsi",
@@ -142,7 +142,7 @@ const UNITS = [
   {
     id: "u5",
     title: "Unit 5 · Saat Sakit",
-    color: "text-rose-300",
+    color: "text-rose-500",
     items: [
       {
         key: "sabar",
@@ -170,7 +170,7 @@ const UNITS = [
   {
     id: "u6",
     title: "Unit 6 · Menjaga Pancaindra",
-    color: "text-amber-200",
+    color: "text-amber-500",
     items: [
       {
         key: "pandangan",
@@ -321,11 +321,13 @@ function showUnit(unitId) {
         <div class="flex items-start justify-between gap-3">
           <div>
             <div class="font-semibold">${escapeHtml(item.q)}</div>
-            <div class="text-xs text-slate-400 mt-1">${escapeHtml(
+            <div class="text-xs text-slate-900 mt-1 font-medium">${escapeHtml(
               item.dalil
             )}</div>
           </div>
-          <div class="text-xs ${unit.color}">Dalil · Sains · NBSN</div>
+          <div class="text-xs ${
+            unit.color
+          } font-semibold">Dalil · Sains · NBSN</div>
         </div>
         <div class="mt-3 flex flex-wrap gap-2">
           <button class="btn-yes ${
@@ -615,7 +617,13 @@ function calcAll() {
 /**
  * Initialize mobile menu functionality
  */
+// Flag to prevent multiple initializations
+let mobileMenuInitialized = false;
+
 function initMobileMenu() {
+  // Prevent multiple initializations
+  if (mobileMenuInitialized) return;
+
   const hamburgerBtn = document.getElementById("hamburgerBtn");
   const mobileMenu = document.getElementById("mobileMenu");
   const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
@@ -654,6 +662,9 @@ function initMobileMenu() {
       setTimeout(closeMobileMenuHandler, 200);
     });
   });
+
+  // Mark as initialized
+  mobileMenuInitialized = true;
 }
 
 // ==================== INITIALIZATION ====================
@@ -1368,7 +1379,7 @@ async function renderEvents() {
       if (event.registration_deadline) {
         const deadline = new Date(event.registration_deadline);
         deadlineText = `
-          <div class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+          <div class="text-xs text-slate-900 mt-1 flex items-center gap-1">
             <i data-lucide="clock" class="w-3 h-3"></i>
             Daftar sebelum: ${deadline.toLocaleDateString("id-ID", {
               day: "numeric",
@@ -1383,7 +1394,7 @@ async function renderEvents() {
       let locationText = "";
       if (event.mode === "offline" && event.location) {
         locationText = `
-          <div class="text-xs text-slate-300 mt-1 flex items-center gap-1">
+          <div class="text-xs text-slate-900 mt-1 flex items-center gap-1">
             <i data-lucide="map-pin" class="w-3 h-3 text-amber-400"></i>
             ${escapeHtml(event.location)}
           </div>
@@ -1395,14 +1406,14 @@ async function renderEvents() {
         <div class="text-xs text-amber-300 mt-1">${escapeHtml(
           event.mode.toUpperCase()
         )} · ${escapeHtml(event.topic)}</div>
-        <div class="text-sm text-slate-400 mt-1 flex items-center gap-1">
+        <div class="text-sm text-slate-900 mt-1 flex items-center gap-1">
           <i data-lucide="calendar" class="w-3 h-3"></i>
           ${formatEventDate(event.event_date)}
         </div>
         ${
           event.speaker
             ? `
-          <div class="text-xs text-emerald-300 mt-1 flex items-center gap-1">
+          <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
             <i data-lucide="user" class="w-3 h-3"></i>
             Pemateri: ${escapeHtml(event.speaker)}
           </div>
@@ -1412,7 +1423,7 @@ async function renderEvents() {
         ${locationText}
         ${deadlineText}
         <div class="text-sm font-semibold text-amber-400 mt-2">${feeText}</div>
-        <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(
+        <p class="text-sm text-slate-900 mt-2">${escapeHtml(
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
         <div class="mt-3 flex gap-2">
@@ -1547,10 +1558,10 @@ async function renderInsightArticles() {
       card.className = "article-card";
       card.innerHTML = `
         <div class="text-lg font-semibold">${escapeHtml(article.title)}</div>
-        <div class="text-xs text-amber-300 mt-1">${escapeHtml(
+        <div class="text-xs text-amber-500 mt-1 font-medium">${escapeHtml(
           article.tags || "Article"
         )}</div>
-        <p class="text-sm text-slate-300/85 mt-2">${escapeHtml(
+        <p class="text-sm text-slate-900 mt-2">${escapeHtml(
           article.excerpt || article.content.substring(0, 150) + "..."
         )}</p>
         <div class="mt-3 flex gap-2">
@@ -2399,36 +2410,36 @@ async function renderServices() {
         const price = formatPrice(service.price);
 
         return `
-          <div class="service-card rounded-2xl border border-slate-800 bg-slate-900/60 p-5 hover:border-amber-400/40 transition-all">
-            <div class="flex items-start justify-between mb-3">
-              <div class="text-lg font-semibold">${escapeHtml(
+          <div class="event-card">
+            <div class="flex items-start justify-between mb-2">
+              <div class="text-lg font-semibold text-slate-900">${escapeHtml(
                 service.name
               )}</div>
               ${categoryBadge}
             </div>
-            <p class="text-sm text-slate-300/85 mb-4">
+            <p class="text-sm text-slate-900 mb-3">
               ${escapeHtml(service.description)}
             </p>
             ${
               service.practitioner
-                ? `<div class="flex items-center gap-2 mb-3 text-xs text-slate-400">
+                ? `<div class="flex items-center gap-2 mb-2 text-xs text-slate-900">
                 <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-                <span>${escapeHtml(service.practitioner)}</span>
+                <span>Praktisi: ${escapeHtml(service.practitioner)}</span>
               </div>`
                 : ""
             }
-            <div class="flex items-center gap-2 mb-3">
+            <div class="flex items-center gap-2 mb-2">
               <i data-lucide="tag" class="w-4 h-4 text-amber-400"></i>
-              <span class="text-lg font-bold text-amber-300">${price}</span>
+              <span class="text-lg font-bold text-amber-500">${price}</span>
             </div>
-            <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
+            <div class="flex items-center gap-2 mb-2 text-xs text-slate-900">
               <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
               <span>${escapeHtml(service.branch)}</span>
             </div>
             ${modeInfo}
             <a
               href="booking.html?service=${encodeURIComponent(service.name)}"
-              class="inline-flex items-center gap-2 rounded-lg bg-amber-400 text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-amber-500 transition-colors"
+              class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-4 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md mt-3"
             >
               <i data-lucide="calendar" class="w-4 h-4"></i>
               Booking Sekarang
@@ -2485,8 +2496,10 @@ function getModeInfoHTML(mode) {
   };
 
   return `
-    <div class="flex items-center gap-2 mb-4 text-xs text-slate-400">
-      <i data-lucide="${icons[mode] || "video"}" class="w-3.5 h-3.5"></i>
+    <div class="flex items-center gap-2 mb-3 text-xs text-slate-900">
+      <i data-lucide="${
+        icons[mode] || "video"
+      }" class="w-3.5 h-3.5 text-emerald-400"></i>
       <span>${labels[mode] || mode}</span>
     </div>
   `;
@@ -2744,18 +2757,22 @@ function filterStoreCategory(category) {
   grid.innerHTML = filtered
     .map(
       (p) => `
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+    <div class="event-card space-y-3">
       <div>
-        <div class="text-xs uppercase tracking-wider text-amber-300/70 mb-1">${getCategoryLabel(
+        <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-semibold">${getCategoryLabel(
           p.cat
         )}</div>
-        <div class="font-semibold text-slate-100">${escapeHtml(p.name)}</div>
+        <div class="font-semibold text-slate-900 text-lg">${escapeHtml(
+          p.name
+        )}</div>
       </div>
       <div class="flex items-center justify-between">
-        <div class="text-amber-300 font-bold">Rp ${p.price.toLocaleString(
+        <div class="text-amber-500 font-bold text-lg">Rp ${p.price.toLocaleString(
           "id-ID"
         )}</div>
-        <button class="btn-primary-sm" onclick="addToCart('${p.id}')">
+        <button class="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${
+          p.id
+        }')">
           <i data-lucide="plus" class="w-3 h-3"></i>
           Tambah
         </button>
@@ -2931,19 +2948,19 @@ function renderLocations() {
 
   grid.innerHTML = LOCATIONS.map(
     (loc) => `
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 space-y-3 hover:border-amber-400/50 transition-all">
       <div class="flex items-start gap-3">
         <div class="mt-1">
-          <i data-lucide="map-pin" class="w-5 h-5 text-amber-300"></i>
+          <i data-lucide="map-pin" class="w-5 h-5 text-amber-500"></i>
         </div>
         <div class="flex-1">
-          <div class="font-semibold text-slate-100 mb-1">${escapeHtml(
+          <div class="font-semibold text-slate-900 mb-1">${escapeHtml(
             loc.name
           )}</div>
-          <div class="text-xs text-slate-400 mb-2">${escapeHtml(
+          <div class="text-xs text-slate-900 mb-2">${escapeHtml(
             loc.address
           )}</div>
-          <div class="text-xs text-slate-500 space-y-1">
+          <div class="text-xs text-slate-700 space-y-1">
             <div><i data-lucide="phone" class="w-3 h-3 inline"></i> ${escapeHtml(
               loc.phone
             )}</div>

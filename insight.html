@@ -13,10 +13,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="bg-slate-950 text-slate-100">
+  <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
     <header
-      class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+      class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200"
     >
       <div
         class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
@@ -45,44 +45,44 @@
           </button>
         </div>
       </div>
-
-      <!-- Mobile Menu Overlay -->
-      <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
-
-      <!-- Mobile Menu -->
-      <div id="mobileMenu" class="mobile-menu">
-        <div class="mobile-menu-header">
-          <span class="font-semibold">Menu</span>
-          <button
-            id="closeMobileMenu"
-            class="close-menu-btn"
-            aria-label="Close menu"
-          >
-            <i data-lucide="x" class="w-6 h-6"></i>
-          </button>
-        </div>
-        <nav class="mobile-menu-nav">
-          <a href="index.html" class="mobile-nav-link">Journey</a>
-          <a href="services.html" class="mobile-nav-link">Services</a>
-          <a href="booking.html" class="mobile-nav-link">Booking</a>
-          <a href="events.html" class="mobile-nav-link">Events</a>
-          <a href="insight.html" class="mobile-nav-link">Insight</a>
-          <a href="media.html" class="mobile-nav-link">Media</a>
-          <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
-        </nav>
-        <div class="mobile-menu-footer">
-          <span class="points-display">
-            Points: <b id="mobileNavPoints">0</b>
-          </span>
-        </div>
-      </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <span class="font-semibold">Menu</span>
+        <button
+          id="closeMobileMenu"
+          class="close-menu-btn"
+          aria-label="Close menu"
+        >
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <nav class="mobile-menu-nav">
+        <a href="index.html" class="mobile-nav-link">Journey</a>
+        <a href="services.html" class="mobile-nav-link">Services</a>
+        <a href="booking.html" class="mobile-nav-link">Booking</a>
+        <a href="events.html" class="mobile-nav-link">Events</a>
+        <a href="insight.html" class="mobile-nav-link">Insight</a>
+        <a href="media.html" class="mobile-nav-link">Media</a>
+        <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <span class="points-display">
+          Points: <b id="mobileNavPoints">0</b>
+        </span>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <div class="mb-6">
         <h1 class="text-3xl md:text-4xl font-bold">Docterbee Insight</h1>
-        <p class="text-slate-300/85">
+        <p class="text-slate-900">
           Artikel edukasi sains × Qur'ani. Pilih artikel lalu minta AI merangkum
           & memberi rekomendasi NBSN.
         </p>
@@ -95,20 +95,20 @@
 
         <aside class="insight-sidebar">
           <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="filter" class="w-4 h-4 text-amber-300"></i>
+            <i data-lucide="filter" class="w-4 h-4 text-amber-500"></i>
             <b>Filter</b>
           </div>
-          <ul class="space-y-1 text-slate-300/85">
+          <ul class="space-y-1 text-slate-900">
             <li><input type="checkbox" checked /> Nutrisi</li>
             <li><input type="checkbox" checked /> Ibadah</li>
             <li><input type="checkbox" checked /> Kebiasaan</li>
             <li><input type="checkbox" checked /> Sains</li>
           </ul>
           <div class="mt-4 flex items-center gap-2">
-            <i data-lucide="book-open-check" class="w-4 h-4 text-sky-300"></i>
+            <i data-lucide="book-open-check" class="w-4 h-4 text-sky-500"></i>
             <b>NBSN</b>
           </div>
-          <p class="text-slate-300/80">
+          <p class="text-slate-900">
             Setiap ringkasan mengikuti kerangka
             Neuron–Biomolekul–Sensorik–Nature.
           </p>
@@ -116,10 +116,10 @@
       </div>
 
       <section class="mt-8 booking-container">
-        <div class="p-5 border-b border-slate-800">
+        <div class="p-5 border-b border-gray-200">
           <div class="text-lg font-semibold">Ringkasan AI</div>
         </div>
-        <div id="insightResult" class="p-5 text-sm text-slate-200">
+        <div id="insightResult" class="p-5 text-sm text-slate-900">
           <p class="opacity-70">
             Klik <b>Ringkas & Rekomendasi</b> pada salah satu artikel.
           </p>
@@ -129,7 +129,7 @@
 
     <!-- Footer -->
     <footer
-      class="mt-10 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+      class="mt-10 border-t border-gray-200 text-center text-xs text-slate-500 py-6"
     >
       © <span id="year"></span> Docterbee
     </footer>

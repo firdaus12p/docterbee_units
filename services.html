@@ -14,10 +14,10 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="bg-slate-950 text-slate-100">
+  <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation (Consistent with other pages) -->
     <header
-      class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+      class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200"
     >
       <div
         class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
@@ -84,7 +84,7 @@
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-3xl md:text-4xl font-bold mb-2">Layanan & Praktisi</h1>
-        <p class="text-slate-300/85">
+        <p class="text-slate-900">
           Pilih layanan kesehatan berbasis Qur'an, Sunnah, dan framework NBSN
         </p>
       </div>
@@ -93,19 +93,23 @@
       <div class="grid gap-6 lg:grid-cols-4">
         <!-- Sidebar Filter -->
         <aside
-          class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 text-sm h-fit"
+          class="rounded-2xl border border-gray-200 bg-white p-5 text-sm h-fit"
         >
-          <div class="font-semibold mb-3 flex items-center gap-2">
+          <div
+            class="font-semibold mb-3 flex items-center gap-2 text-amber-500"
+          >
             <i data-lucide="filter" class="w-4 h-4"></i>
             Filter Layanan
           </div>
 
           <!-- Branch Filter -->
           <label class="block mb-3">
-            <span class="text-slate-300/85 text-xs mb-1 block">Cabang</span>
+            <span class="text-slate-900 text-xs mb-1 block font-medium"
+              >Cabang</span
+            >
             <select
               id="branchFilter"
-              class="w-full rounded-lg bg-slate-900/60 border border-slate-800 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none"
+              class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-400 focus:outline-none"
             >
               <option value="all">Semua Cabang</option>
               <option value="kolaka">Kolaka</option>
@@ -116,10 +120,12 @@
 
           <!-- Mode Filter -->
           <label class="block mb-3">
-            <span class="text-slate-300/85 text-xs mb-1 block">Mode</span>
+            <span class="text-slate-900 text-xs mb-1 block font-medium"
+              >Mode</span
+            >
             <select
               id="modeFilter"
-              class="w-full rounded-lg bg-slate-900/60 border border-slate-800 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none"
+              class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-400 focus:outline-none"
             >
               <option value="all">Semua Mode</option>
               <option value="online">Online</option>
@@ -129,7 +135,7 @@
 
           <!-- Category Filter -->
           <div class="mt-4">
-            <div class="font-semibold mb-2 text-xs text-slate-300/85">
+            <div class="font-semibold mb-2 text-xs text-slate-900">
               Kategori
             </div>
             <ul class="space-y-2">
@@ -142,7 +148,7 @@
                 />
                 <label
                   for="catManual"
-                  class="text-slate-300/85 text-sm cursor-pointer"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Manual Therapy</label
                 >
               </li>
@@ -155,7 +161,7 @@
                 />
                 <label
                   for="catKlinis"
-                  class="text-slate-300/85 text-sm cursor-pointer"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Konsultasi Klinis</label
                 >
               </li>
@@ -168,7 +174,7 @@
                 />
                 <label
                   for="catNutrisi"
-                  class="text-slate-300/85 text-sm cursor-pointer"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Nutrisi & Gizi</label
                 >
               </li>
@@ -181,7 +187,7 @@
                 />
                 <label
                   for="catKeluarga"
-                  class="text-slate-300/85 text-sm cursor-pointer"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Keluarga & Parenting</label
                 >
               </li>
@@ -207,7 +213,7 @@
 
     <!-- Footer -->
     <footer
-      class="mt-16 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+      class="mt-16 border-t border-gray-200 text-center text-xs text-slate-500 py-6"
     >
       <p>
         © <span id="year"></span> Docterbee – Kesehatan berbasis Qur'an & Sunnah

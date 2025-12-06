@@ -1,0 +1,464 @@
+/* ========================================
+   DocterBee Landing Page - Light Theme
+   ======================================== */
+
+/* ====== STYLE DASAR ====== */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #0f172a;
+  background-color: #f9fafb;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(248, 250, 252, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.logo span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  box-shadow: 0 12px 25px rgba(234, 88, 12, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 35px rgba(234, 88, 12, 0.55);
+}
+
+.btn-outline {
+  background: white;
+  color: #ea580c;
+  border: 1px solid rgba(248, 113, 22, 0.4);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(22, 163, 74, 0.08);
+  color: #15803d;
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+}
+
+/* ====== HERO ====== */
+.hero {
+  padding: 3rem 0 2.5rem;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: #475569;
+  margin-bottom: 1.2rem;
+}
+
+.hero-highlight {
+  color: #ea580c;
+  font-weight: 700;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.hero-card {
+  background: radial-gradient(circle at top left, #f97316 0, #0f172a 55%);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  color: #e5e7eb;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.hero-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.hero-card-list {
+  font-size: 0.85rem;
+  opacity: 0.95;
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+}
+
+.hero-card-list li {
+  margin-bottom: 0.25rem;
+}
+
+.hero-card-pill {
+  position: absolute;
+  inset: auto -20px -40px auto;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(250, 250, 249, 0.12), transparent);
+  opacity: 0.9;
+}
+
+/* ====== SECTION GENERIC ====== */
+section {
+  padding: 2.75rem 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.section-header {
+  max-width: 640px;
+  margin-bottom: 1.75rem;
+}
+
+.section-eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #ea580c;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  color: #0f172a;
+}
+
+.section-desc {
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+/* ====== PROBLEM SECTION ====== */
+.problem-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 2rem;
+}
+
+.problem-card {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.3rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.problem-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.problem-card p {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.problem-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.problem-list li {
+  margin-bottom: 0.4rem;
+}
+
+/* ====== COMPARISON ====== */
+.comparison {
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: white;
+}
+
+.comparison-header {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr;
+  padding: 0.75rem 1.25rem;
+  background: #0f172a;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+}
+
+.comparison-row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.comparison-row:nth-child(odd) {
+  background: #f9fafb;
+}
+
+.comparison-label {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.comparison-text {
+  color: #6b7280;
+}
+
+.comparison-text-strong {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.comparison-text-warn {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* ====== THREE COLUMNS ====== */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.3rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 0.9rem;
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
+.card p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.card-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #9ca3af;
+  margin-bottom: 0.35rem;
+}
+
+/* ====== JOURNEY / STEPS ====== */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.step {
+  background: white;
+  border-radius: 1.1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  position: relative;
+}
+
+.step-number {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #f9fafb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.step h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+}
+
+.step p {
+  margin: 0;
+  color: #6b7280;
+}
+
+/* ====== FAQ ====== */
+.faq {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 2rem;
+}
+
+.faq-item + .faq-item {
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.faq-item h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.2rem;
+}
+
+.faq-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* ====== FOOTER ====== */
+footer {
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 1.5rem 0 2rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+footer a {
+  color: #e76f14;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 900px) {
+  .hero-grid,
+  .problem-grid,
+  .faq {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero {
+    padding-top: 2rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+}
+
+@media (max-width: 780px) {
+  .grid-3,
+  .steps,
+  .comparison-header,
+  .comparison-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

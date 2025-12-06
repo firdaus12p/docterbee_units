@@ -13,10 +13,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="bg-slate-950 text-slate-100">
+  <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
     <header
-      class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800"
+      class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200"
     >
       <div
         class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
@@ -45,45 +45,45 @@
           </button>
         </div>
       </div>
-
-      <!-- Mobile Menu Overlay -->
-      <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
-
-      <!-- Mobile Menu -->
-      <div id="mobileMenu" class="mobile-menu">
-        <div class="mobile-menu-header">
-          <span class="font-semibold">Menu</span>
-          <button
-            id="closeMobileMenu"
-            class="close-menu-btn"
-            aria-label="Close menu"
-          >
-            <i data-lucide="x" class="w-6 h-6"></i>
-          </button>
-        </div>
-        <nav class="mobile-menu-nav">
-          <a href="index.html" class="mobile-nav-link">Journey</a>
-          <a href="services.html" class="mobile-nav-link">Services</a>
-          <a href="booking.html" class="mobile-nav-link">Booking</a>
-          <a href="events.html" class="mobile-nav-link">Events</a>
-          <a href="insight.html" class="mobile-nav-link">Insight</a>
-          <a href="media.html" class="mobile-nav-link">Media</a>
-          <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
-        </nav>
-        <div class="mobile-menu-footer">
-          <span class="points-display">
-            Points: <b id="mobileNavPoints">0</b>
-          </span>
-        </div>
-      </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <span class="font-semibold">Menu</span>
+        <button
+          id="closeMobileMenu"
+          class="close-menu-btn"
+          aria-label="Close menu"
+        >
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <nav class="mobile-menu-nav">
+        <a href="index.html" class="mobile-nav-link">Journey</a>
+        <a href="services.html" class="mobile-nav-link">Services</a>
+        <a href="booking.html" class="mobile-nav-link">Booking</a>
+        <a href="events.html" class="mobile-nav-link">Events</a>
+        <a href="insight.html" class="mobile-nav-link">Insight</a>
+        <a href="media.html" class="mobile-nav-link">Media</a>
+        <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <span class="points-display">
+          Points: <b id="mobileNavPoints">0</b>
+        </span>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <!-- Hero Section -->
       <section class="mb-8">
         <h1 class="text-3xl md:text-4xl font-bold mb-3">AI Advisor Qur'ani</h1>
-        <p class="text-slate-300/85 max-w-3xl text-lg">
+        <p class="text-slate-900 max-w-3xl text-lg">
           Tanyakan perilaku atau kebiasaan Anda, dapatkan <b>verdict</b> (Benar
           / Salah / Hati‑hati) dengan <b>dalil</b> Al-Qur'an & Hadis serta
           catatan biomolekuler berdasarkan framework NBSN.
@@ -144,7 +144,7 @@
             <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
             <h3 class="font-semibold text-lg">Guardrails</h3>
           </div>
-          <ul class="list-disc pl-5 text-slate-300/85 space-y-2 text-sm mb-5">
+          <ul class="list-disc pl-5 text-slate-900 space-y-2 text-sm mb-5">
             <li>AI untuk edukasi, bukan diagnosis medis</li>
             <li>Jika bergejala berat → konsultasi praktisi</li>
             <li>Rujukan dalil diambil dari korpus ringkas</li>
@@ -154,7 +154,7 @@
             <i data-lucide="book-open-check" class="w-5 h-5 text-sky-400"></i>
             <h3 class="font-semibold text-lg">Framework NBSN</h3>
           </div>
-          <p class="text-slate-300/85 text-sm">
+          <p class="text-slate-900 text-sm">
             <b>Neuron–Biomolekul–Sensorik–Nature</b> sebagai kerangka nasihat
             holistik yang menggabungkan perspektif syariat dan sains modern.
           </p>
@@ -165,7 +165,7 @@
       <section class="mt-8 grid gap-6 lg:grid-cols-3">
         <!-- Main Result -->
         <div class="lg:col-span-2 booking-container">
-          <div class="border-b border-slate-800 pb-4 mb-4">
+          <div class="border-b border-gray-200 pb-4 mb-4">
             <h2 class="text-xl font-semibold flex items-center gap-2">
               <i data-lucide="file-text" class="w-5 h-5 text-amber-400"></i>
               Hasil Analisis
@@ -178,7 +178,7 @@
                   data-lucide="message-circle"
                   class="w-12 h-12 mx-auto mb-3 opacity-50"
                 ></i>
-                <p>
+                <p class="text-slate-900">
                   Tulis pertanyaan lalu klik <b>Analisis Sekarang</b> untuk
                   melihat hasil
                 </p>
@@ -193,17 +193,17 @@
             <i data-lucide="lightbulb" class="w-5 h-5 text-amber-400"></i>
             <h3 class="font-semibold text-lg">Tips Penggunaan</h3>
           </div>
-          <ul class="list-disc pl-5 text-slate-300/85 space-y-2 text-sm">
+          <ul class="list-disc pl-5 text-slate-900 space-y-2 text-sm">
             <li>Gunakan kalimat yang spesifik & jujur</li>
             <li>Sertakan kebiasaan: tidur, makan, ibadah</li>
             <li>Tulis target perbaikan 7 hari ke depan</li>
             <li>Ceritakan keluhan fisik jika ada</li>
           </ul>
 
-          <div class="mt-5 pt-5 border-t border-slate-800">
+          <div class="mt-5 pt-5 border-t border-gray-200">
             <a
               href="booking.html"
-              class="block text-center rounded-lg bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-sm font-semibold transition"
+              class="block text-center rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white px-4 py-2.5 text-sm font-semibold transition"
             >
               Booking Konsultasi Praktisi →
             </a>
@@ -214,7 +214,7 @@
 
     <!-- Footer -->
     <footer
-      class="mt-16 border-t border-slate-800 text-center text-xs text-slate-500 py-6"
+      class="mt-16 border-t border-gray-200 text-center text-xs text-slate-500 py-6"
     >
       © <span id="year"></span> Docterbee – AI Advisor Qur'ani
     </footer>
@@ -523,7 +523,7 @@
           }
 
           <div class="grid md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
               <div class="font-semibold mb-3 flex items-center gap-2">
                 <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
                 Langkah yang Disarankan
@@ -533,7 +533,7 @@
               </ul>
             </div>
 
-            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
               <div class="font-semibold mb-3 flex items-center gap-2">
                 <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
                 Dalil Syar'i
@@ -544,7 +544,7 @@
             </div>
           </div>
 
-          <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mt-4">
+          <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5 mt-4">
             <div class="font-semibold mb-4 flex items-center gap-2">
               <i data-lucide="microscope" class="w-4 h-4 text-sky-400"></i>
               Analisis NBSN Framework
@@ -763,7 +763,7 @@
           </div>
 
           <div class="grid md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
               <div class="font-semibold mb-3 flex items-center gap-2">
                 <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
                 Langkah yang Disarankan
@@ -773,7 +773,7 @@
               </ul>
             </div>
 
-            <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
               <div class="font-semibold mb-3 flex items-center gap-2">
                 <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
                 Dalil Syar'i
@@ -784,7 +784,7 @@
             </div>
           </div>
 
-          <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mt-4">
+          <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5 mt-4">
             <div class="font-semibold mb-3 flex items-center gap-2">
               <i data-lucide="microscope" class="w-4 h-4 text-sky-400"></i>
               Catatan Biomolekuler (NBSN Framework)

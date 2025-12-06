@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DocterBee — Kembali Sehat dengan Teknologi Alam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="DocterBee membantu kamu kembali sehat dengan obat alami, edukasi, dan gaya hidup sehat berbasis sains, AI, dan teknologi alami."
+    />
+    <link rel="stylesheet" href="css/landing-page.css" />
+    <!--<style>
+    /* ====== STYLE DASAR (bisa diganti sesuai brand) ====== */
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: #0f172a;
+      background-color: #f9fafb;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(248, 250, 252, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .logo span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.4rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      box-shadow: 0 12px 25px rgba(234, 88, 12, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 35px rgba(234, 88, 12, 0.55);
+    }
+
+    .btn-outline {
+      background: white;
+      color: #ea580c;
+      border: 1px solid rgba(248, 113, 22, 0.4);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: rgba(22, 163, 74, 0.08);
+      color: #15803d;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    /* ====== HERO ====== */
+    .hero {
+      padding: 3rem 0 2.5rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .hero-title {
+      font-size: clamp(1.9rem, 3vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      color: #0f172a;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-highlight {
+      color: #ea580c;
+      font-weight: 700;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.75rem;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .hero-card {
+      background: radial-gradient(circle at top left, #f97316 0, #0f172a 55%);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      color: #e5e7eb;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-card-list {
+      font-size: 0.85rem;
+      opacity: 0.95;
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+    }
+
+    .hero-card-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    .hero-card-pill {
+      position: absolute;
+      inset: auto -20px -40px auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(250, 250, 249, 0.12), transparent);
+      opacity: 0.9;
+    }
+
+    /* ====== SECTION GENERIC ====== */
+    section {
+      padding: 2.75rem 0;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .section-header {
+      max-width: 640px;
+      margin-bottom: 1.75rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #ea580c;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      color: #0f172a;
+    }
+
+    .section-desc {
+      font-size: 0.95rem;
+      color: #64748b;
+    }
+
+    /* ====== PROBLEM SECTION ====== */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 2rem;
+    }
+
+    .problem-card {
+      background: white;
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.3rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .problem-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .problem-card p {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .problem-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .problem-list li {
+      margin-bottom: 0.4rem;
+    }
+
+    /* ====== COMPARISON ====== */
+    .comparison {
+      overflow: hidden;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: white;
+    }
+
+    .comparison-header {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.2fr;
+      padding: 0.75rem 1.25rem;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-weight: 600;
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.2fr;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(226, 232, 240, 0.9);
+    }
+
+    .comparison-row:nth-child(odd) {
+      background: #f9fafb;
+    }
+
+    .comparison-label {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .comparison-text {
+      color: #6b7280;
+    }
+
+    .comparison-text-strong {
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .comparison-text-warn {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    /* ====== THREE COLUMNS ====== */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.3rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.9rem;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 0.35rem;
+      font-size: 1rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: #6b7280;
+    }
+
+    .card-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+      margin-bottom: 0.35rem;
+    }
+
+    /* ====== JOURNEY / STEPS ====== */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .step {
+      background: white;
+      border-radius: 1.1rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      position: relative;
+    }
+
+    .step-number {
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #f9fafb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .step h3 {
+      margin: 0 0 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .step p {
+      margin: 0;
+      color: #6b7280;
+    }
+
+    /* ====== FAQ ====== */
+    .faq {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 2rem;
+    }
+
+    .faq-item + .faq-item {
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .faq-item h3 {
+      font-size: 0.95rem;
+      margin: 0 0 0.2rem;
+    }
+
+    .faq-item p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    /* ====== FOOTER ====== */
+    footer {
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 1.5rem 0 2rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    footer a {
+      color: #e76f14;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 900px) {
+      .hero-grid,
+      .problem-grid,
+      .faq {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero {
+        padding-top: 2rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .grid-3,
+      .steps,
+      .comparison-header,
+      .comparison-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>-->
+  </head>
+  <body>
+    <!-- ================= HEADER ================= -->
+    <header>
+      <div class="container">
+        <nav>
+          <div class="logo">
+            🍯 DocterBee
+            <span>Ilmu • AI • Teknologi Alam</span>
+          </div>
+          <div class="nav-links">
+            <a href="#problem">Mengapa Sering Sakit?</a>
+            <a href="#solution">Solusi DocterBee</a>
+            <a href="#nature-tech">Teknologi Alami</a>
+            <a href="#journey">Perjalanan Sehat</a>
+            <a href="#services">Layanan</a>
+            <a href="#faq">FAQ</a>
+            <button class="btn btn-primary" onclick="location.href='#consult'">
+              Konsultasi Sekarang
+            </button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ================= HERO ================= -->
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <div class="badge">
+              <span class="badge-dot"></span>
+              Kembali ke Sehat yang Diciptakan Allah
+            </div>
+            <h1 class="hero-title">
+              Saat <span class="hero-highlight">obat</span> berhenti,
+              <br />teknologi alami di tubuhmu mulai bekerja.
+            </h1>
+            <p class="hero-subtitle">
+              Di layanan kesehatan biasa, perjalananmu selesai setelah minum
+              obat. Di DocterBee, perjalanan baru dimulai:
+              <strong>obat alami</strong>, <strong>gaya hidup sehat</strong>,
+              dan <strong>edukasi</strong>
+              yang membuatmu paham cara tubuh menyembuhkan dirinya sendiri.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" id="consult">
+                Mulai Konsultasi Gratis 10 Menit
+              </button>
+              <button class="btn btn-outline">Lihat Cara Kerjanya ↓</button>
+            </div>
+            <div class="hero-meta">
+              <span
+                >✓ Praktisi: dokter, ahli gizi, & praktisi kesehatan alami</span
+              >
+              <span>✓ Obat utama: madu & bahan alami berkualitas</span>
+              <span>✓ Didukung sains & AI, bukan mitos</span>
+            </div>
+          </div>
+
+          <aside class="hero-card">
+            <div class="hero-card-tag">
+              Lingkaran Sakit yang Terjadi Hari Ini
+            </div>
+            <div class="hero-card-title">
+              Sakit → Obat → Sembuh sebentar → Sakit lagi
+            </div>
+            <ul class="hero-card-list">
+              <li>• Sakit → konsultasi → pulang bawa resep.</li>
+              <li>• Gejala hilang, akar masalah tetap tinggal.</li>
+              <li>• Tubuh makin tergantung obat, bukan makin kuat.</li>
+              <li>• Tidak ada edukasi gaya hidup sehat jangka panjang.</li>
+            </ul>
+            <div class="hero-card-pill"></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= PROBLEM ================= -->
+      <section id="problem">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">
+              Masalah di Industri Kesehatan Hari Ini
+            </div>
+            <h2 class="section-title">Kenapa kita makin sering sakit?</h2>
+            <p class="section-desc">
+              Kebanyakan layanan kesehatan hanya fokus pada
+              <strong>“bagaimana menghilangkan rasa sakitnya sekarang”</strong>,
+              bukan
+              <strong
+                >“bagaimana tubuhmu bisa kembali kuat dan jarang sakit”</strong
+              >. Akhirnya, banyak orang terjebak dalam pola minum obat berulang.
+            </p>
+          </div>
+
+          <div class="problem-grid">
+            <div class="problem-card">
+              <h3>Lingkaran yang melelahkan</h3>
+              <p>
+                Polanya hampir selalu sama. Kamu mungkin juga pernah
+                mengalaminya:
+              </p>
+              <ul class="problem-list">
+                <li>1. Sakit → cari dokter / layanan kesehatan.</li>
+                <li>2. Diperiksa sebentar → pulang dengan obat farmasi.</li>
+                <li>3. Gejala reda → kembali ke aktivitas lama.</li>
+                <li>
+                  4. Beberapa waktu kemudian, sakit lagi dengan pola serupa.
+                </li>
+              </ul>
+              <p>
+                Tubuh tidak pernah diajak “ngobrol”, tidak diajari cara
+                memperbaiki dirinya sendiri. Semua diserahkan ke obat.
+              </p>
+            </div>
+
+            <div class="problem-card">
+              <h3>Apa yang jarang dijelaskan?</h3>
+              <p>
+                Di balik setiap keluhan, ada sistem tubuh yang sebenarnya sudah
+                Allah desain <strong>super canggih</strong>:
+              </p>
+              <ul class="problem-list">
+                <li>• Tubuh bisa membuang racun,</li>
+                <li>• memperbaiki jaringan rusak,</li>
+                <li>• menyeimbangkan sistem saat kita tidur,</li>
+                <li>
+                  • dan butuh bahan baku yang benar dari makanan & minuman.
+                </li>
+              </ul>
+              <p>
+                Tanpa edukasi, kita hanya mengejar “cepat hilang sakitnya” dan
+                lupa membangun “modal sehat jangka panjang”.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= COMPARISON ================= -->
+      <section>
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Bandingkan Cara Kerjanya</div>
+            <h2 class="section-title">
+              Layanan kesehatan biasa vs ekosistem DocterBee
+            </h2>
+            <p class="section-desc">
+              Bukan berarti dokter itu salah. Obat farmasi punya tempat dan
+              fungsi. Namun, DocterBee hadir sebagai
+              <strong>jalan pulang ke sehat</strong>: mengembalikan peran
+              <strong>obat alami, gaya hidup, dan teknologi tubuh</strong>
+              yang selama ini dilupakan.
+            </p>
+          </div>
+
+          <div class="comparison">
+            <div class="comparison-header">
+              <div></div>
+              <div>Layanan Biasa</div>
+              <div>DocterBee</div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Fokus utama</div>
+              <div class="comparison-text">
+                Menghilangkan gejala dengan obat.
+              </div>
+              <div class="comparison-text-strong">
+                Bantu tubuh menyembuhkan diri dengan madu & bahan alami.
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Setelah konsultasi</div>
+              <div class="comparison-text">
+                Selesai setelah obat ditebus, pasien pulang.
+              </div>
+              <div class="comparison-text-strong">
+                Lanjut dengan edukasi, panduan gaya hidup, & komunitas di cafe
+                sehat.
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Peran edukasi</div>
+              <div class="comparison-text">
+                Minimal, fokus pada resep & aturan minum obat.
+              </div>
+              <div class="comparison-text-strong">
+                Artikel, konsultasi, event, dan media AI untuk memahami tubuh
+                sendiri.
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Sumber “teknologi”</div>
+              <div class="comparison-text">
+                Teknologi buatan manusia & mesin.
+              </div>
+              <div class="comparison-text-strong">
+                Teknologi alami: tanaman, lebah, dan sistem penyembuhan tubuh.
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Pola jangka panjang</div>
+              <div class="comparison-text-warn">
+                Risiko ketergantungan obat & sakit berulang.
+              </div>
+              <div class="comparison-text-strong">
+                Tujuan: jarang sakit, tubuh lebih kuat, paham cara menjaga diri.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SOLUSI DOCTERBEE ================= -->
+      <section id="solution">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Solusi DocterBee</div>
+            <h2 class="section-title">
+              Bukan sekadar madu. Ini sistem hidup sehat.
+            </h2>
+            <p class="section-desc">
+              DocterBee menggabungkan <strong>sains modern</strong>,
+              <strong>AI</strong>, dan <strong>teknologi alami</strong> dari
+              tanaman & lebah untuk memandumu keluar dari lingkaran
+              sakit–obat–sakit lagi.
+            </p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-tag">Langkah 1</div>
+              <h3>Konsultasi dengan Praktisi</h3>
+              <p>
+                Kamu akan dibimbing oleh dokter, ahli gizi, dan praktisi
+                kesehatan alami/keluarga yang mengerti cara kerja tubuh, bukan
+                hanya nama penyakit. Tujuannya: memahami kondisi, pola hidup,
+                dan akar masalah.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-tag">Langkah 2</div>
+              <h3>Obat Alami dari Pabrik Alam</h3>
+              <p>
+                Rekomendasi utama bukan pil, tapi produk alami seperti madu,
+                herbal, dan nutrisi yang bersumber dari
+                <strong>pabrik terbaik: tanaman dan lebah</strong>. Mereka
+                mengelola mineral tanah, menghasilkan nektar, dan memprosesnya
+                menjadi madu.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-tag">Langkah 3</div>
+              <h3>Gaya Hidup & Cafe Sehat</h3>
+              <p>
+                Setelah obat alami, kamu diajak membangun
+                <strong>gaya hidup sehat yang nyata</strong>. Salah satunya
+                dengan nongkrong di cafe sehat DocterBee: tempat minum yang
+                baik, ngobrol, belajar, dan kembali merencanakan hidup yang
+                lebih sehat.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TEKNOLOGI ALAMI ================= -->
+      <section id="nature-tech">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Teknologi Alami</div>
+            <h2 class="section-title">
+              Di dunia ada “teknologi madu”, di alam sudah ada madu itu sendiri.
+            </h2>
+            <p class="section-desc">
+              Manusia bangga dengan pabrik, drone, dan rekayasa teknologi.
+              Padahal, di alam sudah ada sistem yang jauh lebih halus dan
+              sempurna.
+            </p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <h3>Tanaman: Pabrik yang Sempurna</h3>
+              <p>
+                Tanaman mengelola mineral dalam tanah, cahaya matahari, dan air
+                untuk menghasilkan buah. Sebelum jadi buah, ada
+                <strong>nektar</strong> — nano nutrisi yang disiapkan alam.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Lebah: “Drone” Alami</h3>
+              <p>
+                Jika di dunia ada drone, di alam ada lebah. Lebah mengumpulkan
+                nektar, menyatukan ribuan titik energi kecil menjadi
+                <strong>madu</strong> yang padat manfaat bagi manusia.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Teknologi Tubuh: Sistem Penyembuhan Otomatis</h3>
+              <p>
+                Tubuhmu sendiri adalah “mesin penyembuh” yang sudah Allah
+                desain. Ia bekerja kuat saat kamu istirahat: membuang racun,
+                memperbaiki jaringan, menormalkan sistem. Madu dan bahan alami
+                menjadi “bensin” dan “suku cadang” untuk proses ini.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SISTEM PENYEMBUHAN TUBUH ================= -->
+      <section>
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Self-Healing yang Benar</div>
+            <h2 class="section-title">
+              Malam hari: saat tubuhmu melakukan bersih-bersih besar.
+            </h2>
+            <p class="section-desc">
+              Banyak orang ingin cepat sehat, tapi lupa bahwa tubuh punya jadwal
+              kerjanya sendiri. DocterBee membantumu menyesuaikan konsumsi dan
+              gaya hidup dengan <strong>ritme alami tubuh</strong>.
+            </p>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <h3>Siang: Tubuh sibuk melayani aktivitasmu</h3>
+              <p>
+                Di siang hari, tubuhmu fokus merespons aktivitas, stres, dan
+                makanan yang masuk. Di fase ini, kita bantu dengan pilihan
+                minuman & makanan yang lebih ramah tubuh.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <h3>Malam: Switch ke mode perbaikan</h3>
+              <p>
+                Saat kamu tidur, tubuh berpindah mode: membuang racun,
+                memperbaiki jaringan rusak, dan menormalkan sistem. Madu dan
+                nutrisi alami yang tepat akan sangat mendukung fase ini.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <h3>Ritme sehat yang konsisten</h3>
+              <p>
+                Dengan konsultasi, edukasi, dan kebiasaan baru, tubuh tidak
+                hanya “dipaksa sehat” dengan obat, tapi diajak kembali ke ritme
+                alami yang membuatmu lebih jarang sakit.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= JOURNEY / CUSTOMER FLOW ================= -->
+      <section id="journey">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Perjalananmu Bersama DocterBee</div>
+            <h2 class="section-title">
+              Dari sakit → paham → sehat → jarang sakit.
+            </h2>
+            <p class="section-desc">
+              Landing page ini bukan sekadar tempat beli produk. Ini pintu masuk
+              ke ekosistem yang ingin melihatmu kembali sehat, kuat, dan paham
+              cara menjaga diri dan keluarga.
+            </p>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <h3>Isi form & ceritakan keluhanmu</h3>
+              <p>
+                Ceritakan secara singkat apa yang kamu rasakan, riwayat sakit,
+                dan kebiasaan harian. Di sini kamu mulai jujur pada tubuhmu.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <h3>Konsultasi dengan praktisi DocterBee</h3>
+              <p>
+                Kamu dipandu oleh dokter, ahli gizi, atau praktisi kesehatan
+                alami untuk memahami kondisi dan rencana perbaikan.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <h3>Rencana sehat + obat alami</h3>
+              <p>
+                Kamu mendapatkan rekomendasi konsumsi madu & bahan alami yang
+                sesuai, plus kebiasaan kecil yang perlu diubah.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <h3>Cafe sehat & komunitas</h3>
+              <p>
+                Kamu bisa lanjutkan perjalanan di cafe sehat DocterBee: minum
+                yang baik, belajar, dan tidak merasa sendirian.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">5</div>
+              <h3>Edukasi artikel, event, & media AI</h3>
+              <p>
+                Baca artikel, ikut event, dan gunakan media AI untuk bertanya
+                kapan pun. Tujuannya: kamu makin paham caranya menjaga diri.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">6</div>
+              <h3>Review & penyesuaian berkala</h3>
+              <p>
+                Tubuhmu akan berubah. Rencana sehat pun menyesuaikan. Ini bukan
+                sekali minum lalu selesai. Ini perjalanan hidup sehat.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= LAYANAN ================= -->
+      <section id="services">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Layanan DocterBee</div>
+            <h2 class="section-title">Satu ekosistem, banyak pintu masuk.</h2>
+            <p class="section-desc">
+              Kamu bisa mulai dari mana saja: konsultasi, produk, cafe, atau
+              konten edukasi. Semuanya saling terhubung ke satu tujuan:
+              <strong>kamu dan keluarga lebih sehat</strong>.
+            </p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <h3>Konsultasi Kesehatan Alami</h3>
+              <p>
+                Konsultasi 1:1 dengan dokter, ahli gizi, atau praktisi kesehatan
+                alami/keluarga. Fokus pada akar masalah, bukan hanya gejala.
+                <br /><br />
+                <strong>Format:</strong> online / offline (di cabang yang
+                tersedia).
+              </p>
+            </div>
+            <div class="card">
+              <h3>Produk Madu & Alami</h3>
+              <p>
+                Pilihan madu lebah kecil, kombinasi herbal, dan produk alami
+                lain yang diseleksi ketat. Bukan sekadar “manis”, tapi sarat
+                nutrisi.
+                <br /><br />
+                <strong>Catatan:</strong> bukan pengganti diagnosis medis, tapi
+                pendamping proses pemulihan tubuh.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Cafe Sehat DocterBee</h3>
+              <p>
+                Tempat nongkrong yang menyehatkan: menu minuman dan makanan yang
+                mendukung tubuh, bukan membebani. Cocok untuk keluarga, pekerja,
+                dan pelajar yang ingin “healing” tanpa merusak badan.
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem" class="grid-3">
+            <div class="card">
+              <h3>Artikel & Modul Edukasi</h3>
+              <p>
+                Artikel singkat, infografik, dan modul yang menjelaskan cara
+                kerja tubuh, peran madu, pola tidur, dan gaya hidup sehat dengan
+                bahasa sederhana. Cocok untuk dibaca bareng keluarga.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Event & Kelas Kesehatan</h3>
+              <p>
+                Event offline/online tentang gaya hidup sehat, keluarga sehat,
+                dan cara menjadi “dokter pertama” bagi diri sendiri dan
+                anak-anak.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Media AI DocterBee</h3>
+              <p>
+                Media AI yang membantumu bertanya seputar pola hidup dan
+                edukasi. Bukan menggantikan dokter, tapi menemanimu memahami
+                ilmu kesehatan dengan cara yang mudah dan praktis.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CTA KHUSUS ================= -->
+      <section>
+        <div class="container">
+          <div
+            style="
+              background: linear-gradient(135deg, #0f172a, #020617);
+              border-radius: 1.5rem;
+              padding: 1.8rem 1.6rem;
+              color: #e5e7eb;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 1.5rem;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div style="max-width: 520px">
+              <h2
+                style="
+                  margin: 0 0 0.4rem;
+                  font-size: 1.3rem;
+                  letter-spacing: -0.02em;
+                "
+              >
+                Jangan tunggu sakitmu makin rumit.
+              </h2>
+              <p style="margin: 0; font-size: 0.95rem; opacity: 0.9">
+                Mulai dulu dari konsultasi singkat. Dengarkan bagaimana tubuhmu
+                sebenarnya bekerja, dan apa yang bisa kamu lakukan hari ini
+                untuk membantunya.
+              </p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem">
+              <button class="btn btn-primary">
+                Jadwalkan Konsultasi Pertama
+              </button>
+              <button class="btn btn-outline">
+                Lihat Panduan Produk Madu →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FAQ ================= -->
+      <section id="faq">
+        <div class="container faq">
+          <div>
+            <div class="section-header">
+              <div class="section-eyebrow">FAQ</div>
+              <h2 class="section-title">Pertanyaan yang sering muncul</h2>
+              <p class="section-desc">
+                Berikut beberapa hal penting yang sering ditanyakan sebelum
+                orang mulai perjalanan sehatnya bersama DocterBee.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <h3>Apakah DocterBee menggantikan dokter sepenuhnya?</h3>
+              <p>
+                Tidak. DocterBee bukan pengganti layanan medis darurat atau
+                perawatan intensif. Kami adalah ekosistem yang fokus pada
+                pemulihan alami, edukasi, dan gaya hidup sehat yang
+                <strong>melengkapi</strong> peran tenaga medis.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Apakah madu bisa menyembuhkan semua penyakit?</h3>
+              <p>
+                Madu bukan “obat sakti” untuk semua penyakit. Namun, dengan
+                sains dan pemakaian yang tepat, madu dan bahan alami dapat
+                <strong>mendukung proses pemulihan tubuh</strong>, terutama jika
+                disertai pola hidup sehat dan istirahat yang cukup.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Kenapa harus ada cafe sehat segala?</h3>
+              <p>
+                Karena sehat bukan hanya soal obat dan vitamin. Sehat juga
+                tentang <strong>lingkungan</strong>, obrolan, dan tempat kita
+                menghabiskan waktu. Cafe sehat DocterBee dirancang agar kamu
+                bisa “nongkrong” sambil benar-benar menjaga tubuh.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Apakah ada pendampingan untuk keluarga?</h3>
+              <p>
+                Ya. Visi DocterBee bukan hanya menyehatkan individu, tapi
+                membantu keluarga membangun kebiasaan sehat bersama. Kamu bisa
+                mulai dari konsultasi individu, lalu dilanjutkan sesi edukasi
+                keluarga dan event khusus.
+              </p>
+            </div>
+          </div>
+
+          <aside>
+            <div class="problem-card">
+              <h3>Butuh bantuan memilih langkah pertama?</h3>
+              <p>
+                Kirimkan saja keluhanmu secara singkat. Tim DocterBee akan bantu
+                menyarankan apakah kamu sebaiknya mulai dari konsultasi, produk,
+                atau langsung datang ke cafe sehat terdekat.
+              </p>
+              <button class="btn btn-primary" style="margin-top: 0.75rem">
+                Chat dengan Tim DocterBee
+              </button>
+              <p style="margin-top: 0.75rem; font-size: 0.8rem; color: #9ca3af">
+                <strong>Disclaimer:</strong> informasi di website ini tidak
+                menggantikan diagnosis dokter. Jika kamu mengalami kondisi
+                darurat atau gejala berat, segera hubungi layanan medis
+                terdekat.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div
+          style="
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: center;
+          "
+        >
+          <div>© DocterBee. Semua hak dilindungi.</div>
+          <div>
+            Berbasis <strong>sains, AI, dan teknologi alami</strong> untuk
+            membantu keluarga kembali sehat. |
+            <a href="#">Kebijakan Privasi</a> ·
+            <a href="#">Syarat & Ketentuan</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
