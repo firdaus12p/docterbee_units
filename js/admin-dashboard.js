@@ -101,17 +101,39 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("serviceForm")
     .addEventListener("submit", handleServiceSubmit);
 
+  // Products section
+  document
+    .getElementById("btnNewProduct")
+    .addEventListener("click", () => openProductModal());
+  document
+    .getElementById("cancelProduct")
+    .addEventListener("click", closeProductModal);
+  document
+    .getElementById("productForm")
+    .addEventListener("submit", handleProductSubmit);
+  document
+    .getElementById("productImage")
+    .addEventListener("change", handleProductImageChange);
+  document
+    .getElementById("removeProductImageBtn")
+    .addEventListener("click", removeProductImage);
+
   // Price input formatters for all price fields
   const priceInputs = [
     "servicePrice",
     "eventRegistrationFee",
     "couponMinBookingValue",
+    "productPrice",
   ];
 
   priceInputs.forEach((inputId) => {
     const input = document.getElementById(inputId);
     if (input) {
       input.addEventListener("input", formatPriceInput);
+      input.addEventListener("paste", (e) => {
+        // Allow paste, will be formatted by input event
+        setTimeout(() => formatPriceInput(e), 0);
+      });
       input.addEventListener("keypress", (e) => {
         // Only allow numbers
         if (!/[0-9]/.test(e.key)) {
@@ -217,6 +239,8 @@ function switchSection(section) {
     loadCoupons();
   } else if (section === "services") {
     loadServices();
+  } else if (section === "products") {
+    loadProducts();
   }
 }
 
@@ -227,7 +251,7 @@ async function loadBookings() {
   const tbody = document.getElementById("bookingsTableBody");
 
   tbody.innerHTML =
-    '<tr><td colspan="13" class="text-center p-6 text-slate-400">Loading...</td></tr>';
+    '<tr><td colspan="13" class="text-center p-6 text-white">Loading...</td></tr>';
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
@@ -238,36 +262,46 @@ async function loadBookings() {
       tbody.innerHTML = result.data
         .map(
           (booking) => `
-        <tr class="border-b border-slate-800 hover:bg-slate-900/50">
-          <td class="p-3">#${booking.id}</td>
-          <td class="p-3">${escapeHtml(booking.service_name)}</td>
-          <td class="p-3">${escapeHtml(booking.branch)}</td>
-          <td class="p-3">${escapeHtml(booking.practitioner)}</td>
-          <td class="p-3">${formatDate(booking.booking_date)}</td>
-          <td class="p-3">${escapeHtml(booking.booking_time)}</td>
+        <tr class="border-b border-slate-200 hover:bg-slate-50">
+          <td class="p-3 text-slate-900">#${booking.id}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(
+            booking.service_name
+          )}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(booking.branch)}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(
+            booking.practitioner
+          )}</td>
+          <td class="p-3 text-slate-900">${formatDate(
+            booking.booking_date
+          )}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(
+            booking.booking_time
+          )}</td>
           <td class="p-3">
-            <span class="px-2 py-1 rounded text-xs ${
+            <span class="px-2 py-1 rounded text-xs font-semibold ${
               booking.mode === "online"
-                ? "bg-emerald-900/50 text-emerald-300"
-                : "bg-amber-900/50 text-amber-300"
+                ? "bg-emerald-500 text-white"
+                : "bg-amber-500 text-white"
             }">
               ${booking.mode}
             </span>
           </td>
-          <td class="p-3">${escapeHtml(booking.customer_name || "-")}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(
+            booking.customer_name || "-"
+          )}</td>
           <td class="p-3">
             ${
               booking.customer_phone
                 ? `<a href="https://wa.me/${booking.customer_phone.replace(
                     /[^0-9]/g,
                     ""
-                  )}" target="_blank" class="text-emerald-400 hover:text-emerald-300">${escapeHtml(
+                  )}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-semibold">${escapeHtml(
                     booking.customer_phone
                   )}</a>`
                 : "-"
             }
           </td>
-          <td class="p-3 text-slate-300">
+          <td class="p-3 text-slate-900">
             ${
               booking.price
                 ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price)
@@ -275,7 +309,7 @@ async function loadBookings() {
             }
             ${
               booking.discount_amount > 0
-                ? '<div class="text-xs text-red-400">- Rp ' +
+                ? '<div class="text-xs text-red-600 font-semibold">- Rp ' +
                   new Intl.NumberFormat("id-ID").format(
                     booking.discount_amount
                   ) +
@@ -283,7 +317,7 @@ async function loadBookings() {
                 : ""
             }
           </td>
-          <td class="p-3 font-semibold text-amber-300">
+          <td class="p-3 font-bold text-amber-600">
             ${
               booking.final_price
                 ? "Rp " +
@@ -295,7 +329,7 @@ async function loadBookings() {
           </td>
           <td class="p-3">
             <select 
-              class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs"
+              class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900 font-medium"
               onchange="updateBookingStatus(${booking.id}, this.value)"
             >
               <option value="pending" ${
@@ -317,14 +351,14 @@ async function loadBookings() {
               <button 
                 data-action="view-booking"
                 data-id="${booking.id}"
-                class="text-amber-400 hover:text-amber-300 text-xs"
+                class="text-amber-600 hover:text-amber-700 text-xs font-bold"
               >
                 Detail
               </button>
               <button 
                 data-action="delete-booking"
                 data-id="${booking.id}"
-                class="text-red-400 hover:text-red-300 text-xs"
+                class="text-red-600 hover:text-red-700 text-xs font-bold"
               >
                 Hapus
               </button>
@@ -356,12 +390,12 @@ async function loadBookings() {
       checkTableOverflow();
     } else {
       tbody.innerHTML =
-        '<tr><td colspan="14" class="text-center p-6 text-slate-400">Belum ada booking</td></tr>';
+        '<tr><td colspan="14" class="text-center p-6 text-white">Belum ada booking</td></tr>';
     }
   } catch (error) {
     console.error("Error loading bookings:", error);
     tbody.innerHTML =
-      '<tr><td colspan="14" class="text-center p-6 text-red-400">Error loading data</td></tr>';
+      '<tr><td colspan="14" class="text-center p-6 text-red-300">Error loading data</td></tr>';
   }
 }
 
@@ -598,7 +632,7 @@ async function viewBookingDetail(id) {
 async function loadArticles() {
   const grid = document.getElementById("articlesGrid");
   grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
+    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     const response = await fetch(`${API_BASE}/insight`);
@@ -609,11 +643,13 @@ async function loadArticles() {
         .map(
           (article) => `
         <div class="booking-container p-5">
-          <h3 class="font-semibold mb-2">${escapeHtml(article.title)}</h3>
-          <p class="text-sm text-slate-400 mb-3">${escapeHtml(
+          <h3 class="font-semibold mb-2 text-slate-900">${escapeHtml(
+            article.title
+          )}</h3>
+          <p class="text-sm text-slate-700 mb-3">${escapeHtml(
             article.excerpt || ""
           )}</p>
-          <div class="text-xs text-slate-500 mb-3">
+          <div class="text-xs text-slate-600 mb-3">
             <span>${formatDate(article.created_at)}</span>
             ${
               article.tags
@@ -625,14 +661,14 @@ async function loadArticles() {
             <button 
               data-action="edit-article"
               data-id="${article.id}"
-              class="flex-1 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm"
+              class="flex-1 bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded text-sm text-white font-bold"
             >
               Edit
             </button>
             <button 
               data-action="delete-article"
               data-id="${article.id}"
-              class="px-3 py-2 rounded text-sm bg-red-900/30 hover:bg-red-900/50 text-red-400"
+              class="px-3 py-2 rounded text-sm bg-red-500 hover:bg-red-600 text-white font-bold"
             >
               Hapus
             </button>
@@ -643,7 +679,7 @@ async function loadArticles() {
         .join("");
     } else {
       grid.innerHTML =
-        '<div class="booking-container p-6 text-center text-slate-400">Belum ada artikel</div>';
+        '<div class="booking-container p-6 text-center text-slate-700">Belum ada artikel</div>';
     }
 
     // Attach event listeners using event delegation
@@ -662,7 +698,7 @@ async function loadArticles() {
   } catch (error) {
     console.error("Error loading articles:", error);
     grid.innerHTML =
-      '<div class="booking-container p-6 text-center text-red-400">Error loading data</div>';
+      '<div class="booking-container p-6 text-center text-red-300">Error loading data</div>';
   }
 }
 
@@ -688,8 +724,17 @@ function closeArticleModal() {
   document.getElementById("articleModal").classList.add("hidden");
 }
 
+let isSubmittingArticle = false;
+
 async function handleArticleSubmit(e) {
   e.preventDefault();
+
+  if (isSubmittingArticle) return;
+  isSubmittingArticle = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menyimpan...";
 
   const id = document.getElementById("articleId").value;
   const data = {
@@ -723,6 +768,12 @@ async function handleArticleSubmit(e) {
   } catch (error) {
     console.error("Error saving article:", error);
     alert("Gagal menyimpan artikel");
+  } finally {
+    isSubmittingArticle = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
   }
 }
 
@@ -779,7 +830,7 @@ async function deleteArticle(id) {
 async function loadEvents() {
   const grid = document.getElementById("eventsGrid");
   grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
+    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     // Admin: includeInactive=true to see all events (active & inactive)
@@ -795,21 +846,21 @@ async function loadEvents() {
         <div class="booking-container p-5 ${
           event.is_active === 0 ? "opacity-50 border-red-900/30" : ""
         }">
-          <h3 class="font-semibold mb-2">
+          <h3 class="font-semibold mb-2 text-slate-900">
             ${escapeHtml(event.title)}
             ${
               event.is_active === 0
-                ? '<span class="ml-2 text-xs text-red-400">(Tidak Aktif)</span>'
+                ? '<span class="ml-2 text-xs text-red-600 font-semibold">(Tidak Aktif)</span>'
                 : ""
             }
           </h3>
-          <div class="text-sm text-slate-400 space-y-1 mb-3">
+          <div class="text-sm text-slate-700 space-y-1 mb-3">
             <div>📅 ${formatDate(event.event_date)}</div>
             <div>
-              <span class="px-2 py-1 rounded text-xs ${
+              <span class="px-2 py-1 rounded text-xs font-semibold ${
                 event.mode === "online"
-                  ? "bg-emerald-900/50 text-emerald-300"
-                  : "bg-amber-900/50 text-amber-300"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-amber-100 text-amber-700"
               }">
                 ${event.mode}
               </span>
@@ -820,14 +871,14 @@ async function loadEvents() {
             <button 
               data-action="edit-event"
               data-id="${event.id}"
-              class="flex-1 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm"
+              class="flex-1 bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded text-sm text-white font-bold"
             >
               Edit
             </button>
             <button 
               data-action="delete-event"
               data-id="${event.id}"
-              class="px-3 py-2 rounded text-sm bg-red-900/30 hover:bg-red-900/50 text-red-400"
+              class="px-3 py-2 rounded text-sm bg-red-500 hover:bg-red-600 text-white font-bold"
             >
               Hapus
             </button>
@@ -838,7 +889,7 @@ async function loadEvents() {
         .join("");
     } else {
       grid.innerHTML =
-        '<div class="booking-container p-6 text-center text-slate-400">Belum ada event</div>';
+        '<div class="booking-container p-6 text-center text-slate-700">Belum ada event</div>';
     }
 
     // Attach event listeners using event delegation
@@ -857,7 +908,7 @@ async function loadEvents() {
   } catch (error) {
     console.error("Error loading events:", error);
     grid.innerHTML =
-      '<div class="booking-container p-6 text-center text-red-400">Error loading events</div>';
+      '<div class="booking-container p-6 text-center text-red-300">Error loading events</div>';
   }
 }
 
@@ -878,8 +929,17 @@ function closeEventModal() {
   document.getElementById("eventModal").classList.add("hidden");
 }
 
+let isSubmittingEvent = false;
+
 async function handleEventSubmit(e) {
   e.preventDefault();
+
+  if (isSubmittingEvent) return;
+  isSubmittingEvent = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menyimpan...";
 
   const id = document.getElementById("eventId").value;
   const data = {
@@ -921,6 +981,12 @@ async function handleEventSubmit(e) {
   } catch (error) {
     console.error("Error saving event:", error);
     alert("Gagal menyimpan event");
+  } finally {
+    isSubmittingEvent = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
   }
 }
 
@@ -1003,7 +1069,7 @@ async function deleteEvent(id) {
 async function loadCoupons() {
   const grid = document.getElementById("couponsGrid");
   grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-slate-400">Loading...</div>';
+    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     const response = await fetch(`${API_BASE}/coupons`);
@@ -1015,24 +1081,24 @@ async function loadCoupons() {
           (coupon) => `
         <div class="booking-container p-5">
           <div class="flex items-start justify-between mb-2">
-            <h3 class="font-semibold text-amber-300">${escapeHtml(
+            <h3 class="font-semibold text-amber-600">${escapeHtml(
               coupon.code
             )}</h3>
-            <span class="text-xs px-2 py-1 rounded ${
+            <span class="text-xs px-2 py-1 rounded font-semibold ${
               coupon.is_active
-                ? "bg-emerald-900/50 text-emerald-300"
-                : "bg-slate-800 text-slate-500"
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-slate-200 text-slate-600"
             }">
               ${coupon.is_active ? "Aktif" : "Nonaktif"}
             </span>
           </div>
-          <p class="text-sm text-slate-400 mb-2">${escapeHtml(
+          <p class="text-sm text-slate-700 mb-2">${escapeHtml(
             coupon.description || ""
           )}</p>
           <div class="text-sm mb-3">
             <div>
-              <span class="text-slate-500">Diskon:</span>
-              <span class="text-amber-300 font-semibold">
+              <span class="text-slate-900">Diskon:</span>
+              <span class="text-amber-600 font-bold">
                 ${
                   coupon.discount_type === "percentage"
                     ? `${coupon.discount_value}%`
@@ -1040,7 +1106,7 @@ async function loadCoupons() {
                 }
               </span>
             </div>
-            <div class="text-xs text-slate-500">
+            <div class="text-xs text-slate-600">
               Used: ${coupon.used_count} ${
             coupon.max_uses ? `/ ${coupon.max_uses}` : ""
           }
@@ -1055,14 +1121,14 @@ async function loadCoupons() {
             <button 
               data-action="edit-coupon"
               data-id="${coupon.id}"
-              class="flex-1 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm"
+              class="flex-1 bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded text-sm text-white font-bold"
             >
               Edit
             </button>
             <button 
               data-action="delete-coupon"
               data-id="${coupon.id}"
-              class="px-3 py-2 rounded text-sm bg-red-900/30 hover:bg-red-900/50 text-red-400"
+              class="px-3 py-2 rounded text-sm bg-red-500 hover:bg-red-600 text-white font-bold"
             >
               Hapus
             </button>
@@ -1073,7 +1139,7 @@ async function loadCoupons() {
         .join("");
     } else {
       grid.innerHTML =
-        '<div class="booking-container p-6 text-center text-slate-400">Belum ada kode promo</div>';
+        '<div class="booking-container p-6 text-center text-white">Belum ada kode promo</div>';
     }
 
     // Attach event listeners using event delegation
@@ -1092,7 +1158,7 @@ async function loadCoupons() {
   } catch (error) {
     console.error("Error loading coupons:", error);
     grid.innerHTML =
-      '<div class="booking-container p-6 text-center text-red-400">Error loading data</div>';
+      '<div class="booking-container p-6 text-center text-red-300">Error loading data</div>';
   }
 }
 
@@ -1115,8 +1181,17 @@ function closeCouponModal() {
   document.getElementById("couponModal").classList.add("hidden");
 }
 
+let isSubmittingCoupon = false;
+
 async function handleCouponSubmit(e) {
   e.preventDefault();
+
+  if (isSubmittingCoupon) return;
+  isSubmittingCoupon = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menyimpan...";
 
   const id = document.getElementById("couponId").value;
   const data = {
@@ -1157,6 +1232,12 @@ async function handleCouponSubmit(e) {
   } catch (error) {
     console.error("Error saving coupon:", error);
     alert("Gagal menyimpan kode promo");
+  } finally {
+    isSubmittingCoupon = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
   }
 }
 
@@ -1311,7 +1392,7 @@ function closeSuccessModal() {
 
 async function loadServices() {
   const tbody = document.getElementById("servicesTableBody");
-  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-600 font-medium">Loading...</td></tr>`;
 
   try {
     const response = await fetch(`${API_BASE}/services?is_active=1`);
@@ -1324,16 +1405,18 @@ async function loadServices() {
     const services = result.data;
 
     if (services.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Belum ada layanan</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-600">Belum ada layanan</td></tr>`;
       return;
     }
 
     tbody.innerHTML = services
       .map(
         (service) => `
-        <tr class="border-t border-slate-800 hover:bg-slate-800/50">
-          <td class="px-3 py-3">${service.id}</td>
-          <td class="px-3 py-3 font-semibold">${escapeHtml(service.name)}</td>
+        <tr class="border-t border-slate-200 hover:bg-slate-50">
+          <td class="px-3 py-3 text-slate-900">${service.id}</td>
+          <td class="px-3 py-3 font-semibold text-slate-900">${escapeHtml(
+            service.name
+          )}</td>
           <td class="px-3 py-3">
             <span class="text-xs rounded-full px-2 py-1 ${getCategoryBadgeClass(
               service.category
@@ -1341,8 +1424,12 @@ async function loadServices() {
               ${getCategoryLabel(service.category)}
             </span>
           </td>
-          <td class="px-3 py-3">Rp ${formatNumber(service.price)}</td>
-          <td class="px-3 py-3 text-xs">${escapeHtml(service.branch)}</td>
+          <td class="px-3 py-3 text-slate-900 font-medium">Rp ${formatNumber(
+            service.price
+          )}</td>
+          <td class="px-3 py-3 text-xs text-slate-700">${escapeHtml(
+            service.branch
+          )}</td>
           <td class="px-3 py-3">
             <span class="text-xs rounded-full px-2 py-1 ${getModeBadgeClass(
               service.mode
@@ -1351,10 +1438,10 @@ async function loadServices() {
             </span>
           </td>
           <td class="px-3 py-3">
-            <span class="text-xs rounded-full px-2 py-1 ${
+            <span class="text-xs rounded-full px-2 py-1 font-semibold ${
               service.is_active
-                ? "bg-emerald-400/10 border border-emerald-400/40 text-emerald-300"
-                : "bg-slate-700 text-slate-400"
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-slate-200 text-slate-600"
             }">
               ${service.is_active ? "Aktif" : "Nonaktif"}
             </span>
@@ -1363,7 +1450,7 @@ async function loadServices() {
             <div class="flex gap-1 justify-center">
               <button
                 onclick="editService(${service.id})"
-                class="px-2 py-1 bg-amber-400/10 border border-amber-400/40 text-amber-300 rounded hover:bg-amber-400/20 text-xs"
+                class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded text-xs"
                 title="Edit"
               >
                 Edit
@@ -1372,7 +1459,7 @@ async function loadServices() {
                 onclick="deleteService(${service.id}, '${escapeHtml(
           service.name
         ).replace(/'/g, "\\'")}')"
-                class="px-2 py-1 bg-red-400/10 border border-red-400/40 text-red-300 rounded hover:bg-red-400/20 text-xs"
+                class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded text-xs"
                 title="Hapus"
               >
                 Hapus
@@ -1389,7 +1476,7 @@ async function loadServices() {
     }
   } catch (error) {
     console.error("Error loading services:", error);
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-400">Error: ${error.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-600 font-semibold">Error: ${error.message}</td></tr>`;
   }
 }
 
@@ -1405,13 +1492,12 @@ function getCategoryLabel(category) {
 
 function getCategoryBadgeClass(category) {
   const classes = {
-    manual: "bg-amber-400/10 border border-amber-400/40 text-amber-300",
-    klinis: "bg-sky-400/10 border border-sky-400/40 text-sky-300",
-    konsultasi: "bg-purple-400/10 border border-purple-400/40 text-purple-300",
-    perawatan:
-      "bg-emerald-400/10 border border-emerald-400/40 text-emerald-300",
+    manual: "bg-amber-100 text-amber-700 font-semibold",
+    klinis: "bg-sky-100 text-sky-700 font-semibold",
+    konsultasi: "bg-purple-100 text-purple-700 font-semibold",
+    perawatan: "bg-emerald-100 text-emerald-700 font-semibold",
   };
-  return classes[category] || "bg-slate-700 text-slate-300";
+  return classes[category] || "bg-slate-200 text-slate-700";
 }
 
 function getModeLabel(mode) {
@@ -1425,11 +1511,11 @@ function getModeLabel(mode) {
 
 function getModeBadgeClass(mode) {
   const classes = {
-    online: "bg-blue-400/10 border border-blue-400/40 text-blue-300",
-    offline: "bg-green-400/10 border border-green-400/40 text-green-300",
-    both: "bg-purple-400/10 border border-purple-400/40 text-purple-300",
+    online: "bg-blue-100 text-blue-700 font-semibold",
+    offline: "bg-green-100 text-green-700 font-semibold",
+    both: "bg-purple-100 text-purple-700 font-semibold",
   };
-  return classes[mode] || "bg-slate-700 text-slate-300";
+  return classes[mode] || "bg-slate-200 text-slate-700";
 }
 
 function openServiceModal(id = null) {
@@ -1467,8 +1553,17 @@ function closeServiceModal() {
   modal.classList.add("hidden");
 }
 
+let isSubmittingService = false;
+
 async function handleServiceSubmit(e) {
   e.preventDefault();
+
+  if (isSubmittingService) return;
+  isSubmittingService = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menyimpan...";
 
   const id = document.getElementById("serviceId").value;
   const name = document.getElementById("serviceName").value.trim();
@@ -1532,6 +1627,12 @@ async function handleServiceSubmit(e) {
   } catch (error) {
     console.error("Error saving service:", error);
     alert("Error: " + error.message);
+  } finally {
+    isSubmittingService = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
   }
 }
 
@@ -1600,6 +1701,380 @@ function deleteService(id, name) {
       }
     }
   );
+}
+
+// ========== PRODUCTS CRUD ==========
+
+async function loadProducts() {
+  const grid = document.getElementById("productsGrid");
+  grid.innerHTML =
+    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+
+  try {
+    const response = await fetch(`${API_BASE}/products`);
+    const result = await response.json();
+
+    if (result.success && result.data.length > 0) {
+      grid.innerHTML = result.data
+        .map(
+          (product) => `
+        <div class="booking-container p-5 ${
+          product.is_active === 0 ? "opacity-50 border-red-900/30" : ""
+        }">
+          ${
+            product.image_url
+              ? `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(
+                  product.name
+                )}" class="w-full h-32 object-cover rounded-lg mb-3" />`
+              : `<div class="w-full h-32 bg-slate-800 rounded-lg mb-3 flex items-center justify-center text-slate-500 text-sm">
+                  <i data-lucide="image-off" class="w-8 h-8"></i>
+                 </div>`
+          }
+          <h3 class="font-semibold mb-2 text-slate-900">
+            ${escapeHtml(product.name)}
+            ${
+              product.is_active === 0
+                ? '<span class="ml-2 text-xs text-red-600 font-semibold">(Tidak Aktif)</span>'
+                : ""
+            }
+          </h3>
+          <div class="text-sm text-slate-700 space-y-1 mb-3">
+            <div>
+              <span class="text-xs px-2 py-1 rounded ${getProductCategoryBadgeClass(
+                product.category
+              )}">
+                ${getProductCategoryIcon(product.category)} ${escapeHtml(
+            product.category
+          )}
+              </span>
+            </div>
+            <div class="font-bold text-amber-600">Rp ${formatNumber(
+              product.price
+            )}</div>
+            <div class="text-xs text-slate-700">
+              Stok: <span class="font-semibold ${
+                product.stock > 0 ? "text-emerald-600" : "text-red-600"
+              }">${product.stock}</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button 
+              data-action="edit-product"
+              data-id="${product.id}"
+              class="flex-1 bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded text-sm text-white font-bold"
+            >
+              Edit
+            </button>
+            <button 
+              data-action="delete-product"
+              data-id="${product.id}"
+              data-name="${escapeHtml(product.name)}"
+              class="px-3 py-2 rounded text-sm bg-red-500 hover:bg-red-600 text-white font-bold"
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+      `
+        )
+        .join("");
+    } else {
+      grid.innerHTML =
+        '<div class="booking-container p-6 text-center text-slate-700">Belum ada produk</div>';
+    }
+
+    // Attach event listeners using event delegation
+    grid.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const action = this.getAttribute("data-action");
+        const id = this.getAttribute("data-id");
+
+        if (action === "edit-product") {
+          editProduct(parseInt(id));
+        } else if (action === "delete-product") {
+          const name = this.getAttribute("data-name");
+          deleteProduct(parseInt(id), name);
+        }
+      });
+    });
+
+    // Re-create icons
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  } catch (error) {
+    console.error("Error loading products:", error);
+    grid.innerHTML =
+      '<div class="booking-container p-6 text-center text-red-400">Error loading data</div>';
+  }
+}
+
+function openProductModal(id = null) {
+  const modal = document.getElementById("productModal");
+  const title = document.getElementById("productModalTitle");
+  const form = document.getElementById("productForm");
+
+  if (id) {
+    title.textContent = "Edit Produk";
+  } else {
+    title.textContent = "Tambah Produk";
+    form.reset();
+    document.getElementById("productId").value = "";
+    document.getElementById("productImageUrl").value = "";
+    hideProductImagePreview();
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function handleProductImageChange(e) {
+  const file = e.target.files[0];
+
+  if (!file) {
+    hideProductImagePreview();
+    return;
+  }
+
+  // Validate file type
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    alert("Format file tidak didukung. Gunakan JPG, PNG, atau WebP.");
+    e.target.value = "";
+    hideProductImagePreview();
+    return;
+  }
+
+  // Validate file size (5MB max)
+  const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+  if (file.size > maxSize) {
+    alert("Ukuran file terlalu besar. Maksimal 5MB.");
+    e.target.value = "";
+    hideProductImagePreview();
+    return;
+  }
+
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const preview = document.getElementById("productImagePreview");
+    const img = document.getElementById("productImagePreviewImg");
+    img.src = e.target.result;
+    preview.classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
+}
+
+function hideProductImagePreview() {
+  const preview = document.getElementById("productImagePreview");
+  const img = document.getElementById("productImagePreviewImg");
+  preview.classList.add("hidden");
+  img.src = "";
+}
+
+function removeProductImage() {
+  document.getElementById("productImage").value = "";
+  document.getElementById("productImageUrl").value = "";
+  hideProductImagePreview();
+}
+
+function closeProductModal() {
+  const modal = document.getElementById("productModal");
+  modal.classList.add("hidden");
+  document.getElementById("productForm").reset();
+}
+
+let isSubmittingProduct = false;
+
+async function handleProductSubmit(e) {
+  e.preventDefault();
+
+  // Prevent double submission
+  if (isSubmittingProduct) {
+    console.log("⚠️ Product submission already in progress");
+    return;
+  }
+
+  const id = document.getElementById("productId").value;
+  const name = document.getElementById("productName").value.trim();
+  const category = document.getElementById("productCategory").value;
+  const priceInput = document.getElementById("productPrice").value.trim();
+  const price = parsePriceInput(priceInput);
+  const description = document
+    .getElementById("productDescription")
+    .value.trim();
+  const stock = parseInt(document.getElementById("productStock").value) || 0;
+  const imageFile = document.getElementById("productImage").files[0];
+  const existingImageUrl = document.getElementById("productImageUrl").value;
+
+  if (!name || !category || !description) {
+    alert("Mohon isi semua field yang wajib diisi");
+    return;
+  }
+
+  if (!priceInput || price <= 0) {
+    alert("Mohon masukkan harga yang valid (contoh: 20.000)");
+    return;
+  }
+
+  // Set flag and disable button
+  isSubmittingProduct = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menyimpan...";
+
+  try {
+    let image_url = existingImageUrl || null;
+
+    // Upload new image if selected
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("image", imageFile);
+
+      const uploadResponse = await fetch(`${API_BASE}/upload/product-image`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+
+      if (!uploadResult.success) {
+        alert(uploadResult.error || "Gagal mengupload gambar");
+        return;
+      }
+
+      image_url = uploadResult.data.url;
+    }
+
+    const data = {
+      name,
+      category,
+      price,
+      description,
+      image_url,
+      stock,
+    };
+
+    const url = id ? `${API_BASE}/products/${id}` : `${API_BASE}/products`;
+    const method = id ? "PATCH" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showSuccessModal(
+        id ? "Produk berhasil diupdate" : "Produk baru berhasil ditambahkan"
+      );
+      closeProductModal();
+      loadProducts();
+    } else {
+      alert(result.error || "Gagal menyimpan produk");
+    }
+  } catch (error) {
+    console.error("Error saving product:", error);
+    alert("Gagal menyimpan produk: " + error.message);
+  } finally {
+    // Reset flag and button
+    isSubmittingProduct = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  }
+}
+
+async function editProduct(id) {
+  try {
+    const response = await fetch(`${API_BASE}/products/${id}`);
+    const result = await response.json();
+
+    if (!result.success || !result.data) {
+      alert("Produk tidak ditemukan");
+      return;
+    }
+
+    const product = result.data;
+
+    // Open modal first
+    openProductModal(id);
+
+    // Then populate fields
+    document.getElementById("productId").value = product.id;
+    document.getElementById("productName").value = product.name;
+    document.getElementById("productCategory").value = product.category;
+    // Format price with thousand separator
+    document.getElementById("productPrice").value = parseInt(
+      product.price
+    ).toLocaleString("id-ID");
+    document.getElementById("productDescription").value = product.description;
+    document.getElementById("productStock").value = product.stock || 0;
+
+    // Handle existing image
+    if (product.image_url) {
+      document.getElementById("productImageUrl").value = product.image_url;
+      const preview = document.getElementById("productImagePreview");
+      const img = document.getElementById("productImagePreviewImg");
+      img.src = product.image_url;
+      preview.classList.remove("hidden");
+    } else {
+      hideProductImagePreview();
+    }
+  } catch (error) {
+    console.error("Error loading product:", error);
+    alert("Error: " + error.message);
+  }
+}
+
+function deleteProduct(id, name) {
+  showDeleteModal(
+    `Apakah Anda yakin ingin menghapus produk "${name}"? Produk akan dihapus dari sistem (soft delete).`,
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/products/${id}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showSuccessModal("Produk berhasil dihapus");
+          loadProducts();
+        } else {
+          alert(result.error || "Gagal menghapus produk");
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("Gagal menghapus produk");
+      }
+    }
+  );
+}
+
+function getProductCategoryBadgeClass(category) {
+  const badgeClasses = {
+    "Zona Sunnah": "bg-purple-100 text-purple-700 font-semibold",
+    "1001 Rempah": "bg-orange-100 text-orange-700 font-semibold",
+    "Zona Honey": "bg-amber-100 text-amber-700 font-semibold",
+    "Cold Pressed": "bg-green-100 text-green-700 font-semibold",
+  };
+  return badgeClasses[category] || "bg-slate-200 text-slate-700";
+}
+
+function getProductCategoryIcon(category) {
+  const icons = {
+    "Zona Sunnah": "🌙",
+    "1001 Rempah": "🧂",
+    "Zona Honey": "🍯",
+    "Cold Pressed": "🥤",
+  };
+  return icons[category] || "📦";
 }
 
 // ========== UTILITIES ==========

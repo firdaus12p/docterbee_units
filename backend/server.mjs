@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Innertube } from "youtubei.js";
 import { testConnection, initializeTables } from "./db.mjs";
@@ -9,9 +11,15 @@ import eventsRouter from "./routes/events.mjs";
 import insightRouter from "./routes/insight.mjs";
 import couponsRouter from "./routes/coupons.mjs";
 import servicesRouter from "./routes/services.mjs";
+import productsRouter from "./routes/products.mjs";
+import uploadRouter from "./routes/upload.mjs";
 
-// Load environment variables
-dotenv.config();
+// Get directory path for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables from parent directory
+dotenv.config({ path: join(__dirname, "..", ".env") });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +28,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(".")); // Serve static files from root directory
+app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
 
 // Initialize Google Generative AI
 const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -53,6 +62,8 @@ app.use("/api/events", eventsRouter);
 app.use("/api/insight", insightRouter);
 app.use("/api/coupons", couponsRouter);
 app.use("/api/services", servicesRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/upload", uploadRouter);
 
 // Helper function to clean YouTube URL (remove tracking parameters)
 function cleanYoutubeUrl(url) {

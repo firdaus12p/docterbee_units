@@ -2556,104 +2556,8 @@ function initServices() {
 // ========================================
 
 // Product catalog dengan 16 items across 8 categories
-const PRODUCTS = [
-  // Zona Sunnah
-  {
-    id: "zs-kurma",
-    name: "Kurma Ajwa Premium",
-    cat: "zona-sunnah",
-    price: 85000,
-  },
-  {
-    id: "zs-zaitun",
-    name: "Minyak Zaitun Extra Virgin",
-    cat: "zona-sunnah",
-    price: 125000,
-  },
-
-  // 1001 Rempah
-  {
-    id: "rp-jintan",
-    name: "Jintan Hitam Habbatussauda",
-    cat: "rempah",
-    price: 45000,
-  },
-  { id: "rp-jahe", name: "Jahe Merah Original", cat: "rempah", price: 35000 },
-
-  // Zona Honey
-  { id: "hn-murni", name: "Madu Murni 500ml", cat: "honey", price: 150000 },
-  {
-    id: "hn-forest",
-    name: "Madu Hutan Sumbawa 250ml",
-    cat: "honey",
-    price: 95000,
-  },
-
-  // Cold-Pressed Juice
-  {
-    id: "cp-green",
-    name: "Green Detox Juice",
-    cat: "cold-pressed",
-    price: 42000,
-  },
-  {
-    id: "cp-beet",
-    name: "Beetroot Energy Juice",
-    cat: "cold-pressed",
-    price: 38000,
-  },
-
-  // CoffeeBee
-  {
-    id: "cf-arabica",
-    name: "Arabica Single Origin",
-    cat: "coffeebee",
-    price: 28000,
-  },
-  {
-    id: "cf-robusta",
-    name: "Robusta Strong Blend",
-    cat: "coffeebee",
-    price: 26000,
-  },
-
-  // TeaBee
-  { id: "tb-green", name: "Green Tea Jasmine", cat: "teabee", price: 22000 },
-  {
-    id: "tb-chamomile",
-    name: "Chamomile Relax Tea",
-    cat: "teabee",
-    price: 24000,
-  },
-
-  // Susu Kurma
-  {
-    id: "sk-original",
-    name: "Susu Kurma Original 500ml",
-    cat: "susu-kurma",
-    price: 27000,
-  },
-  {
-    id: "sk-premium",
-    name: "Susu Kurma Premium 1L",
-    cat: "susu-kurma",
-    price: 50000,
-  },
-
-  // Buah Lokal
-  {
-    id: "bl-alpukat",
-    name: "Jus Alpukat Segar",
-    cat: "buah-lokal",
-    price: 18000,
-  },
-  {
-    id: "bl-mangga",
-    name: "Jus Mangga Manis",
-    cat: "buah-lokal",
-    price: 15000,
-  },
-];
+// Products data - will be loaded from API
+let PRODUCTS = [];
 
 // Location data untuk 3 branches
 const LOCATIONS = [
@@ -2738,10 +2642,50 @@ function showStoreTab(tabName) {
   }
 }
 
+// Fetch products from API
+async function loadProductsFromAPI() {
+  try {
+    const response = await fetch("http://localhost:3000/api/products");
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      // Transform API data to match existing structure
+      PRODUCTS = result.data.map((product) => ({
+        id: product.id,
+        name: product.name,
+        cat: product.category, // API uses "category" field
+        price: parseFloat(product.price),
+        description: product.description,
+        image: product.image_url,
+        stock: product.stock,
+      }));
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error loading products:", error);
+    return false;
+  }
+}
+
 // Filter products by category
-function filterStoreCategory(category) {
+async function filterStoreCategory(category) {
   const grid = document.getElementById("productGrid");
   if (!grid) return;
+
+  // Show loading state
+  grid.innerHTML =
+    '<div class="col-span-full text-center text-slate-400 py-8">Loading products...</div>';
+
+  // Load products if not already loaded
+  if (PRODUCTS.length === 0) {
+    const loaded = await loadProductsFromAPI();
+    if (!loaded) {
+      grid.innerHTML =
+        '<div class="col-span-full text-center text-red-400 py-8">Failed to load products. Please try again.</div>';
+      return;
+    }
+  }
 
   let filtered = PRODUCTS;
   if (category && category !== "all") {
@@ -2757,25 +2701,46 @@ function filterStoreCategory(category) {
   grid.innerHTML = filtered
     .map(
       (p) => `
-    <div class="event-card space-y-3">
-      <div>
-        <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-semibold">${getCategoryLabel(
-          p.cat
-        )}</div>
-        <div class="font-semibold text-slate-900 text-lg">${escapeHtml(
-          p.name
-        )}</div>
-      </div>
-      <div class="flex items-center justify-between">
-        <div class="text-amber-500 font-bold text-lg">Rp ${p.price.toLocaleString(
-          "id-ID"
-        )}</div>
-        <button class="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${
-          p.id
-        }')">
-          <i data-lucide="plus" class="w-3 h-3"></i>
-          Tambah
-        </button>
+    <div class="event-card overflow-hidden space-y-0 p-0">
+      ${
+        p.image
+          ? `<img src="${escapeHtml(p.image)}" 
+               alt="${escapeHtml(p.name)}" 
+               class="w-full h-48 object-cover"
+               onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">`
+          : `<div class="w-full h-48 bg-slate-200 flex items-center justify-center text-slate-400">
+               <i data-lucide="image-off" class="w-12 h-12"></i>
+             </div>`
+      }
+      <div class="p-4 space-y-3">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-semibold">${getCategoryLabel(
+            p.cat
+          )}</div>
+          <div class="font-semibold text-slate-900 text-lg">${escapeHtml(
+            p.name
+          )}</div>
+          ${
+            p.description
+              ? `<p class="text-sm text-slate-600 mt-1 line-clamp-2">${escapeHtml(
+                  p.description
+                )}</p>`
+              : ""
+          }
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="text-amber-500 font-bold text-lg">Rp ${p.price.toLocaleString(
+            "id-ID"
+          )}</div>
+          ${
+            p.stock > 0
+              ? `<button class="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${p.id}')">
+                  <i data-lucide="plus" class="w-3 h-3"></i>
+                  Tambah
+                </button>`
+              : `<span class="text-xs text-red-500 font-semibold">Stok Habis</span>`
+          }
+        </div>
       </div>
     </div>
   `
@@ -2789,14 +2754,19 @@ function filterStoreCategory(category) {
 
 function getCategoryLabel(cat) {
   const labels = {
-    "zona-sunnah": "Zona Sunnah",
-    rempah: "1001 Rempah",
-    honey: "Zona Honey",
-    "cold-pressed": "Cold-Pressed",
-    coffeebee: "CoffeeBee",
-    teabee: "TeaBee",
-    "susu-kurma": "Susu Kurma",
-    "buah-lokal": "Buah Lokal",
+    "Zona Sunnah": "🌙 Zona Sunnah",
+    "1001 Rempah": "🧂 1001 Rempah",
+    "Zona Honey": "🍯 Zona Honey",
+    "Cold Pressed": "🥤 Cold Pressed",
+    // Legacy support for old category names
+    "zona-sunnah": "🌙 Zona Sunnah",
+    rempah: "🧂 1001 Rempah",
+    honey: "🍯 Zona Honey",
+    "cold-pressed": "🥤 Cold Pressed",
+    coffeebee: "☕ CoffeeBee",
+    teabee: "🍵 TeaBee",
+    "susu-kurma": "🥛 Susu Kurma",
+    "buah-lokal": "🍊 Buah Lokal",
   };
   return labels[cat] || cat;
 }

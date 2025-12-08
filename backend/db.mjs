@@ -1,7 +1,14 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
-dotenv.config();
+// Get directory path for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables from parent directory
+dotenv.config({ path: join(__dirname, "..", ".env") });
 
 // Database connection configuration
 const dbConfig = {
@@ -221,6 +228,26 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: services");
+
+    // Create products table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        category ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed') NOT NULL,
+        price DECIMAL(10, 2) NOT NULL,
+        description TEXT NOT NULL,
+        image_url VARCHAR(500) DEFAULT NULL,
+        stock INT DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_category (category),
+        INDEX idx_active (is_active),
+        INDEX idx_stock (stock)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: products");
 
     console.log("📦 All tables initialized successfully");
   } catch (error) {
