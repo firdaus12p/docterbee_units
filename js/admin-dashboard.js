@@ -1,8 +1,22 @@
 // Admin Dashboard JavaScript
-const API_BASE = "http://localhost:3000/api";
+/**
+ * Production-ready API Base URL
+ * - Production: Automatically uses current domain
+ * - Development: Uses localhost:3000
+ */
+const API_BASE = (() => {
+  const isDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  return isDev ? "http://localhost:3000/api" : window.location.origin + "/api";
+})();
 
 console.log("🚀 Admin Dashboard Loaded");
 console.log("📍 API Base URL:", API_BASE);
+console.log(
+  "📍 Environment:",
+  API_BASE.includes("localhost") ? "DEVELOPMENT" : "PRODUCTION"
+);
 
 // Simple authentication (can be improved with JWT later)
 let isLoggedIn = false;
