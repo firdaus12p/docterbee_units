@@ -12,6 +12,7 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
+
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
@@ -122,6 +123,7 @@
               id="ytUrl"
               class="media-input flex-1"
               placeholder="https://www.youtube.com/watch?v=..."
+              autocomplete="off"
             />
             <button id="btnLoadYT" class="btn-primary-sm">Load</button>
           </div>
@@ -161,6 +163,7 @@
               id="mediaNotes"
               class="media-textarea"
               placeholder="Kosongkan untuk auto-fetch transcript, atau tulis catatan manual di sini..."
+              autocomplete="off"
             ></textarea>
           </div>
           <div
@@ -231,6 +234,7 @@
                 id="customAudioUrl"
                 class="media-input-sm mb-2"
                 placeholder="Tempel URL .mp3"
+                autocomplete="off"
               />
               <button id="btnLoadCustomAudio" class="btn-secondary-sm">
                 Putar
