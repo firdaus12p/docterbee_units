@@ -37,9 +37,15 @@ main {
   overflow: visible !important; /* No scroll on main */
 }
 
-/* Prevent overflow on all container elements */
-div, section, aside, article, nav, header, footer {
-  overflow: visible !important; /* No scroll on containers */
+/* Prevent overflow ONLY on page-level containers, NOT modals */
+body > div:not([id*="modal"]):not([id*="Modal"]):not([class*="modal"]):not([class*="Modal"]),
+body > section,
+body > aside,
+body > article,
+body > nav,
+body > header,
+body > footer {
+  overflow: visible !important;
 }
 
 /* Ensure grid and flex containers don't overflow */

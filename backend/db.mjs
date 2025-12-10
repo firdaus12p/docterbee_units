@@ -249,6 +249,29 @@ async function initializeTables() {
     `);
     console.log("✅ Table: products");
 
+    // Create articles table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS articles (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) NOT NULL UNIQUE,
+        content LONGTEXT NOT NULL,
+        excerpt TEXT,
+        header_image VARCHAR(500) DEFAULT NULL,
+        category ENUM('Nutrisi', 'Ibadah', 'Kebiasaan', 'Sains') NOT NULL,
+        author VARCHAR(100) DEFAULT 'Admin',
+        is_published TINYINT(1) DEFAULT 1,
+        views INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_slug (slug),
+        INDEX idx_category (category),
+        INDEX idx_published (is_published),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: articles");
+
     console.log("📦 All tables initialized successfully");
   } catch (error) {
     console.error("❌ Error initializing tables:", error.message);

@@ -64,7 +64,7 @@ router.get("/:slug", async (req, res) => {
 // POST /api/insight - Create new article (admin only)
 router.post("/", async (req, res) => {
   try {
-    const { title, slug, content, excerpt, tags } = req.body;
+    const { title, slug, content, excerpt, tags, category, header_image } = req.body;
 
     // Validation
     if (!title || !slug || !content) {
@@ -88,9 +88,9 @@ router.post("/", async (req, res) => {
     // Insert article
     const result = await query(
       `INSERT INTO articles 
-       (title, slug, content, excerpt, tags)
-       VALUES (?, ?, ?, ?, ?)`,
-      [title, slug, content, excerpt || null, tags || null]
+       (title, slug, content, excerpt, tags, category, header_image)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [title, slug, content, excerpt || null, tags || null, category || null, header_image || null]
     );
 
     res.status(201).json({
@@ -115,7 +115,7 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, slug, content, excerpt, tags, isPublished } = req.body;
+    const { title, slug, content, excerpt, tags, category, header_image, isPublished } = req.body;
 
     // Check if article exists
     const existing = await queryOne(
@@ -165,6 +165,14 @@ router.patch("/:id", async (req, res) => {
     if (tags !== undefined) {
       updates.push("tags = ?");
       params.push(tags);
+    }
+    if (category !== undefined) {
+      updates.push("category = ?");
+      params.push(category);
+    }
+    if (header_image !== undefined) {
+      updates.push("header_image = ?");
+      params.push(header_image);
     }
     if (isPublished !== undefined) {
       updates.push("is_published = ?");
