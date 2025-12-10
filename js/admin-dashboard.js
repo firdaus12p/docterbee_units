@@ -255,6 +255,11 @@ function switchSection(section) {
     loadServices();
   } else if (section === "products") {
     loadProducts();
+  } else if (section === "orders") {
+    // Load orders from orders-manager.js
+    if (typeof window.loadOrders === 'function') {
+      window.loadOrders();
+    }
   }
 }
 
@@ -757,6 +762,8 @@ async function handleArticleSubmit(e) {
     excerpt: document.getElementById("articleExcerpt").value,
     content: document.getElementById("articleContent").value,
     tags: document.getElementById("articleTags").value,
+    category: document.getElementById("articleCategory").value || null,
+    header_image: document.getElementById("insightHeaderImage").value || null,
   };
 
   try {
@@ -1406,7 +1413,7 @@ function closeSuccessModal() {
 
 async function loadServices() {
   const tbody = document.getElementById("servicesTableBody");
-  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-600 font-medium">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-white font-medium">Loading...</td></tr>`;
 
   try {
     const response = await fetch(`${API_BASE}/services?is_active=1`);
@@ -1419,16 +1426,16 @@ async function loadServices() {
     const services = result.data;
 
     if (services.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-600">Belum ada layanan</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-white">Belum ada layanan</td></tr>`;
       return;
     }
 
     tbody.innerHTML = services
       .map(
         (service) => `
-        <tr class="border-t border-slate-200 hover:bg-slate-50">
-          <td class="px-3 py-3 text-slate-900">${service.id}</td>
-          <td class="px-3 py-3 font-semibold text-slate-900">${escapeHtml(
+        <tr class="border-t border-slate-700 hover:bg-slate-800">
+          <td class="px-3 py-3 text-white">${service.id}</td>
+          <td class="px-3 py-3 font-semibold text-white">${escapeHtml(
             service.name
           )}</td>
           <td class="px-3 py-3">
@@ -1438,10 +1445,10 @@ async function loadServices() {
               ${getCategoryLabel(service.category)}
             </span>
           </td>
-          <td class="px-3 py-3 text-slate-900 font-medium">Rp ${formatNumber(
+          <td class="px-3 py-3 text-white font-medium">Rp ${formatNumber(
             service.price
           )}</td>
-          <td class="px-3 py-3 text-xs text-slate-700">${escapeHtml(
+          <td class="px-3 py-3 text-xs text-white">${escapeHtml(
             service.branch
           )}</td>
           <td class="px-3 py-3">
@@ -1490,7 +1497,7 @@ async function loadServices() {
     }
   } catch (error) {
     console.error("Error loading services:", error);
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-600 font-semibold">Error: ${error.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-400 font-semibold">Error: ${error.message}</td></tr>`;
   }
 }
 
@@ -2144,3 +2151,132 @@ function parsePriceInput(formattedPrice) {
   if (!formattedPrice) return 0;
   return parseInt(formattedPrice.replace(/\./g, "")) || 0;
 }
+
+// ============================================
+// INSIGHT MANAGER - IMAGE UPLOAD FUNCTIONS
+// ============================================
+
+// Upload header image for Insight
+async function uploadInsightHeaderImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    alert('File harus berupa gambar (JPG, PNG, GIF, dll)');
+    input.value = '';
+    return;
+  }
+
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Ukuran file maksimal 5MB');
+    input.value = '';
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE}/upload`, {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Gagal upload gambar');
+    }
+
+    // Set hidden input value
+    document.getElementById('insightHeaderImage').value = result.filePath;
+
+    // Show preview
+    const preview = document.getElementById('insightHeaderImagePreview');
+    const img = document.getElementById('insightHeaderImagePreviewImg');
+    img.src = result.filePath;
+    preview.classList.remove('hidden');
+
+    console.log('✅ Insight header image uploaded:', result.filePath);
+  } catch (error) {
+    console.error('Error uploading insight header image:', error);
+    alert('Error upload gambar: ' + error.message);
+    input.value = '';
+  }
+}
+
+// Upload content image for Insight
+async function uploadInsightContentImage() {
+  // Create temporary file input
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('File harus berupa gambar (JPG, PNG, GIF, dll)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal 5MB');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Gagal upload gambar');
+      }
+
+      // Insert image tag at cursor position in textarea
+      const textarea = document.getElementById('articleContent');
+      const imageTag = `\n<img src="${result.filePath}" alt="Gambar artikel" class="w-full rounded-lg my-4">\n`;
+
+      const cursorPos = textarea.selectionStart;
+      const textBefore = textarea.value.substring(0, cursorPos);
+      const textAfter = textarea.value.substring(cursorPos);
+
+      textarea.value = textBefore + imageTag + textAfter;
+
+      // Set cursor after inserted image
+      textarea.selectionStart = textarea.selectionEnd = cursorPos + imageTag.length;
+      textarea.focus();
+
+      console.log('✅ Insight content image uploaded and inserted:', result.filePath);
+    } catch (error) {
+      console.error('Error uploading insight content image:', error);
+      alert('Error upload gambar: ' + error.message);
+    }
+  };
+
+  input.click();
+}
+
+// Remove header image for Insight
+function removeInsightHeaderImage() {
+  document.getElementById('insightHeaderImage').value = '';
+  document.getElementById('insightHeaderImageFile').value = '';
+  document.getElementById('insightHeaderImagePreview').classList.add('hidden');
+}
+
+// Expose functions to window
+window.uploadInsightHeaderImage = uploadInsightHeaderImage;
+window.uploadInsightContentImage = uploadInsightContentImage;
+window.removeInsightHeaderImage = removeInsightHeaderImage;

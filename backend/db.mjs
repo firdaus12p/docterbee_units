@@ -14,9 +14,9 @@ dotenv.config({ path: join(__dirname, "..", ".env") });
 const dbConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
+  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : "",
   database: process.env.DB_NAME || "docterbee_units",
-  port: parseInt(process.env.DB_PORT) || 3306,
+  port: parseInt(process.env.DB_PORT) || 3307,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -248,6 +248,60 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: products");
+
+    // Create articles table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS articles (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) NOT NULL UNIQUE,
+        content LONGTEXT NOT NULL,
+        excerpt TEXT,
+        header_image VARCHAR(500) DEFAULT NULL,
+        category ENUM('Nutrisi', 'Ibadah', 'Kebiasaan', 'Sains') NOT NULL,
+        author VARCHAR(100) DEFAULT 'Admin',
+        is_published TINYINT(1) DEFAULT 1,
+        views INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_slug (slug),
+        INDEX idx_category (category),
+        INDEX idx_published (is_published),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: articles");
+
+    // Create orders table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        order_number VARCHAR(50) NOT NULL UNIQUE,
+        user_id INT,
+        customer_name VARCHAR(100),
+        customer_phone VARCHAR(20),
+        customer_email VARCHAR(100),
+        order_type ENUM('dine_in', 'take_away') NOT NULL,
+        store_location ENUM('kolaka', 'makassar', 'kendari') NOT NULL,
+        items JSON NOT NULL,
+        total_amount DECIMAL(10,2) NOT NULL,
+        points_earned INT DEFAULT 0,
+        status ENUM('pending', 'completed', 'expired', 'cancelled') DEFAULT 'pending',
+        payment_status ENUM('pending', 'paid') DEFAULT 'pending',
+        qr_code_data TEXT NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        completed_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_order_number (order_number),
+        INDEX idx_user_id (user_id),
+        INDEX idx_status (status),
+        INDEX idx_payment_status (payment_status),
+        INDEX idx_expires_at (expires_at),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: orders");
 
     console.log("📦 All tables initialized successfully");
   } catch (error) {

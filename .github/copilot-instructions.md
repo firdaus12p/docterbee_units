@@ -2,50 +2,64 @@
 
 ## Project Overview
 
-Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), modern science, and the NBSN framework (Neuron, Biomolekul, Sensorik, Nature). Users answer daily questions, book appointments, attend events, read insights, and analyze media content—all earning points/scores.
+Health journey tracking app combining Islamic teachings (Qur'an & Sunnah), modern science, and the NBSN framework (Neuron, Biomolekul, Sensorik, Nature). Users answer daily questions, book appointments, attend events, read insights, analyze media content, and purchase wellness products—all earning points/scores.
 
-**Tech Stack**: Node.js + Express (backend), MySQL/XAMPP (database), Vanilla JS + Tailwind CSS (frontend)  
+**Tech Stack**: Node.js + Express (backend), MySQL (database), Vanilla JS + Tailwind CSS (frontend)  
 **Key Insight**: Frontend and backend are decoupled - frontend works standalone with localStorage/mock data, backend provides API persistence
+
+**Production**: Runs on Plesk Node.js hosting with MariaDB. XAMPP (port 3307) for local development only.
 
 ## Architecture: Full-Stack Hybrid SPA
 
 ### Frontend (Multi-Page Pattern)
 
-**Eight HTML pages with organized CSS/JS (moved to folders):**
+**Ten HTML pages with organized CSS/JS:**
 
 - **`index.html`**: Journey tracking (6 units) - uses `localStorage` for state
+- **`services.html`**: Services listing - fetches from `/api/services` with filters (branch, mode, category)
 - **`booking.html`**: Appointment + promo validation - calls `/api/bookings`, `/api/coupons/validate`
+- **`store.html`**: Product catalog with cart (localStorage) - calls `/api/products`, `/api/orders`
 - **`events.html`**: Webinar listings - fetches from `/api/events` (falls back to mock `EVENTS_DATA`)
-- **`insight.html`**: Articles - fetches from `/api/insight` (falls back to mock `INSIGHT_DATA`)
+- **`insight.html`**: Articles grid - fetches from `/api/insight` (falls back to mock `INSIGHT_DATA`)
+- **`article.html`**: Full article reader - uses URL param `?slug=...` to fetch single article
 - **`media.html`**: YouTube/podcast player + AI analysis via `/api/summarize` (Gemini)
 - **`ai-advisor.html`**: AI health advisor with Qur'an/Sunnah context - calls `/api/ai-advisor` (Gemini)
-- **`admin-dashboard.html`**: CRUD for bookings/events/articles/coupons - uses `sessionStorage` auth
-- **`services.html`**: Services listing - fetches from `/api/services` with filters (branch, mode, category)
+- **`admin-dashboard.html`**: CRUD for bookings/events/articles/coupons/products/orders - uses `sessionStorage` auth
+- **`landing-page.html`**: Marketing landing page (separate CSS: `landing-page.css`)
 
 **File Organization** (critical - paths changed from root):
 
 - **`css/style.css`**: 1669 lines (Header: 119, Hero: 227, Booking: 697, Events: 1102, Insight: 1200, Media: 1339)
-- **`js/script.js`**: 2500+ lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Services: ~2350, Page inits: 664+)
+- **`css/landing-page.css`**: Separate stylesheet for marketing landing page
+- **`js/script.js`**: 3000+ lines for public pages (UNITS: line 7, Storage helpers: ~250, Rendering: ~320, Services: ~2350, Store: ~2600, Page inits: 664+)
 - **`js/admin-dashboard.js`**: 875 lines for admin (Auth check: line 18, Event listeners: 50-92, Tab switching: 117)
+- **`js/store-cart.js`**: 300+ lines for store cart logic (localStorage-based cart, checkout, QR code generation)
+- **`js/article-reader.js`**: 300+ lines for single article display with navigation
+- **`js/insight-articles.js`**: 200+ lines for article grid with filters and pagination
+- **`js/articles-manager.js`**: 600+ lines for admin article CRUD with image upload
+- **`js/orders-manager.js`**: 350+ lines for admin order management
 
-**All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or `js/admin-dashboard.js` for admin)  
+**All HTML pages link**: `href="css/style.css"` and `src="js/script.js"` (or specialized JS files)  
 **Exception**: `ai-advisor.html` contains inline JavaScript (~570 lines) for AI analysis logic
 
 ### Backend (Express + MySQL)
 
 **API server with auto-initializing database:**
 
-- **`backend/server.mjs`**: Main server (627 lines) - mounts 4 routers, serves static files from root, 2 Gemini endpoints (`/api/summarize`, `/api/ai-advisor`)
-- **`backend/db.mjs`**: Connection pool (250+ lines) - creates 5 tables on startup if missing
-- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs, services.mjs (each ~200-310 lines)
+- **`backend/server.mjs`**: Main server (890 lines) - mounts 8 routers, serves static files from root, 2 Gemini endpoints (`/api/summarize`, `/api/ai-advisor`)
+- **`backend/db.mjs`**: Connection pool (333 lines) - creates 7 tables on startup if missing
+- **`backend/articles.mjs`**: Dedicated articles router with image upload support
+- **`backend/routes/`**: bookings.mjs, events.mjs, insight.mjs, coupons.mjs, services.mjs, products.mjs, orders.mjs, upload.mjs (each ~200-400 lines)
 
 **Database Tables** (auto-created):
 
 1. `bookings` - service_name, booking_date, booking_time, promo_code, status (enum), price, discount_amount, final_price, customer data (name, phone, age, gender, address), indexed
 2. `events` - title, event_date, mode (enum: online/offline), topic, description, speaker, registration_fee, registration_deadline, location, link, is_active (soft delete)
-3. `articles` - title, slug (unique), content, image_url, is_published (soft delete)
-4. `coupons` - code (unique), discount_type (enum: percentage/fixed), value, usage_limit, is_active
+3. `articles` - title, slug (unique), content, image_url, header_image, author, published_at, is_published (soft delete)
+4. `coupons` - code (unique), discount_type (enum: percentage/fixed), value, usage_limit, usage_count, is_active
 5. `services` - name, category (enum: manual/klinis/konsultasi/perawatan), price, description, branch (comma-separated), mode (enum: online/offline/both), practitioner, is_active (soft delete)
+6. `products` - name, category, price, description, image_url, stock, is_active (soft delete)
+7. `orders` - order_number (unique), customer data (name, phone, email, address), items (JSON), total_amount, status (enum: pending/completed/cancelled), payment_method, qr_code, notes
 
 **Critical**: MySQL runs on port **3307** (not default 3306) - XAMPP configuration. Set `DB_PORT=3307` in `.env`
 
@@ -352,25 +366,35 @@ const requests = await page.evaluate(() =>
 **Dynamic rendering**: Replaces static HTML cards with API data from database  
 **Integration**: Services managed via admin dashboard appear on public page automatically
 
+### Store Page (store.html)
+
+**State**: `cart` array in localStorage (`docterbee_cart` key), synced with cart count display  
+**Key functions**: `loadProducts()` (async), `addToCart()`, `updateCartCount()`, `checkout()` with QR code generation  
+**Cart operations**: Add/remove items, quantity management, localStorage persistence, checkout flow  
+**API integration**: `GET /api/products`, `POST /api/orders` with full customer data + QR code  
+**Payment**: QR code generated via qrcode.min.js library for transfer confirmation
+
 ### Admin Dashboard (admin-dashboard.html)
 
 **Authentication**: Simple sessionStorage-based (`admin_session` key), credentials: `admin/docterbee2025`  
-**Structure**: 5 sections with tab navigation (Bookings, Events, Insight, Coupons, Services)  
+**Structure**: 7 sections with tab navigation (Bookings, Events, Articles, Coupons, Services, Products, Orders)  
 **Key patterns**:
 
 - `sessionStorage` check on load (line 18 in js/admin-dashboard.js)
 - All CRUD uses fetch API to backend (`API_BASE = "http://localhost:3000/api"`)
 - Modal-based editing (open/close functions per section)
 - Status dropdown for bookings (pending/confirmed/completed/cancelled)
-- Soft delete for events/articles/services (sets `is_active=0` or `is_published=0`)
+- Soft delete for events/articles/services/products (sets `is_active=0` or `is_published=0`)
 
 **Critical functions per section**:
 
 - Bookings: `loadBookings()`, `updateBookingStatus()`, `filterBookingStatus`
 - Events: `loadEvents()`, `openEventModal()`, `handleEventSubmit()`, `deleteEvent()`
-- Insight: `loadArticles()`, `openArticleModal()`, `handleArticleSubmit()`, `deleteArticle()`
+- Articles: Uses `articles-manager.js` - `loadArticles()`, `openArticleModal()`, `handleArticleSubmit()`, image upload
 - Coupons: `loadCoupons()`, `openCouponModal()`, `handleCouponSubmit()`, `deleteCoupon()`
 - Services: `loadServices()`, `openServiceModal()`, `handleServiceSubmit()`, `editService()`, `confirmDeleteService()`
+- Products: Inline in admin-dashboard.js - product CRUD with image upload
+- Orders: Uses `orders-manager.js` - `loadOrders()`, view details, mark complete, cancel order
 
 ## Testing & Validation
 
@@ -402,7 +426,7 @@ await page.click('#couponForm button[type="submit"]');
 3. **Edit operations**: Verify modal pre-fills with existing data
 4. **Network inspection**: Check PATCH/POST URLs don't contain event objects
 5. **localStorage state**: Verify `db_units`, `db_points` persist correctly
-6. ❌ Don't forget to update ALL 8 HTML pages when changing shared components (header/footer/nav)
+6. ❌ Don't forget to update ALL 10 HTML pages when changing shared components (header/footer/nav)
 
 ## Common Pitfalls to Avoid
 
@@ -413,11 +437,10 @@ await page.click('#couponForm button[type="submit"]');
 5. ❌ Don't display raw markdown symbols (\*_, _, `) in AI responses - always use `markdownToHtml()` for proper formatting
 6. ❌ Don't use string concatenation in SQL queries - always use parameterized statements
 7. ❌ Don't hard delete database records - use soft delete flags (`is_active`, `is_published`)
-8. ❌ Don't forget to update ALL 8 HTML pages when changing shared components (header/footer/nav)
-9. ❌ Don't forget `initMobileMenu()` call when creating new pages
-10. ❌ Don't assume MySQL default port 3306 - this project uses 3307 (XAMPP config)
-11. ❌ Don't use `require()` in backend - this project uses ES Modules (`import/export`)
-12. ❌ Don't pass functions directly to addEventListener if they have optional parameters - use arrow functions
+8. ❌ Don't forget `initMobileMenu()` call when creating new pages
+9. ❌ Don't assume MySQL default port 3306 - this project uses 3307 (XAMPP config)
+10. ❌ Don't use `require()` in backend - this project uses ES Modules (`import/export`)
+11. ❌ Don't pass functions directly to addEventListener if they have optional parameters - use arrow functions
 
 ## Project Structure
 
@@ -442,25 +465,19 @@ docterbee_units/
 **Current pages**:
 
 - **`index.html`** - Journey tracking (6 units with daily questions)
+- **`services.html`** - Services listing with filters
 - **`booking.html`** - Appointment booking with promo validation
+- **`store.html`** - Product catalog with cart & checkout
 - **`events.html`** - Webinar & workshop listings
-- **`insight.html`** - Educational articles with AI summaries
+- **`insight.html`** - Article grid with filters & pagination
+- **`article.html`** - Full article reader with navigation
 - **`media.html`** - YouTube player, podcast audio, AI content analysis
-- **`ai-advisor.html`** - AI health advisor with Islamic context (NEW)
-- **`services.html`** - Services listing
+- **`ai-advisor.html`** - AI health advisor with Islamic context
 - **`admin-dashboard.html`** - Admin control panel (protected)
+- **`landing-page.html`** - Marketing landing page (separate CSS)
 
-**Navigation pattern**: Six-page public nav (Journey, Services, Booking, Events, Insight, Media, AI Advisor)
-When modifying header/footer, update ALL 8 HTML files for consistency.
-- **`booking.html`** - Appointment booking with promo validation
-- **`events.html`** - Webinar & workshop listings
-- **`insight.html`** - Educational articles with AI summaries
-- **`media.html`** - YouTube player, podcast audio, AI content analysis
-- **`services.html`** - Services listing
-- **`admin-dashboard.html`** - Admin control panel (protected)
-
-**Navigation pattern**: Five-page public nav (Journey, Booking, Events, Insight, Media)
-When modifying header/footer, update ALL 7 HTML files for consistency.
+**Navigation pattern**: Seven-page public nav (Journey, Services, Store, Events, Insight, Media, AI Advisor)
+When modifying header/footer, update ALL 10 HTML files for consistency.
 
 ## Language & Content
 

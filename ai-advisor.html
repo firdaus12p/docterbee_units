@@ -12,6 +12,7 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
+
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
@@ -97,7 +98,7 @@
       </section>
 
       <!-- Main Grid -->
-      <div class="grid gap-6 lg:grid-cols-3">
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <!-- Input Section -->
         <div class="lg:col-span-2 booking-container">
           <label class="block text-sm font-semibold mb-2 opacity-80"
@@ -107,6 +108,7 @@
             id="questionInput"
             class="w-full rounded-lg bg-slate-900/60 border border-slate-700 px-4 py-3 h-32 focus:border-amber-400 focus:outline-none transition"
             placeholder="Contoh: Saya sering begadang, jarang shalat malam, dan minum kopi manis 3 gelas sehari. Bagaimana menurut syariat dan kesehatan?"
+            autocomplete="off"
           ></textarea>
 
           <div class="mt-4 flex flex-wrap gap-3">
@@ -162,7 +164,7 @@
       </div>
 
       <!-- Results Section -->
-      <section class="mt-8 grid gap-6 lg:grid-cols-3">
+      <section class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <!-- Main Result -->
         <div class="lg:col-span-2 booking-container">
           <div class="border-b border-gray-200 pb-4 mb-4">

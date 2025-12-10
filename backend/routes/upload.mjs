@@ -32,8 +32,8 @@ const storage = multer.diskStorage({
 
 // File filter for security
 const fileFilter = (req, file, cb) => {
-  const allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-  const allowedExts = [".jpg", ".jpeg", ".png", ".webp"];
+  const allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+  const allowedExts = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
   const ext = path.extname(file.originalname).toLowerCase();
   const mimeValid = allowedMimes.includes(file.mimetype);
@@ -43,7 +43,7 @@ const fileFilter = (req, file, cb) => {
     cb(null, true);
   } else {
     cb(
-      new Error("Hanya file gambar (JPG, PNG, WebP) yang diperbolehkan!"),
+      new Error("Hanya file gambar (JPG, PNG, WebP, GIF) yang diperbolehkan!"),
       false
     );
   }
@@ -58,7 +58,62 @@ const upload = multer({
   },
 });
 
-// Upload endpoint
+// Generic upload endpoint (for articles, insights, etc.)
+router.post("/", (req, res) => {
+  upload.single("file")(req, res, (err) => {
+    if (err) {
+      // Multer error
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({
+            success: false,
+            error: "Ukuran file terlalu besar. Maksimal 5MB",
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          error: err.message,
+        });
+      }
+      
+      // Custom error (file filter)
+      return res.status(400).json({
+        success: false,
+        error: err.message,
+      });
+    }
+
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: "Tidak ada file yang diupload",
+        });
+      }
+
+      // Return relative URL path
+      const filePath = `/uploads/products/${req.file.filename}`;
+
+      res.json({
+        success: true,
+        filePath: filePath, // For compatibility with articles-manager.js
+        data: {
+          url: filePath,
+          filename: req.file.filename,
+          size: req.file.size,
+        },
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Gagal mengupload gambar",
+      });
+    }
+  });
+});
+
+// Upload endpoint (for products - legacy)
 router.post("/product-image", upload.single("image"), (req, res) => {
   try {
     if (!req.file) {

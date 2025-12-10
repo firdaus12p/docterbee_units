@@ -336,7 +336,7 @@ function showUnit(unitId) {
 
       return `
       <div class="question-card">
-        <div class="flex items-start justify-between gap-3">
+        <div class="question-head flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div>
             <div class="font-semibold">${escapeHtml(item.q)}</div>
             <div class="text-xs text-slate-900 mt-1 font-medium">${escapeHtml(
@@ -377,9 +377,9 @@ function showUnit(unitId) {
 
   // Render unit content
   unitWrap.innerHTML = `
-    <div class="flex items-center justify-between mb-3">
+    <div class="unit-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
       <div class="text-lg font-semibold">${escapeHtml(unit.title)}</div>
-      <div class="flex items-center gap-2">
+      <div class="unit-actions flex flex-wrap items-center gap-2 sm:flex-nowrap">
         <button class="btn-calc-unit" data-unit="${unitId}">Hitung Skor Unit</button>
         <span class="text-2xl font-bold text-amber-300" id="score_${unitId}">—</span>
       </div>
@@ -1442,7 +1442,7 @@ async function renderEvents() {
         <p class="text-sm text-slate-900 mt-2">${escapeHtml(
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
-        <div class="mt-3 flex gap-2">
+        <div class="mt-3 flex flex-wrap gap-2">
           <a href="booking.html?service=${encodeURIComponent(
             event.title
           )}" class="btn-primary-sm">Daftar</a>
@@ -2427,7 +2427,7 @@ async function renderServices() {
 
         return `
           <div class="event-card">
-            <div class="flex items-start justify-between mb-2">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
               <div class="text-lg font-semibold text-slate-900">${escapeHtml(
                 service.name
               )}</div>
@@ -2744,7 +2744,7 @@ async function filterStoreCategory(category) {
               : ""
           }
         </div>
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div class="text-amber-500 font-bold text-lg">Rp ${p.price.toLocaleString(
             "id-ID"
           )}</div>
@@ -2787,28 +2787,42 @@ function getCategoryLabel(cat) {
   return labels[cat] || cat;
 }
 
-// Add product to cart
+// Add product to cart (Updated to use store-cart.js)
 function addToCart(productId) {
-  const product = PRODUCTS.find((p) => p.id === productId);
-  if (!product) return;
+  // Convert productId to number if it's a string
+  const numId = typeof productId === "string" ? parseInt(productId) : productId;
 
-  const cart = _storeGet("db_cart", []);
-  const existing = cart.find((item) => item.id === productId);
+  // Try to find product with both number and string comparison
+  const product = PRODUCTS.find(
+    (p) => p.id === numId || p.id === productId || p.id == productId
+  );
 
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      qty: 1,
-    });
+  // Debug log
+  console.log("Looking for product ID:", productId, "converted to:", numId);
+  console.log("Product found:", product);
+  console.log("PRODUCTS array:", PRODUCTS);
+  console.log(
+    "Product IDs in array:",
+    PRODUCTS.map((p) => ({ id: p.id, type: typeof p.id }))
+  );
+
+  if (!product) {
+    console.error("Product not found with ID:", productId);
+    alert("Product tidak ditemukan. ID: " + productId);
+    return;
   }
 
-  _storeSet("db_cart", cart);
-  updateCartDisplay();
-  updatePointsView();
+  // Call the new addToStoreCart from store-cart.js
+  if (typeof window.addToStoreCart === "function") {
+    window.addToStoreCart(
+      product.id,
+      product.name,
+      product.price,
+      product.image
+    );
+  } else {
+    console.error("addToStoreCart function not found");
+  }
 
   // Show feedback
   const btn = event.target.closest("button");
@@ -2897,15 +2911,6 @@ function updatePointsView() {
   }
 }
 
-// Add demo points for testing
-function addDemoPoints(amount) {
-  const data = _db("db_points");
-  const newValue = (data.value || 0) + amount;
-  _db("db_points", { value: newValue });
-  addPoints(0); // Trigger nav refresh
-  updatePointsView();
-}
-
 // Redeem rewards
 function redeemReward(cost, rewardName) {
   const data = _db("db_points");
@@ -2981,7 +2986,7 @@ function checkIn(locationId) {
   if (!loc) return;
 
   // Tambah 5 points untuk check-in
-  addDemoPoints(5);
+  addPoints(5);
   alert(`Check-in berhasil di ${loc.name}! +5 points`);
 }
 
@@ -3084,3 +3089,6 @@ if (document.readyState === "loading") {
     init();
   }
 }
+
+// Expose addPoints to window for cross-file usage (e.g., store-cart.js)
+window.addPoints = addPoints;
