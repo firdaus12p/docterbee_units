@@ -1392,7 +1392,7 @@ function closeSuccessModal() {
 
 async function loadServices() {
   const tbody = document.getElementById("servicesTableBody");
-  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-600 font-medium">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-white font-medium">Loading...</td></tr>`;
 
   try {
     const response = await fetch(`${API_BASE}/services?is_active=1`);
@@ -1405,16 +1405,16 @@ async function loadServices() {
     const services = result.data;
 
     if (services.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-600">Belum ada layanan</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-white">Belum ada layanan</td></tr>`;
       return;
     }
 
     tbody.innerHTML = services
       .map(
         (service) => `
-        <tr class="border-t border-slate-200 hover:bg-slate-50">
-          <td class="px-3 py-3 text-slate-900">${service.id}</td>
-          <td class="px-3 py-3 font-semibold text-slate-900">${escapeHtml(
+        <tr class="border-t border-slate-700 hover:bg-slate-800">
+          <td class="px-3 py-3 text-white">${service.id}</td>
+          <td class="px-3 py-3 font-semibold text-white">${escapeHtml(
             service.name
           )}</td>
           <td class="px-3 py-3">
@@ -1424,10 +1424,10 @@ async function loadServices() {
               ${getCategoryLabel(service.category)}
             </span>
           </td>
-          <td class="px-3 py-3 text-slate-900 font-medium">Rp ${formatNumber(
+          <td class="px-3 py-3 text-white font-medium">Rp ${formatNumber(
             service.price
           )}</td>
-          <td class="px-3 py-3 text-xs text-slate-700">${escapeHtml(
+          <td class="px-3 py-3 text-xs text-white">${escapeHtml(
             service.branch
           )}</td>
           <td class="px-3 py-3">
@@ -1476,7 +1476,7 @@ async function loadServices() {
     }
   } catch (error) {
     console.error("Error loading services:", error);
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-600 font-semibold">Error: ${error.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-400 font-semibold">Error: ${error.message}</td></tr>`;
   }
 }
 
