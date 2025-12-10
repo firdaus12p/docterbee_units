@@ -30,3 +30,9 @@ logs/
 
 # Optional eslint cache
 .eslintcache
+
+# MCP and AI Assistant folders (internal development only)
+.gemini/
+.github/
+.serena/
+.playwright-mcp/
