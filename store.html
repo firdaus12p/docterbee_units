@@ -105,8 +105,7 @@
 
       <!-- Tab Navigation -->
       <div
-        class="flex gap-2 mb-6 overflow-x-auto pb-2"
-        style="scrollbar-width: thin"
+        class="flex gap-2 mb-6 overflow-x-auto pb-2 store-tab-scroll"
       >
         <button
           id="tabStore"
@@ -158,34 +157,34 @@
         </div>
 
         <!-- Category Filters -->
-        <div class="flex flex-wrap gap-2">
+        <div class="flex gap-2 overflow-x-auto pb-2 store-category-scroll">
           <button
             onclick="filterStoreCategory('all')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 whitespace-nowrap"
           >
             Semua Produk
           </button>
           <button
             onclick="filterStoreCategory('Zona Sunnah')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🌙 Zona Sunnah
           </button>
           <button
             onclick="filterStoreCategory('1001 Rempah')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🧂 1001 Rempah
           </button>
           <button
             onclick="filterStoreCategory('Zona Honey')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🍯 Zona Honey
           </button>
           <button
             onclick="filterStoreCategory('Cold Pressed')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🥤 Cold Pressed
           </button>
@@ -532,12 +531,9 @@
             <div id="pointsBig" class="text-5xl font-bold text-amber-500 mb-4">
               0
             </div>
-            <button
-              onclick="addDemoPoints(10)"
-              class="text-xs px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white transition-all"
-            >
-              + Simulasi Tambah 10 Poin
-            </button>
+            <p class="text-xs text-slate-500 italic">
+              Poin akan otomatis bertambah saat pesanan Anda di-accept oleh admin
+            </p>
           </div>
         </div>
 
@@ -550,10 +546,14 @@
             <ul class="text-sm text-slate-900 space-y-2">
               <li>✅ Belanja produk: +1 poin per item</li>
               <li>✅ Dine-in di café: +1 poin per transaksi</li>
+              <li>✅ Order di-accept admin: +poin otomatis</li>
               <li>✅ Check-in di cabang: +3 poin</li>
               <li>✅ Complete journey units: +bonus poin</li>
               <li>✅ Ikut event/webinar: +5 poin</li>
             </ul>
+            <p class="text-xs text-slate-500 mt-3 italic">
+              💡 Poin dari order akan otomatis masuk saat admin menerima pesanan Anda
+            </p>
           </div>
 
           <!-- Tukar Poin -->
@@ -663,17 +663,25 @@
             <i data-lucide="check-circle" class="w-6 h-6 text-emerald-500"></i>
           </div>
           
-          <h2 class="text-xl font-bold text-slate-900 mb-2">
+          <h2 id="qrModalTitle" class="text-xl font-bold text-slate-900 mb-2">
             Pesanan Berhasil!
           </h2>
           
-          <p class="text-xs text-slate-600 mb-4">
+          <p id="qrModalSubtitle" class="text-xs text-slate-600 mb-4">
             Tunjukkan QR code ini ke kasir untuk memproses pesanan Anda
           </p>
 
-          <!-- QR Code -->
-          <div class="bg-slate-50 rounded-xl p-4 mb-3">
-            <div id="qrcode" class="flex justify-center"></div>
+          <!-- QR Code Container (Hidden when completed) -->
+          <div id="qrCodeContainer" class="mb-3">
+            <div class="bg-slate-50 rounded-xl p-4 mb-3">
+              <div id="qrcode" class="flex justify-center"></div>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+              <div class="text-xs text-red-600 mb-1">⏱️ QR Code Kadaluarsa Dalam:</div>
+              <div id="qrCountdown" class="text-2xl font-bold text-red-500">--:--:--</div>
+            </div>
           </div>
 
           <!-- Order Info -->
@@ -687,12 +695,12 @@
                 +<span id="qrPoints">0</span> poin
               </div>
               
-              <div class="text-slate-600">Berlaku Hingga:</div>
+              <div class="text-slate-600" id="qrExpiryLabel">Berlaku Hingga:</div>
               <div class="font-semibold text-red-500 text-xs" id="qrExpiresAt">-</div>
             </div>
           </div>
 
-          <p class="text-xs text-slate-500 mb-3">
+          <p id="qrWarningText" class="text-xs text-slate-500 mb-3">
             ⚠️ QR code akan kadaluarsa sesuai waktu yang ditentukan
           </p>
 

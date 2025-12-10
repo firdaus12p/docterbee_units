@@ -84,7 +84,7 @@ async function loadInsightArticles() {
             `
                 : ""
             }
-            <div class="flex items-center justify-between text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
+            <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
               <span>${article.author}</span>
               <span>${formatDate(article.created_at)}</span>
             </div>
@@ -192,7 +192,7 @@ async function filterArticlesByCategory() {
             `
                 : ""
             }
-            <div class="flex items-center justify-between text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
+            <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
               <span>${article.author}</span>
               <span>${formatDate(article.created_at)}</span>
             </div>

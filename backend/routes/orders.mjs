@@ -59,7 +59,8 @@ router.post("/", async (req, res) => {
     if (!order_type || !store_location || !items || !total_amount) {
       return res.status(400).json({
         success: false,
-        error: "Order type, store location, items, dan total amount harus diisi",
+        error:
+          "Order type, store location, items, dan total amount harus diisi",
       });
     }
 
@@ -114,6 +115,7 @@ router.post("/", async (req, res) => {
         qr_code_data: qrCodeData,
         expires_at: expiresAt,
         points_earned: pointsEarned,
+        status: "pending",
       },
     });
   } catch (error) {
@@ -170,6 +172,49 @@ router.get("/", async (req, res) => {
 });
 
 // ============================================
+// GET /api/orders/id/:id - Get order by ID
+// ============================================
+router.get("/id/:id", async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [
+      orderId,
+    ]);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order tidak ditemukan",
+      });
+    }
+
+    // Check if expired
+    const now = new Date();
+    const expiresAt = new Date(order.expires_at);
+
+    if (now > expiresAt && order.status === "pending") {
+      // Auto-expire order
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
+        order.id,
+      ]);
+      order.status = "expired";
+    }
+
+    res.json({
+      success: true,
+      data: order,
+    });
+  } catch (error) {
+    console.error("Error fetching order by ID:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil order",
+    });
+  }
+});
+
+// ============================================
 // GET /api/orders/:orderNumber - Get order by number
 // ============================================
 router.get("/:orderNumber", async (req, res) => {
@@ -194,10 +239,9 @@ router.get("/:orderNumber", async (req, res) => {
 
     if (now > expiresAt && order.status === "pending") {
       // Auto-expire order
-      await query(
-        "UPDATE orders SET status = 'expired' WHERE id = ?",
-        [order.id]
-      );
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
+        order.id,
+      ]);
       order.status = "expired";
     }
 
@@ -264,7 +308,9 @@ router.patch("/:id/complete", async (req, res) => {
     // TODO: Update user points if user_id exists
     if (order.user_id) {
       // Add points to user (implement this later when user table is ready)
-      console.log(`TODO: Add ${order.points_earned} points to user ${order.user_id}`);
+      console.log(
+        `TODO: Add ${order.points_earned} points to user ${order.user_id}`
+      );
     }
 
     res.json({
@@ -301,7 +347,6 @@ router.patch("/:id/cancel", async (req, res) => {
     });
   }
 });
-
 
 // ============================================
 // DELETE /api/orders/:id - Delete order (hard delete)

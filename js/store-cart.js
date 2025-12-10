@@ -15,17 +15,22 @@ let currentUser = null; // TODO: Get from login system
 // Add product to cart
 function addToStoreCartInternal(productId, productName, price, imageUrl) {
   // Debug log
-  console.log('addToStoreCartInternal called with:', { productId, productName, price, imageUrl });
-  
+  console.log("addToStoreCartInternal called with:", {
+    productId,
+    productName,
+    price,
+    imageUrl,
+  });
+
   // Ensure price is a number
-  const numPrice = typeof price === 'number' ? price : parseFloat(price);
-  
+  const numPrice = typeof price === "number" ? price : parseFloat(price);
+
   if (isNaN(numPrice)) {
-    console.error('Invalid price:', price);
-    showToast('Error: Harga produk tidak valid', 'error');
+    console.error("Invalid price:", price);
+    showToast("Error: Harga produk tidak valid", "error");
     return;
   }
-  
+
   // Check if product already in cart
   const existingItem = cart.find((item) => item.id === productId);
 
@@ -106,7 +111,9 @@ function updateCartUI() {
       }
       <div class="flex-1">
         <h4 class="font-semibold text-sm text-slate-900">${item.name}</h4>
-        <p class="text-xs text-amber-500 font-bold">Rp ${item.price.toLocaleString("id-ID")}</p>
+        <p class="text-xs text-amber-500 font-bold">Rp ${item.price.toLocaleString(
+          "id-ID"
+        )}</p>
       </div>
       <div class="flex items-center gap-2">
         <button 
@@ -115,7 +122,9 @@ function updateCartUI() {
         >
           <i data-lucide="minus" class="w-3 h-3"></i>
         </button>
-        <span class="w-8 text-center font-semibold text-sm">${item.quantity}</span>
+        <span class="w-8 text-center font-semibold text-sm">${
+          item.quantity
+        }</span>
         <button 
           onclick="updateQuantity(${item.id}, 1)"
           class="w-7 h-7 rounded-full bg-amber-400 hover:bg-amber-500 flex items-center justify-center transition"
@@ -163,7 +172,9 @@ async function submitOrder() {
   }
 
   // Get order details
-  const orderType = document.querySelector('input[name="orderType"]:checked')?.value;
+  const orderType = document.querySelector(
+    'input[name="orderType"]:checked'
+  )?.value;
   const storeLocation = document.getElementById("storeLocation")?.value;
 
   if (!orderType) {
@@ -250,49 +261,191 @@ async function submitOrder() {
 // QR CODE MODAL
 // ============================================
 
+let countdownInterval = null;
+
 function showQRCodeModal(orderData) {
   const modal = document.getElementById("qrModal");
   const orderNumberEl = document.getElementById("qrOrderNumber");
   const expiresAtEl = document.getElementById("qrExpiresAt");
   const pointsEl = document.getElementById("qrPoints");
   const qrcodeContainer = document.getElementById("qrcode");
+  const qrCodeContainerDiv = document.getElementById("qrCodeContainer");
+  const modalTitle = document.getElementById("qrModalTitle");
+  const modalSubtitle = document.getElementById("qrModalSubtitle");
+  const warningText = document.getElementById("qrWarningText");
+  const expiryLabel = document.getElementById("qrExpiryLabel");
+  const countdownEl = document.getElementById("qrCountdown");
 
   // Set order info
   orderNumberEl.textContent = orderData.order_number;
   pointsEl.textContent = orderData.points_earned;
 
-  // Format expiry time
-  const expiryDate = new Date(orderData.expires_at);
-  expiresAtEl.textContent = expiryDate.toLocaleString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  // Check if order is completed
+  const isCompleted =
+    orderData.status === "completed" || orderData.status === "paid";
 
-  // Clear previous QR code
-  qrcodeContainer.innerHTML = "";
+  if (isCompleted) {
+    // Show "Pesanan Di Proses" view (no QR code)
+    modalTitle.textContent = "Pesanan Di Proses!";
+    modalSubtitle.textContent =
+      "Pesanan anda sudah di accept oleh admin, silahkan tunggu pesanan anda. Terimakasih!";
+    qrCodeContainerDiv.style.display = "none";
+    warningText.style.display = "none";
+    expiryLabel.textContent = "Status:";
+    expiresAtEl.textContent = "COMPLETED";
+    expiresAtEl.className = "font-semibold text-emerald-500 text-xs";
 
-  // Generate QR code
-  new QRCode(qrcodeContainer, {
-    text: orderData.qr_code_data,
-    width: 256,
-    height: 256,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H,
-  });
+    // Clear any existing countdown
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+
+    // Add points if not already claimed
+    claimOrderPoints(orderData);
+  } else {
+    // Show "Pesanan Berhasil" view (with QR code and countdown)
+    modalTitle.textContent = "Pesanan Berhasil!";
+    modalSubtitle.textContent =
+      "Tunjukkan QR code ini ke kasir untuk memproses pesanan Anda";
+    qrCodeContainerDiv.style.display = "block";
+    warningText.style.display = "block";
+    expiryLabel.textContent = "Berlaku Hingga:";
+    expiresAtEl.className = "font-semibold text-red-500 text-xs";
+
+    // Format expiry time
+    const expiryDate = new Date(orderData.expires_at);
+    expiresAtEl.textContent = expiryDate.toLocaleString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    // Clear previous QR code
+    qrcodeContainer.innerHTML = "";
+
+    // Generate QR code
+    new QRCode(qrcodeContainer, {
+      text: orderData.qr_code_data,
+      width: 256,
+      height: 256,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+
+    // Start countdown timer
+    startCountdown(expiryDate, countdownEl);
+  }
 
   // Show modal
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
 
+function startCountdown(expiryDate, countdownEl) {
+  // Clear any existing countdown
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const expiry = new Date(expiryDate).getTime();
+    const distance = expiry - now;
+
+    if (distance < 0) {
+      countdownEl.textContent = "KADALUARSA";
+      countdownEl.className = "text-2xl font-bold text-red-600";
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+      return;
+    }
+
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    countdownEl.textContent = `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+    // Change color based on time remaining
+    if (distance < 5 * 60 * 1000) {
+      // Less than 5 minutes
+      countdownEl.className = "text-2xl font-bold text-red-600 animate-pulse";
+    } else if (distance < 15 * 60 * 1000) {
+      // Less than 15 minutes
+      countdownEl.className = "text-2xl font-bold text-orange-500";
+    } else {
+      countdownEl.className = "text-2xl font-bold text-red-500";
+    }
+  }
+
+  // Update immediately
+  updateCountdown();
+
+  // Update every second
+  countdownInterval = setInterval(updateCountdown, 1000);
+}
+
 function closeQRModal() {
   const modal = document.getElementById("qrModal");
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+
+  // Clear countdown when closing modal
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+}
+
+// ============================================
+// POINTS CLAIMING
+// ============================================
+
+function claimOrderPoints(orderData) {
+  // Check if points already claimed for this order
+  const claimedOrders = getClaimedOrders();
+
+  if (claimedOrders.includes(orderData.id)) {
+    console.log(`Points already claimed for order ${orderData.id}`);
+    return;
+  }
+
+  // Add points using global addPoints function from script.js
+  if (typeof window.addPoints === "function") {
+    window.addPoints(orderData.points_earned);
+
+    // Mark order as claimed
+    claimedOrders.push(orderData.id);
+    localStorage.setItem(
+      "docterbee_claimed_orders",
+      JSON.stringify(claimedOrders)
+    );
+
+    // Show toast notification
+    showToast(
+      `+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`,
+      "success"
+    );
+
+    console.log(
+      `Successfully claimed ${orderData.points_earned} points for order ${orderData.id}`
+    );
+  } else {
+    console.error("addPoints function not available");
+  }
+}
+
+function getClaimedOrders() {
+  const claimed = localStorage.getItem("docterbee_claimed_orders");
+  return claimed ? JSON.parse(claimed) : [];
 }
 
 // ============================================
@@ -324,22 +477,34 @@ function getLastOrder() {
   return savedOrder ? JSON.parse(savedOrder) : null;
 }
 
-// Reopen last order QR
-function reopenLastOrderQR() {
+// Reopen last order QR with latest status from server
+async function reopenLastOrderQR() {
   const lastOrder = getLastOrder();
-  if (lastOrder) {
-    // Check if order is still valid (not expired)
-    const expiryDate = new Date(lastOrder.expires_at);
-    const now = new Date();
-    
-    if (now > expiryDate) {
-      showToast("QR code sudah kadaluarsa", "error");
-      return;
-    }
-    
-    showQRCodeModal(lastOrder);
-  } else {
+  if (!lastOrder) {
     showToast("Belum ada transaksi", "error");
+    return;
+  }
+
+  try {
+    // Fetch latest order status from server
+    const response = await fetch(`${API_BASE}/orders/id/${lastOrder.id}`);
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error("Gagal mengambil status order");
+    }
+
+    const updatedOrder = result.data;
+
+    // Update localStorage with latest data
+    saveLastOrder(updatedOrder);
+
+    // Show modal with updated status
+    showQRCodeModal(updatedOrder);
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    // Fallback to cached data if server fails
+    showQRCodeModal(lastOrder);
   }
 }
 
@@ -347,12 +512,12 @@ function reopenLastOrderQR() {
 function updateLastOrderButton() {
   const lastOrder = getLastOrder();
   const button = document.getElementById("lastOrderBtn");
-  
+
   if (button) {
     if (lastOrder) {
       const expiryDate = new Date(lastOrder.expires_at);
       const now = new Date();
-      
+
       if (now <= expiryDate) {
         button.classList.remove("hidden");
       } else {
@@ -371,9 +536,7 @@ function updateLastOrderButton() {
 function showToast(message, type = "success") {
   const toast = document.createElement("div");
   toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all ${
-    type === "error"
-      ? "bg-red-500 text-white"
-      : "bg-emerald-500 text-white"
+    type === "error" ? "bg-red-500 text-white" : "bg-emerald-500 text-white"
   }`;
   toast.textContent = message;
 

@@ -1818,6 +1818,84 @@ header {
   background: rgba(251, 191, 36, 0.8);
 }
 
+/* Store Tab Navigation Scroll */
+.store-tab-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.7) rgba(71, 85, 105, 0.3);
+  scroll-behavior: smooth;
+  /* Add subtle gradient fade on edges to indicate scrollable content */
+  position: relative;
+  /* Enable smooth scrolling with snap points */
+  scroll-snap-type: x proximity;
+  touch-action: pan-x;
+}
+
+.store-tab-scroll button {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Visual indicator for scrollable content - removed to prevent overlay on buttons */
+
+.store-tab-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.store-tab-scroll::-webkit-scrollbar-track {
+  background: rgba(71, 85, 105, 0.3);
+  border-radius: 4px;
+  margin: 0 4px;
+}
+
+.store-tab-scroll::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.7);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+  border: 2px solid rgba(71, 85, 105, 0.1);
+}
+
+.store-tab-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.95);
+}
+
+/* Store category filter scroll - same style as tab scroll */
+.store-category-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.7) rgba(71, 85, 105, 0.3);
+  scroll-behavior: smooth;
+  position: relative;
+  scroll-snap-type: x proximity;
+  touch-action: pan-x;
+}
+
+.store-category-scroll button {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+.store-category-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.store-category-scroll::-webkit-scrollbar-track {
+  background: rgba(71, 85, 105, 0.3);
+  border-radius: 4px;
+  margin: 0 4px;
+}
+
+.store-category-scroll::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.7);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+  border: 2px solid rgba(71, 85, 105, 0.1);
+}
+
+.store-category-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.95);
+}
+
 /* Responsive table wrapper */
 /* Table wrapper - scrollbar only appears when content actually overflows */
 .booking-container.overflow-x-auto {
@@ -1967,9 +2045,103 @@ header {
     font-size: 0.875rem;
   }
 
+  /* Compact header points on small screens */
+  .points-display {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  /* Container padding tuning for mobile cards/sidebars */
+  .media-container,
+  .booking-container,
+  .insight-sidebar,
+  .event-sidebar,
+  .media-sidebar {
+    padding: 1rem !important;
+  }
+
+  /* Keep article metadata readable when stacked */
+  .article-meta {
+    align-items: flex-start;
+    width: 100%;
+  }
+
   /* Card padding on mobile */
   .booking-container {
     padding: 1rem !important;
+  }
+
+  /* Responsive tables for mobile */
+  table {
+    font-size: 0.75rem;
+  }
+
+  table th,
+  table td {
+    padding: 0.5rem !important;
+    font-size: 0.75rem;
+  }
+
+  /* Store tab buttons smaller on mobile */
+  .store-tab-scroll button {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Store tab scroll - more visible scrollbar on mobile */
+  .store-tab-scroll::-webkit-scrollbar {
+    height: 12px !important;
+  }
+
+  .store-tab-scroll::-webkit-scrollbar-track {
+    background: rgba(71, 85, 105, 0.5) !important;
+    border-radius: 6px !important;
+  }
+
+  .store-tab-scroll::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 1) !important;
+    border: 2px solid rgba(15, 23, 42, 0.3) !important;
+    border-radius: 6px !important;
+  }
+
+  .store-tab-scroll::-webkit-scrollbar-thumb:active {
+    background: rgba(245, 158, 11, 1) !important;
+  }
+
+  /* Store category scroll - same mobile enhancements */
+  .store-category-scroll::-webkit-scrollbar {
+    height: 12px !important;
+  }
+
+  .store-category-scroll::-webkit-scrollbar-track {
+    background: rgba(71, 85, 105, 0.5) !important;
+    border-radius: 6px !important;
+  }
+
+  .store-category-scroll::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 1) !important;
+    border: 2px solid rgba(15, 23, 42, 0.3) !important;
+    border-radius: 6px !important;
+  }
+
+  .store-category-scroll::-webkit-scrollbar-thumb:active {
+    background: rgba(245, 158, 11, 1) !important;
+  }
+
+  /* Hero section responsive */
+  .hero-section h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .hero-section p {
+    font-size: 0.875rem !important;
+  }
+
+  /* Card grid responsive spacing */
+  .card-grid,
+  .event-card,
+  .article-card {
+    margin-bottom: 0.75rem;
   }
 }
 

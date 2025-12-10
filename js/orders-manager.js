@@ -3,7 +3,6 @@
 // ============================================
 // Note: API_BASE is already defined in admin-dashboard.js
 
-
 // ============================================
 // LOAD ORDERS
 // ============================================
@@ -16,7 +15,7 @@ async function loadOrders() {
     // Show loading
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="text-center py-8">
+        <td colspan="8" class="text-center py-8">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div>
           <p class="mt-2 text-slate-400">Memuat orders...</p>
         </td>
@@ -35,7 +34,7 @@ async function loadOrders() {
     if (orders.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="9" class="text-center py-8 text-slate-400">
+          <td colspan="8" class="text-center py-8 text-slate-400">
             Belum ada order
           </td>
         </tr>
@@ -46,19 +45,23 @@ async function loadOrders() {
     // Render orders
     tableBody.innerHTML = orders
       .map((order) => {
-        const items = JSON.parse(order.items);
-        const itemsText = items.map((item) => `${item.name} (${item.quantity}x)`).join(", ");
         const statusBadge = getStatusBadge(order.status, order.payment_status);
         const expiryStatus = getExpiryStatus(order.expires_at, order.status);
 
         return `
           <tr class="border-b border-slate-800 hover:bg-slate-800/30">
             <td class="px-4 py-3">
-              <span class="font-mono text-sm text-amber-400">${order.order_number}</span>
+              <span class="font-mono text-sm text-amber-400">${
+                order.order_number
+              }</span>
             </td>
             <td class="px-4 py-3">
               <div class="text-sm">${order.customer_name || "Guest"}</div>
-              ${order.customer_phone ? `<div class="text-xs text-slate-400">${order.customer_phone}</div>` : ""}
+              ${
+                order.customer_phone
+                  ? `<div class="text-xs text-slate-400">${order.customer_phone}</div>`
+                  : ""
+              }
             </td>
             <td class="px-4 py-3">
               <span class="text-xs px-2 py-1 rounded-full ${
@@ -69,14 +72,13 @@ async function loadOrders() {
                 ${order.order_type === "dine_in" ? "Dine In" : "Take Away"}
               </span>
             </td>
-            <td class="px-4 py-3 text-sm capitalize">${order.store_location}</td>
+            <td class="px-4 py-3 text-sm capitalize">${
+              order.store_location
+            }</td>
             <td class="px-4 py-3">
-              <div class="text-xs text-slate-400 max-w-xs truncate" title="${itemsText}">
-                ${itemsText}
-              </div>
-            </td>
-            <td class="px-4 py-3">
-              <span class="font-semibold text-amber-400">Rp ${parseFloat(order.total_amount).toLocaleString("id-ID")}</span>
+              <span class="font-semibold text-amber-400">Rp ${parseFloat(
+                order.total_amount
+              ).toLocaleString("id-ID")}</span>
             </td>
             <td class="px-4 py-3">
               ${statusBadge}
@@ -127,7 +129,7 @@ async function loadOrders() {
     console.error("Error loading orders:", error);
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="text-center py-8 text-red-400">
+        <td colspan="8" class="text-center py-8 text-red-400">
           Error: ${error.message}
         </td>
       </tr>
@@ -227,7 +229,9 @@ async function viewOrderDetails(orderNumber) {
         <!-- Order Number -->
         <div class="bg-slate-800 rounded-lg p-4">
           <div class="text-xs text-slate-400 mb-1">Order Number</div>
-          <div class="text-2xl font-bold font-mono text-amber-400">${order.order_number}</div>
+          <div class="text-2xl font-bold font-mono text-amber-400">${
+            order.order_number
+          }</div>
         </div>
 
         <!-- Customer Info -->
@@ -270,7 +274,9 @@ async function viewOrderDetails(orderNumber) {
               <div class="flex justify-between items-center bg-slate-800 rounded p-3">
                 <div>
                   <div class="font-semibold">${item.name}</div>
-                  <div class="text-xs text-slate-400">${item.quantity}x @ Rp ${item.price.toLocaleString("id-ID")}</div>
+                  <div class="text-xs text-slate-400">${
+                    item.quantity
+                  }x @ Rp ${item.price.toLocaleString("id-ID")}</div>
                 </div>
                 <div class="font-bold text-amber-400">
                   Rp ${(item.price * item.quantity).toLocaleString("id-ID")}
@@ -286,11 +292,15 @@ async function viewOrderDetails(orderNumber) {
         <div class="bg-amber-900/20 border border-amber-400/30 rounded-lg p-4">
           <div class="flex justify-between items-center mb-2">
             <span class="text-lg font-semibold">Total</span>
-            <span class="text-2xl font-bold text-amber-400">Rp ${parseFloat(order.total_amount).toLocaleString("id-ID")}</span>
+            <span class="text-2xl font-bold text-amber-400">Rp ${parseFloat(
+              order.total_amount
+            ).toLocaleString("id-ID")}</span>
           </div>
           <div class="flex justify-between items-center text-sm">
             <span class="text-slate-400">Points Earned</span>
-            <span class="font-semibold text-emerald-400">+${order.points_earned} poin</span>
+            <span class="font-semibold text-emerald-400">+${
+              order.points_earned
+            } poin</span>
           </div>
         </div>
 
@@ -302,7 +312,9 @@ async function viewOrderDetails(orderNumber) {
           </div>
           <div>
             <div class="text-xs text-slate-400 mb-1">Expires At</div>
-            <div class="text-sm ${isExpired ? "text-red-400" : "text-slate-300"}">
+            <div class="text-sm ${
+              isExpired ? "text-red-400" : "text-slate-300"
+            }">
               ${expiryDate.toLocaleString("id-ID")}
             </div>
           </div>
@@ -349,7 +361,11 @@ function closeOrderDetailsModal() {
 // ============================================
 
 async function completeOrder(orderId) {
-  if (!confirm("Complete order ini? Status akan berubah menjadi PAID dan COMPLETED.")) {
+  if (
+    !confirm(
+      "Complete order ini? Status akan berubah menjadi PAID dan COMPLETED."
+    )
+  ) {
     return;
   }
 
@@ -372,13 +388,16 @@ async function completeOrder(orderId) {
   }
 }
 
-
 // ============================================
 // DELETE ORDER
 // ============================================
 
 async function deleteOrder(orderId) {
-  if (!confirm("Hapus order ini? Data akan dihapus permanen dan tidak dapat dikembalikan.")) {
+  if (
+    !confirm(
+      "Hapus order ini? Data akan dihapus permanen dan tidak dapat dikembalikan."
+    )
+  ) {
     return;
   }
 
@@ -425,10 +444,14 @@ function getStatusBadge(status, paymentStatus) {
 
   return `
     <div class="flex flex-col gap-1">
-      <span class="text-xs px-2 py-1 rounded-full ${statusColors[status] || "bg-slate-700 text-slate-400"}">
+      <span class="text-xs px-2 py-1 rounded-full ${
+        statusColors[status] || "bg-slate-700 text-slate-400"
+      }">
         ${status.toUpperCase()}
       </span>
-      <span class="text-xs px-2 py-1 rounded-full ${paymentColors[paymentStatus] || "bg-slate-700 text-slate-400"}">
+      <span class="text-xs px-2 py-1 rounded-full ${
+        paymentColors[paymentStatus] || "bg-slate-700 text-slate-400"
+      }">
         ${paymentStatus === "paid" ? "PAID" : "UNPAID"}
       </span>
     </div>
