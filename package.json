@@ -6,8 +6,7 @@
   "main": "backend/server.mjs",
   "scripts": {
     "start": "node backend/server.mjs",
-    "dev": "node --watch backend/server.mjs",
-    "old-server": "node server.mjs"
+    "dev": "node --watch backend/server.mjs"
   },
   "keywords": [
     "docterbee",

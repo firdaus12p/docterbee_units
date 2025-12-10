@@ -65,6 +65,59 @@ app.use("/api/services", servicesRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/upload", uploadRouter);
 
+// DEBUG ENDPOINT - Untuk troubleshooting database
+app.get("/api/debug", async (req, res) => {
+  try {
+    const { pool } = await import("./db.mjs");
+    
+    // Test database connection
+    let dbStatus = "disconnected";
+    let dbError = null;
+    let tables = [];
+    
+    try {
+      const connection = await pool.getConnection();
+      dbStatus = "connected";
+      
+      // Get list of tables
+      const [rows] = await connection.query("SHOW TABLES");
+      tables = rows.map(row => Object.values(row)[0]);
+      
+      connection.release();
+    } catch (error) {
+      dbError = error.message;
+    }
+    
+    res.json({
+      status: "OK",
+      timestamp: new Date().toISOString(),
+      environment: {
+        NODE_ENV: process.env.NODE_ENV || "development",
+        PORT: process.env.PORT || "3000",
+        DB_HOST: process.env.DB_HOST || "not set",
+        DB_PORT: process.env.DB_PORT || "not set",
+        DB_USER: process.env.DB_USER || "not set",
+        DB_NAME: process.env.DB_NAME || "not set",
+        DB_PASSWORD: process.env.DB_PASSWORD ? "***SET***" : "NOT SET",
+        GEMINI_API_KEY: process.env.GEMINI_API_KEY ? "***SET***" : "NOT SET",
+      },
+      database: {
+        status: dbStatus,
+        error: dbError,
+        tables: tables,
+        tableCount: tables.length,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "ERROR",
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+});
+
+
 // Helper function to clean YouTube URL (remove tracking parameters)
 function cleanYoutubeUrl(url) {
   if (!url) return null;
