@@ -14,6 +14,7 @@ import servicesRouter from "./routes/services.mjs";
 import productsRouter from "./routes/products.mjs";
 import uploadRouter from "./routes/upload.mjs";
 import articlesRouter from "./articles.mjs";
+import ordersRouter from "./routes/orders.mjs";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -66,6 +67,7 @@ app.use("/api/services", servicesRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/articles", articlesRouter);
+app.use("/api/orders", ordersRouter);
 
 // DEBUG ENDPOINT - Untuk troubleshooting database
 app.get("/api/debug", async (req, res) => {

@@ -272,6 +272,37 @@ async function initializeTables() {
     `);
     console.log("✅ Table: articles");
 
+    // Create orders table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        order_number VARCHAR(50) NOT NULL UNIQUE,
+        user_id INT,
+        customer_name VARCHAR(100),
+        customer_phone VARCHAR(20),
+        customer_email VARCHAR(100),
+        order_type ENUM('dine_in', 'take_away') NOT NULL,
+        store_location ENUM('kolaka', 'makassar', 'kendari') NOT NULL,
+        items JSON NOT NULL,
+        total_amount DECIMAL(10,2) NOT NULL,
+        points_earned INT DEFAULT 0,
+        status ENUM('pending', 'completed', 'expired', 'cancelled') DEFAULT 'pending',
+        payment_status ENUM('pending', 'paid') DEFAULT 'pending',
+        qr_code_data TEXT NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        completed_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_order_number (order_number),
+        INDEX idx_user_id (user_id),
+        INDEX idx_status (status),
+        INDEX idx_payment_status (payment_status),
+        INDEX idx_expires_at (expires_at),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: orders");
+
     console.log("📦 All tables initialized successfully");
   } catch (error) {
     console.error("❌ Error initializing tables:", error.message);

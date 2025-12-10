@@ -241,6 +241,11 @@ function switchSection(section) {
     loadServices();
   } else if (section === "products") {
     loadProducts();
+  } else if (section === "orders") {
+    // Load orders from orders-manager.js
+    if (typeof window.loadOrders === 'function') {
+      window.loadOrders();
+    }
   }
 }
 

@@ -111,7 +111,7 @@
       <!-- Main Content -->
       <main class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
         <!-- Tab Navigation -->
-        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 dashboard-tab-scroll">
           <button
             class="dashboard-tab active whitespace-nowrap"
             data-section="bookings"
@@ -156,6 +156,14 @@
             <i data-lucide="shopping-bag" class="w-4 h-4"></i>
             <span class="hidden sm:inline">Products Manager</span>
             <span class="sm:hidden">Products</span>
+          </button>
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="orders"
+          >
+            <i data-lucide="receipt" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Orders Manager</span>
+            <span class="sm:hidden">Orders</span>
           </button>
         </div>
 
@@ -1168,6 +1176,48 @@
       </div>
 
       <!-- ============================================ -->
+      <!-- SECTION: ORDERS MANAGER -->
+      <!-- ============================================ -->
+      <section id="section-orders" class="dashboard-section hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold">Orders Manager</h2>
+          <button
+            onclick="openQRScanner()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 w-full sm:w-auto justify-center"
+          >
+            <i data-lucide="scan" class="w-4 h-4"></i>
+            Scan QR Code
+          </button>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-slate-700">
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Order #</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Customer</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Type</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Location</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Items</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Total</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Status</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Created</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="9" class="text-center py-8 text-slate-400">
+                  Loading orders...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================ -->
       <!-- SECTION: ARTICLES MANAGER -->
       <!-- ============================================ -->
       <section id="section-articles" class="dashboard-section hidden">
@@ -1417,8 +1467,41 @@
       </footer>
     </div>
 
+    <!-- QR Scanner Modal -->
+    <div id="qrScannerModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold">Scan QR Code</h3>
+          <button onclick="closeQRScanner()" class="text-slate-400 hover:text-slate-200">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+        <div id="qr-reader" class="w-full"></div>
+        <p class="text-xs text-slate-400 text-center mt-4">
+          Arahkan camera ke QR code pesanan customer
+        </p>
+      </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold">Order Details</h3>
+          <button onclick="closeOrderDetailsModal()" class="text-slate-400 hover:text-slate-200">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+        <div id="orderDetailsContent">
+          <!-- Content will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="js/admin-dashboard.js"></script>
+    <script src="js/orders-manager.js"></script>
   </body>
 </html>

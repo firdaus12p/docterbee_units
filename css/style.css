@@ -38,7 +38,10 @@ main {
 }
 
 /* Prevent overflow ONLY on page-level containers, NOT modals */
-body > div:not([id*="modal"]):not([id*="Modal"]):not([class*="modal"]):not([class*="Modal"]),
+body
+  > div:not([id*="modal"]):not([id*="Modal"]):not([class*="modal"]):not(
+    [class*="Modal"]
+  ),
 body > section,
 body > aside,
 body > article,
@@ -1786,6 +1789,33 @@ header {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Dashboard Tab Navigation Scroll */
+.dashboard-tab-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.5) rgba(15, 23, 42, 0.3);
+  scroll-behavior: smooth;
+}
+
+.dashboard-tab-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.dashboard-tab-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 4px;
+}
+
+.dashboard-tab-scroll::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.5);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.dashboard-tab-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.8);
 }
 
 /* Responsive table wrapper */

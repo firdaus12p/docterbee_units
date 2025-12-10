@@ -2771,28 +2771,32 @@ function getCategoryLabel(cat) {
   return labels[cat] || cat;
 }
 
-// Add product to cart
+// Add product to cart (Updated to use store-cart.js)
 function addToCart(productId) {
-  const product = PRODUCTS.find((p) => p.id === productId);
-  if (!product) return;
-
-  const cart = _storeGet("db_cart", []);
-  const existing = cart.find((item) => item.id === productId);
-
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      qty: 1,
-    });
+  // Convert productId to number if it's a string
+  const numId = typeof productId === 'string' ? parseInt(productId) : productId;
+  
+  // Try to find product with both number and string comparison
+  const product = PRODUCTS.find((p) => p.id === numId || p.id === productId || p.id == productId);
+  
+  // Debug log
+  console.log('Looking for product ID:', productId, 'converted to:', numId);
+  console.log('Product found:', product);
+  console.log('PRODUCTS array:', PRODUCTS);
+  console.log('Product IDs in array:', PRODUCTS.map(p => ({ id: p.id, type: typeof p.id })));
+  
+  if (!product) {
+    console.error('Product not found with ID:', productId);
+    alert('Product tidak ditemukan. ID: ' + productId);
+    return;
   }
 
-  _storeSet("db_cart", cart);
-  updateCartDisplay();
-  updatePointsView();
+  // Call the new addToStoreCart from store-cart.js
+  if (typeof window.addToStoreCart === 'function') {
+    window.addToStoreCart(product.id, product.name, product.price, product.image);
+  } else {
+    console.error('addToStoreCart function not found');
+  }
 
   // Show feedback
   const btn = event.target.closest("button");

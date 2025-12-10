@@ -12,6 +12,7 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="bg-gray-50 text-slate-900">
@@ -196,31 +197,134 @@
           class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         ></div>
 
-        <!-- Grab & Go + Konsultasi Info -->
-        <div class="border-t border-gray-200 pt-6 grid gap-4 md:grid-cols-2">
-          <div
-            class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-amber-400/50 transition-all"
-          >
-            <div class="flex items-center gap-2 text-amber-500 font-semibold">
-              <i data-lucide="package" class="w-5 h-5"></i>
-              <span>Grab & Go</span>
+        </div>
+
+        <!-- ========== SHOPPING CART ========== -->
+        <div class="border-t border-gray-200 pt-6 space-y-4">
+          <div class="rounded-2xl border-2 border-amber-400/40 bg-white p-6">
+            <h2 class="text-xl font-bold text-amber-500 mb-4 flex items-center gap-2">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              Keranjang Belanja
+            </h2>
+
+            <!-- Cart Items -->
+            <div id="cartItems" class="space-y-2 mb-4">
+              <p class="text-slate-500 text-sm text-center py-8">
+                Keranjang belanja kosong. Tambahkan produk untuk mulai berbelanja.
+              </p>
             </div>
-            <p class="text-sm text-slate-900">
-              Ambil langsung di cabang terdekat tanpa antri. Pre-order via
-              WhatsApp atau langsung datang.
-            </p>
+
+            <!-- Order Options -->
+            <div class="border-t border-gray-200 pt-4 space-y-4">
+              <!-- Order Type -->
+              <div>
+                <label class="block text-sm font-semibold text-slate-900 mb-2">
+                  Tipe Pesanan
+                </label>
+                <div class="flex gap-3">
+                  <label class="flex-1 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="orderType" 
+                      value="dine_in" 
+                      checked
+                      class="peer hidden"
+                    >
+                    <div class="border-2 border-gray-200 peer-checked:border-amber-400 peer-checked:bg-amber-50 rounded-lg p-3 text-center transition">
+                      <i data-lucide="utensils" class="w-5 h-5 mx-auto mb-1 text-amber-500"></i>
+                      <div class="text-sm font-semibold text-slate-900">Dine In</div>
+                      <div class="text-xs text-slate-500">Makan di tempat</div>
+                    </div>
+                  </label>
+                  <label class="flex-1 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="orderType" 
+                      value="take_away"
+                      class="peer hidden"
+                    >
+                    <div class="border-2 border-gray-200 peer-checked:border-emerald-400 peer-checked:bg-emerald-50 rounded-lg p-3 text-center transition">
+                      <i data-lucide="shopping-bag" class="w-5 h-5 mx-auto mb-1 text-emerald-500"></i>
+                      <div class="text-sm font-semibold text-slate-900">Take Away</div>
+                      <div class="text-xs text-slate-500">Bawa pulang</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Store Location -->
+              <div>
+                <label class="block text-sm font-semibold text-slate-900 mb-2">
+                  Pilih Lokasi Store
+                </label>
+                <select 
+                  id="storeLocation"
+                  class="w-full bg-slate-50 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-amber-400 focus:outline-none transition"
+                >
+                  <option value="">-- Pilih Lokasi --</option>
+                  <option value="kolaka">🏪 Docterbee Kolaka ZE Center</option>
+                  <option value="makassar">🏪 Docterbee Makassar Pettarani</option>
+                  <option value="kendari">🏪 Docterbee Kendari ByPass</option>
+                </select>
+              </div>
+
+              <!-- Total & Submit -->
+              <div class="border-t border-gray-200 pt-4">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-lg font-semibold text-slate-900">Total Pembayaran</span>
+                  <span class="text-2xl font-bold text-amber-500">
+                    Rp <span id="cartTotal">0</span>
+                  </span>
+                </div>
+                
+                <button 
+                  id="submitOrderBtn"
+                  onclick="submitOrder()"
+                  class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <i data-lucide="send" class="w-5 h-5"></i>
+                  Kirim Pesanan
+                </button>
+                
+                <!-- Last Order QR Button -->
+                <button 
+                  id="lastOrderBtn"
+                  onclick="reopenLastOrderQR()"
+                  class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 mt-3"
+                >
+                  <i data-lucide="history" class="w-4 h-4"></i>
+                  Lihat QR Terakhir
+                </button>
+                
+                <p class="text-xs text-slate-500 text-center mt-2">
+                  Anda akan mendapatkan QR code untuk di-scan di kasir
+                </p>
+              </div>
+            </div>
           </div>
-          <div
-            class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-emerald-400/50 transition-all"
-          >
-            <div class="flex items-center gap-2 text-emerald-500 font-semibold">
-              <i data-lucide="stethoscope" class="w-5 h-5"></i>
-              <span>Konsultasi Gratis</span>
+
+          <!-- Info Cards -->
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-amber-400/50 transition-all">
+              <div class="flex items-center gap-2 text-amber-500 font-semibold">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Grab & Go</span>
+              </div>
+              <p class="text-sm text-slate-900">
+                Ambil langsung di cabang terdekat tanpa antri. Pre-order via
+                WhatsApp atau langsung datang.
+              </p>
             </div>
-            <p class="text-sm text-slate-900">
-              Member dengan poin ≥50 dapat konsultasi produk kesehatan gratis
-              dengan praktisi kami.
-            </p>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-emerald-400/50 transition-all">
+              <div class="flex items-center gap-2 text-emerald-500 font-semibold">
+                <i data-lucide="stethoscope" class="w-5 h-5"></i>
+                <span>Konsultasi Gratis</span>
+              </div>
+              <p class="text-sm text-slate-900">
+                Member dengan poin ≥50 dapat konsultasi produk kesehatan gratis
+                dengan praktisi kami.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -548,6 +652,60 @@
       </section>
     </main>
 
+    <!-- QR Code Modal -->
+    <div 
+      id="qrModal" 
+      class="hidden fixed inset-0 bg-black/60 z-50 items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div class="text-center">
+          <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="check-circle" class="w-6 h-6 text-emerald-500"></i>
+          </div>
+          
+          <h2 class="text-xl font-bold text-slate-900 mb-2">
+            Pesanan Berhasil!
+          </h2>
+          
+          <p class="text-xs text-slate-600 mb-4">
+            Tunjukkan QR code ini ke kasir untuk memproses pesanan Anda
+          </p>
+
+          <!-- QR Code -->
+          <div class="bg-slate-50 rounded-xl p-4 mb-3">
+            <div id="qrcode" class="flex justify-center"></div>
+          </div>
+
+          <!-- Order Info -->
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 text-left">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="text-slate-600">Order Number:</div>
+              <div class="font-bold text-slate-900" id="qrOrderNumber">-</div>
+              
+              <div class="text-slate-600">Poin Didapat:</div>
+              <div class="font-bold text-amber-500">
+                +<span id="qrPoints">0</span> poin
+              </div>
+              
+              <div class="text-slate-600">Berlaku Hingga:</div>
+              <div class="font-semibold text-red-500 text-xs" id="qrExpiresAt">-</div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-500 mb-3">
+            ⚠️ QR code akan kadaluarsa sesuai waktu yang ditentukan
+          </p>
+
+          <button 
+            onclick="closeQRModal()"
+            class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-lg transition text-sm"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer
       class="mt-16 border-t border-gray-200 text-center text-xs text-slate-500 py-6"
@@ -559,6 +717,7 @@
 
     <!-- Scripts -->
     <script src="js/script.js"></script>
+    <script src="js/store-cart.js"></script>
     <script>
       // Initialize year
       document.getElementById("year").textContent = new Date().getFullYear();
