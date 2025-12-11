@@ -306,6 +306,9 @@ function buildTabs() {
  * @param {string} unitId - Unit ID to display
  */
 function showUnit(unitId) {
+  // Track current unit globally for re-rendering after data loads
+  window.currentUnitId = unitId;
+
   const unit = UNITS.find((u) => u.id === unitId);
   if (!unit) return;
 
@@ -457,9 +460,23 @@ function escapeHtml(text) {
  * @param {number} value - Answer value (0 or 1)
  */
 function answer(unitId, key, value) {
-  const state = getState();
-  state[unitId] = state[unitId] || {};
+  // Get current state
+  let state = getState();
+
+  // Ensure state is an object
+  if (!state || typeof state !== "object") {
+    state = {};
+  }
+
+  // Ensure unit exists in state
+  if (!state[unitId] || typeof state[unitId] !== "object") {
+    state[unitId] = {};
+  }
+
+  // Set answer
   state[unitId][key] = value;
+
+  // Save state to localStorage
   setState(state);
 
   const element = document.getElementById("ans_" + unitId + "_" + key);
@@ -469,7 +486,8 @@ function answer(unitId, key, value) {
   if (value === 1) {
     element.textContent = "Terpenuhi";
     element.className = "status-answered";
-    addPoints(1);
+    // NOTE: Journey answers do NOT add points to "My Points & Rewards"
+    // Points only increase from product purchases (order completed)
   } else {
     element.textContent = "Belum melakukan";
     element.className = "status-unanswered";
@@ -495,7 +513,10 @@ function answer(unitId, key, value) {
 
   // Auto-save to database if sync is enabled
   if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    console.log("🔄 Triggering debounced save to database...");
     window.UserDataSync.debouncedSaveProgress();
+  } else {
+    console.log("👤 Guest mode - data saved to localStorage only");
   }
 }
 
@@ -538,11 +559,9 @@ function calcUnit(unitId) {
     }
   }
 
-  // Add bonus points
-  const bonusPoints = Math.floor(score / 20);
-  if (bonusPoints > 0) {
-    addPoints(bonusPoints);
-  }
+  // NOTE: Journey scoring does NOT add points to "My Points & Rewards"
+  // This is just for tracking daily health habits
+  // Points only increase from product purchases (order completed)
 }
 
 /**
@@ -615,11 +634,9 @@ function calcAll() {
     }
   }
 
-  // Add bonus points
-  const bonusPoints = Math.floor(total / 25);
-  if (bonusPoints > 0) {
-    addPoints(bonusPoints);
-  }
+  // NOTE: Journey scoring does NOT add points to "My Points & Rewards"
+  // This is just for tracking daily health habits
+  // Points only increase from product purchases (order completed)
 }
 
 // ==================== MOBILE MENU ====================
@@ -775,7 +792,13 @@ async function init() {
     yearElement.textContent = new Date().getFullYear();
   }
 
-  // Build tabs and show first unit
+  // Initialize user data sync FIRST (check if logged in and load data)
+  // This must happen before rendering UI to ensure data is available
+  if (window.UserDataSync && window.UserDataSync.autoInit) {
+    await window.UserDataSync.autoInit();
+  }
+
+  // Build tabs and show first unit (after data is loaded)
   buildTabs();
   showUnit(UNITS[0].id);
 
@@ -797,11 +820,6 @@ async function init() {
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
-  }
-
-  // Load user data from database if logged in
-  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
-    await window.UserDataSync.loadProgress();
   }
 
   // Refresh navigation points

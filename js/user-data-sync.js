@@ -92,7 +92,17 @@ async function loadUserProgress() {
 
     const result = await response.json();
     if (result.success) {
-      const { unitData, points } = result.data;
+      let { unitData, points } = result.data;
+
+      // Backend returns unitData as STRING, parse it to object
+      if (typeof unitData === "string") {
+        try {
+          unitData = JSON.parse(unitData);
+        } catch (e) {
+          console.error("❌ Failed to parse unitData:", e);
+          unitData = {};
+        }
+      }
 
       // Save to localStorage for immediate access
       localStorage.setItem("db_units", JSON.stringify(unitData));
@@ -100,10 +110,15 @@ async function loadUserProgress() {
 
       // Refresh UI if on journey page
       if (typeof refreshNav === "function") refreshNav();
-      if (typeof calcAll === "function") calcAll();
+
+      // Re-render current unit to show selected answers
+      if (typeof showUnit === "function" && window.currentUnitId) {
+        console.log("🔄 Re-rendering unit to show loaded data...");
+        showUnit(window.currentUnitId);
+      }
     }
   } catch (error) {
-    console.error("Error loading progress:", error);
+    console.error("❌ Error loading progress:", error);
   }
 }
 
