@@ -108,13 +108,21 @@ router.get("/check-pending", async (req, res) => {
 // ============================================
 router.post("/", async (req, res) => {
   try {
-    const { customer_email, order_type, store_location, items, total_amount } =
+    const { guest_data, order_type, store_location, items, total_amount } =
       req.body;
 
-    // Get user data from session
+    // Get user data from session OR guest_data
     const userId = req.session?.userId || null;
-    const customerName = req.session?.userName || null;
-    const customerPhone = req.session?.userPhone || null;
+    let customerName = req.session?.userName || null;
+    let customerPhone = req.session?.userPhone || null;
+    let customerAddress = null;
+
+    // If guest_data provided, use it
+    if (guest_data) {
+      customerName = guest_data.name;
+      customerPhone = guest_data.phone;
+      customerAddress = guest_data.address || null;
+    }
 
     // Check for existing pending order (logged in users only)
     if (userId) {
@@ -165,7 +173,7 @@ router.post("/", async (req, res) => {
     // Insert order
     const result = await query(
       `INSERT INTO orders 
-       (order_number, user_id, customer_name, customer_phone, customer_email, 
+       (order_number, user_id, customer_name, customer_phone, customer_address,
         order_type, store_location, items, total_amount, points_earned, 
         qr_code_data, expires_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -174,7 +182,7 @@ router.post("/", async (req, res) => {
         userId,
         customerName,
         customerPhone,
-        customer_email || null,
+        customerAddress,
         order_type,
         store_location,
         JSON.stringify(items),
@@ -478,6 +486,118 @@ router.patch("/:id/cancel", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal membatalkan order",
+    });
+  }
+});
+
+// ============================================
+// POST /api/orders/:id/assign-points-by-phone - Assign points to user by phone
+// ============================================
+router.post("/:id/assign-points-by-phone", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({
+        success: false,
+        error: "Nomor HP harus diisi",
+      });
+    }
+
+    // Check if order exists
+    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order tidak ditemukan",
+      });
+    }
+
+    // Check if order is completed
+    if (order.status !== "completed") {
+      return res.status(400).json({
+        success: false,
+        error: "Hanya order completed yang bisa di-assign points",
+      });
+    }
+
+    // Check if order already assigned to a user
+    if (order.user_id) {
+      return res.status(400).json({
+        success: false,
+        error: "Order ini sudah ter-assign ke user",
+      });
+    }
+
+    // Find user by phone number
+    const user = await queryOne(
+      "SELECT id, name, email, phone FROM users WHERE phone = ? AND is_active = 1",
+      [phone]
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error:
+          "User dengan nomor HP ini tidak terdaftar. Points tidak dapat di-assign.",
+      });
+    }
+
+    // Get current user progress
+    const progress = await queryOne(
+      "SELECT points FROM user_progress WHERE user_id = ?",
+      [user.id]
+    );
+
+    let currentPoints = 0;
+    if (progress) {
+      currentPoints = progress.points || 0;
+    } else {
+      // Create user_progress if not exists
+      await query(
+        "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, '{}', 0)",
+        [user.id]
+      );
+    }
+
+    // Calculate new points
+    const pointsToAdd = order.points_earned || 0;
+    const newPoints = currentPoints + pointsToAdd;
+
+    // Update user_progress with new points
+    await query(
+      "UPDATE user_progress SET points = ?, updated_at = NOW() WHERE user_id = ?",
+      [newPoints, user.id]
+    );
+
+    // Update order with user_id
+    await query("UPDATE orders SET user_id = ? WHERE id = ?", [user.id, id]);
+
+    console.log(
+      `✅ Added ${pointsToAdd} points to user ${user.id} (${user.name}) from order ${order.order_number}`
+    );
+
+    res.json({
+      success: true,
+      message: `Points berhasil di-assign ke ${user.name}`,
+      data: {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+        },
+        points_added: pointsToAdd,
+        new_total_points: newPoints,
+      },
+    });
+  } catch (error) {
+    console.error("Error assigning points:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal assign points",
     });
   }
 });

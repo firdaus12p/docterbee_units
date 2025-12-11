@@ -187,6 +187,42 @@ async function submitOrder() {
     return;
   }
 
+  // Get guest customer data (if form is visible)
+  const guestInfoDiv = document.getElementById("guestCustomerInfo");
+  let guestData = null;
+
+  if (guestInfoDiv && !guestInfoDiv.classList.contains("hidden")) {
+    // Guest mode - validate required fields
+    const guestName = document.getElementById("guestName")?.value.trim();
+    const guestPhone = document.getElementById("guestPhone")?.value.trim();
+    const guestAddress = document.getElementById("guestAddress")?.value.trim();
+
+    if (!guestName) {
+      showToast("Nama harus diisi", "error");
+      document.getElementById("guestName")?.focus();
+      return;
+    }
+
+    if (!guestPhone) {
+      showToast("Nomor HP harus diisi", "error");
+      document.getElementById("guestPhone")?.focus();
+      return;
+    }
+
+    // Validate phone number format (basic)
+    if (!/^[0-9]{10,15}$/.test(guestPhone)) {
+      showToast("Format nomor HP tidak valid (10-15 digit)", "error");
+      document.getElementById("guestPhone")?.focus();
+      return;
+    }
+
+    guestData = {
+      name: guestName,
+      phone: guestPhone,
+      address: guestAddress,
+    };
+  }
+
   // ✅ CHECK FOR PENDING ORDER FIRST
   try {
     const checkResponse = await fetch(
@@ -208,18 +244,19 @@ async function submitOrder() {
     // Continue with checkout if check fails (for guest users)
   }
 
-  // Customer data will be taken from session on backend
-  const customerEmail = ""; // Optional email field
-
   const totalAmount = calculateTotal();
 
   const orderData = {
-    customer_email: customerEmail,
     order_type: orderType,
     store_location: storeLocation,
     items: cart,
     total_amount: totalAmount,
   };
+
+  // Add guest data if available
+  if (guestData) {
+    orderData.guest_data = guestData;
+  }
 
   try {
     // Show loading
@@ -231,6 +268,9 @@ async function submitOrder() {
       Memproses...
     `;
 
+    // Debug: log order data being sent
+    console.log("💾 Sending order data:", orderData);
+
     const response = await fetch("http://localhost:3000/api/orders", {
       method: "POST",
       headers: {
@@ -241,6 +281,10 @@ async function submitOrder() {
     });
 
     const result = await response.json();
+
+    // Debug: log response
+    console.log("📡 Response status:", response.status);
+    console.log("📡 Response data:", result);
 
     if (!result.success) {
       throw new Error(result.error || "Gagal membuat order");
@@ -749,6 +793,41 @@ window.closePendingOrderModal = closePendingOrderModal;
 window.cancelPendingOrderAndRetry = cancelPendingOrderAndRetry;
 
 // ============================================
+// CUSTOMER INFO MANAGEMENT
+// ============================================
+
+async function initCustomerInfo() {
+  try {
+    // Check if user is logged in
+    const response = await fetch("http://localhost:3000/api/auth/check", {
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    const guestInfoDiv = document.getElementById("guestCustomerInfo");
+
+    if (data.loggedIn && data.user) {
+      // User is logged in - hide guest form
+      if (guestInfoDiv) {
+        guestInfoDiv.classList.add("hidden");
+      }
+    } else {
+      // Guest user - show form
+      if (guestInfoDiv) {
+        guestInfoDiv.classList.remove("hidden");
+      }
+    }
+  } catch (error) {
+    console.error("Error checking auth status:", error);
+    // Show guest form on error
+    const guestInfoDiv = document.getElementById("guestCustomerInfo");
+    if (guestInfoDiv) {
+      guestInfoDiv.classList.remove("hidden");
+    }
+  }
+}
+
+// ============================================
 // INIT
 // ============================================
 
@@ -756,6 +835,7 @@ window.cancelPendingOrderAndRetry = cancelPendingOrderAndRetry;
 document.addEventListener("DOMContentLoaded", () => {
   loadCartFromLocalStorage();
   updateLastOrderButton();
+  initCustomerInfo();
 });
 
 // Expose functions to window
