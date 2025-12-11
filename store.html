@@ -672,6 +672,84 @@
       </section>
     </main>
 
+    <!-- Pending Order Modal -->
+    <div 
+      id="pendingOrderModal" 
+      class="hidden fixed inset-0 bg-black/60 z-50 items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div class="text-center">
+          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="alert-circle" class="w-6 h-6 text-amber-500"></i>
+          </div>
+          
+          <h2 class="text-xl font-bold text-slate-900 mb-2">
+            Transaksi Belum Selesai
+          </h2>
+          
+          <p class="text-sm text-slate-600 mb-4">
+            Anda masih memiliki transaksi yang belum diselesaikan. Harap selesaikan transaksi ini terlebih dahulu sebelum membuat pesanan baru.
+          </p>
+
+          <!-- Pending Order Info -->
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 text-left">
+            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div class="text-slate-600">Order Number:</div>
+              <div class="font-bold text-slate-900" id="pendingOrderNumber">-</div>
+              
+              <div class="text-slate-600">Total Bayar:</div>
+              <div class="font-bold text-amber-500" id="pendingOrderTotal">-</div>
+              
+              <div class="text-slate-600">Tipe Order:</div>
+              <div class="font-semibold text-slate-700" id="pendingOrderType">-</div>
+              
+              <div class="text-slate-600">Kadaluarsa:</div>
+              <div class="font-semibold text-red-500 text-xs" id="pendingExpiresAt">-</div>
+            </div>
+
+            <!-- Items Preview -->
+            <div class="border-t border-amber-300 pt-2 mt-2">
+              <div class="text-xs text-slate-600 mb-2">Items:</div>
+              <div id="pendingOrderItems" class="space-y-1 max-h-32 overflow-y-auto">
+                <!-- Items will be populated via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code Display -->
+          <div id="pendingQRContainer" class="mb-4">
+            <div class="bg-slate-50 rounded-xl p-4">
+              <div id="pendingQrcode" class="flex justify-center"></div>
+            </div>
+            <p class="text-xs text-slate-500 mt-2">
+              Tunjukkan QR code ini ke kasir untuk menyelesaikan pembayaran
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-2">
+            <button 
+              onclick="closePendingOrderModal()"
+              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg transition"
+            >
+              OK, Saya Mengerti
+            </button>
+            
+            <button 
+              onclick="cancelPendingOrderAndRetry()"
+              class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition"
+            >
+              Batalkan Order Lama & Buat Baru
+            </button>
+          </div>
+
+          <p class="text-xs text-slate-400 mt-3">
+            ⚠️ Jika Anda membatalkan order lama, poin yang dijanjikan tidak akan diberikan
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- QR Code Modal -->
     <div 
       id="qrModal" 

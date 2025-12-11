@@ -40,6 +40,70 @@ function calculatePoints(totalAmount) {
 }
 
 // ============================================
+// GET /api/orders/check-pending - Check if user has pending order
+// ============================================
+router.get("/check-pending", async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+
+    if (!userId) {
+      return res.json({
+        success: true,
+        has_pending: false,
+        message: "Guest user - no pending order check",
+      });
+    }
+
+    // Check for pending order
+    const pendingOrder = await queryOne(
+      `SELECT id, order_number, total_amount, items, qr_code_data, 
+              expires_at, created_at, store_location, order_type
+       FROM orders 
+       WHERE user_id = ? AND status = 'pending'
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [userId]
+    );
+
+    if (!pendingOrder) {
+      return res.json({
+        success: true,
+        has_pending: false,
+      });
+    }
+
+    // Check if order expired
+    const now = new Date();
+    const expiresAt = new Date(pendingOrder.expires_at);
+
+    if (now > expiresAt) {
+      // Auto-expire order
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
+        pendingOrder.id,
+      ]);
+
+      return res.json({
+        success: true,
+        has_pending: false,
+        message: "Previous pending order has expired",
+      });
+    }
+
+    res.json({
+      success: true,
+      has_pending: true,
+      data: pendingOrder,
+    });
+  } catch (error) {
+    console.error("Error checking pending order:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengecek pending order",
+    });
+  }
+});
+
+// ============================================
 // POST /api/orders - Create new order
 // ============================================
 router.post("/", async (req, res) => {
@@ -51,6 +115,24 @@ router.post("/", async (req, res) => {
     const userId = req.session?.userId || null;
     const customerName = req.session?.userName || null;
     const customerPhone = req.session?.userPhone || null;
+
+    // Check for existing pending order (logged in users only)
+    if (userId) {
+      const pendingOrder = await queryOne(
+        `SELECT id, order_number FROM orders 
+         WHERE user_id = ? AND status = 'pending'
+         LIMIT 1`,
+        [userId]
+      );
+
+      if (pendingOrder) {
+        return res.status(400).json({
+          success: false,
+          error: "Anda masih memiliki transaksi pending",
+          pending_order: pendingOrder.order_number,
+        });
+      }
+    }
 
     // Validation
     if (!order_type || !store_location || !items || !total_amount) {
@@ -357,6 +439,33 @@ router.patch("/:id/complete", async (req, res) => {
 router.patch("/:id/cancel", async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.session?.userId;
+
+    // Get order to verify ownership
+    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order tidak ditemukan",
+      });
+    }
+
+    // Verify ownership (allow admin or order owner)
+    if (userId && order.user_id && order.user_id !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: "Anda tidak memiliki akses untuk membatalkan order ini",
+      });
+    }
+
+    // Only allow canceling pending orders
+    if (order.status !== "pending") {
+      return res.status(400).json({
+        success: false,
+        error: `Order dengan status ${order.status} tidak dapat dibatalkan`,
+      });
+    }
 
     await query("UPDATE orders SET status = 'cancelled' WHERE id = ?", [id]);
 

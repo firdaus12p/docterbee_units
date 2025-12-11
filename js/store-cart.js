@@ -5,6 +5,9 @@
 // Cart state
 let cart = [];
 
+// Pending order state
+let pendingOrderData = null;
+
 // ============================================
 // CART FUNCTIONS
 // ============================================
@@ -182,6 +185,27 @@ async function submitOrder() {
   if (!storeLocation) {
     showToast("Pilih lokasi store", "error");
     return;
+  }
+
+  // ✅ CHECK FOR PENDING ORDER FIRST
+  try {
+    const checkResponse = await fetch(
+      "http://localhost:3000/api/orders/check-pending",
+      {
+        credentials: "include",
+      }
+    );
+
+    const checkResult = await checkResponse.json();
+
+    if (checkResult.success && checkResult.has_pending) {
+      // User has pending order - show modal
+      showPendingOrderModal(checkResult.data);
+      return; // Stop checkout process
+    }
+  } catch (error) {
+    console.error("Error checking pending order:", error);
+    // Continue with checkout if check fails (for guest users)
   }
 
   // Customer data will be taken from session on backend
@@ -594,6 +618,135 @@ function showToast(message, type = "success") {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
+
+// ============================================
+// PENDING ORDER MODAL FUNCTIONS
+// ============================================
+
+function showPendingOrderModal(orderData) {
+  pendingOrderData = orderData;
+  const modal = document.getElementById("pendingOrderModal");
+
+  // Populate order info
+  document.getElementById("pendingOrderNumber").textContent =
+    orderData.order_number;
+  document.getElementById("pendingOrderTotal").textContent =
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(orderData.total_amount);
+
+  // Format order type
+  const orderTypeText =
+    orderData.order_type === "dine_in" ? "Dine In" : "Take Away";
+  document.getElementById("pendingOrderType").textContent = orderTypeText;
+
+  // Format expiry date
+  const expiryDate = new Date(orderData.expires_at);
+  document.getElementById("pendingExpiresAt").textContent =
+    expiryDate.toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  // Display items
+  const itemsContainer = document.getElementById("pendingOrderItems");
+  const items = JSON.parse(orderData.items);
+  itemsContainer.innerHTML = items
+    .map(
+      (item) => `
+    <div class="flex justify-between text-xs text-slate-700">
+      <span>${item.name} x${item.quantity}</span>
+      <span class="font-semibold">${new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      }).format(item.price * item.quantity)}</span>
+    </div>
+  `
+    )
+    .join("");
+
+  // Generate QR Code
+  const qrContainer = document.getElementById("pendingQrcode");
+  qrContainer.innerHTML = ""; // Clear previous QR
+
+  new QRCode(qrContainer, {
+    text: orderData.qr_code_data,
+    width: 200,
+    height: 200,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
+  });
+
+  // Show modal
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  // Reinitialize Lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function closePendingOrderModal() {
+  const modal = document.getElementById("pendingOrderModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pendingOrderData = null;
+}
+
+async function cancelPendingOrderAndRetry() {
+  if (!pendingOrderData) {
+    showToast("Data order tidak ditemukan", "error");
+    return;
+  }
+
+  const confirmCancel = confirm(
+    `Apakah Anda yakin ingin membatalkan order ${pendingOrderData.order_number}?\n\n⚠️ Poin yang dijanjikan tidak akan diberikan jika order dibatalkan.`
+  );
+
+  if (!confirmCancel) {
+    return;
+  }
+
+  try {
+    // Call cancel endpoint
+    const response = await fetch(
+      `http://localhost:3000/api/orders/${pendingOrderData.id}/cancel`,
+      {
+        method: "PATCH",
+        credentials: "include",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal membatalkan order");
+    }
+
+    showToast("✅ Order berhasil dibatalkan", "success");
+    closePendingOrderModal();
+
+    // Wait a bit then retry checkout
+    setTimeout(() => {
+      submitOrder();
+    }, 500);
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    showToast("❌ Error: " + error.message, "error");
+  }
+}
+
+// Make functions globally accessible
+window.closePendingOrderModal = closePendingOrderModal;
+window.cancelPendingOrderAndRetry = cancelPendingOrderAndRetry;
 
 // ============================================
 // INIT
