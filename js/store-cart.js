@@ -2,8 +2,6 @@
 // STORE CART - Shopping Cart Management
 // ============================================
 
-const API_BASE = "http://localhost:3000/api";
-
 // Cart state
 let cart = [];
 
@@ -209,7 +207,7 @@ async function submitOrder() {
       Memproses...
     `;
 
-    const response = await fetch(`${API_BASE}/orders`, {
+    const response = await fetch("http://localhost:3000/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -404,7 +402,7 @@ function closeQRModal() {
 // POINTS CLAIMING
 // ============================================
 
-function claimOrderPoints(orderData) {
+async function claimOrderPoints(orderData) {
   // Check if points already claimed for this order
   const claimedOrders = getClaimedOrders();
 
@@ -413,28 +411,67 @@ function claimOrderPoints(orderData) {
     return;
   }
 
-  // Add points using global addPoints function from script.js
-  if (typeof window.addPoints === "function") {
-    window.addPoints(orderData.points_earned);
+  // If user is logged in, reload progress from database (points already added by backend)
+  if (
+    typeof window.UserDataSync !== "undefined" &&
+    window.UserDataSync.isEnabled()
+  ) {
+    console.log("🔄 Reloading user progress from database...");
 
-    // Mark order as claimed
-    claimedOrders.push(orderData.id);
-    localStorage.setItem(
-      "docterbee_claimed_orders",
-      JSON.stringify(claimedOrders)
-    );
+    try {
+      // Reload progress from backend (this will update localStorage with correct points)
+      await window.UserDataSync.loadProgress();
 
-    // Show toast notification
-    showToast(
-      `+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`,
-      "success"
-    );
+      // Refresh UI to show new points
+      if (typeof window.refreshNav === "function") {
+        window.refreshNav();
+      }
 
-    console.log(
-      `Successfully claimed ${orderData.points_earned} points for order ${orderData.id}`
-    );
+      // Mark order as claimed
+      claimedOrders.push(orderData.id);
+      localStorage.setItem(
+        "docterbee_claimed_orders",
+        JSON.stringify(claimedOrders)
+      );
+
+      // Show toast notification
+      showToast(
+        `+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`,
+        "success"
+      );
+
+      console.log(
+        `✅ Successfully loaded ${orderData.points_earned} points from database for order ${orderData.id}`
+      );
+    } catch (error) {
+      console.error("❌ Failed to reload progress:", error);
+    }
   } else {
-    console.error("addPoints function not available");
+    // Guest mode - add points to localStorage only
+    console.log("👤 Guest mode - adding points to localStorage");
+
+    if (typeof window.addPoints === "function") {
+      window.addPoints(orderData.points_earned);
+
+      // Mark order as claimed
+      claimedOrders.push(orderData.id);
+      localStorage.setItem(
+        "docterbee_claimed_orders",
+        JSON.stringify(claimedOrders)
+      );
+
+      // Show toast notification
+      showToast(
+        `+${orderData.points_earned} poin telah ditambahkan! 🎉`,
+        "success"
+      );
+
+      console.log(
+        `✅ Added ${orderData.points_earned} points to localStorage for order ${orderData.id}`
+      );
+    } else {
+      console.error("addPoints function not available");
+    }
   }
 }
 
@@ -459,7 +496,15 @@ function saveCartToLocalStorage() {
 function loadCartFromLocalStorage() {
   const savedCart = localStorage.getItem("docterbee_cart");
   if (savedCart) {
-    cart = JSON.parse(savedCart);
+    try {
+      const parsed = JSON.parse(savedCart);
+      // Ensure cart is always an array
+      cart = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error("Error parsing cart from localStorage:", error);
+      cart = [];
+      localStorage.removeItem("docterbee_cart"); // Clear corrupted data
+    }
     updateCartUI();
     updateCartCount();
   }
@@ -487,7 +532,9 @@ async function reopenLastOrderQR() {
 
   try {
     // Fetch latest order status from server
-    const response = await fetch(`${API_BASE}/orders/id/${lastOrder.id}`);
+    const response = await fetch(
+      `http://localhost:3000/api/orders/id/${lastOrder.id}`
+    );
     const result = await response.json();
 
     if (!result.success) {

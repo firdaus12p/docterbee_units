@@ -1,8 +1,6 @@
 // User Data Sync Helper - Database-backed localStorage replacement
 // This file handles syncing Journey progress, Points, and Cart with backend
 
-const API_BASE = "http://localhost:3000/api";
-
 // ==================== SYNC STATE ====================
 let syncEnabled = false; // Set to true after user login
 let currentUserId = null;
@@ -26,6 +24,34 @@ async function initUserDataSync(userId) {
     return true;
   } catch (error) {
     console.error("❌ Failed to load user data:", error);
+    return false;
+  }
+}
+
+/**
+ * Auto-check if user is logged in and initialize sync
+ * Call this on page load for protected pages
+ */
+async function autoInitUserDataSync() {
+  try {
+    const response = await fetch("http://localhost:3000/api/auth/check", {
+      credentials: "include",
+    });
+
+    if (!response.ok) return false;
+
+    const result = await response.json();
+
+    if (result.loggedIn && result.user && result.user.id) {
+      console.log("🔐 User logged in, initializing sync...", result.user.id);
+      await initUserDataSync(result.user.id);
+      return true;
+    } else {
+      console.log("👤 Guest mode - no sync");
+      return false;
+    }
+  } catch (error) {
+    console.warn("⚠️ Could not check login status:", error.message);
     return false;
   }
 }
@@ -55,9 +81,12 @@ async function loadUserProgress() {
   if (!syncEnabled) return;
 
   try {
-    const response = await fetch(`${API_BASE}/user-data/progress`, {
-      credentials: "include",
-    });
+    const response = await fetch(
+      "http://localhost:3000/api/user-data/progress",
+      {
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) throw new Error("Failed to load progress");
 
@@ -83,7 +112,10 @@ async function loadUserProgress() {
  * Call this after user answers questions or earns points
  */
 async function saveUserProgress() {
-  if (!syncEnabled) return;
+  if (!syncEnabled) {
+    // User not logged in - data stays in localStorage only (guest mode)
+    return;
+  }
 
   try {
     // Read from localStorage
@@ -93,18 +125,47 @@ async function saveUserProgress() {
     );
     const points = pointsData.value || 0;
 
-    const response = await fetch(`${API_BASE}/user-data/progress`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ unitData, points }),
+    console.log("💾 Attempting to save progress:", {
+      unitData,
+      points,
+      syncEnabled,
     });
 
-    if (!response.ok) throw new Error("Failed to save progress");
+    const response = await fetch(
+      "http://localhost:3000/api/user-data/progress",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ unitData, points }),
+      }
+    );
+
+    console.log("📡 Response status:", response.status, response.statusText);
+
+    if (!response.ok) {
+      // Check if it's authentication error (401)
+      if (response.status === 401) {
+        console.warn("⚠️ User session expired. Data saved locally only.");
+        syncEnabled = false; // Disable sync to prevent repeated errors
+        return;
+      }
+
+      // Get error details from response
+      const errorData = await response.json().catch(() => ({}));
+      console.error("❌ Save failed:", response.status, errorData);
+      throw new Error(
+        `Failed to save progress: ${response.status} ${
+          errorData.error || response.statusText
+        }`
+      );
+    }
 
     const result = await response.json();
     if (!result.success) {
       console.error("Server error saving progress:", result.error);
+    } else {
+      console.log("✅ Progress saved successfully");
     }
   } catch (error) {
     console.error("Error saving progress:", error);
@@ -120,7 +181,7 @@ async function loadUserCart() {
   if (!syncEnabled) return;
 
   try {
-    const response = await fetch(`${API_BASE}/user-data/cart`, {
+    const response = await fetch("http://localhost:3000/api/user-data/cart", {
       credentials: "include",
     });
 
@@ -149,20 +210,31 @@ async function loadUserCart() {
  * Call this after user adds/removes items or completes order
  */
 async function saveUserCart(lastQrCode = null) {
-  if (!syncEnabled) return;
+  if (!syncEnabled) {
+    // User not logged in - cart stays in localStorage only (guest mode)
+    return;
+  }
 
   try {
     // Read from localStorage
     const cartData = JSON.parse(localStorage.getItem("docterbee_cart") || "[]");
 
-    const response = await fetch(`${API_BASE}/user-data/cart`, {
+    const response = await fetch("http://localhost:3000/api/user-data/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ cartData, lastQrCode }),
     });
 
-    if (!response.ok) throw new Error("Failed to save cart");
+    if (!response.ok) {
+      // Check if it's authentication error (401)
+      if (response.status === 401) {
+        console.warn("⚠️ User session expired. Cart saved locally only.");
+        syncEnabled = false; // Disable sync to prevent repeated errors
+        return;
+      }
+      throw new Error("Failed to save cart");
+    }
 
     const result = await response.json();
     if (!result.success) {
@@ -177,15 +249,30 @@ async function saveUserCart(lastQrCode = null) {
  * Clear user cart from database (after order completion)
  */
 async function clearUserCart() {
-  if (!syncEnabled) return;
+  if (!syncEnabled) {
+    // User not logged in - just clear localStorage
+    localStorage.removeItem("docterbee_cart");
+    if (typeof updateCartDisplay === "function") updateCartDisplay();
+    return;
+  }
 
   try {
-    const response = await fetch(`${API_BASE}/user-data/cart`, {
+    const response = await fetch("http://localhost:3000/api/user-data/cart", {
       method: "DELETE",
       credentials: "include",
     });
 
-    if (!response.ok) throw new Error("Failed to clear cart");
+    if (!response.ok) {
+      // Check if it's authentication error (401)
+      if (response.status === 401) {
+        console.warn("⚠️ User session expired. Cart cleared locally only.");
+        syncEnabled = false;
+        localStorage.removeItem("docterbee_cart");
+        if (typeof updateCartDisplay === "function") updateCartDisplay();
+        return;
+      }
+      throw new Error("Failed to clear cart");
+    }
 
     // Also clear localStorage
     localStorage.removeItem("docterbee_cart");
@@ -227,6 +314,7 @@ function debouncedSaveCart() {
 // Make functions globally available
 window.UserDataSync = {
   init: initUserDataSync,
+  autoInit: autoInitUserDataSync,
   clear: clearUserDataSync,
 
   // Progress functions
@@ -244,3 +332,13 @@ window.UserDataSync = {
   isEnabled: () => syncEnabled,
   getUserId: () => currentUserId,
 };
+
+// Auto-initialize on page load (check if user is logged in)
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoInitUserDataSync);
+  } else {
+    // DOM already loaded
+    autoInitUserDataSync();
+  }
+}

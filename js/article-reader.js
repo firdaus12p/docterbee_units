@@ -97,7 +97,9 @@ async function loadRelatedArticles(category, currentId) {
   const container = document.getElementById("relatedArticles");
 
   try {
-    const response = await fetch(`${API_BASE}/articles?category=${category}`);
+    const response = await fetch(
+      `http://localhost:3000/api/articles?category=${category}`
+    );
     const result = await response.json();
 
     if (!result.success) {

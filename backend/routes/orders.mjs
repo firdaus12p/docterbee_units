@@ -302,17 +302,45 @@ router.patch("/:id/complete", async (req, res) => {
       [id]
     );
 
-    // TODO: Update user points if user_id exists
-    if (order.user_id) {
-      // Add points to user (implement this later when user table is ready)
-      console.log(
-        `TODO: Add ${order.points_earned} points to user ${order.user_id}`
-      );
+    // Add points to user in database
+    if (order.user_id && order.points_earned > 0) {
+      try {
+        // Get current user progress
+        const userProgress = await queryOne(
+          "SELECT unit_data, points FROM user_progress WHERE user_id = ?",
+          [order.user_id]
+        );
+
+        if (userProgress) {
+          // User has existing progress - add points
+          const newPoints = userProgress.points + order.points_earned;
+          await query("UPDATE user_progress SET points = ? WHERE user_id = ?", [
+            newPoints,
+            order.user_id,
+          ]);
+          console.log(
+            `✅ Added ${order.points_earned} points to user ${order.user_id} (total: ${newPoints})`
+          );
+        } else {
+          // New user - create progress record with initial points
+          await query(
+            "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, ?, ?)",
+            [order.user_id, JSON.stringify({}), order.points_earned]
+          );
+          console.log(
+            `✅ Created progress for user ${order.user_id} with ${order.points_earned} points`
+          );
+        }
+      } catch (pointError) {
+        console.error("❌ Error adding points to user:", pointError);
+        // Don't fail the whole request, order is already completed
+      }
     }
 
     res.json({
       success: true,
       message: "Order berhasil diselesaikan",
+      points_added: order.points_earned || 0,
     });
   } catch (error) {
     console.error("Error completing order:", error);
