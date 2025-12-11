@@ -44,16 +44,13 @@ function calculatePoints(totalAmount) {
 // ============================================
 router.post("/", async (req, res) => {
   try {
-    const {
-      user_id,
-      customer_name,
-      customer_phone,
-      customer_email,
-      order_type,
-      store_location,
-      items,
-      total_amount,
-    } = req.body;
+    const { customer_email, order_type, store_location, items, total_amount } =
+      req.body;
+
+    // Get user data from session
+    const userId = req.session?.userId || null;
+    const customerName = req.session?.userName || null;
+    const customerPhone = req.session?.userPhone || null;
 
     // Validation
     if (!order_type || !store_location || !items || !total_amount) {
@@ -92,9 +89,9 @@ router.post("/", async (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         orderNumber,
-        user_id || null,
-        customer_name || null,
-        customer_phone || null,
+        userId,
+        customerName,
+        customerPhone,
         customer_email || null,
         order_type,
         store_location,

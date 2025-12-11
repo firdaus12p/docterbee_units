@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import cors from "cors";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
@@ -6,6 +7,7 @@ import { dirname, join } from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Innertube } from "youtubei.js";
 import { testConnection, initializeTables } from "./db.mjs";
+import authRouter from "./routes/auth.mjs";
 import bookingsRouter from "./routes/bookings.mjs";
 import eventsRouter from "./routes/events.mjs";
 import insightRouter from "./routes/insight.mjs";
@@ -15,6 +17,8 @@ import productsRouter from "./routes/products.mjs";
 import uploadRouter from "./routes/upload.mjs";
 import articlesRouter from "./articles.mjs";
 import ordersRouter from "./routes/orders.mjs";
+import usersRouter from "./routes/users.mjs";
+import userDataRouter from "./routes/user-data.mjs";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -26,8 +30,28 @@ dotenv.config({ path: join(__dirname, "..", ".env") });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Session middleware (MUST be before routes)
+app.use(
+  session({
+    secret:
+      process.env.SESSION_SECRET || "docterbee-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set true in production with HTTPS
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    },
+  })
+);
+
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.static(".")); // Serve static files from root directory
 app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
@@ -59,6 +83,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 })();
 
 // Mount API routers
+app.use("/api/auth", authRouter);
 app.use("/api/bookings", bookingsRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/insight", insightRouter);
@@ -68,30 +93,32 @@ app.use("/api/products", productsRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/articles", articlesRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/user-data", userDataRouter);
 
 // DEBUG ENDPOINT - Untuk troubleshooting database
 app.get("/api/debug", async (req, res) => {
   try {
     const { pool } = await import("./db.mjs");
-    
+
     // Test database connection
     let dbStatus = "disconnected";
     let dbError = null;
     let tables = [];
-    
+
     try {
       const connection = await pool.getConnection();
       dbStatus = "connected";
-      
+
       // Get list of tables
       const [rows] = await connection.query("SHOW TABLES");
-      tables = rows.map(row => Object.values(row)[0]);
-      
+      tables = rows.map((row) => Object.values(row)[0]);
+
       connection.release();
     } catch (error) {
       dbError = error.message;
     }
-    
+
     res.json({
       status: "OK",
       timestamp: new Date().toISOString(),
@@ -120,7 +147,6 @@ app.get("/api/debug", async (req, res) => {
     });
   }
 });
-
 
 // Helper function to clean YouTube URL (remove tracking parameters)
 function cleanYoutubeUrl(url) {

@@ -6,7 +6,6 @@ const API_BASE = "http://localhost:3000/api";
 
 // Cart state
 let cart = [];
-let currentUser = null; // TODO: Get from login system
 
 // ============================================
 // CART FUNCTIONS
@@ -187,17 +186,12 @@ async function submitOrder() {
     return;
   }
 
-  // TODO: Get user info from login system
-  const customerName = "Guest User"; // Temporary
-  const customerPhone = ""; // Temporary
-  const customerEmail = ""; // Temporary
+  // Customer data will be taken from session on backend
+  const customerEmail = ""; // Optional email field
 
   const totalAmount = calculateTotal();
 
   const orderData = {
-    user_id: currentUser?.id || null,
-    customer_name: customerName,
-    customer_phone: customerPhone,
     customer_email: customerEmail,
     order_type: orderType,
     store_location: storeLocation,
@@ -220,6 +214,7 @@ async function submitOrder() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Send session cookie
       body: JSON.stringify(orderData),
     });
 
@@ -454,6 +449,11 @@ function getClaimedOrders() {
 
 function saveCartToLocalStorage() {
   localStorage.setItem("docterbee_cart", JSON.stringify(cart));
+
+  // Auto-save to database if sync is enabled
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    window.UserDataSync.debouncedSaveCart();
+  }
 }
 
 function loadCartFromLocalStorage() {

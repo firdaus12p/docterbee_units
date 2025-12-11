@@ -1,0 +1,198 @@
+import express from "express";
+import bcrypt from "bcryptjs";
+import { query, queryOne } from "../db.mjs";
+
+const router = express.Router();
+
+// ============================================
+// GET /api/users - Get all users
+// ============================================
+router.get("/", async (req, res) => {
+  try {
+    const users = await query(`
+      SELECT id, name, email, phone, created_at, is_active
+      FROM users
+      ORDER BY created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      data: users,
+      count: users.length,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil data users",
+    });
+  }
+});
+
+// ============================================
+// GET /api/users/:id - Get single user
+// ============================================
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await queryOne(
+      `SELECT id, name, email, phone, created_at, is_active
+       FROM users
+       WHERE id = ?`,
+      [id]
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User tidak ditemukan",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil data user",
+    });
+  }
+});
+
+// ============================================
+// PATCH /api/users/:id/password - Reset user password
+// ============================================
+router.patch("/:id/password", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    // Validation
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        error: "Password harus diisi",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "Password minimal 6 karakter",
+      });
+    }
+
+    // Check if user exists
+    const user = await queryOne("SELECT id, email FROM users WHERE id = ?", [
+      id,
+    ]);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User tidak ditemukan",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update password
+    await query("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      id,
+    ]);
+
+    res.json({
+      success: true,
+      message: "Password berhasil direset",
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal reset password",
+    });
+  }
+});
+
+// ============================================
+// PATCH /api/users/:id/toggle - Toggle user active status
+// ============================================
+router.patch("/:id/toggle", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if user exists
+    const user = await queryOne(
+      "SELECT id, is_active FROM users WHERE id = ?",
+      [id]
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User tidak ditemukan",
+      });
+    }
+
+    // Toggle active status
+    const newStatus = user.is_active === 1 ? 0 : 1;
+    await query("UPDATE users SET is_active = ? WHERE id = ?", [newStatus, id]);
+
+    res.json({
+      success: true,
+      message: `User berhasil ${
+        newStatus === 1 ? "diaktifkan" : "dinonaktifkan"
+      }`,
+      data: { is_active: newStatus },
+    });
+  } catch (error) {
+    console.error("Error toggling user status:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengubah status user",
+    });
+  }
+});
+
+// ============================================
+// DELETE /api/users/:id - Delete user (hard delete)
+// ============================================
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if user exists
+    const user = await queryOne("SELECT id, email FROM users WHERE id = ?", [
+      id,
+    ]);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User tidak ditemukan",
+      });
+    }
+
+    // Delete user
+    await query("DELETE FROM users WHERE id = ?", [id]);
+
+    res.json({
+      success: true,
+      message: "User berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal menghapus user",
+    });
+  }
+});
+
+export default router;

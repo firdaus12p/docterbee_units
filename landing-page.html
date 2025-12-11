@@ -2,7 +2,7 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <title>DocterBee â€” Kembali Sehat dengan Teknologi Alam</title>
+    <title>DocterBee – Kembali Sehat dengan Teknologi Alam</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
@@ -16,8 +16,8 @@
       <div class="container">
         <nav>
           <div class="logo">
-            ðŸ¯ DocterBee
-            <span>Ilmu â€¢ AI â€¢ Teknologi Alam</span>
+            🍯 DocterBee
+            <span>Ilmu • AI • Teknologi Alam</span>
           </div>
           <div class="nav-links">
             <a href="#problem">Mengapa Sering Sakit?</a>
@@ -26,13 +26,83 @@
             <a href="#journey">Perjalanan Sehat</a>
             <a href="#services">Layanan</a>
             <a href="#faq">FAQ</a>
-            <button class="btn btn-primary" onclick="location.href='#consult'">
-              Konsultasi Sekarang
+            <button
+              class="btn btn-outline"
+              onclick="location.href='login.html'"
+              style="margin-right: 8px"
+            >
+              Masuk
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="location.href='register.html'"
+            >
+              Daftar Sekarang
             </button>
           </div>
+
+          <!-- Hamburger Menu Button (Mobile) -->
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </nav>
       </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-header">
+        <div class="logo-box" style="margin: 0">
+          <span style="font-size: 1.2rem">🐝</span>
+        </div>
+        <button
+          class="mobile-menu-close"
+          id="mobileMenuClose"
+          aria-label="Close"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="#problem" class="mobile-nav-link">Mengapa Sering Sakit?</a>
+        <a href="#solution" class="mobile-nav-link">Solusi DocterBee</a>
+        <a href="#nature-tech" class="mobile-nav-link">Teknologi Alami</a>
+        <a href="#journey" class="mobile-nav-link">Perjalanan Sehat</a>
+        <a href="#services" class="mobile-nav-link">Layanan</a>
+        <a href="#faq" class="mobile-nav-link">FAQ</a>
+        <div class="mobile-menu-actions">
+          <button
+            class="btn btn-outline"
+            onclick="location.href='login.html'"
+            style="width: 100%"
+          >
+            Masuk
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="location.href='register.html'"
+            style="width: 100%"
+          >
+            Daftar Sekarang
+          </button>
+        </div>
+      </nav>
+    </div>
 
     <!-- ================= HERO ================= -->
     <main>
@@ -58,15 +128,14 @@
               <button class="btn btn-primary" id="consult">
                 Mulai Konsultasi Gratis 10 Menit
               </button>
-              <button class="btn btn-outline">Lihat Cara Kerjanya â†“</button>
+              <button class="btn btn-outline">Lihat Cara Kerjanya ↓</button>
             </div>
             <div class="hero-meta">
               <span
-                >âœ“ Praktisi: dokter, ahli gizi, & praktisi kesehatan
-                alami</span
+                >✓ Praktisi: dokter, ahli gizi, & praktisi kesehatan alami</span
               >
-              <span>âœ“ Obat utama: madu & bahan alami berkualitas</span>
-              <span>âœ“ Didukung sains & AI, bukan mitos</span>
+              <span>✓ Obat utama: madu & bahan alami berkualitas</span>
+              <span>✓ Didukung sains & AI, bukan mitos</span>
             </div>
           </div>
 
@@ -75,13 +144,13 @@
               Lingkaran Sakit yang Terjadi Hari Ini
             </div>
             <div class="hero-card-title">
-              Sakit â†’ Obat â†’ Sembuh sebentar â†’ Sakit lagi
+              Sakit → Obat → Sembuh sebentar → Sakit lagi
             </div>
             <ul class="hero-card-list">
-              <li>â€¢ Sakit â†’ konsultasi â†’ pulang bawa resep.</li>
-              <li>â€¢ Gejala hilang, akar masalah tetap tinggal.</li>
-              <li>â€¢ Tubuh makin tergantung obat, bukan makin kuat.</li>
-              <li>â€¢ Tidak ada edukasi gaya hidup sehat jangka panjang.</li>
+              <li>• Sakit → konsultasi → pulang bawa resep.</li>
+              <li>• Gejala hilang, akar masalah tetap tinggal.</li>
+              <li>• Tubuh makin tergantung obat, bukan makin kuat.</li>
+              <li>• Tidak ada edukasi gaya hidup sehat jangka panjang.</li>
             </ul>
             <div class="hero-card-pill"></div>
           </aside>
@@ -98,12 +167,10 @@
             <h2 class="section-title">Kenapa kita makin sering sakit?</h2>
             <p class="section-desc">
               Kebanyakan layanan kesehatan hanya fokus pada
+              <strong>"bagaimana menghilangkan rasa sakitnya sekarang"</strong>,
+              bukan
               <strong
-                >â€œbagaimana menghilangkan rasa sakitnya sekarangâ€</strong
-              >, bukan
-              <strong
-                >â€œbagaimana tubuhmu bisa kembali kuat dan jarang
-                sakitâ€</strong
+                >"bagaimana tubuhmu bisa kembali kuat dan jarang sakit"</strong
               >. Akhirnya, banyak orang terjebak dalam pola minum obat berulang.
             </p>
           </div>
@@ -116,15 +183,15 @@
                 mengalaminya:
               </p>
               <ul class="problem-list">
-                <li>1. Sakit â†’ cari dokter / layanan kesehatan.</li>
-                <li>2. Diperiksa sebentar â†’ pulang dengan obat farmasi.</li>
-                <li>3. Gejala reda â†’ kembali ke aktivitas lama.</li>
+                <li>1. Sakit → cari dokter / layanan kesehatan.</li>
+                <li>2. Diperiksa sebentar → pulang dengan obat farmasi.</li>
+                <li>3. Gejala reda → kembali ke aktivitas lama.</li>
                 <li>
                   4. Beberapa waktu kemudian, sakit lagi dengan pola serupa.
                 </li>
               </ul>
               <p>
-                Tubuh tidak pernah diajak â€œngobrolâ€, tidak diajari cara
+                Tubuh tidak pernah diajak "ngobrol", tidak diajari cara
                 memperbaiki dirinya sendiri. Semua diserahkan ke obat.
               </p>
             </div>
@@ -136,16 +203,16 @@
                 Allah desain <strong>super canggih</strong>:
               </p>
               <ul class="problem-list">
-                <li>â€¢ Tubuh bisa membuang racun,</li>
-                <li>â€¢ memperbaiki jaringan rusak,</li>
-                <li>â€¢ menyeimbangkan sistem saat kita tidur,</li>
+                <li>• Tubuh bisa membuang racun,</li>
+                <li>• memperbaiki jaringan rusak,</li>
+                <li>• menyeimbangkan sistem saat kita tidur,</li>
                 <li>
-                  â€¢ dan butuh bahan baku yang benar dari makanan & minuman.
+                  • dan butuh bahan baku yang benar dari makanan & minuman.
                 </li>
               </ul>
               <p>
-                Tanpa edukasi, kita hanya mengejar â€œcepat hilang sakitnyaâ€
-                dan lupa membangun â€œmodal sehat jangka panjangâ€.
+                Tanpa edukasi, kita hanya mengejar "cepat hilang sakitnya" dan
+                lupa membangun "modal sehat jangka panjang".
               </p>
             </div>
           </div>
@@ -205,7 +272,7 @@
               </div>
             </div>
             <div class="comparison-row">
-              <div class="comparison-label">Sumber â€œteknologiâ€</div>
+              <div class="comparison-label">Sumber "teknologi"</div>
               <div class="comparison-text">
                 Teknologi buatan manusia & mesin.
               </div>
@@ -238,7 +305,7 @@
               DocterBee menggabungkan <strong>sains modern</strong>,
               <strong>AI</strong>, dan <strong>teknologi alami</strong> dari
               tanaman & lebah untuk memandumu keluar dari lingkaran
-              sakitâ€“obatâ€“sakit lagi.
+              sakit—obat—sakit lagi.
             </p>
           </div>
 
@@ -285,8 +352,7 @@
           <div class="section-header">
             <div class="section-eyebrow">Teknologi Alami</div>
             <h2 class="section-title">
-              Di dunia ada â€œteknologi maduâ€, di alam sudah ada madu itu
-              sendiri.
+              Di dunia ada "teknologi madu", di alam sudah ada madu itu sendiri.
             </h2>
             <p class="section-desc">
               Manusia bangga dengan pabrik, drone, dan rekayasa teknologi.
@@ -301,11 +367,11 @@
               <p>
                 Tanaman mengelola mineral dalam tanah, cahaya matahari, dan air
                 untuk menghasilkan buah. Sebelum jadi buah, ada
-                <strong>nektar</strong> â€” nano nutrisi yang disiapkan alam.
+                <strong>nektar</strong> – nano nutrisi yang disiapkan alam.
               </p>
             </div>
             <div class="card">
-              <h3>Lebah: â€œDroneâ€ Alami</h3>
+              <h3>Lebah: "Drone" Alami</h3>
               <p>
                 Jika di dunia ada drone, di alam ada lebah. Lebah mengumpulkan
                 nektar, menyatukan ribuan titik energi kecil menjadi
@@ -315,10 +381,10 @@
             <div class="card">
               <h3>Teknologi Tubuh: Sistem Penyembuhan Otomatis</h3>
               <p>
-                Tubuhmu sendiri adalah â€œmesin penyembuhâ€ yang sudah Allah
+                Tubuhmu sendiri adalah "mesin penyembuh" yang sudah Allah
                 desain. Ia bekerja kuat saat kamu istirahat: membuang racun,
                 memperbaiki jaringan, menormalkan sistem. Madu dan bahan alami
-                menjadi â€œbensinâ€ dan â€œsuku cadangâ€ untuk proses ini.
+                menjadi "bensin" dan "suku cadang" untuk proses ini.
               </p>
             </div>
           </div>
@@ -364,8 +430,8 @@
               <h3>Ritme sehat yang konsisten</h3>
               <p>
                 Dengan konsultasi, edukasi, dan kebiasaan baru, tubuh tidak
-                hanya â€œdipaksa sehatâ€ dengan obat, tapi diajak kembali ke
-                ritme alami yang membuatmu lebih jarang sakit.
+                hanya "dipaksa sehat" dengan obat, tapi diajak kembali ke ritme
+                alami yang membuatmu lebih jarang sakit.
               </p>
             </div>
           </div>
@@ -378,7 +444,7 @@
           <div class="section-header">
             <div class="section-eyebrow">Perjalananmu Bersama DocterBee</div>
             <h2 class="section-title">
-              Dari sakit â†’ paham â†’ sehat â†’ jarang sakit.
+              Dari sakit → paham → sehat → jarang sakit.
             </h2>
             <p class="section-desc">
               Landing page ini bukan sekadar tempat beli produk. Ini pintu masuk
@@ -468,7 +534,7 @@
               <h3>Produk Madu & Alami</h3>
               <p>
                 Pilihan madu lebah kecil, kombinasi herbal, dan produk alami
-                lain yang diseleksi ketat. Bukan sekadar â€œmanisâ€, tapi sarat
+                lain yang diseleksi ketat. Bukan sekadar "manis", tapi sarat
                 nutrisi.
                 <br /><br />
                 <strong>Catatan:</strong> bukan pengganti diagnosis medis, tapi
@@ -480,7 +546,7 @@
               <p>
                 Tempat nongkrong yang menyehatkan: menu minuman dan makanan yang
                 mendukung tubuh, bukan membebani. Cocok untuk keluarga, pekerja,
-                dan pelajar yang ingin â€œhealingâ€ tanpa merusak badan.
+                dan pelajar yang ingin "healing" tanpa merusak badan.
               </p>
             </div>
           </div>
@@ -498,7 +564,7 @@
               <h3>Event & Kelas Kesehatan</h3>
               <p>
                 Event offline/online tentang gaya hidup sehat, keluarga sehat,
-                dan cara menjadi â€œdokter pertamaâ€ bagi diri sendiri dan
+                dan cara menjadi "dokter pertama" bagi diri sendiri dan
                 anak-anak.
               </p>
             </div>
@@ -551,7 +617,7 @@
                 Jadwalkan Konsultasi Pertama
               </button>
               <button class="btn btn-outline">
-                Lihat Panduan Produk Madu â†’
+                Lihat Panduan Produk Madu →
               </button>
             </div>
           </div>
@@ -583,7 +649,7 @@
             <div class="faq-item">
               <h3>Apakah madu bisa menyembuhkan semua penyakit?</h3>
               <p>
-                Madu bukan â€œobat saktiâ€ untuk semua penyakit. Namun, dengan
+                Madu bukan "obat sakti" untuk semua penyakit. Namun, dengan
                 sains dan pemakaian yang tepat, madu dan bahan alami dapat
                 <strong>mendukung proses pemulihan tubuh</strong>, terutama jika
                 disertai pola hidup sehat dan istirahat yang cukup.
@@ -595,7 +661,7 @@
                 Karena sehat bukan hanya soal obat dan vitamin. Sehat juga
                 tentang <strong>lingkungan</strong>, obrolan, dan tempat kita
                 menghabiskan waktu. Cafe sehat DocterBee dirancang agar kamu
-                bisa â€œnongkrongâ€ sambil benar-benar menjaga tubuh.
+                bisa "nongkrong" sambil benar-benar menjaga tubuh.
               </p>
             </div>
             <div class="faq-item">
@@ -644,15 +710,202 @@
             align-items: center;
           "
         >
-          <div>Â© DocterBee. Semua hak dilindungi.</div>
+          <div>© DocterBee. Semua hak dilindungi.</div>
           <div>
             Berbasis <strong>sains, AI, dan teknologi alami</strong> untuk
             membantu keluarga kembali sehat. |
-            <a href="#">Kebijakan Privasi</a> Â·
+            <a href="#">Kebijakan Privasi</a> ·
             <a href="#">Syarat & Ketentuan</a>
           </div>
         </div>
       </div>
     </footer>
+
+    <!-- ================= JAVASCRIPT FOR ANIMATIONS ================= -->
+    <script>
+      // ========== SMOOTH SCROLL ANIMATIONS ==========
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      }, observerOptions);
+
+      // Observe all sections
+      document.addEventListener("DOMContentLoaded", () => {
+        // ========== MOBILE MENU TOGGLE ==========
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+        const mobileMenuClose = document.getElementById("mobileMenuClose");
+        const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+
+        function openMobileMenu() {
+          hamburgerBtn.classList.add("active");
+          mobileMenu.classList.add("active");
+          mobileMenuOverlay.classList.add("active");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeMobileMenu() {
+          hamburgerBtn.classList.remove("active");
+          mobileMenu.classList.remove("active");
+          mobileMenuOverlay.classList.remove("active");
+          document.body.style.overflow = "";
+        }
+
+        if (hamburgerBtn) {
+          hamburgerBtn.addEventListener("click", () => {
+            if (mobileMenu.classList.contains("active")) {
+              closeMobileMenu();
+            } else {
+              openMobileMenu();
+            }
+          });
+        }
+
+        if (mobileMenuClose) {
+          mobileMenuClose.addEventListener("click", closeMobileMenu);
+        }
+
+        if (mobileMenuOverlay) {
+          mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+        }
+
+        // Close menu when clicking nav links
+        mobileNavLinks.forEach((link) => {
+          link.addEventListener("click", () => {
+            closeMobileMenu();
+          });
+        });
+
+        // Close menu on escape key
+        document.addEventListener("keydown", (e) => {
+          if (
+            e.key === "Escape" &&
+            mobileMenu &&
+            mobileMenu.classList.contains("active")
+          ) {
+            closeMobileMenu();
+          }
+        });
+
+        // ========== SECTION OBSERVERS ==========
+        const sections = document.querySelectorAll("section");
+        sections.forEach((section) => {
+          observer.observe(section);
+        });
+
+        // Header scroll effect
+        const header = document.querySelector("header");
+        let lastScroll = 0;
+
+        window.addEventListener("scroll", () => {
+          const currentScroll = window.pageYOffset;
+
+          if (currentScroll > 50) {
+            header.classList.add("scrolled");
+          } else {
+            header.classList.remove("scrolled");
+          }
+
+          lastScroll = currentScroll;
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (href !== "#" && href !== "#consult") {
+              e.preventDefault();
+              const target = document.querySelector(href);
+              if (target) {
+                target.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }
+          });
+        });
+
+        // Add stagger animation to cards and steps
+        const addStaggerAnimation = (selector, delay = 100) => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach((el, index) => {
+            el.style.animationDelay = `${index * delay}ms`;
+            el.style.opacity = "0";
+            el.style.animation = "fadeInUp 0.6s ease forwards";
+          });
+        };
+
+        // Apply stagger animations when sections become visible
+        const staggerObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && !entry.target.dataset.animated) {
+                entry.target.dataset.animated = "true";
+
+                const cards = entry.target.querySelectorAll(
+                  ".card, .step, .problem-card"
+                );
+                cards.forEach((card, index) => {
+                  setTimeout(() => {
+                    card.style.opacity = "0";
+                    card.style.transform = "translateY(20px)";
+                    card.style.animation = "fadeInUp 0.6s ease forwards";
+                  }, index * 100);
+                });
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+
+        sections.forEach((section) => {
+          staggerObserver.observe(section);
+        });
+
+        // Parallax effect for hero card (disabled on mobile)
+        const heroCard = document.querySelector(".hero-card");
+        if (heroCard && window.innerWidth > 900) {
+          window.addEventListener("scroll", () => {
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * 0.3;
+            if (scrolled < 600) {
+              heroCard.style.transform = `translateY(${rate}px)`;
+            }
+          });
+        }
+
+        // Add hover effect sound feedback (visual only, no audio)
+        const buttons = document.querySelectorAll(".btn");
+        buttons.forEach((btn) => {
+          btn.addEventListener("mouseenter", function () {
+            this.style.transform = "translateY(-2px) scale(1.02)";
+          });
+          btn.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0) scale(1)";
+          });
+        });
+
+        // Animate comparison rows on hover
+        const comparisonRows = document.querySelectorAll(".comparison-row");
+        comparisonRows.forEach((row) => {
+          row.addEventListener("mouseenter", function () {
+            this.style.backgroundColor = "rgba(249, 115, 22, 0.05)";
+          });
+          row.addEventListener("mouseleave", function () {
+            this.style.backgroundColor = "";
+          });
+        });
+      });
+    </script>
   </body>
 </html>

@@ -2,7 +2,74 @@
    DocterBee Landing Page - Light Theme
    ======================================== */
 
+/* ====== KEYFRAME ANIMATIONS ====== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* ====== STYLE DASAR ====== */
+* {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -30,6 +97,12 @@ header {
   background: rgba(248, 250, 252, 0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  animation: fadeIn 0.6s ease;
+  transition: box-shadow 0.3s ease;
+}
+
+header.scrolled {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 nav {
@@ -45,6 +118,12 @@ nav {
   gap: 0.5rem;
   font-weight: 700;
   font-size: 1.1rem;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .logo span {
@@ -60,6 +139,157 @@ nav {
   color: #475569;
 }
 
+.nav-links a {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #ea580c;
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #ea580c;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* ====== HAMBURGER MENU (MOBILE) ====== */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1003;
+  position: relative;
+}
+
+.hamburger-btn span {
+  width: 25px;
+  height: 3px;
+  background: #0f172a;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-btn.active span:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 280px;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+.mobile-menu.active {
+  right: 0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #0f172a;
+  transition: color 0.2s ease;
+}
+
+.mobile-menu-close:hover {
+  color: #ea580c;
+}
+
+.mobile-nav {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 0.875rem 0;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  width: 100%;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.mobile-nav-link:hover {
+  color: #ea580c;
+  padding-left: 8px;
+}
+
+.mobile-menu-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -73,6 +303,26 @@ nav {
   transition: transform 0.15s ease, box-shadow 0.15s ease,
     background-color 0.15s ease;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .btn-primary {
@@ -103,6 +353,7 @@ nav {
   text-transform: uppercase;
   background: rgba(22, 163, 74, 0.08);
   color: #15803d;
+  animation: fadeInUp 0.8s ease;
 }
 
 .badge-dot {
@@ -110,6 +361,7 @@ nav {
   height: 7px;
   border-radius: 999px;
   background: #22c55e;
+  animation: pulse 2s ease infinite;
 }
 
 /* ====== HERO ====== */
@@ -124,18 +376,24 @@ nav {
   align-items: center;
 }
 
+.hero-grid > div:first-child {
+  animation: slideInLeft 0.8s ease;
+}
+
 .hero-title {
   font-size: clamp(1.9rem, 3vw, 2.6rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   margin-bottom: 0.75rem;
   color: #0f172a;
+  animation: fadeInUp 1s ease;
 }
 
 .hero-subtitle {
   font-size: 1rem;
   color: #475569;
   margin-bottom: 1.2rem;
+  animation: fadeInUp 1.2s ease;
 }
 
 .hero-highlight {
@@ -149,6 +407,7 @@ nav {
   gap: 0.75rem;
   align-items: center;
   margin-top: 1rem;
+  animation: fadeInUp 1.4s ease;
 }
 
 .hero-meta {
@@ -158,6 +417,7 @@ nav {
   margin-top: 1.75rem;
   font-size: 0.8rem;
   color: #64748b;
+  animation: fadeInUp 1.6s ease;
 }
 
 .hero-card {
@@ -167,6 +427,13 @@ nav {
   color: #e5e7eb;
   position: relative;
   overflow: hidden;
+  animation: slideInRight 0.8s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .hero-card-tag {
@@ -209,6 +476,14 @@ nav {
 section {
   padding: 2.75rem 0;
   border-top: 1px solid rgba(148, 163, 184, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+section.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .section-header {
@@ -250,6 +525,13 @@ section {
   border-radius: 1.25rem;
   padding: 1.25rem 1.3rem;
   border: 1px solid rgba(148, 163, 184, 0.35);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.problem-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  border-color: rgba(234, 88, 12, 0.3);
 }
 
 .problem-card h3 {
@@ -302,6 +584,8 @@ section {
   padding: 0.65rem 1.25rem;
   font-size: 0.9rem;
   border-top: 1px solid rgba(226, 232, 240, 0.9);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .comparison-row:nth-child(odd) {
@@ -340,6 +624,14 @@ section {
   padding: 1.25rem 1.3rem;
   border: 1px solid rgba(148, 163, 184, 0.35);
   font-size: 0.9rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.1);
+  border-color: rgba(234, 88, 12, 0.4);
 }
 
 .card h3 {
@@ -375,6 +667,12 @@ section {
   padding: 1rem 1.1rem;
   border: 1px solid rgba(148, 163, 184, 0.28);
   position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.step:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
 .step-number {
@@ -389,6 +687,12 @@ section {
   font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 0.4rem;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.step:hover .step-number {
+  transform: scale(1.15);
+  background: #ea580c;
 }
 
 .step h3 {
@@ -408,6 +712,15 @@ section {
   gap: 2rem;
 }
 
+.faq-item {
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.faq-item:hover {
+  transform: translateX(5px);
+}
+
 .faq-item + .faq-item {
   border-top: 1px solid rgba(148, 163, 184, 0.35);
   padding-top: 0.75rem;
@@ -417,6 +730,11 @@ section {
 .faq-item h3 {
   font-size: 0.95rem;
   margin: 0 0 0.2rem;
+  transition: color 0.3s ease;
+}
+
+.faq-item:hover h3 {
+  color: #ea580c;
 }
 
 .faq-item p {
@@ -447,10 +765,29 @@ footer a {
 
   .hero {
     padding-top: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .hero-card {
+    margin-bottom: 2rem;
+    position: relative;
+    transform: none !important;
   }
 
   .nav-links {
     display: none;
+  }
+
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  .mobile-menu-overlay {
+    display: block;
   }
 }
 

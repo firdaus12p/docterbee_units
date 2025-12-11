@@ -2,7 +2,35 @@
 // INSIGHT PAGE - Articles Loader
 // ============================================
 
-const API_BASE = "http://localhost:3000/api";
+// ============================================
+// HELPER FUNCTIONS (Must be defined first)
+// ============================================
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getCategoryColor(category) {
+  const colors = {
+    Nutrisi: "bg-green-100 text-green-700",
+    Ibadah: "bg-blue-100 text-blue-700",
+    Kebiasaan: "bg-purple-100 text-purple-700",
+    Sains: "bg-orange-100 text-orange-700",
+  };
+  return colors[category] || "bg-gray-100 text-gray-700";
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 // ============================================
 // LOAD ARTICLES
@@ -21,7 +49,7 @@ async function loadInsightArticles() {
 
   try {
     // Get published articles only
-    const response = await fetch(`${API_BASE}/articles`);
+    const response = await fetch("http://localhost:3000/api/articles");
     const result = await response.json();
 
     if (!result.success) {
@@ -29,6 +57,9 @@ async function loadInsightArticles() {
     }
 
     const articles = result.data;
+
+    console.log("📦 Articles loaded:", articles.length);
+    console.log("📄 First article:", articles[0]);
 
     if (articles.length === 0) {
       articlesContainer.innerHTML = `
@@ -41,8 +72,9 @@ async function loadInsightArticles() {
 
     // Render articles
     articlesContainer.innerHTML = articles
-      .map(
-        (article) => `
+      .map((article) => {
+        console.log("🎨 Rendering article:", article.title);
+        return `
         <article 
           class="article-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           onclick="openArticle('${article.slug}')"
@@ -90,8 +122,8 @@ async function loadInsightArticles() {
             </div>
           </div>
         </article>
-      `
-      )
+      `;
+      })
       .join("");
   } catch (error) {
     console.error("Error loading articles:", error);
@@ -212,34 +244,6 @@ async function filterArticlesByCategory() {
 function openArticle(slug) {
   // Redirect to article reader page
   window.location.href = `article.html?slug=${slug}`;
-}
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-function getCategoryColor(category) {
-  const colors = {
-    Nutrisi: "bg-green-100 text-green-700",
-    Ibadah: "bg-blue-100 text-blue-700",
-    Kebiasaan: "bg-purple-100 text-purple-700",
-    Sains: "bg-orange-100 text-orange-700",
-  };
-  return colors[category] || "bg-gray-100 text-gray-700";
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 // ============================================

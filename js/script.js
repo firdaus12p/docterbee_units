@@ -243,6 +243,11 @@ function addPoints(value) {
   points += value;
   _setPoints(points);
   refreshNav();
+
+  // Auto-save to database if sync is enabled
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    window.UserDataSync.debouncedSaveProgress();
+  }
 }
 
 /**
@@ -487,6 +492,11 @@ function answer(unitId, key, value) {
       noBtn.classList.add("selected");
     }
   }
+
+  // Auto-save to database if sync is enabled
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    window.UserDataSync.debouncedSaveProgress();
+  }
 }
 
 /**
@@ -617,6 +627,40 @@ function calcAll() {
 /**
  * Initialize mobile menu functionality
  */
+// ============================================
+// LOGOUT FUNCTIONALITY
+// ============================================
+function initLogout() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Clear user data sync
+        if (window.UserDataSync) {
+          window.UserDataSync.clear();
+        }
+
+        alert("Logout berhasil");
+        window.location.href = "landing-page.html";
+      } else {
+        alert("Logout gagal");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Terjadi kesalahan saat logout");
+    }
+  });
+}
+
 // Flag to prevent multiple initializations
 let mobileMenuInitialized = false;
 
@@ -672,7 +716,7 @@ function initMobileMenu() {
 /**
  * Initialize application
  */
-function init() {
+async function init() {
   // Set current year in footer
   const yearElement = document.getElementById("year");
   if (yearElement) {
@@ -689,12 +733,20 @@ function init() {
     calcAllBtn.addEventListener("click", calcAll);
   }
 
+  // Initialize logout functionality
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
+  }
+
+  // Load user data from database if logged in
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    await window.UserDataSync.loadProgress();
   }
 
   // Refresh navigation points
@@ -1268,6 +1320,9 @@ function initBooking() {
     }
   });
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
 
@@ -1490,6 +1545,9 @@ function initEvents() {
     topicSelect.addEventListener("change", renderEvents);
   }
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
 
@@ -1677,6 +1735,9 @@ function initInsight() {
 
   // Render articles
   renderInsightArticles();
+
+  // Initialize logout
+  initLogout();
 
   // Initialize mobile menu
   initMobileMenu();
@@ -2343,6 +2404,9 @@ function initMedia() {
     btnLoadCustomAudio.addEventListener("click", loadCustomAudio);
   }
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
 
@@ -2536,6 +2600,9 @@ function initServices() {
   if (modeFilter) {
     modeFilter.addEventListener("change", renderServices);
   }
+
+  // Initialize logout
+  initLogout();
 
   // Initialize mobile menu
   initMobileMenu();
@@ -3043,8 +3110,6 @@ if (document.readyState === "loading") {
       initBooking();
     } else if (document.getElementById("events")) {
       initEvents();
-    } else if (document.getElementById("articles")) {
-      initInsight();
     } else if (document.getElementById("ytPlayer")) {
       initMedia();
     } else if (document.getElementById("storePageRoot")) {
@@ -3061,8 +3126,6 @@ if (document.readyState === "loading") {
     initBooking();
   } else if (document.getElementById("events")) {
     initEvents();
-  } else if (document.getElementById("articles")) {
-    initInsight();
   } else if (document.getElementById("ytPlayer")) {
     initMedia();
   } else if (document.getElementById("page-store")) {
