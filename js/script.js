@@ -630,35 +630,87 @@ function calcAll() {
 // ============================================
 // LOGOUT FUNCTIONALITY
 // ============================================
-function initLogout() {
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (!logoutBtn) return;
+async function handleLogout() {
+  try {
+    const response = await fetch("http://localhost:3000/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
 
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+    const data = await response.json();
 
-      const data = await response.json();
-
-      if (data.success) {
-        // Clear user data sync
-        if (window.UserDataSync) {
-          window.UserDataSync.clear();
-        }
-
-        alert("Logout berhasil");
-        window.location.href = "landing-page.html";
-      } else {
-        alert("Logout gagal");
+    if (data.success) {
+      // Clear user data sync
+      if (window.UserDataSync) {
+        window.UserDataSync.clear();
       }
-    } catch (error) {
-      console.error("Logout error:", error);
-      alert("Terjadi kesalahan saat logout");
+
+      alert("Logout berhasil");
+      window.location.href = "landing-page.html";
+    } else {
+      alert("Logout gagal");
     }
-  });
+  } catch (error) {
+    console.error("Logout error:", error);
+    alert("Terjadi kesalahan saat logout");
+  }
+}
+
+function initLogout() {
+  // Desktop logout button
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout);
+  }
+
+  // Mobile logout button
+  const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener("click", handleLogout);
+  }
+}
+
+/**
+ * Update login/logout button visibility based on auth status
+ */
+async function updateAuthButtons() {
+  try {
+    const response = await fetch("http://localhost:3000/api/auth/check", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    // Desktop buttons
+    const desktopLogoutBtn = document.getElementById("logoutBtn");
+
+    // Mobile buttons
+    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+    if (data.loggedIn) {
+      // User is logged in - show logout buttons
+      if (desktopLogoutBtn) desktopLogoutBtn.classList.remove("hidden");
+      if (mobileLogoutBtn) mobileLogoutBtn.classList.remove("hidden");
+      if (mobileLoginBtn) mobileLoginBtn.classList.add("hidden");
+    } else {
+      // User is not logged in - show login button
+      if (desktopLogoutBtn) desktopLogoutBtn.classList.add("hidden");
+      if (mobileLogoutBtn) mobileLogoutBtn.classList.add("hidden");
+      if (mobileLoginBtn) mobileLoginBtn.classList.remove("hidden");
+    }
+  } catch (error) {
+    console.error("Auth check error:", error);
+    // On error, assume not logged in - show login button
+    const desktopLogoutBtn = document.getElementById("logoutBtn");
+    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+    if (desktopLogoutBtn) desktopLogoutBtn.classList.add("hidden");
+    if (mobileLogoutBtn) mobileLogoutBtn.classList.add("hidden");
+    if (mobileLoginBtn) mobileLoginBtn.classList.remove("hidden");
+  }
 }
 
 // Flag to prevent multiple initializations
@@ -739,6 +791,9 @@ async function init() {
   // Initialize mobile menu
   initMobileMenu();
 
+  // Update auth buttons visibility
+  await updateAuthButtons();
+
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
@@ -774,16 +829,26 @@ function generateSlots() {
   const slotsContainer = document.getElementById("slots");
   if (!slotsContainer) return;
 
-  slotsContainer.innerHTML = "";
   const hours = [9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20];
 
-  hours.forEach((hour) => {
-    const button = document.createElement("button");
-    button.className = "slot-button";
-    button.textContent = (hour < 10 ? "0" : "") + hour + ":00";
-    button.addEventListener("click", () => selectSlot(button.textContent));
-    slotsContainer.appendChild(button);
-  });
+  // Create select dropdown for time slots
+  slotsContainer.innerHTML = `
+    <select id="timeSlotSelect" class="booking-select w-full">
+      <option value="">Pilih jam yang tersedia...</option>
+      ${hours
+        .map((hour) => {
+          const timeStr = (hour < 10 ? "0" : "") + hour + ":00";
+          return `<option value="${timeStr}">${timeStr}</option>`;
+        })
+        .join("")}
+    </select>
+  `;
+
+  // Add event listener to the select element
+  const selectElement = document.getElementById("timeSlotSelect");
+  if (selectElement) {
+    selectElement.addEventListener("change", (e) => selectSlot(e.target.value));
+  }
 }
 
 /**
@@ -791,17 +856,19 @@ function generateSlots() {
  * @param {string} time - Selected time slot
  */
 function selectSlot(time) {
+  // Jika time kosong (user pilih default option), reset
+  if (!time) {
+    bookingState.selectedTime = null;
+    updateBookingSummary();
+    return;
+  }
+
   bookingState.selectedTime = time;
 
-  // Update slot buttons styling
-  const slots = document.getElementById("slots");
-  if (slots) {
-    Array.from(slots.children).forEach((button) => {
-      button.classList.remove("selected");
-      if (button.textContent === time) {
-        button.classList.add("selected");
-      }
-    });
+  // Update the select element value
+  const selectElement = document.getElementById("timeSlotSelect");
+  if (selectElement && selectElement.value !== time) {
+    selectElement.value = time;
   }
 
   updateBookingSummary();
@@ -1126,6 +1193,10 @@ async function saveBookingToDatabase() {
         customerAge: parseInt(customerAge),
         customerGender: customerGender,
         customerAddress: customerAddress,
+        // Send calculated prices from frontend
+        price: bookingState.price,
+        discountAmount: bookingState.discountAmount,
+        finalPrice: bookingState.finalPrice,
       }),
     });
 
@@ -1133,6 +1204,12 @@ async function saveBookingToDatabase() {
 
     if (result.success) {
       console.log("✅ Booking berhasil disimpan ke database:", result.data);
+      console.log("💰 Harga yang dikirim:", {
+        price: bookingState.price,
+        discountAmount: bookingState.discountAmount,
+        finalPrice: bookingState.finalPrice,
+        promoCode: promoCode,
+      });
       return true;
     } else {
       console.error("❌ Gagal menyimpan booking:", result.error);
@@ -1325,6 +1402,9 @@ function initBooking() {
 
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -1551,6 +1631,9 @@ function initEvents() {
   // Initialize mobile menu
   initMobileMenu();
 
+  // Update auth buttons
+  updateAuthButtons();
+
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
@@ -1741,6 +1824,9 @@ function initInsight() {
 
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -2410,6 +2496,9 @@ function initMedia() {
   // Initialize mobile menu
   initMobileMenu();
 
+  // Update auth buttons
+  updateAuthButtons();
+
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
@@ -2606,6 +2695,9 @@ function initServices() {
 
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {

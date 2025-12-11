@@ -94,6 +94,19 @@
             <span id="mobileCartCount">0</span>
           </span>
         </div>
+        <button
+          id="mobileLogoutBtn"
+          class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
+        >
+          Logout
+        </button>
+        <a
+          id="mobileLoginBtn"
+          href="login.html"
+          class="hidden mt-4 w-full py-2 px-4 bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold rounded-lg transition-colors text-center block"
+        >
+          Login
+        </a>
       </div>
     </div>
 
@@ -711,19 +724,9 @@
             ⚠️ QR code akan kadaluarsa sesuai waktu yang ditentukan
           </p>
 
-          <!-- WhatsApp Confirmation Button -->
-          <button 
-            id="sendToWhatsAppBtn"
-            onclick="sendOrderToWhatsApp()"
-            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 mb-2"
-          >
-            <i data-lucide="message-circle" class="w-4 h-4"></i>
-            Kirim ke WhatsApp
-          </button>
-
           <button 
             onclick="closeQRModal()"
-            class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-lg transition text-sm"
+            class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition"
           >
             Tutup
           </button>

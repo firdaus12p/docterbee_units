@@ -82,6 +82,19 @@
         <span class="points-display">
           Points: <b id="mobileNavPoints">0</b>
         </span>
+        <button
+          id="mobileLogoutBtn"
+          class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
+        >
+          Logout
+        </button>
+        <a
+          id="mobileLoginBtn"
+          href="login.html"
+          class="hidden mt-4 w-full py-2 px-4 bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold rounded-lg transition-colors text-center block"
+        >
+          Login
+        </a>
       </div>
     </div>
 
@@ -823,11 +836,97 @@
         resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
+      // ============================================
+      // AUTH & LOGOUT FUNCTIONALITY FOR AI ADVISOR
+      // ============================================
+      async function handleLogoutAI() {
+        try {
+          const response = await fetch(
+            "http://localhost:3000/api/auth/logout",
+            {
+              method: "POST",
+              credentials: "include",
+            }
+          );
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Clear user data sync
+            if (window.UserDataSync) {
+              window.UserDataSync.clear();
+            }
+
+            alert("Logout berhasil");
+            window.location.href = "landing-page.html";
+          } else {
+            alert("Logout gagal");
+          }
+        } catch (error) {
+          console.error("Logout error:", error);
+          alert("Terjadi kesalahan saat logout");
+        }
+      }
+
+      async function updateAuthButtonsAI() {
+        try {
+          const response = await fetch("http://localhost:3000/api/auth/check", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          const data = await response.json();
+
+          // Desktop buttons
+          const desktopLogoutBtn = document.getElementById("logoutBtn");
+
+          // Mobile buttons
+          const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+          const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+          if (data.loggedIn) {
+            // User is logged in - show logout buttons
+            if (desktopLogoutBtn) desktopLogoutBtn.classList.remove("hidden");
+            if (mobileLogoutBtn) mobileLogoutBtn.classList.remove("hidden");
+            if (mobileLoginBtn) mobileLoginBtn.classList.add("hidden");
+          } else {
+            // User is not logged in - show login button
+            if (desktopLogoutBtn) desktopLogoutBtn.classList.add("hidden");
+            if (mobileLogoutBtn) mobileLogoutBtn.classList.add("hidden");
+            if (mobileLoginBtn) mobileLoginBtn.classList.remove("hidden");
+          }
+        } catch (error) {
+          console.error("Auth check error:", error);
+          // On error, assume not logged in - show login button
+          const desktopLogoutBtn = document.getElementById("logoutBtn");
+          const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+          const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+          if (desktopLogoutBtn) desktopLogoutBtn.classList.add("hidden");
+          if (mobileLogoutBtn) mobileLogoutBtn.classList.add("hidden");
+          if (mobileLoginBtn) mobileLoginBtn.classList.remove("hidden");
+        }
+      }
+
       // Initialize
       document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Setup logout handlers
+      const desktopLogoutBtn = document.getElementById("logoutBtn");
+      if (desktopLogoutBtn) {
+        desktopLogoutBtn.addEventListener("click", handleLogoutAI);
+      }
+
+      const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+      if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener("click", handleLogoutAI);
+      }
+
+      // Update auth button visibility
+      updateAuthButtonsAI();
+
       lucide.createIcons();
     </script>
     <script src="js/user-data-sync.js"></script>
-    <script src="js/auth-check.js"></script>
   </body>
 </html>
