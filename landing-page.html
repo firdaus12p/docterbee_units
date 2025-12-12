@@ -17,27 +17,37 @@
         <nav>
           <div class="logo">
             🍯 DocterBee
-            <span>Ilmu • AI • Teknologi Alam</span>
           </div>
           <div class="nav-links">
-            <a href="#problem">Mengapa Sering Sakit?</a>
-            <a href="#solution">Solusi DocterBee</a>
-            <a href="#nature-tech">Teknologi Alami</a>
-            <a href="#journey">Perjalanan Sehat</a>
-            <a href="#services">Layanan</a>
-            <a href="#faq">FAQ</a>
+            <a href="landing-page.html" id="guestNavItem">Beranda</a>
+            <a href="index.html">Journey</a>
+            <a href="services.html">Services</a>
+            <a href="store.html">Store</a>
+            <a href="events.html">Events</a>
+            <a href="insight.html">Insight</a>
+            <a href="media.html">Media</a>
+            <a href="ai-advisor.html">AI Advisor</a>
+            <div id="authButtons">
+              <button
+                class="btn btn-outline"
+                onclick="location.href='login.html'"
+                style="margin-right: 8px"
+              >
+                Masuk
+              </button>
+              <button
+                class="btn btn-primary"
+                onclick="location.href='register.html'"
+              >
+                Daftar Sekarang
+              </button>
+            </div>
             <button
+              id="logoutBtn"
               class="btn btn-outline"
-              onclick="location.href='login.html'"
-              style="margin-right: 8px"
+              style="display: none; margin-left: 8px"
             >
-              Masuk
-            </button>
-            <button
-              class="btn btn-primary"
-              onclick="location.href='register.html'"
-            >
-              Daftar Sekarang
+              Logout
             </button>
           </div>
 
@@ -79,26 +89,37 @@
         </button>
       </div>
       <nav class="mobile-nav">
-        <a href="#problem" class="mobile-nav-link">Mengapa Sering Sakit?</a>
-        <a href="#solution" class="mobile-nav-link">Solusi DocterBee</a>
-        <a href="#nature-tech" class="mobile-nav-link">Teknologi Alami</a>
-        <a href="#journey" class="mobile-nav-link">Perjalanan Sehat</a>
-        <a href="#services" class="mobile-nav-link">Layanan</a>
-        <a href="#faq" class="mobile-nav-link">FAQ</a>
+        <a href="landing-page.html" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
+        <a href="index.html" class="mobile-nav-link">Journey</a>
+        <a href="services.html" class="mobile-nav-link">Services</a>
+        <a href="store.html" class="mobile-nav-link">Store</a>
+        <a href="events.html" class="mobile-nav-link">Events</a>
+        <a href="insight.html" class="mobile-nav-link">Insight</a>
+        <a href="media.html" class="mobile-nav-link">Media</a>
+        <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
         <div class="mobile-menu-actions">
+          <div id="mobileAuthButtons">
+            <button
+              class="btn btn-outline"
+              onclick="location.href='login.html'"
+              style="width: 100%"
+            >
+              Masuk
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="location.href='register.html'"
+              style="width: 100%"
+            >
+              Daftar Sekarang
+            </button>
+          </div>
           <button
+            id="mobileLogoutBtn"
             class="btn btn-outline"
-            onclick="location.href='login.html'"
-            style="width: 100%"
+            style="display: none; width: 100%"
           >
-            Masuk
-          </button>
-          <button
-            class="btn btn-primary"
-            onclick="location.href='register.html'"
-            style="width: 100%"
-          >
-            Daftar Sekarang
+            Logout
           </button>
         </div>
       </nav>
@@ -907,5 +928,6 @@
         });
       });
     </script>
+    <script src="js/landing-navbar.js"></script>
   </body>
 </html>
