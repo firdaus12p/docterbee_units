@@ -1,5 +1,5 @@
 // Admin Dashboard JavaScript
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "/api";
 
 console.log("🚀 Admin Dashboard Loaded");
 console.log("📍 API Base URL:", API_BASE);

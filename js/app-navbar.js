@@ -9,7 +9,7 @@
   async function checkAuthAndUpdateLogoutBtn() {
     console.log("[app-navbar] Checking auth status...");
     try {
-      const response = await fetch("http://localhost:3000/api/auth/check", {
+      const response = await fetch("/api/auth/check", {
         credentials: "include",
       });
 

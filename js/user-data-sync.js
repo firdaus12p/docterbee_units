@@ -34,7 +34,7 @@ async function initUserDataSync(userId) {
  */
 async function autoInitUserDataSync() {
   try {
-    const response = await fetch("http://localhost:3000/api/auth/check", {
+    const response = await fetch("/api/auth/check", {
       credentials: "include",
     });
 
@@ -82,7 +82,7 @@ async function loadUserProgress() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/api/user-data/progress",
+      "/api/user-data/progress",
       {
         credentials: "include",
       }
@@ -147,7 +147,7 @@ async function saveUserProgress() {
     });
 
     const response = await fetch(
-      "http://localhost:3000/api/user-data/progress",
+      "/api/user-data/progress",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -196,7 +196,7 @@ async function loadUserCart() {
   if (!syncEnabled) return;
 
   try {
-    const response = await fetch("http://localhost:3000/api/user-data/cart", {
+    const response = await fetch("/api/user-data/cart", {
       credentials: "include",
     });
 
@@ -234,7 +234,7 @@ async function saveUserCart(lastQrCode = null) {
     // Read from localStorage
     const cartData = JSON.parse(localStorage.getItem("docterbee_cart") || "[]");
 
-    const response = await fetch("http://localhost:3000/api/user-data/cart", {
+    const response = await fetch("/api/user-data/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -272,7 +272,7 @@ async function clearUserCart() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/api/user-data/cart", {
+    const response = await fetch("/api/user-data/cart", {
       method: "DELETE",
       credentials: "include",
     });

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docterbee – Webinar & Workshop</title>
+    <title>Docterbee – Journey 6 Unit</title>
 
     <!-- External Stylesheets -->
     <link
@@ -21,16 +21,16 @@
       <div
         class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
       >
-        <a href="index.html" class="flex items-center gap-2">
+        <a href="#" class="flex items-center gap-2">
           <div class="logo-box"></div>
           <span class="font-semibold">Docterbee</span>
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="index.html" id="guestNavItem" class="nav-link">Beranda</a>
-          <a href="journey.html" class="nav-link">Journey</a>
+          <a href="journey.html" class="nav-link active">Journey</a>
           <a href="services.html" class="nav-link">Services</a>
           <a href="store.html" class="nav-link">Store</a>
-          <a href="events.html" class="nav-link active">Events</a>
+          <a href="events.html" class="nav-link">Events</a>
           <a href="insight.html" class="nav-link">Insight</a>
           <a href="media.html" class="nav-link">Media</a>
           <a href="ai-advisor.html" class="nav-link">AI Advisor</a>
@@ -103,76 +103,35 @@
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
-      <div class="mb-6">
-        <h1 class="text-3xl md:text-4xl font-bold">
-          Belajar bersama Praktisi Docterbee
-        </h1>
-        <p class="text-slate-900">
-          Webinar & workshop <b>online</b> dan <b>offline</b> tentang gaya hidup
-          Rasulullah, nutrisi Qur'ani, sains kesehatan, parenting, dan
-          produktivitas.
-        </p>
-      </div>
-
-      <div class="grid gap-6 md:grid-cols-4">
-        <aside class="event-sidebar">
-          <div class="font-semibold mb-2">Filter</div>
-          <label class="block mb-2">
-            Mode
-            <select id="eventMode" class="event-select">
-              <option value="all">Semua</option>
-              <option value="online">Online</option>
-              <option value="offline">Offline</option>
-            </select>
-          </label>
-          <label class="block mb-2">
-            Topik
-            <select id="eventTopic" class="event-select">
-              <option value="all">Semua</option>
-              <option value="quranic">Qur'anic Lifestyle</option>
-              <option value="nutrition">Nutrisi</option>
-              <option value="science">Sains</option>
-              <option value="parenting">Parenting</option>
-              <option value="productivity">Produktivitas</option>
-            </select>
-          </label>
-        </aside>
-
-        <section
-          class="md:col-span-3 grid gap-4 md:grid-cols-2"
-          id="events"
-        ></section>
-      </div>
-
-      <section class="mt-8 booking-container">
-        <div class="p-5 border-b border-gray-200">
-          <div class="text-lg font-semibold">Cara Daftar</div>
-        </div>
-        <div class="p-5 text-sm text-slate-900 grid md:grid-cols-2 gap-4">
-          <div class="event-info-card">
-            <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="video" class="w-4 h-4 text-emerald-300"></i>
-              <b>Online (Zoom)</b>
-            </div>
-            <ol class="list-decimal pl-5 space-y-1 text-slate-900">
-              <li>Pilih event → klik <b>Daftar</b>.</li>
-              <li>Isi data → terima email/WA link Zoom.</li>
-              <li>Masuk 10 menit sebelum mulai.</li>
-            </ol>
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div
+          class="flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+        >
+          <div>
+            <h1 class="text-2xl md:text-3xl font-bold">
+              Journey Hidup Sehat – 6 Unit
+            </h1>
+            <p class="text-slate-900">
+              Qur'an–Sunnah × Sains × NBSN · Jawab pertanyaan harian, dapatkan
+              feedback & skor.
+            </p>
           </div>
-          <div class="event-info-card">
-            <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="map-pin" class="w-4 h-4 text-amber-300"></i>
-              <b>Offline (Cabang)</b>
+          <div class="text-right">
+            <div class="text-sm">Skor Total Harian</div>
+            <div class="text-3xl font-bold text-amber-300" id="totalScore">
+              —
             </div>
-            <ol class="list-decimal pl-5 space-y-1 text-slate-900">
-              <li>Pilih event → klik <b>Daftar</b>.</li>
-              <li>Terima WA alamat & jam check-in.</li>
-              <li>Tunjukkan QR saat registrasi.</li>
-            </ol>
+            <button id="btnCalcAll" class="btn-calc-all">Hitung Total</button>
           </div>
         </div>
       </section>
+
+      <!-- Tab Navigation -->
+      <div class="flex flex-wrap gap-2 mb-4" id="tabs"></div>
+
+      <!-- Unit Content Container -->
+      <section id="unitWrap" class="unit-wrap"></section>
     </main>
 
     <!-- Footer -->
@@ -185,8 +144,8 @@
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="js/user-data-sync.js"></script>
-    <!-- Note: auth-check.js removed - Events supports guest mode -->
-    <script src="js/script.js"></script>
     <script src="js/app-navbar.js"></script>
+    <!-- Note: auth-check.js NOT included - Journey supports guest mode -->
+    <script src="js/script.js"></script>
   </body>
 </html>

@@ -8,7 +8,7 @@
   async function checkAuthAndUpdateNavbar() {
     console.log("[landing-navbar] Checking auth status...");
     try {
-      const response = await fetch("http://localhost:3000/api/auth/check", {
+      const response = await fetch("/api/auth/check", {
         credentials: "include",
       });
 
@@ -83,7 +83,7 @@
   // Handle logout
   async function handleLogout() {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/logout", {
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

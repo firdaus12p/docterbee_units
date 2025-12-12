@@ -21,12 +21,12 @@
       <div
         class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
       >
-        <a href="landing-page.html" class="flex items-center gap-2">
+        <a href="index.html" class="flex items-center gap-2">
           <div class="logo-box"></div>
           <span class="font-semibold">Docterbee</span>
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
-          <a href="landing-page.html" class="nav-link">Home</a>
+          <a href="index.html" class="nav-link">Home</a>
           <a href="register.html" class="nav-link">Daftar</a>
           <a href="login.html" class="nav-link active">Login</a>
         </nav>
@@ -115,7 +115,7 @@
         }
 
         try {
-          const response = await fetch("http://localhost:3000/api/auth/login", {
+          const response = await fetch("/api/auth/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

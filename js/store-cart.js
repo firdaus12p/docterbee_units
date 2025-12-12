@@ -226,7 +226,7 @@ async function submitOrder() {
   // ✅ CHECK FOR PENDING ORDER FIRST
   try {
     const checkResponse = await fetch(
-      "http://localhost:3000/api/orders/check-pending",
+      "/api/orders/check-pending",
       {
         credentials: "include",
       }
@@ -271,7 +271,7 @@ async function submitOrder() {
     // Debug: log order data being sent
     console.log("💾 Sending order data:", orderData);
 
-    const response = await fetch("http://localhost:3000/api/orders", {
+    const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -601,7 +601,7 @@ async function reopenLastOrderQR() {
   try {
     // Fetch latest order status from server
     const response = await fetch(
-      `http://localhost:3000/api/orders/id/${lastOrder.id}`
+      `/api/orders/id/${lastOrder.id}`
     );
     const result = await response.json();
 
@@ -762,7 +762,7 @@ async function cancelPendingOrderAndRetry() {
   try {
     // Call cancel endpoint
     const response = await fetch(
-      `http://localhost:3000/api/orders/${pendingOrderData.id}/cancel`,
+      `/api/orders/${pendingOrderData.id}/cancel`,
       {
         method: "PATCH",
         credentials: "include",
@@ -799,7 +799,7 @@ window.cancelPendingOrderAndRetry = cancelPendingOrderAndRetry;
 async function initCustomerInfo() {
   try {
     // Check if user is logged in
-    const response = await fetch("http://localhost:3000/api/auth/check", {
+    const response = await fetch("/api/auth/check", {
       credentials: "include",
     });
 

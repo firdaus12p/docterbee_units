@@ -649,7 +649,7 @@ function calcAll() {
 // ============================================
 async function handleLogout() {
   try {
-    const response = await fetch("http://localhost:3000/api/auth/logout", {
+    const response = await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
@@ -663,7 +663,7 @@ async function handleLogout() {
       }
 
       alert("Logout berhasil");
-      window.location.href = "landing-page.html";
+      window.location.href = "index.html";
     } else {
       alert("Logout gagal");
     }
@@ -692,7 +692,7 @@ function initLogout() {
  */
 async function updateAuthButtons() {
   try {
-    const response = await fetch("http://localhost:3000/api/auth/check", {
+    const response = await fetch("/api/auth/check", {
       method: "GET",
       credentials: "include",
     });
@@ -1084,7 +1084,7 @@ async function validatePromoCode() {
   promoResult.classList.remove("hidden");
 
   try {
-    const response = await fetch("http://localhost:3000/api/coupons/validate", {
+    const response = await fetch("/api/coupons/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: code.toUpperCase() }),
@@ -1195,7 +1195,7 @@ async function saveBookingToDatabase() {
     : "offline";
 
   try {
-    const response = await fetch("http://localhost:3000/api/bookings", {
+    const response = await fetch("/api/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1246,7 +1246,7 @@ async function saveBookingToDatabase() {
 async function loadServicePrice(serviceName) {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/bookings/prices/${encodeURIComponent(
+      `/api/bookings/prices/${encodeURIComponent(
         serviceName
       )}`
     );
@@ -1496,7 +1496,7 @@ async function renderEvents() {
 
   try {
     // Build query params
-    let url = "http://localhost:3000/api/events?limit=50";
+    let url = "/api/events?limit=50";
     if (modeFilter !== "all") {
       url += `&mode=${modeFilter}`;
     }
@@ -1701,7 +1701,7 @@ async function renderInsightArticles() {
     '<div class="col-span-3 text-center text-slate-400 p-6">Loading articles...</div>';
 
   try {
-    const response = await fetch("http://localhost:3000/api/insight?limit=20");
+    const response = await fetch("/api/insight?limit=20");
     const result = await response.json();
 
     if (!result.success || result.data.length === 0) {
@@ -1782,7 +1782,7 @@ async function summarizeArticleById(slug) {
     '<p class="text-slate-400">Loading article...</p>';
 
   try {
-    const response = await fetch(`http://localhost:3000/api/insight/${slug}`);
+    const response = await fetch(`/api/insight/${slug}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -2031,7 +2031,7 @@ async function checkTranscript() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/api/check-transcript", {
+    const response = await fetch("/api/check-transcript", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ youtubeUrl }),
@@ -2159,7 +2159,7 @@ async function analyzeMedia() {
     });
 
     // Call backend API
-    const response = await fetch("http://localhost:3000/api/summarize", {
+    const response = await fetch("/api/summarize", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -2547,7 +2547,7 @@ async function renderServices() {
     params.append("is_active", "1"); // Only show active services
 
     const response = await fetch(
-      `http://localhost:3000/api/services?${params.toString()}`
+      `/api/services?${params.toString()}`
     );
     const result = await response.json();
 
@@ -2822,7 +2822,7 @@ function showStoreTab(tabName) {
 // Fetch products from API
 async function loadProductsFromAPI() {
   try {
-    const response = await fetch("http://localhost:3000/api/products");
+    const response = await fetch("/api/products");
     const result = await response.json();
 
     if (result.success && result.data) {

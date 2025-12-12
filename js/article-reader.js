@@ -19,7 +19,7 @@ async function loadArticle() {
 
   try {
     const response = await fetch(
-      `http://localhost:3000/api/articles/slug/${slug}`
+      `/api/articles/slug/${slug}`
     );
     const result = await response.json();
 
@@ -98,7 +98,7 @@ async function loadRelatedArticles(category, currentId) {
 
   try {
     const response = await fetch(
-      `http://localhost:3000/api/articles?category=${category}`
+      `/api/articles?category=${category}`
     );
     const result = await response.json();
 
