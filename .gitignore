@@ -1,39 +1,61 @@
-# Environment variables (contains API keys)
+# ===============================
+# ENVIRONMENT VARIABLES (SECRET)
+# ===============================
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 rules-for-ai.md
 
-# Node.js dependencies
+# ===============================
+# NODE / NPM
+# ===============================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
-# OS files
+# ===============================
+# RUNTIME DATA (SERVER ONLY)
+# ===============================
+uploads/
+uploads/**
+logs/
+*.log
+
+# PM2
+.pm2/
+
+# ===============================
+# OS FILES
+# ===============================
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# IDE files
+# ===============================
+# IDE / EDITOR
+# ===============================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Logs
-logs/
-*.log
-
-# Optional npm cache directory
+# ===============================
+# CACHE
+# ===============================
 .npm
-
-# Optional eslint cache
 .eslintcache
 
-# MCP and AI Assistant folders (internal development only)
+# ===============================
+# AI / MCP / COPILOT (LOCAL ONLY)
+# ===============================
 .gemini/
-.github/
 .serena/
 .playwright-mcp/
+
+# ===============================
+# OPTIONAL (NO CI/CD YET)
+# ===============================
+.github/
