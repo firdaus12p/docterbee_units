@@ -410,9 +410,6 @@
           // Render structured response
           renderStructuredResponse(result.data);
 
-          // Add points for using AI Advisor
-          addPoints(3);
-
           // Smooth scroll to result
           resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
         } catch (error) {
@@ -616,7 +613,6 @@
         `;
 
         lucide.createIcons();
-        addPoints(3);
       }
 
       function renderErrorWithFallback(errorMessage, question) {
@@ -830,9 +826,6 @@
 
         // Re-create icons
         lucide.createIcons();
-
-        // Add points for using AI Advisor
-        addPoints(3);
 
         // Smooth scroll to result
         resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });

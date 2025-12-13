@@ -49,6 +49,19 @@ router.post("/register", async (req, res) => {
       });
     }
 
+    // Check if phone number already exists
+    const existingPhone = await queryOne(
+      "SELECT id FROM users WHERE phone = ?",
+      [phone]
+    );
+
+    if (existingPhone) {
+      return res.status(400).json({
+        success: false,
+        error: "Nomor telepon sudah terdaftar",
+      });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 

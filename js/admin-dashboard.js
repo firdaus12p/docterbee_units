@@ -19,11 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-  // Check if already logged in
+// Check if already logged in - verify with backend
   const session = sessionStorage.getItem("admin_session");
   if (session) {
-    isLoggedIn = true;
-    showDashboard();
+    // Verify session with backend
+    checkAdminSession();
   }
 
   // Login form
@@ -162,36 +162,81 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Login handling
-function handleLogin(e) {
+// Check admin session with backend
+async function checkAdminSession() {
+  try {
+    const response = await fetch(`${API_BASE}/admin/check`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    
+    if (data.success && data.isAdmin) {
+      isLoggedIn = true;
+      showDashboard();
+    } else {
+      // Session invalid, clear local storage
+      sessionStorage.removeItem("admin_session");
+      isLoggedIn = false;
+    }
+  } catch (error) {
+    console.error("[SESSION] Error checking session:", error);
+    sessionStorage.removeItem("admin_session");
+    isLoggedIn = false;
+  }
+}
+
+// Login handling - NOW USES BACKEND API
+async function handleLogin(e) {
   e.preventDefault();
   console.log("[LOGIN] 🔵 Login attempt");
 
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
+  const loginError = document.getElementById("loginError");
 
-  console.log(
-    "[LOGIN] Username:",
-    username,
-    "| Password length:",
-    password.length
-  );
+  console.log("[LOGIN] Username:", username, "| Password length:", password.length);
 
-  // Simple hardcoded auth (replace with API call later)
-  if (username === "admin" && password === "docterbee2025") {
-    console.log("[LOGIN] ✅ Credentials valid!");
-    isLoggedIn = true;
-    sessionStorage.setItem("admin_session", "logged_in");
-    showDashboard();
-  } else {
-    console.log("[LOGIN] ❌ Invalid credentials");
-    document.getElementById("loginError").textContent =
-      "Username atau password salah";
-    document.getElementById("loginError").classList.remove("hidden");
+  try {
+    const response = await fetch(`${API_BASE}/admin/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("[LOGIN] ✅ Login berhasil!");
+      isLoggedIn = true;
+      sessionStorage.setItem("admin_session", "logged_in");
+      loginError.classList.add("hidden");
+      showDashboard();
+    } else {
+      console.log("[LOGIN] ❌ Login gagal:", data.error);
+      loginError.textContent = data.error || "Username atau password salah";
+      loginError.classList.remove("hidden");
+    }
+  } catch (error) {
+    console.error("[LOGIN] ❌ Error:", error);
+    loginError.textContent = "Terjadi kesalahan. Pastikan server berjalan.";
+    loginError.classList.remove("hidden");
   }
 }
 
-function handleLogout() {
+async function handleLogout() {
+  try {
+    // Call backend to clear admin session
+    await fetch(`${API_BASE}/admin/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("[LOGOUT] Error:", error);
+  }
+  
   isLoggedIn = false;
   sessionStorage.removeItem("admin_session");
   document.getElementById("loginOverlay").classList.remove("hidden");

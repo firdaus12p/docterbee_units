@@ -30,6 +30,9 @@ dotenv.config({ path: join(__dirname, "..", ".env") });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Check if running in production
+const isProduction = process.env.NODE_ENV === "production";
+
 // Session middleware (MUST be before routes)
 app.use(
   session({
@@ -38,23 +41,71 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Set true in production with HTTPS
+      secure: isProduction, // true in production (HTTPS), false in development
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: isProduction ? "strict" : "lax", // CSRF protection
     },
   })
 );
 
-// Middleware
+// Allowed origins for CORS
+const allowedOrigins = [
+  "https://docterbee.com",
+  "https://www.docterbee.com",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
+// CORS middleware with restricted origins
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, same-origin)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        // In development, allow all origins for easier testing
+        if (!isProduction) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      }
+    },
     credentials: true,
   })
 );
 app.use(express.json());
 app.use(express.static(".")); // Serve static files from root directory
 app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
+
+// ============================================
+// CLEAN URLs (without .html extension)
+// ============================================
+const cleanUrlPages = [
+  "login",
+  "register",
+  "journey",
+  "services",
+  "store",
+  "events",
+  "insight",
+  "media",
+  "booking",
+  "article",
+  "ai-advisor",
+  "admin-dashboard",
+];
+
+// Handle clean URLs - serve HTML files without extension
+cleanUrlPages.forEach((page) => {
+  app.get(`/${page}`, (req, res) => {
+    res.sendFile(join(__dirname, "..", `${page}.html`));
+  });
+});
 
 // Initialize Google Generative AI
 const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -95,6 +146,85 @@ app.use("/api/articles", articlesRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/user-data", userDataRouter);
+
+// ============================================
+// ADMIN AUTHENTICATION
+// ============================================
+
+// Admin credentials from environment variables
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "docterbee2025";
+
+// POST /api/admin/login - Admin login
+app.post("/api/admin/login", (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        error: "Username dan password harus diisi",
+      });
+    }
+
+    // Validate credentials against environment variables
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // Set admin session
+      req.session.isAdmin = true;
+      req.session.adminUsername = username;
+
+      res.json({
+        success: true,
+        message: "Admin login berhasil",
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: "Username atau password salah",
+      });
+    }
+  } catch (error) {
+    console.error("Admin login error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Terjadi kesalahan saat login",
+    });
+  }
+});
+
+// POST /api/admin/logout - Admin logout
+app.post("/api/admin/logout", (req, res) => {
+  req.session.isAdmin = false;
+  req.session.adminUsername = null;
+  res.json({
+    success: true,
+    message: "Admin logout berhasil",
+  });
+});
+
+// GET /api/admin/check - Check admin session
+app.get("/api/admin/check", (req, res) => {
+  res.json({
+    success: true,
+    isAdmin: !!req.session.isAdmin,
+    username: req.session.adminUsername || null,
+  });
+});
+
+// Middleware to require admin authentication
+const requireAdmin = (req, res, next) => {
+  if (req.session && req.session.isAdmin) {
+    next();
+  } else {
+    res.status(401).json({
+      success: false,
+      error: "Akses ditolak. Silakan login sebagai admin.",
+    });
+  }
+};
+
+// Export middleware for use in route files (if needed later)
+app.set("requireAdmin", requireAdmin);
 
 // DEBUG ENDPOINT - Untuk troubleshooting database
 app.get("/api/debug", async (req, res) => {
