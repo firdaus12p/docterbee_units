@@ -167,6 +167,14 @@
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
+            data-section="rewards"
+          >
+            <i data-lucide="gift" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Rewards Manager</span>
+            <span class="sm:hidden">Rewards</span>
+          </button>
+          <button
+            class="dashboard-tab whitespace-nowrap"
             data-section="users"
           >
             <i data-lucide="users" class="w-4 h-4"></i>
@@ -1182,6 +1190,142 @@
       </div>
 
       <!-- ============================================ -->
+      <!-- SECTION: REWARDS MANAGER -->
+      <!-- ============================================ -->
+      <section id="section-rewards" class="dashboard-section hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 class="text-xl sm:text-2xl font-bold">Rewards Manager</h2>
+          <button
+            id="btnNewReward"
+            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
+          >
+            + Tambah Reward
+          </button>
+        </div>
+        <div
+          id="rewardsGrid"
+          class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        >
+          <div class="booking-container p-6 text-center text-slate-400">
+            Loading...
+          </div>
+        </div>
+
+        <!-- Reward Form Modal -->
+        <div
+          id="rewardModal"
+          class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+        >
+          <div
+            class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="rewardModalTitle" class="text-xl font-bold">
+                Tambah Reward Baru
+              </h3>
+              <button
+                id="closeRewardModal"
+                class="text-slate-400 hover:text-slate-200 transition"
+              >
+                <i data-lucide="x" class="w-6 h-6"></i>
+              </button>
+            </div>
+            <form id="rewardForm" class="space-y-4">
+              <input type="hidden" id="rewardId" />
+
+              <div>
+                <label class="block text-sm mb-2">Nama Reward <span class="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  id="rewardName"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  placeholder="Contoh: Diskon 10%"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Deskripsi</label>
+                <textarea
+                  id="rewardDescription"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  rows="2"
+                  placeholder="Deskripsi singkat reward (opsional)"
+                ></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Biaya Poin <span class="text-red-400">*</span></label>
+                <input
+                  type="number"
+                  id="rewardPoints"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  placeholder="Contoh: 20"
+                  min="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Warna Tema</label>
+                <select
+                  id="rewardColor"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                >
+                  <option value="amber">Amber (Kuning)</option>
+                  <option value="emerald">Emerald (Hijau)</option>
+                  <option value="purple">Purple (Ungu)</option>
+                  <option value="sky">Sky (Biru Muda)</option>
+                  <option value="blue">Blue (Biru)</option>
+                  <option value="rose">Rose (Merah Muda)</option>
+                </select>
+                <p class="text-xs text-slate-500 mt-1">Warna untuk tampilan di halaman Store</p>
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Urutan Tampilan</label>
+                <input
+                  type="number"
+                  id="rewardSortOrder"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  placeholder="0"
+                  value="0"
+                  min="0"
+                />
+                <p class="text-xs text-slate-500 mt-1">Reward dengan urutan lebih kecil ditampilkan terlebih dahulu</p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rewardActive"
+                  class="w-4 h-4 bg-slate-800 border-slate-700 rounded focus:ring-amber-400"
+                  checked
+                />
+                <label for="rewardActive" class="text-sm">Aktif (tampilkan di halaman Store)</label>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onclick="closeRewardModal()"
+                  class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  class="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-900 py-2 rounded-lg font-semibold transition"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================ -->
       <!-- SECTION: ORDERS MANAGER -->
       <!-- ============================================ -->
       <section id="section-orders" class="dashboard-section hidden">
@@ -1487,5 +1631,6 @@
     <script src="js/admin-dashboard.js"></script>
     <script src="js/orders-manager.js"></script>
     <script src="js/users-manager.js"></script>
+    <script src="js/rewards-manager.js"></script>
   </body>
 </html>

@@ -296,6 +296,16 @@ function switchSection(section) {
     if (typeof window.loadOrders === "function") {
       window.loadOrders();
     }
+  } else if (section === "rewards") {
+    // Load rewards from rewards-manager.js
+    if (typeof initRewardsManager === "function") {
+      initRewardsManager();
+    }
+  } else if (section === "users") {
+    // Load users from users-manager.js
+    if (typeof initUsersManager === "function") {
+      initUsersManager();
+    }
   }
 }
 

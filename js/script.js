@@ -2813,6 +2813,11 @@ function showStoreTab(tabName) {
     targetTab.classList.remove("bg-slate-800", "text-slate-300");
     targetTab.classList.add("bg-amber-400", "text-slate-900");
   }
+  
+  // Reload rewards when switching to points tab
+  if (tabName === "points") {
+    loadAndRenderRewards();
+  }
 }
 
 // Fetch products from API
@@ -3069,7 +3074,7 @@ function updatePointsView() {
 }
 
 // Redeem rewards
-async function redeemReward(cost, rewardName) {
+async function redeemReward(cost, rewardName, rewardId = null) {
   const data = _db("db_points");
   const current = data.value || 0;
 
@@ -3092,6 +3097,7 @@ async function redeemReward(cost, rewardName) {
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
+        rewardId: rewardId,
         rewardName: rewardName,
         pointsCost: cost,
       }),
@@ -3129,6 +3135,100 @@ async function redeemReward(cost, rewardName) {
       `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
     );
   }
+}
+
+// Load rewards from API and render them dynamically
+async function loadAndRenderRewards() {
+  try {
+    const response = await fetch("/api/rewards", {
+      credentials: "include",
+    });
+    const data = await response.json();
+
+    if (data.success && data.rewards && data.rewards.length > 0) {
+      renderRewards(data.rewards);
+    } else {
+      // Fallback to default rewards if API fails or returns no data
+      console.warn("No rewards from API, using defaults");
+      renderDefaultRewards();
+    }
+  } catch (error) {
+    console.error("Error loading rewards:", error);
+    // Fallback to default rewards on error
+    renderDefaultRewards();
+  }
+}
+
+// Render rewards from API data
+function renderRewards(rewards) {
+  const rewardsContainer = document.querySelector('.grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4');
+  
+  if (!rewardsContainer) {
+    console.warn("Rewards container not found");
+    return;
+  }
+
+  rewardsContainer.innerHTML = rewards
+    .map((reward) => {
+      const colorClass = `${reward.color_theme}-400`;
+      const hoverBgClass = `${reward.color_theme}-50`;
+      const hoverBorderClass = `${reward.color_theme}-400/50`;
+
+      return `
+        <button
+          onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name).replace(/'/g, "\\'")}', ${reward.id})"
+          class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${hoverBorderClass} hover:bg-${hoverBgClass} transition text-left"
+        >
+          <div class="text-xs text-${colorClass} mb-1 font-semibold">
+            ${reward.points_cost} poin
+          </div>
+          <div class="font-semibold text-sm text-slate-900">${escapeHtml(reward.name)}</div>
+          ${reward.description ? `<p class="text-xs text-slate-600 mt-1">${escapeHtml(reward.description)}</p>` : ''}
+        </button>
+      `;
+    })
+    .join("");
+}
+
+// Render default fallback rewards (if API fails)
+function renderDefaultRewards() {
+  const rewardsContainer = document.querySelector('.grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4');
+  
+  if (!rewardsContainer) {
+    return;
+  }
+
+  // Keep existing hardcoded rewards as fallback
+  rewardsContainer.innerHTML = `
+    <button
+      onclick="redeemReward(20, 'Diskon 10%')"
+      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-amber-400/50 hover:bg-amber-50 transition text-left"
+    >
+      <div class="text-xs text-amber-500 mb-1 font-semibold">20 poin</div>
+      <div class="font-semibold text-sm text-slate-900">Diskon 10%</div>
+    </button>
+    <button
+      onclick="redeemReward(50, 'Konsultasi Gratis')"
+      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-emerald-400/50 hover:bg-emerald-50 transition text-left"
+    >
+      <div class="text-xs text-emerald-500 mb-1 font-semibold">50 poin</div>
+      <div class="font-semibold text-sm text-slate-900">Konsultasi Gratis</div>
+    </button>
+    <button
+      onclick="redeemReward(80, 'Free Product Kecil')"
+      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-purple-400/50 hover:bg-purple-50 transition text-left"
+    >
+      <div class="text-xs text-purple-500 mb-1 font-semibold">80 poin</div>
+      <div class="font-semibold text-sm text-slate-900">Free Product Kecil</div>
+    </button>
+    <button
+      onclick="redeemReward(100, 'Voucher Rp 50K')"
+      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-sky-400/50 hover:bg-sky-50 transition text-left"
+    >
+      <div class="text-xs text-sky-500 mb-1 font-semibold">100 poin</div>
+      <div class="font-semibold text-sm text-slate-900">Voucher Rp 50K</div>
+    </button>
+  `;
 }
 
 // Render locations
@@ -3238,6 +3338,9 @@ function initStorePage() {
   updateCartDisplay();
   updatePointsView();
   showStoreTab("store"); // Default tab
+  
+  // Load rewards from API
+  loadAndRenderRewards();
 
   // Init mobile menu
   initMobileMenu();

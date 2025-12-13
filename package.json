@@ -6,7 +6,8 @@
   "main": "backend/server.mjs",
   "scripts": {
     "start": "node backend/server.mjs",
-    "dev": "node --watch backend/server.mjs"
+    "dev": "node --watch backend/server.mjs",
+    "migrate:seed-rewards": "node -e \"import('./backend/migrations/seed-default-rewards.mjs').then(m => m.up())\""
   },
   "keywords": [
     "docterbee",

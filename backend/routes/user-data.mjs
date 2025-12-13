@@ -147,10 +147,13 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
       [userId, newPoints, newPoints]
     );
 
+    // Get reward_id if reward exists in database (optional)
+    const { rewardId } = req.body;
+
     // Record redemption
     await query(
-      "INSERT INTO reward_redemptions (user_id, reward_name, points_cost) VALUES (?, ?, ?)",
-      [userId, rewardName, pointsCost]
+      "INSERT INTO reward_redemptions (user_id, reward_id, reward_name, points_cost) VALUES (?, ?, ?, ?)",
+      [userId, rewardId || null, rewardName, pointsCost]
     );
 
     res.json({

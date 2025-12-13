@@ -19,6 +19,7 @@ import articlesRouter from "./articles.mjs";
 import ordersRouter from "./routes/orders.mjs";
 import usersRouter from "./routes/users.mjs";
 import userDataRouter from "./routes/user-data.mjs";
+import rewardsRouter from "./routes/rewards.mjs";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -63,7 +64,7 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, same-origin)
       if (!origin) return callback(null, true);
-      
+
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -162,6 +163,7 @@ app.use("/api/articles", articlesRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/user-data", userDataRouter);
+app.use("/api/rewards", rewardsRouter);
 
 // ============================================
 // ADMIN AUTHENTICATION
