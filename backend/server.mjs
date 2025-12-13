@@ -42,10 +42,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProduction, // true in production (HTTPS), false in development
+      secure: false, // Set to false for compatibility (even in production if not using HTTPS)
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      sameSite: isProduction ? "strict" : "lax", // CSRF protection
+      sameSite: "lax", // More permissive for cross-origin requests
     },
   })
 );
