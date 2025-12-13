@@ -234,6 +234,34 @@ async function initializeTables() {
     `);
     console.log("✅ Table: orders");
 
+    // Create user_progress table for Journey data sync
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS user_progress (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        unit_data JSON NOT NULL,
+        points INT DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: user_progress");
+
+    // Create user_cart table for Store cart data sync
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS user_cart (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        cart_data JSON NOT NULL,
+        last_qr_code TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user_cart (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: user_cart");
+
     console.log("📦 All tables initialized successfully");
   } catch (error) {
     console.error("❌ Error initializing tables:", error.message);
