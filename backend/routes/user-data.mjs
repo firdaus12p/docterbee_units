@@ -63,12 +63,10 @@ router.post("/progress", requireAuth, async (req, res) => {
         .json({ success: false, error: "unitData must be an object" });
     }
     if (typeof points !== "number" || points < 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "points must be a non-negative number",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "points must be a non-negative number",
+      });
     }
 
     // Insert or update
@@ -85,6 +83,84 @@ router.post("/progress", requireAuth, async (req, res) => {
   } catch (error) {
     console.error("Error saving user progress:", error);
     res.status(500).json({ success: false, error: "Failed to save progress" });
+  }
+});
+
+// === REWARD REDEMPTIONS ===
+
+// GET user reward redemptions history
+router.get("/rewards", requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const rewards = await query(
+      "SELECT id, reward_name, points_cost, redeemed_at FROM reward_redemptions WHERE user_id = ? ORDER BY redeemed_at DESC",
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      data: rewards,
+    });
+  } catch (error) {
+    console.error("Error fetching reward redemptions:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch reward history" });
+  }
+});
+
+// POST redeem reward
+router.post("/rewards/redeem", requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { rewardName, pointsCost } = req.body;
+
+    // Validate input
+    if (!rewardName || typeof pointsCost !== "number" || pointsCost <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid reward data",
+      });
+    }
+
+    // Get current points
+    const progress = await queryOne(
+      "SELECT points FROM user_progress WHERE user_id = ?",
+      [userId]
+    );
+
+    const currentPoints = progress ? progress.points : 0;
+
+    if (currentPoints < pointsCost) {
+      return res.status(400).json({
+        success: false,
+        error: "Insufficient points",
+      });
+    }
+
+    // Deduct points
+    const newPoints = currentPoints - pointsCost;
+    await query(
+      `INSERT INTO user_progress (user_id, unit_data, points) 
+       VALUES (?, '{}', ?)
+       ON DUPLICATE KEY UPDATE points = ?`,
+      [userId, newPoints, newPoints]
+    );
+
+    // Record redemption
+    await query(
+      "INSERT INTO reward_redemptions (user_id, reward_name, points_cost) VALUES (?, ?, ?)",
+      [userId, rewardName, pointsCost]
+    );
+
+    res.json({
+      success: true,
+      message: "Reward redeemed successfully",
+      newPoints,
+    });
+  } catch (error) {
+    console.error("Error redeeming reward:", error);
+    res.status(500).json({ success: false, error: "Failed to redeem reward" });
   }
 });
 

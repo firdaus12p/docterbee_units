@@ -1246,9 +1246,7 @@ async function saveBookingToDatabase() {
 async function loadServicePrice(serviceName) {
   try {
     const response = await fetch(
-      `/api/bookings/prices/${encodeURIComponent(
-        serviceName
-      )}`
+      `/api/bookings/prices/${encodeURIComponent(serviceName)}`
     );
     const result = await response.json();
 
@@ -2546,9 +2544,7 @@ async function renderServices() {
     if (modeFilter !== "all") params.append("mode", modeFilter);
     params.append("is_active", "1"); // Only show active services
 
-    const response = await fetch(
-      `/api/services?${params.toString()}`
-    );
+    const response = await fetch(`/api/services?${params.toString()}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -3073,7 +3069,7 @@ function updatePointsView() {
 }
 
 // Redeem rewards
-function redeemReward(cost, rewardName) {
+async function redeemReward(cost, rewardName) {
   const data = _db("db_points");
   const current = data.value || 0;
 
@@ -3084,13 +3080,55 @@ function redeemReward(cost, rewardName) {
     return;
   }
 
-  const newValue = current - cost;
-  _db("db_points", { value: newValue });
-  addPoints(0); // Trigger nav refresh
-  updatePointsView();
-  alert(
-    `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
-  );
+  // Confirm redemption
+  if (!confirm(`Tukar ${cost} poin untuk ${rewardName}?`)) {
+    return;
+  }
+
+  try {
+    // Save to server if logged in
+    const response = await fetch("/api/user-data/rewards/redeem", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        rewardName: rewardName,
+        pointsCost: cost,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Update local storage
+      const newValue = result.newPoints;
+      _db("db_points", { value: newValue });
+      addPoints(0); // Trigger nav refresh
+      updatePointsView();
+      alert(
+        `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
+      );
+    } else {
+      // Fallback to local storage only
+      const newValue = current - cost;
+      _db("db_points", { value: newValue });
+      addPoints(0);
+      updatePointsView();
+      alert(
+        `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
+      );
+    }
+  } catch (error) {
+    console.error("Error redeeming reward:", error);
+    // Fallback to local storage only
+    const newValue = current - cost;
+    _db("db_points", { value: newValue });
+    addPoints(0);
+    updatePointsView();
+    alert(
+      `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
+    );
+  }
 }
 
 // Render locations

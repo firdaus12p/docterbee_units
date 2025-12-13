@@ -10,9 +10,11 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const users = await query(`
-      SELECT id, name, email, phone, created_at, is_active
-      FROM users
-      ORDER BY created_at DESC
+      SELECT u.id, u.name, u.email, u.phone, u.created_at, u.is_active,
+             COALESCE(up.points, 0) as points
+      FROM users u
+      LEFT JOIN user_progress up ON u.id = up.user_id
+      ORDER BY u.created_at DESC
     `);
 
     res.json({
@@ -191,6 +193,47 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal menghapus user",
+    });
+  }
+});
+
+// ============================================
+// GET /api/users/:id/rewards - Get user reward redemptions history (admin)
+// ============================================
+router.get("/:id/rewards", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if user exists
+    const user = await queryOne("SELECT id, name FROM users WHERE id = ?", [
+      id,
+    ]);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User tidak ditemukan",
+      });
+    }
+
+    // Get reward redemptions
+    const rewards = await query(
+      "SELECT id, reward_name, points_cost, redeemed_at FROM reward_redemptions WHERE user_id = ? ORDER BY redeemed_at DESC",
+      [id]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        user: user,
+        rewards: rewards,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching user rewards:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil riwayat reward",
     });
   }
 });

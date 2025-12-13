@@ -21,7 +21,7 @@ async function loadUsers() {
     console.error("Error loading users:", error);
     document.getElementById("usersTableBody").innerHTML = `
       <tr>
-        <td colspan="7" class="px-4 py-8 text-center text-red-400">
+        <td colspan="8" class="px-4 py-8 text-center text-red-400">
           Error: ${error.message}
         </td>
       </tr>
@@ -38,7 +38,7 @@ function displayUsers(users) {
   if (!users || users.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="px-4 py-8 text-center text-slate-400">
+        <td colspan="8" class="px-4 py-8 text-center text-slate-400">
           Belum ada user terdaftar
         </td>
       </tr>
@@ -59,6 +59,9 @@ function displayUsers(users) {
         ? '<span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Aktif</span>'
         : '<span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">Nonaktif</span>';
 
+      const points = user.points || 0;
+      const pointsBadge = `<span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs font-bold">${points}</span>`;
+
       return `
         <tr class="border-t border-slate-800 hover:bg-slate-800/50">
           <td class="px-4 py-3 text-slate-300">#${user.id}</td>
@@ -71,8 +74,18 @@ function displayUsers(users) {
           )}</td>
           <td class="px-4 py-3 text-slate-400 text-xs">${formattedDate}</td>
           <td class="px-4 py-3">${statusBadge}</td>
+          <td class="px-4 py-3 text-center">${pointsBadge}</td>
           <td class="px-4 py-3 text-center">
             <div class="flex items-center justify-center gap-2">
+              <button
+                onclick="viewUserRewards(${user.id}, '${escapeHtml(
+        user.name
+      )}')"
+                class="text-emerald-400 hover:text-emerald-300 p-1"
+                title="Lihat Riwayat Reward"
+              >
+                <i data-lucide="award" class="w-4 h-4"></i>
+              </button>
               <button
                 onclick="openResetPasswordModal(${user.id}, '${escapeHtml(
         user.name
@@ -298,11 +311,96 @@ if (typeof window !== "undefined") {
   }
 }
 
+// ============================================
+// View User Rewards
+// ============================================
+async function viewUserRewards(userId, userName) {
+  try {
+    const response = await fetch(`${API_BASE}/users/${userId}/rewards`);
+    const data = await response.json();
+
+    if (data.success) {
+      openRewardsModal(userId, userName, data.data.rewards);
+    } else {
+      alert(data.error || "Gagal memuat riwayat reward");
+    }
+  } catch (error) {
+    console.error("Error fetching user rewards:", error);
+    alert("Terjadi kesalahan saat memuat riwayat reward");
+  }
+}
+
+// ============================================
+// Open Rewards Modal
+// ============================================
+function openRewardsModal(userId, userName, rewards) {
+  document.getElementById("rewardUserId").textContent = userId;
+  document.getElementById("rewardUserName").textContent = userName;
+
+  const rewardsBody = document.getElementById("rewardsHistoryBody");
+
+  if (!rewards || rewards.length === 0) {
+    rewardsBody.innerHTML = `
+      <tr>
+        <td colspan="3" class="px-4 py-8 text-center text-slate-400">
+          Belum ada riwayat penukaran reward
+        </td>
+      </tr>
+    `;
+  } else {
+    rewardsBody.innerHTML = rewards
+      .map((reward, index) => {
+        const redeemedDate = new Date(reward.redeemed_at);
+        const formattedDate = redeemedDate.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
+          <tr class="border-t border-slate-800 hover:bg-slate-800/30">
+            <td class="px-4 py-3 text-slate-300 text-center">${index + 1}</td>
+            <td class="px-4 py-3 text-slate-200">${escapeHtml(
+              reward.reward_name
+            )}</td>
+            <td class="px-4 py-3 text-amber-400 font-semibold text-center">${
+              reward.points_cost
+            } poin</td>
+            <td class="px-4 py-3 text-slate-400 text-xs">${formattedDate}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  const modal = document.getElementById("rewardsModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  // Re-initialize Lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+// ============================================
+// Close Rewards Modal
+// ============================================
+function closeRewardsModal() {
+  const modal = document.getElementById("rewardsModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
 // Export functions for use in HTML
 if (typeof window !== "undefined") {
   window.loadUsers = loadUsers;
+  window.viewUserRewards = viewUserRewards;
   window.openResetPasswordModal = openResetPasswordModal;
   window.closeUserModal = closeUserModal;
+  window.closeRewardsModal = closeRewardsModal;
   window.toggleUserStatus = toggleUserStatus;
   window.confirmDeleteUser = confirmDeleteUser;
   window.deleteUser = deleteUser;

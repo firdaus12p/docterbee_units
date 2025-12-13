@@ -14,7 +14,8 @@ dotenv.config({ path: join(__dirname, "..", ".env") });
 const dbConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : "",
+  password:
+    process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : "",
   database: process.env.DB_NAME || "docterbee_units",
   port: parseInt(process.env.DB_PORT) || 3307,
   waitForConnections: true,
@@ -261,6 +262,21 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: user_cart");
+
+    // Create reward_redemptions table for tracking reward history
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS reward_redemptions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        reward_name VARCHAR(255) NOT NULL,
+        points_cost INT NOT NULL,
+        redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        INDEX idx_user_id (user_id),
+        INDEX idx_redeemed_at (redeemed_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: reward_redemptions");
 
     console.log("📦 All tables initialized successfully");
   } catch (error) {
