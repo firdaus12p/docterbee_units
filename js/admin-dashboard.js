@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-// Check if already logged in - verify with backend
+  // Check if already logged in - verify with backend
   const session = sessionStorage.getItem("admin_session");
   if (session) {
     // Verify session with backend
@@ -169,7 +169,7 @@ async function checkAdminSession() {
       credentials: "include",
     });
     const data = await response.json();
-    
+
     if (data.success && data.isAdmin) {
       isLoggedIn = true;
       showDashboard();
@@ -194,7 +194,12 @@ async function handleLogin(e) {
   const password = document.getElementById("loginPassword").value;
   const loginError = document.getElementById("loginError");
 
-  console.log("[LOGIN] Username:", username, "| Password length:", password.length);
+  console.log(
+    "[LOGIN] Username:",
+    username,
+    "| Password length:",
+    password.length
+  );
 
   try {
     const response = await fetch(`${API_BASE}/admin/login`, {
@@ -236,7 +241,7 @@ async function handleLogout() {
   } catch (error) {
     console.error("[LOGOUT] Error:", error);
   }
-  
+
   isLoggedIn = false;
   sessionStorage.removeItem("admin_session");
   document.getElementById("loginOverlay").classList.remove("hidden");
@@ -834,12 +839,15 @@ function openArticleModal(id = null) {
   document.getElementById("articleModalTitle").textContent = id
     ? "Edit Artikel"
     : "Artikel Baru";
-  document.getElementById("articleForm").reset();
-  document.getElementById("articleId").value = id || "";
 
-  if (id) {
-    // Load article data for editing
-    // TODO: Fetch article by id and populate form
+  // Only reset form if creating new article (not editing)
+  if (!id) {
+    document.getElementById("articleForm").reset();
+    document.getElementById("articleId").value = "";
+    // Hide image preview for new article
+    document
+      .getElementById("insightHeaderImagePreview")
+      .classList.add("hidden");
   }
 
   if (typeof lucide !== "undefined") {
@@ -908,7 +916,7 @@ async function handleArticleSubmit(e) {
 
 async function editArticle(id) {
   try {
-    const response = await fetch(`${API_BASE}/insight/${id}`);
+    const response = await fetch(`${API_BASE}/insight/id/${id}`);
     const result = await response.json();
 
     if (result.success) {
@@ -919,6 +927,24 @@ async function editArticle(id) {
       document.getElementById("articleExcerpt").value = article.excerpt || "";
       document.getElementById("articleContent").value = article.content;
       document.getElementById("articleTags").value = article.tags || "";
+      document.getElementById("articleCategory").value = article.category || "";
+      document.getElementById("insightHeaderImage").value =
+        article.header_image || "";
+
+      // Show preview image if header_image exists
+      if (article.header_image) {
+        const previewDiv = document.getElementById("insightHeaderImagePreview");
+        const previewImg = document.getElementById(
+          "insightHeaderImagePreviewImg"
+        );
+        previewImg.src = article.header_image;
+        previewDiv.classList.remove("hidden");
+      } else {
+        // Hide preview if no image
+        document
+          .getElementById("insightHeaderImagePreview")
+          .classList.add("hidden");
+      }
 
       openArticleModal(id);
     }
@@ -1296,10 +1322,15 @@ function openCouponModal(id = null) {
   document.getElementById("couponModalTitle").textContent = id
     ? "Edit Kode Promo"
     : "Kode Promo Baru";
-  document.getElementById("couponForm").reset();
-  document.getElementById("couponId").value = id || "";
-  document.getElementById("couponMinBookingValue").value = "0";
-  document.getElementById("couponIsActive").checked = true;
+
+  // Only reset form if creating new coupon (not editing)
+  if (!id) {
+    document.getElementById("couponForm").reset();
+    document.getElementById("couponId").value = "";
+    document.getElementById("couponMinBookingValue").value = "0";
+    document.getElementById("couponIsActive").checked = true;
+    document.getElementById("couponExpiresAt").value = "";
+  }
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
