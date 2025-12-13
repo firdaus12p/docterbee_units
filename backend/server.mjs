@@ -584,7 +584,7 @@ KRITERIA VERDICT:
 
 PENTING:
 - Output HARUS valid JSON tanpa markdown code block atau teks tambahan
-- Dalil harus shahih (Qur'an atau Hadis Bukhari/Muslim/Tirmidzi/Abu Dawud/Ahmad)
+- Dalil harus benar-benar shahih (Qur'an atau Hadis Bukhari/Muslim/Tirmidzi/Abu Dawud/Ahmad)
 - Langkah rekomendasi harus praktis dan bisa dilakukan dalam 7 hari
 - Analisis NBSN harus spesifik dan berdasarkan sains modern
 - Jika ada yang bertentangan dengan Islam atau sains, berikan koreksi dengan sopan

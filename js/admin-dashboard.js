@@ -836,11 +836,10 @@ function openArticleModal(id = null) {
     : "Artikel Baru";
   document.getElementById("articleForm").reset();
   document.getElementById("articleId").value = id || "";
-
-  if (id) {
-    // Load article data for editing
-    // TODO: Fetch article by id and populate form
-  }
+  
+  // Reset header image preview (will be populated by editArticle if editing)
+  document.getElementById("articleHeaderImage").value = "";
+  document.getElementById("headerImagePreview").classList.add("hidden");
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
@@ -871,7 +870,7 @@ async function handleArticleSubmit(e) {
     content: document.getElementById("articleContent").value,
     tags: document.getElementById("articleTags").value,
     category: document.getElementById("articleCategory").value || null,
-    header_image: document.getElementById("insightHeaderImage").value || null,
+    header_image: document.getElementById("articleHeaderImage").value || null,
   };
 
   try {
@@ -908,19 +907,47 @@ async function handleArticleSubmit(e) {
 
 async function editArticle(id) {
   try {
-    const response = await fetch(`${API_BASE}/insight/${id}`);
+    // Use /insight/id/:id endpoint to get article by ID (not slug)
+    const response = await fetch(`${API_BASE}/insight/id/${id}`);
     const result = await response.json();
 
     if (result.success) {
       const article = result.data;
-      document.getElementById("articleId").value = article.id;
-      document.getElementById("articleTitle").value = article.title;
-      document.getElementById("articleSlug").value = article.slug;
-      document.getElementById("articleExcerpt").value = article.excerpt || "";
-      document.getElementById("articleContent").value = article.content;
-      document.getElementById("articleTags").value = article.tags || "";
+      console.log("[editArticle] Loaded article data:", article);
 
+      // Open modal first
       openArticleModal(id);
+
+      // Then populate with data AFTER opening
+      document.getElementById("articleId").value = article.id;
+      document.getElementById("articleTitle").value = article.title || "";
+      document.getElementById("articleSlug").value = article.slug || "";
+      document.getElementById("articleExcerpt").value = article.excerpt || "";
+      document.getElementById("articleContent").value = article.content || "";
+      document.getElementById("articleTags").value = article.tags || "";
+      
+      // Handle category
+      if (article.category) {
+        document.getElementById("articleCategory").value = article.category;
+      }
+      
+      // Handle header image
+      const headerImageInput = document.getElementById("articleHeaderImage");
+      const headerImagePreview = document.getElementById("headerImagePreview");
+      const headerImagePreviewImg = document.getElementById("headerImagePreviewImg");
+      
+      if (article.header_image && headerImageInput && headerImagePreview && headerImagePreviewImg) {
+        console.log("[editArticle] Setting header image:", article.header_image);
+        headerImageInput.value = article.header_image;
+        headerImagePreviewImg.src = article.header_image;
+        headerImagePreview.classList.remove("hidden");
+      } else {
+        console.log("[editArticle] No header image or elements not found");
+        if (headerImageInput) headerImageInput.value = "";
+        if (headerImagePreview) headerImagePreview.classList.add("hidden");
+      }
+    } else {
+      alert("Gagal memuat artikel: " + (result.error || "Unknown error"));
     }
   } catch (error) {
     console.error("Error loading article:", error);
@@ -1377,14 +1404,19 @@ async function editCoupon(id) {
 
     if (result.success) {
       const coupon = result.data;
+
+      // Open modal first
+      openCouponModal(id);
+
+      // Then populate with data AFTER opening
       document.getElementById("couponId").value = coupon.id;
-      document.getElementById("couponCode").value = coupon.code;
+      document.getElementById("couponCode").value = coupon.code || "";
       document.getElementById("couponDescription").value =
         coupon.description || "";
       document.getElementById("couponDiscountType").value =
-        coupon.discount_type;
+        coupon.discount_type || "percentage";
       document.getElementById("couponDiscountValue").value =
-        coupon.discount_value;
+        coupon.discount_value || "";
       // Format min booking value with thousand separator
       document.getElementById("couponMinBookingValue").value = parseInt(
         coupon.min_booking_value || 0
@@ -1397,8 +1429,8 @@ async function editCoupon(id) {
       }
       document.getElementById("couponIsActive").checked =
         coupon.is_active === 1;
-
-      openCouponModal(id);
+    } else {
+      alert("Gagal memuat kode promo: " + (result.error || "Unknown error"));
     }
   } catch (error) {
     console.error("Error loading coupon:", error);

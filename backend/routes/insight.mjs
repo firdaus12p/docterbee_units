@@ -31,6 +31,36 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/insight/id/:id - Get single article by ID (for admin editing)
+router.get("/id/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const article = await queryOne(
+      "SELECT * FROM articles WHERE id = ?",
+      [id]
+    );
+
+    if (!article) {
+      return res.status(404).json({
+        success: false,
+        error: "Artikel tidak ditemukan",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: article,
+    });
+  } catch (error) {
+    console.error("Error fetching article by ID:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil detail artikel",
+    });
+  }
+});
+
 // GET /api/insight/:slug - Get single article by slug
 router.get("/:slug", async (req, res) => {
   try {
