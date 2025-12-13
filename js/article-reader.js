@@ -124,7 +124,7 @@ async function loadRelatedArticles(category, currentId) {
       .map(
         (article) => `
         <a 
-          href="article.html?slug=${article.slug}"
+          href="/article?slug=${article.slug}"
           class="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition"
         >
           ${
@@ -208,7 +208,7 @@ function showError(message) {
       <h2 class="text-2xl font-bold text-slate-900 mb-2">Artikel Tidak Ditemukan</h2>
       <p class="text-slate-600 mb-6">${message}</p>
       <a 
-        href="insight.html" 
+        href="/insight" 
         class="inline-block px-6 py-3 bg-amber-400 text-slate-900 font-semibold rounded-lg hover:bg-amber-500 transition"
       >
         Kembali ke Insight

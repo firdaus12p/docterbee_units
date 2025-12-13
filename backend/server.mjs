@@ -79,11 +79,9 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(express.static(".")); // Serve static files from root directory
-app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
 
 // ============================================
-// CLEAN URLs (without .html extension)
+// REDIRECT .html to clean URLs (MUST be before static middleware)
 // ============================================
 const cleanUrlPages = [
   "login",
@@ -100,7 +98,25 @@ const cleanUrlPages = [
   "admin-dashboard",
 ];
 
-// Handle clean URLs - serve HTML files without extension
+// Redirect .html URLs to clean URLs (SEO friendly)
+cleanUrlPages.forEach((page) => {
+  app.get(`/${page}.html`, (req, res) => {
+    res.redirect(301, `/${page}`);
+  });
+});
+
+// Redirect index.html to root
+app.get("/index.html", (req, res) => {
+  res.redirect(301, "/");
+});
+
+// Static files (after redirect to ensure .html is caught first)
+app.use(express.static(".")); // Serve static files from root directory
+app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
+
+// ============================================
+// CLEAN URLs - serve HTML files without extension
+// ============================================
 cleanUrlPages.forEach((page) => {
   app.get(`/${page}`, (req, res) => {
     res.sendFile(join(__dirname, "..", `${page}.html`));

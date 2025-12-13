@@ -663,7 +663,7 @@ async function handleLogout() {
       }
 
       alert("Logout berhasil");
-      window.location.href = "index.html";
+      window.location.href = "/";
     } else {
       alert("Logout gagal");
     }
@@ -1580,7 +1580,7 @@ async function renderEvents() {
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
         <div class="mt-3 flex flex-wrap gap-2">
-          <a href="booking.html?service=${encodeURIComponent(
+          <a href="/booking?service=${encodeURIComponent(
             event.title
           )}" class="btn-primary-sm">Daftar</a>
           ${
@@ -2609,7 +2609,7 @@ async function renderServices() {
             </div>
             ${modeInfo}
             <a
-              href="booking.html?service=${encodeURIComponent(service.name)}"
+              href="/booking?service=${encodeURIComponent(service.name)}"
               class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-4 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md mt-3"
             >
               <i data-lucide="calendar" class="w-4 h-4"></i>

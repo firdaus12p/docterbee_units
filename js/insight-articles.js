@@ -243,7 +243,7 @@ async function filterArticlesByCategory() {
 // ============================================
 function openArticle(slug) {
   // Redirect to article reader page
-  window.location.href = `article.html?slug=${slug}`;
+  window.location.href = `/article?slug=${slug}`;
 }
 
 // ============================================
