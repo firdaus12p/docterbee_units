@@ -15,7 +15,7 @@ async function loadOrders() {
     // Show loading
     tableBody.innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-8">
+        <td colspan="9" class="text-center py-8">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div>
           <p class="mt-2 text-slate-400">Memuat orders...</p>
         </td>
@@ -34,7 +34,7 @@ async function loadOrders() {
     if (orders.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="8" class="text-center py-8 text-slate-400">
+          <td colspan="9" class="text-center py-8 text-slate-400">
             Belum ada order
           </td>
         </tr>
@@ -47,6 +47,7 @@ async function loadOrders() {
       .map((order) => {
         const statusBadge = getStatusBadge(order.status, order.payment_status);
         const expiryStatus = getExpiryStatus(order.expires_at, order.status);
+        const pointsStatus = getPointsStatus(order);
 
         return `
           <tr class="border-b border-slate-800 hover:bg-slate-800/30">
@@ -84,36 +85,55 @@ async function loadOrders() {
               ${statusBadge}
               ${expiryStatus}
             </td>
+            <td class="px-4 py-3">
+              ${pointsStatus}
+            </td>
             <td class="px-4 py-3 text-xs text-slate-400">
               ${formatDate(order.created_at)}
             </td>
             <td class="px-4 py-3">
-              <div class="flex gap-2">
-                <button
-                  onclick="viewOrderDetails('${order.order_number}')"
-                  class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition"
-                  title="View Details"
-                >
-                  <i data-lucide="eye" class="w-3 h-3"></i>
-                </button>
+              <div class="flex flex-col gap-2">
+                <div class="flex gap-2">
+                  <button
+                    onclick="viewOrderDetails('${order.order_number}')"
+                    class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition"
+                    title="View Details"
+                  >
+                    <i data-lucide="eye" class="w-3 h-3"></i>
+                  </button>
+                  ${
+                    order.status === "pending"
+                      ? `<button
+                          onclick="completeOrder(${order.id})"
+                          class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-xs transition"
+                          title="Complete Order"
+                        >
+                          <i data-lucide="check" class="w-3 h-3"></i>
+                        </button>`
+                      : ""
+                  }
+                  <button
+                    onclick="deleteOrder(${order.id})"
+                    class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs transition"
+                    title="Hapus Order"
+                  >
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                  </button>
+                </div>
                 ${
-                  order.status === "pending"
+                  order.status === "completed" &&
+                  !order.user_id &&
+                  order.customer_phone
                     ? `<button
-                        onclick="completeOrder(${order.id})"
-                        class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-xs transition"
-                        title="Complete Order"
+                        onclick="openAssignPointsModal(${order.id}, '${order.order_number}', ${order.points_earned}, '${order.customer_phone}')"
+                        class="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs transition w-full"
+                        title="Assign Points by Phone"
                       >
-                        <i data-lucide="check" class="w-3 h-3"></i>
+                        <i data-lucide="award" class="w-3 h-3 inline mr-1"></i>
+                        Assign Points
                       </button>`
                     : ""
                 }
-                <button
-                  onclick="deleteOrder(${order.id})"
-                  class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs transition"
-                  title="Hapus Order"
-                >
-                  <i data-lucide="trash-2" class="w-3 h-3"></i>
-                </button>
               </div>
             </td>
           </tr>
@@ -488,6 +508,220 @@ function formatDate(dateString) {
   });
 }
 
+function getPointsStatus(order) {
+  if (order.status !== "completed") {
+    return '<span class="text-xs text-slate-500">-</span>';
+  }
+
+  // If user_id exists, points already assigned
+  if (order.user_id) {
+    return `
+      <div class="flex flex-col gap-1">
+        <span class="text-xs px-2 py-1 rounded-full bg-emerald-900/30 text-emerald-400">
+          ✓ ${order.points_earned} pts
+        </span>
+        <span class="text-xs text-slate-500">Assigned</span>
+      </div>
+    `;
+  }
+
+  // Guest order - check if phone exists
+  if (order.customer_phone) {
+    return `
+      <div class="flex flex-col gap-1">
+        <span class="text-xs px-2 py-1 rounded-full bg-amber-900/30 text-amber-400">
+          ⏳ ${order.points_earned} pts
+        </span>
+        <span class="text-xs text-slate-500">Claimable</span>
+      </div>
+    `;
+  }
+
+  // No phone - points lost
+  return `
+    <div class="flex flex-col gap-1">
+      <span class="text-xs px-2 py-1 rounded-full bg-red-900/30 text-red-400">
+        ✗ ${order.points_earned} pts
+      </span>
+      <span class="text-xs text-slate-500">Lost</span>
+    </div>
+  `;
+}
+
+// ============================================
+// ASSIGN POINTS BY PHONE
+// ============================================
+
+function openAssignPointsModal(
+  orderId,
+  orderNumber,
+  pointsEarned,
+  customerPhone
+) {
+  const modal = document.getElementById("assignPointsModal");
+  if (!modal) {
+    // Create modal if not exists
+    createAssignPointsModal();
+    return openAssignPointsModal(
+      orderId,
+      orderNumber,
+      pointsEarned,
+      customerPhone
+    );
+  }
+
+  // Set modal data
+  document.getElementById("assignOrderId").value = orderId;
+  document.getElementById("assignOrderNumber").textContent = orderNumber;
+  document.getElementById("assignPointsAmount").textContent = pointsEarned;
+  document.getElementById("assignPhoneInput").value = customerPhone;
+  document.getElementById("assignPhoneDisplay").textContent = customerPhone;
+
+  // Show modal
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeAssignPointsModal() {
+  const modal = document.getElementById("assignPointsModal");
+  if (modal) {
+    modal.classList.remove("flex");
+    modal.classList.add("hidden");
+  }
+}
+
+async function submitAssignPoints() {
+  const orderId = document.getElementById("assignOrderId").value;
+  const phone = document.getElementById("assignPhoneInput").value.trim();
+
+  if (!phone) {
+    alert("Nomor HP harus diisi");
+    return;
+  }
+
+  try {
+    const submitBtn = document.querySelector(
+      "#assignPointsModal button[type='submit']"
+    );
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML =
+      '<i data-lucide="loader" class="w-4 h-4 inline animate-spin"></i> Processing...';
+
+    const response = await fetch(
+      `${API_BASE}/orders/${orderId}/assign-points-by-phone`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal assign points");
+    }
+
+    // Success
+    alert(
+      `✅ ${result.message}\n\n${result.data.points_added} points berhasil diberikan ke ${result.data.user.name}`
+    );
+
+    closeAssignPointsModal();
+    loadOrders(); // Reload orders table
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  } catch (error) {
+    console.error("Error assigning points:", error);
+    alert("❌ Error: " + error.message);
+
+    const submitBtn = document.querySelector(
+      "#assignPointsModal button[type='submit']"
+    );
+    submitBtn.disabled = false;
+    submitBtn.innerHTML =
+      '<i data-lucide="award" class="w-4 h-4 inline mr-1"></i> Assign Points';
+  }
+}
+
+function createAssignPointsModal() {
+  const modalHTML = `
+    <div id="assignPointsModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-white">Assign Points by Phone</h3>
+          <button onclick="closeAssignPointsModal()" class="text-slate-400 hover:text-slate-200">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <input type="hidden" id="assignOrderId" />
+          
+          <div class="bg-slate-800 rounded-lg p-4">
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div class="text-slate-400">Order Number:</div>
+              <div class="font-mono text-amber-400" id="assignOrderNumber">-</div>
+              
+              <div class="text-slate-400">Points to Assign:</div>
+              <div class="font-bold text-emerald-400">
+                <i data-lucide="award" class="w-4 h-4 inline"></i>
+                <span id="assignPointsAmount">0</span> pts
+              </div>
+              
+              <div class="text-slate-400">Customer Phone:</div>
+              <div class="font-semibold text-white" id="assignPhoneDisplay">-</div>
+            </div>
+          </div>
+
+          <div class="bg-amber-900/20 border border-amber-800/50 rounded-lg p-3 text-sm text-amber-200">
+            <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+            System akan mencari user dengan nomor HP ini. Jika tidak terdaftar, points akan hilang.
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">
+              Konfirmasi Nomor HP
+            </label>
+            <input 
+              type="tel" 
+              id="assignPhoneInput"
+              placeholder="08123456789"
+              class="w-full bg-slate-800 border-2 border-slate-700 rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:outline-none transition"
+            />
+          </div>
+
+          <div class="flex gap-3">
+            <button 
+              onclick="closeAssignPointsModal()"
+              class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+            >
+              Batal
+            </button>
+            <button 
+              onclick="submitAssignPoints()"
+              type="submit"
+              class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition"
+            >
+              <i data-lucide="award" class="w-4 h-4 inline mr-1"></i>
+              Assign Points
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+  // Initialize lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
 // ============================================
 // EXPOSE FUNCTIONS
 // ============================================
@@ -499,3 +733,6 @@ window.viewOrderDetails = viewOrderDetails;
 window.closeOrderDetailsModal = closeOrderDetailsModal;
 window.completeOrder = completeOrder;
 window.completeOrderFromModal = completeOrderFromModal;
+window.openAssignPointsModal = openAssignPointsModal;
+window.closeAssignPointsModal = closeAssignPointsModal;
+window.submitAssignPoints = submitAssignPoints;

@@ -2,8 +2,6 @@
 // ARTICLE READER
 // ============================================
 
-const API_BASE = "http://localhost:3000/api";
-
 let currentArticle = null;
 
 // ============================================
@@ -20,7 +18,9 @@ async function loadArticle() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/articles/slug/${slug}`);
+    const response = await fetch(
+      `/api/articles/slug/${slug}`
+    );
     const result = await response.json();
 
     if (!result.success) {
@@ -41,12 +41,16 @@ async function loadArticle() {
 // ============================================
 function displayArticle(article) {
   // Update page title
-  document.getElementById("pageTitle").textContent = `${article.title} - Docterbee`;
+  document.getElementById(
+    "pageTitle"
+  ).textContent = `${article.title} - Docterbee`;
   document.title = `${article.title} - Docterbee`;
 
   // Header Image
   if (article.header_image) {
-    const imageContainer = document.getElementById("articleHeaderImageContainer");
+    const imageContainer = document.getElementById(
+      "articleHeaderImageContainer"
+    );
     const image = document.getElementById("articleHeaderImage");
     image.src = article.header_image;
     image.alt = article.title;
@@ -62,7 +66,9 @@ function displayArticle(article) {
 
   // Meta Info
   document.getElementById("articleAuthor").textContent = article.author;
-  document.getElementById("articleDate").textContent = formatDate(article.created_at);
+  document.getElementById("articleDate").textContent = formatDate(
+    article.created_at
+  );
   document.getElementById("articleViews").textContent = article.views;
 
   // Title
@@ -91,7 +97,9 @@ async function loadRelatedArticles(category, currentId) {
   const container = document.getElementById("relatedArticles");
 
   try {
-    const response = await fetch(`${API_BASE}/articles?category=${category}`);
+    const response = await fetch(
+      `/api/articles?category=${category}`
+    );
     const result = await response.json();
 
     if (!result.success) {
@@ -116,7 +124,7 @@ async function loadRelatedArticles(category, currentId) {
       .map(
         (article) => `
         <a 
-          href="article.html?slug=${article.slug}"
+          href="/article?slug=${article.slug}"
           class="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition"
         >
           ${
@@ -200,7 +208,7 @@ function showError(message) {
       <h2 class="text-2xl font-bold text-slate-900 mb-2">Artikel Tidak Ditemukan</h2>
       <p class="text-slate-600 mb-6">${message}</p>
       <a 
-        href="insight.html" 
+        href="/insight" 
         class="inline-block px-6 py-3 bg-amber-400 text-slate-900 font-semibold rounded-lg hover:bg-amber-500 transition"
       >
         Kembali ke Insight

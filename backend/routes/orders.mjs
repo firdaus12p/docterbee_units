@@ -40,20 +40,107 @@ function calculatePoints(totalAmount) {
 }
 
 // ============================================
+// GET /api/orders/check-pending - Check if user has pending order
+// ============================================
+router.get("/check-pending", async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+
+    if (!userId) {
+      return res.json({
+        success: true,
+        has_pending: false,
+        message: "Guest user - no pending order check",
+      });
+    }
+
+    // Check for pending order
+    const pendingOrder = await queryOne(
+      `SELECT id, order_number, total_amount, items, qr_code_data, 
+              expires_at, created_at, store_location, order_type
+       FROM orders 
+       WHERE user_id = ? AND status = 'pending'
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [userId]
+    );
+
+    if (!pendingOrder) {
+      return res.json({
+        success: true,
+        has_pending: false,
+      });
+    }
+
+    // Check if order expired
+    const now = new Date();
+    const expiresAt = new Date(pendingOrder.expires_at);
+
+    if (now > expiresAt) {
+      // Auto-expire order
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
+        pendingOrder.id,
+      ]);
+
+      return res.json({
+        success: true,
+        has_pending: false,
+        message: "Previous pending order has expired",
+      });
+    }
+
+    res.json({
+      success: true,
+      has_pending: true,
+      data: pendingOrder,
+    });
+  } catch (error) {
+    console.error("Error checking pending order:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengecek pending order",
+    });
+  }
+});
+
+// ============================================
 // POST /api/orders - Create new order
 // ============================================
 router.post("/", async (req, res) => {
   try {
-    const {
-      user_id,
-      customer_name,
-      customer_phone,
-      customer_email,
-      order_type,
-      store_location,
-      items,
-      total_amount,
-    } = req.body;
+    const { guest_data, order_type, store_location, items, total_amount } =
+      req.body;
+
+    // Get user data from session OR guest_data
+    const userId = req.session?.userId || null;
+    let customerName = req.session?.userName || null;
+    let customerPhone = req.session?.userPhone || null;
+    let customerAddress = null;
+
+    // If guest_data provided, use it
+    if (guest_data) {
+      customerName = guest_data.name;
+      customerPhone = guest_data.phone;
+      customerAddress = guest_data.address || null;
+    }
+
+    // Check for existing pending order (logged in users only)
+    if (userId) {
+      const pendingOrder = await queryOne(
+        `SELECT id, order_number FROM orders 
+         WHERE user_id = ? AND status = 'pending'
+         LIMIT 1`,
+        [userId]
+      );
+
+      if (pendingOrder) {
+        return res.status(400).json({
+          success: false,
+          error: "Anda masih memiliki transaksi pending",
+          pending_order: pendingOrder.order_number,
+        });
+      }
+    }
 
     // Validation
     if (!order_type || !store_location || !items || !total_amount) {
@@ -86,16 +173,16 @@ router.post("/", async (req, res) => {
     // Insert order
     const result = await query(
       `INSERT INTO orders 
-       (order_number, user_id, customer_name, customer_phone, customer_email, 
+       (order_number, user_id, customer_name, customer_phone, customer_address,
         order_type, store_location, items, total_amount, points_earned, 
         qr_code_data, expires_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         orderNumber,
-        user_id || null,
-        customer_name || null,
-        customer_phone || null,
-        customer_email || null,
+        userId,
+        customerName,
+        customerPhone,
+        customerAddress,
         order_type,
         store_location,
         JSON.stringify(items),
@@ -305,17 +392,45 @@ router.patch("/:id/complete", async (req, res) => {
       [id]
     );
 
-    // TODO: Update user points if user_id exists
-    if (order.user_id) {
-      // Add points to user (implement this later when user table is ready)
-      console.log(
-        `TODO: Add ${order.points_earned} points to user ${order.user_id}`
-      );
+    // Add points to user in database
+    if (order.user_id && order.points_earned > 0) {
+      try {
+        // Get current user progress
+        const userProgress = await queryOne(
+          "SELECT unit_data, points FROM user_progress WHERE user_id = ?",
+          [order.user_id]
+        );
+
+        if (userProgress) {
+          // User has existing progress - add points
+          const newPoints = userProgress.points + order.points_earned;
+          await query("UPDATE user_progress SET points = ? WHERE user_id = ?", [
+            newPoints,
+            order.user_id,
+          ]);
+          console.log(
+            `✅ Added ${order.points_earned} points to user ${order.user_id} (total: ${newPoints})`
+          );
+        } else {
+          // New user - create progress record with initial points
+          await query(
+            "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, ?, ?)",
+            [order.user_id, JSON.stringify({}), order.points_earned]
+          );
+          console.log(
+            `✅ Created progress for user ${order.user_id} with ${order.points_earned} points`
+          );
+        }
+      } catch (pointError) {
+        console.error("❌ Error adding points to user:", pointError);
+        // Don't fail the whole request, order is already completed
+      }
     }
 
     res.json({
       success: true,
       message: "Order berhasil diselesaikan",
+      points_added: order.points_earned || 0,
     });
   } catch (error) {
     console.error("Error completing order:", error);
@@ -332,6 +447,33 @@ router.patch("/:id/complete", async (req, res) => {
 router.patch("/:id/cancel", async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.session?.userId;
+
+    // Get order to verify ownership
+    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order tidak ditemukan",
+      });
+    }
+
+    // Verify ownership (allow admin or order owner)
+    if (userId && order.user_id && order.user_id !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: "Anda tidak memiliki akses untuk membatalkan order ini",
+      });
+    }
+
+    // Only allow canceling pending orders
+    if (order.status !== "pending") {
+      return res.status(400).json({
+        success: false,
+        error: `Order dengan status ${order.status} tidak dapat dibatalkan`,
+      });
+    }
 
     await query("UPDATE orders SET status = 'cancelled' WHERE id = ?", [id]);
 
@@ -344,6 +486,118 @@ router.patch("/:id/cancel", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal membatalkan order",
+    });
+  }
+});
+
+// ============================================
+// POST /api/orders/:id/assign-points-by-phone - Assign points to user by phone
+// ============================================
+router.post("/:id/assign-points-by-phone", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({
+        success: false,
+        error: "Nomor HP harus diisi",
+      });
+    }
+
+    // Check if order exists
+    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order tidak ditemukan",
+      });
+    }
+
+    // Check if order is completed
+    if (order.status !== "completed") {
+      return res.status(400).json({
+        success: false,
+        error: "Hanya order completed yang bisa di-assign points",
+      });
+    }
+
+    // Check if order already assigned to a user
+    if (order.user_id) {
+      return res.status(400).json({
+        success: false,
+        error: "Order ini sudah ter-assign ke user",
+      });
+    }
+
+    // Find user by phone number
+    const user = await queryOne(
+      "SELECT id, name, email, phone FROM users WHERE phone = ? AND is_active = 1",
+      [phone]
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error:
+          "User dengan nomor HP ini tidak terdaftar. Points tidak dapat di-assign.",
+      });
+    }
+
+    // Get current user progress
+    const progress = await queryOne(
+      "SELECT points FROM user_progress WHERE user_id = ?",
+      [user.id]
+    );
+
+    let currentPoints = 0;
+    if (progress) {
+      currentPoints = progress.points || 0;
+    } else {
+      // Create user_progress if not exists
+      await query(
+        "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, '{}', 0)",
+        [user.id]
+      );
+    }
+
+    // Calculate new points
+    const pointsToAdd = order.points_earned || 0;
+    const newPoints = currentPoints + pointsToAdd;
+
+    // Update user_progress with new points
+    await query(
+      "UPDATE user_progress SET points = ?, updated_at = NOW() WHERE user_id = ?",
+      [newPoints, user.id]
+    );
+
+    // Update order with user_id
+    await query("UPDATE orders SET user_id = ? WHERE id = ?", [user.id, id]);
+
+    console.log(
+      `✅ Added ${pointsToAdd} points to user ${user.id} (${user.name}) from order ${order.order_number}`
+    );
+
+    res.json({
+      success: true,
+      message: `Points berhasil di-assign ke ${user.name}`,
+      data: {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+        },
+        points_added: pointsToAdd,
+        new_total_points: newPoints,
+      },
+    });
+  } catch (error) {
+    console.error("Error assigning points:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal assign points",
     });
   }
 });

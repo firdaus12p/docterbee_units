@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import cors from "cors";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
@@ -6,6 +7,7 @@ import { dirname, join } from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Innertube } from "youtubei.js";
 import { testConnection, initializeTables } from "./db.mjs";
+import authRouter from "./routes/auth.mjs";
 import bookingsRouter from "./routes/bookings.mjs";
 import eventsRouter from "./routes/events.mjs";
 import insightRouter from "./routes/insight.mjs";
@@ -15,6 +17,8 @@ import productsRouter from "./routes/products.mjs";
 import uploadRouter from "./routes/upload.mjs";
 import articlesRouter from "./articles.mjs";
 import ordersRouter from "./routes/orders.mjs";
+import usersRouter from "./routes/users.mjs";
+import userDataRouter from "./routes/user-data.mjs";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -25,53 +29,98 @@ dotenv.config({ path: join(__dirname, "..", ".env") });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const NODE_ENV = process.env.NODE_ENV || "development";
 
-// Production-ready CORS configuration
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allowed origins
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      process.env.PRODUCTION_URL, // Production domain from .env
-    ].filter(Boolean);
+// Check if running in production
+const isProduction = process.env.NODE_ENV === "production";
 
-    // Allow if no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else if (NODE_ENV === "development") {
-      // Allow all in development
-      callback(null, true);
-    } else {
-      // Reject in production if not in allowed list
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+// Session middleware (MUST be before routes)
+app.use(
+  session({
+    secret:
+      process.env.SESSION_SECRET || "docterbee-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: isProduction, // true in production (HTTPS), false in development
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: isProduction ? "strict" : "lax", // CSRF protection
+    },
+  })
+);
 
-// Middleware
-app.use(cors(corsOptions));
-app.use(express.json({ limit: "50mb" })); // Increase body size limit for file uploads
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+// Allowed origins for CORS
+const allowedOrigins = [
+  "https://docterbee.com",
+  "https://www.docterbee.com",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
+// CORS middleware with restricted origins
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, same-origin)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        // In development, allow all origins for easier testing
+        if (!isProduction) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      }
+    },
+    credentials: true,
+  })
+);
+app.use(express.json());
+
+// ============================================
+// REDIRECT .html to clean URLs (MUST be before static middleware)
+// ============================================
+const cleanUrlPages = [
+  "login",
+  "register",
+  "journey",
+  "services",
+  "store",
+  "events",
+  "insight",
+  "media",
+  "booking",
+  "article",
+  "ai-advisor",
+  "admin-dashboard",
+];
+
+// Redirect .html URLs to clean URLs (SEO friendly)
+cleanUrlPages.forEach((page) => {
+  app.get(`/${page}.html`, (req, res) => {
+    res.redirect(301, `/${page}`);
+  });
+});
+
+// Redirect index.html to root
+app.get("/index.html", (req, res) => {
+  res.redirect(301, "/");
+});
+
+// Static files (after redirect to ensure .html is caught first)
 app.use(express.static(".")); // Serve static files from root directory
 app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
 
-// Security headers middleware
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  if (NODE_ENV === "production") {
-    res.setHeader(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains"
-    );
-  }
-  next();
+// ============================================
+// CLEAN URLs - serve HTML files without extension
+// ============================================
+cleanUrlPages.forEach((page) => {
+  app.get(`/${page}`, (req, res) => {
+    res.sendFile(join(__dirname, "..", `${page}.html`));
+  });
 });
 
 // Initialize Google Generative AI
@@ -101,6 +150,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 })();
 
 // Mount API routers
+app.use("/api/auth", authRouter);
 app.use("/api/bookings", bookingsRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/insight", insightRouter);
@@ -110,30 +160,111 @@ app.use("/api/products", productsRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/articles", articlesRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/user-data", userDataRouter);
+
+// ============================================
+// ADMIN AUTHENTICATION
+// ============================================
+
+// Admin credentials from environment variables
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "docterbee2025";
+
+// POST /api/admin/login - Admin login
+app.post("/api/admin/login", (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        error: "Username dan password harus diisi",
+      });
+    }
+
+    // Validate credentials against environment variables
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // Set admin session
+      req.session.isAdmin = true;
+      req.session.adminUsername = username;
+
+      res.json({
+        success: true,
+        message: "Admin login berhasil",
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: "Username atau password salah",
+      });
+    }
+  } catch (error) {
+    console.error("Admin login error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Terjadi kesalahan saat login",
+    });
+  }
+});
+
+// POST /api/admin/logout - Admin logout
+app.post("/api/admin/logout", (req, res) => {
+  req.session.isAdmin = false;
+  req.session.adminUsername = null;
+  res.json({
+    success: true,
+    message: "Admin logout berhasil",
+  });
+});
+
+// GET /api/admin/check - Check admin session
+app.get("/api/admin/check", (req, res) => {
+  res.json({
+    success: true,
+    isAdmin: !!req.session.isAdmin,
+    username: req.session.adminUsername || null,
+  });
+});
+
+// Middleware to require admin authentication
+const requireAdmin = (req, res, next) => {
+  if (req.session && req.session.isAdmin) {
+    next();
+  } else {
+    res.status(401).json({
+      success: false,
+      error: "Akses ditolak. Silakan login sebagai admin.",
+    });
+  }
+};
+
+// Export middleware for use in route files (if needed later)
+app.set("requireAdmin", requireAdmin);
 
 // DEBUG ENDPOINT - Untuk troubleshooting database
 app.get("/api/debug", async (req, res) => {
   try {
     const { pool } = await import("./db.mjs");
-    
+
     // Test database connection
     let dbStatus = "disconnected";
     let dbError = null;
     let tables = [];
-    
+
     try {
       const connection = await pool.getConnection();
       dbStatus = "connected";
-      
+
       // Get list of tables
       const [rows] = await connection.query("SHOW TABLES");
-      tables = rows.map(row => Object.values(row)[0]);
-      
+      tables = rows.map((row) => Object.values(row)[0]);
+
       connection.release();
     } catch (error) {
       dbError = error.message;
     }
-    
+
     res.json({
       status: "OK",
       timestamp: new Date().toISOString(),
@@ -162,7 +293,6 @@ app.get("/api/debug", async (req, res) => {
     });
   }
 });
-
 
 // Helper function to clean YouTube URL (remove tracking parameters)
 function cleanYoutubeUrl(url) {

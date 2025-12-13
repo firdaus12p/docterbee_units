@@ -1,22 +1,8 @@
 // Admin Dashboard JavaScript
-/**
- * Production-ready API Base URL
- * - Production: Automatically uses current domain
- * - Development: Uses localhost:3000
- */
-const API_BASE = (() => {
-  const isDev =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  return isDev ? "http://localhost:3000/api" : window.location.origin + "/api";
-})();
+const API_BASE = "/api";
 
 console.log("🚀 Admin Dashboard Loaded");
 console.log("📍 API Base URL:", API_BASE);
-console.log(
-  "📍 Environment:",
-  API_BASE.includes("localhost") ? "DEVELOPMENT" : "PRODUCTION"
-);
 
 // Simple authentication (can be improved with JWT later)
 let isLoggedIn = false;
@@ -33,11 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-  // Check if already logged in
+// Check if already logged in - verify with backend
   const session = sessionStorage.getItem("admin_session");
   if (session) {
-    isLoggedIn = true;
-    showDashboard();
+    // Verify session with backend
+    checkAdminSession();
   }
 
   // Login form
@@ -176,36 +162,81 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Login handling
-function handleLogin(e) {
+// Check admin session with backend
+async function checkAdminSession() {
+  try {
+    const response = await fetch(`${API_BASE}/admin/check`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    
+    if (data.success && data.isAdmin) {
+      isLoggedIn = true;
+      showDashboard();
+    } else {
+      // Session invalid, clear local storage
+      sessionStorage.removeItem("admin_session");
+      isLoggedIn = false;
+    }
+  } catch (error) {
+    console.error("[SESSION] Error checking session:", error);
+    sessionStorage.removeItem("admin_session");
+    isLoggedIn = false;
+  }
+}
+
+// Login handling - NOW USES BACKEND API
+async function handleLogin(e) {
   e.preventDefault();
   console.log("[LOGIN] 🔵 Login attempt");
 
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
+  const loginError = document.getElementById("loginError");
 
-  console.log(
-    "[LOGIN] Username:",
-    username,
-    "| Password length:",
-    password.length
-  );
+  console.log("[LOGIN] Username:", username, "| Password length:", password.length);
 
-  // Simple hardcoded auth (replace with API call later)
-  if (username === "admin" && password === "docterbee2025") {
-    console.log("[LOGIN] ✅ Credentials valid!");
-    isLoggedIn = true;
-    sessionStorage.setItem("admin_session", "logged_in");
-    showDashboard();
-  } else {
-    console.log("[LOGIN] ❌ Invalid credentials");
-    document.getElementById("loginError").textContent =
-      "Username atau password salah";
-    document.getElementById("loginError").classList.remove("hidden");
+  try {
+    const response = await fetch(`${API_BASE}/admin/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("[LOGIN] ✅ Login berhasil!");
+      isLoggedIn = true;
+      sessionStorage.setItem("admin_session", "logged_in");
+      loginError.classList.add("hidden");
+      showDashboard();
+    } else {
+      console.log("[LOGIN] ❌ Login gagal:", data.error);
+      loginError.textContent = data.error || "Username atau password salah";
+      loginError.classList.remove("hidden");
+    }
+  } catch (error) {
+    console.error("[LOGIN] ❌ Error:", error);
+    loginError.textContent = "Terjadi kesalahan. Pastikan server berjalan.";
+    loginError.classList.remove("hidden");
   }
 }
 
-function handleLogout() {
+async function handleLogout() {
+  try {
+    // Call backend to clear admin session
+    await fetch(`${API_BASE}/admin/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("[LOGOUT] Error:", error);
+  }
+  
   isLoggedIn = false;
   sessionStorage.removeItem("admin_session");
   document.getElementById("loginOverlay").classList.remove("hidden");
@@ -257,7 +288,7 @@ function switchSection(section) {
     loadProducts();
   } else if (section === "orders") {
     // Load orders from orders-manager.js
-    if (typeof window.loadOrders === 'function') {
+    if (typeof window.loadOrders === "function") {
       window.loadOrders();
     }
   }
@@ -270,7 +301,7 @@ async function loadBookings() {
   const tbody = document.getElementById("bookingsTableBody");
 
   tbody.innerHTML =
-    '<tr><td colspan="13" class="text-center p-6 text-white">Loading...</td></tr>';
+    '<tr><td colspan="11" class="text-center p-6 text-white">Loading...</td></tr>';
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
@@ -280,9 +311,9 @@ async function loadBookings() {
     if (result.success && result.data.length > 0) {
       tbody.innerHTML = result.data
         .map(
-          (booking) => `
+          (booking, index) => `
         <tr class="border-b border-slate-200 hover:bg-slate-50">
-          <td class="p-3 text-slate-900">#${booking.id}</td>
+          <td class="p-3 text-slate-900 font-semibold">#${index + 1}</td>
           <td class="p-3 text-slate-900">${escapeHtml(
             booking.service_name
           )}</td>
@@ -304,21 +335,6 @@ async function loadBookings() {
             }">
               ${booking.mode}
             </span>
-          </td>
-          <td class="p-3 text-slate-900">${escapeHtml(
-            booking.customer_name || "-"
-          )}</td>
-          <td class="p-3">
-            ${
-              booking.customer_phone
-                ? `<a href="https://wa.me/${booking.customer_phone.replace(
-                    /[^0-9]/g,
-                    ""
-                  )}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-semibold">${escapeHtml(
-                    booking.customer_phone
-                  )}</a>`
-                : "-"
-            }
           </td>
           <td class="p-3 text-slate-900">
             ${
@@ -366,20 +382,22 @@ async function loadBookings() {
             </select>
           </td>
           <td class="p-3">
-            <div class="flex gap-2">
+            <div class="flex gap-2 justify-center">
               <button 
                 data-action="view-booking"
                 data-id="${booking.id}"
-                class="text-amber-600 hover:text-amber-700 text-xs font-bold"
+                class="text-blue-600 hover:text-blue-700 transition-colors"
+                title="Lihat detail booking"
               >
-                Detail
+                <i data-lucide="eye" class="w-4 h-4"></i>
               </button>
               <button 
                 data-action="delete-booking"
                 data-id="${booking.id}"
-                class="text-red-600 hover:text-red-700 text-xs font-bold"
+                class="text-red-600 hover:text-red-700 transition-colors"
+                title="Hapus booking"
               >
-                Hapus
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
             </div>
           </td>
@@ -404,6 +422,11 @@ async function loadBookings() {
             deleteBooking(parseInt(id));
           });
         });
+
+      // Refresh Lucide icons
+      if (typeof lucide !== "undefined" && lucide.createIcons) {
+        lucide.createIcons();
+      }
 
       // Check if table actually overflows and adjust scrollbar visibility
       checkTableOverflow();
@@ -500,149 +523,234 @@ async function viewBookingDetail(id) {
     }
 
     const booking = result.data;
+
+    // Status badge color
+    const statusColors = {
+      pending: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+      confirmed: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+      completed: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+      cancelled: "bg-red-500/20 text-red-400 border-red-500/30",
+    };
+
     const detailHTML = `
-      <div class="text-left space-y-3">
-        <div>
-          <span class="text-slate-400 text-sm">ID Booking:</span>
-          <p class="font-semibold">#${booking.id}</p>
+      <div class="space-y-6">
+        <!-- Header Section -->
+        <div class="flex items-start justify-between">
+          <div>
+            <h4 class="text-xl font-bold text-white mb-1">${escapeHtml(
+              booking.service_name
+            )}</h4>
+            <p class="text-sm text-slate-400">Booking ID: #${booking.id}</p>
+          </div>
+          <span class="px-3 py-1 rounded-lg text-xs font-semibold border ${
+            statusColors[booking.status] || statusColors.pending
+          }">
+            ${booking.status.toUpperCase()}
+          </span>
         </div>
-        <div>
-          <span class="text-slate-400 text-sm">Layanan:</span>
-          <p class="font-semibold">${escapeHtml(booking.service_name)}</p>
+
+        <!-- Booking Info -->
+        <div class="bg-slate-800/50 rounded-xl p-4 space-y-3">
+          <div class="flex items-center gap-3">
+            <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i>
+            <div class="flex-1">
+              <p class="text-xs text-slate-400">Tanggal & Waktu</p>
+              <p class="text-white font-medium">${formatDate(
+                booking.booking_date
+              )} • ${escapeHtml(booking.booking_time)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <i data-lucide="map-pin" class="w-5 h-5 text-amber-400"></i>
+            <div class="flex-1">
+              <p class="text-xs text-slate-400">Cabang</p>
+              <p class="text-white font-medium">${escapeHtml(
+                booking.branch
+              )}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <i data-lucide="user-check" class="w-5 h-5 text-amber-400"></i>
+            <div class="flex-1">
+              <p class="text-xs text-slate-400">Praktisi</p>
+              <p class="text-white font-medium">${escapeHtml(
+                booking.practitioner
+              )}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <i data-lucide="${
+              booking.mode === "online" ? "monitor" : "building"
+            }" class="w-5 h-5 text-amber-400"></i>
+            <div class="flex-1">
+              <p class="text-xs text-slate-400">Mode</p>
+              <span class="inline-block px-2 py-1 rounded text-xs font-semibold ${
+                booking.mode === "online"
+                  ? "bg-emerald-500 text-white"
+                  : "bg-amber-500 text-white"
+              }">${booking.mode.toUpperCase()}</span>
+            </div>
+          </div>
         </div>
-        <div>
-          <span class="text-slate-400 text-sm">Cabang:</span>
-          <p>${escapeHtml(booking.branch)}</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Praktisi:</span>
-          <p>${escapeHtml(booking.practitioner)}</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Tanggal & Waktu:</span>
-          <p>${formatDate(booking.booking_date)} - ${escapeHtml(
-      booking.booking_time
-    )}</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Mode:</span>
-          <p class="capitalize">${escapeHtml(booking.mode)}</p>
-        </div>
-        ${
-          booking.price
-            ? `
-        <hr class="border-slate-700">
-        <h4 class="font-semibold text-amber-400">Rincian Harga</h4>
-        <div>
-          <span class="text-slate-400 text-sm">Harga Layanan:</span>
-          <p class="font-semibold">Rp ${new Intl.NumberFormat("id-ID").format(
-            booking.price
-          )}</p>
-        </div>
-        ${
-          booking.discount_amount > 0
-            ? `
-        <div>
-          <span class="text-slate-400 text-sm">Diskon:</span>
-          <p class="text-red-400">- Rp ${new Intl.NumberFormat("id-ID").format(
-            booking.discount_amount
-          )}</p>
-        </div>
-        `
-            : ""
-        }
-        <div>
-          <span class="text-slate-400 text-sm">Total Bayar:</span>
-          <p class="font-bold text-lg text-amber-300">Rp ${new Intl.NumberFormat(
-            "id-ID"
-          ).format(booking.final_price || booking.price)}</p>
-        </div>
-        `
-            : ""
-        }
+
+        <!-- Customer Info -->
         ${
           booking.customer_name
             ? `
-        <hr class="border-slate-700">
-        <h4 class="font-semibold text-amber-400">Data Pribadi</h4>
-        <div>
-          <span class="text-slate-400 text-sm">Nama:</span>
-          <p>${escapeHtml(booking.customer_name)}</p>
+        <div class="bg-slate-800/50 rounded-xl p-4 space-y-3">
+          <h5 class="font-semibold text-amber-400 flex items-center gap-2">
+            <i data-lucide="user" class="w-4 h-4"></i>
+            Data Customer
+          </h5>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-slate-400">Nama Lengkap</p>
+              <p class="text-white font-medium">${escapeHtml(
+                booking.customer_name
+              )}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400">No. HP / WhatsApp</p>
+              <p><a href="https://wa.me/${booking.customer_phone.replace(
+                /[^0-9]/g,
+                ""
+              )}" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1">
+                <i data-lucide="phone" class="w-3 h-3"></i>
+                ${escapeHtml(booking.customer_phone)}
+              </a></p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400">Umur</p>
+              <p class="text-white font-medium">${
+                booking.customer_age
+              } tahun</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400">Jenis Kelamin</p>
+              <p class="text-white font-medium">${escapeHtml(
+                booking.customer_gender
+              )}</p>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 mb-1">Alamat Lengkap</p>
+            <p class="text-white text-sm leading-relaxed">${escapeHtml(
+              booking.customer_address
+            )}</p>
+          </div>
         </div>
-        <div>
-          <span class="text-slate-400 text-sm">No. HP:</span>
-          <p><a href="https://wa.me/${booking.customer_phone.replace(
-            /[^0-9]/g,
-            ""
-          )}" target="_blank" class="text-emerald-400 hover:text-emerald-300">${escapeHtml(
-                booking.customer_phone
-              )}</a></p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Umur:</span>
-          <p>${booking.customer_age} tahun</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Jenis Kelamin:</span>
-          <p>${escapeHtml(booking.customer_gender)}</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Alamat:</span>
-          <p>${escapeHtml(booking.customer_address)}</p>
+        `
+            : '<div class="bg-slate-800/50 rounded-xl p-4 text-center text-slate-400 text-sm">Data customer tidak tersedia</div>'
+        }
+
+        <!-- Price Info -->
+        ${
+          booking.price
+            ? `
+        <div class="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl p-4 space-y-3">
+          <h5 class="font-semibold text-amber-400 flex items-center gap-2">
+            <i data-lucide="receipt" class="w-4 h-4"></i>
+            Rincian Pembayaran
+          </h5>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Harga Layanan</span>
+              <span class="text-white font-semibold">Rp ${new Intl.NumberFormat(
+                "id-ID"
+              ).format(booking.price)}</span>
+            </div>
+            ${
+              booking.discount_amount > 0
+                ? `
+            <div class="flex justify-between items-center text-red-400">
+              <span>Diskon ${
+                booking.promo_code ? `(${booking.promo_code})` : ""
+              }</span>
+              <span class="font-semibold">- Rp ${new Intl.NumberFormat(
+                "id-ID"
+              ).format(booking.discount_amount)}</span>
+            </div>
+            `
+                : ""
+            }
+            <hr class="border-slate-700">
+            <div class="flex justify-between items-center text-lg">
+              <span class="text-amber-300 font-semibold">Total Bayar</span>
+              <span class="text-amber-300 font-bold">Rp ${new Intl.NumberFormat(
+                "id-ID"
+              ).format(booking.final_price || booking.price)}</span>
+            </div>
+          </div>
         </div>
         `
             : ""
         }
+
+        <!-- Notes -->
         ${
-          booking.promo_code
+          booking.notes
             ? `
-        <div>
-          <span class="text-slate-400 text-sm">Kode Promo:</span>
-          <p class="font-semibold text-emerald-400">${escapeHtml(
-            booking.promo_code
+        <div class="bg-slate-800/50 rounded-xl p-4">
+          <h5 class="font-semibold text-slate-300 mb-2 flex items-center gap-2">
+            <i data-lucide="sticky-note" class="w-4 h-4"></i>
+            Catatan
+          </h5>
+          <p class="text-slate-300 text-sm leading-relaxed">${escapeHtml(
+            booking.notes
           )}</p>
         </div>
         `
             : ""
         }
-        ${
-          booking.notes
-            ? `
-        <div>
-          <span class="text-slate-400 text-sm">Catatan:</span>
-          <p>${escapeHtml(booking.notes)}</p>
-        </div>
-        `
-            : ""
-        }
-        <div>
-          <span class="text-slate-400 text-sm">Status:</span>
-          <p class="capitalize font-semibold ${
-            booking.status === "completed"
-              ? "text-emerald-400"
-              : booking.status === "confirmed"
-              ? "text-blue-400"
-              : booking.status === "cancelled"
-              ? "text-red-400"
-              : "text-amber-400"
-          }">${escapeHtml(booking.status)}</p>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Dibuat:</span>
-          <p class="text-sm">${formatDate(booking.created_at)}</p>
+
+        <!-- Timestamps -->
+        <div class="text-xs text-slate-500 text-center space-y-1">
+          <p>Dibuat: ${new Date(booking.created_at).toLocaleString("id-ID")}</p>
+          ${
+            booking.updated_at
+              ? `<p>Terakhir diupdate: ${new Date(
+                  booking.updated_at
+                ).toLocaleString("id-ID")}</p>`
+              : ""
+          }
         </div>
       </div>
     `;
 
-    alert(
-      detailHTML
-        .replace(/<[^>]*>/g, "\n")
-        .replace(/\n+/g, "\n")
-        .trim()
-    );
+    // Show modal with detail
+    const modal = document.getElementById("bookingDetailModal");
+    const content = document.getElementById("bookingDetailContent");
+
+    if (modal && content) {
+      content.innerHTML = detailHTML;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      // Refresh Lucide icons
+      if (typeof lucide !== "undefined" && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    } else {
+      // Fallback to alert if modal not found
+      alert(
+        detailHTML
+          .replace(/<[^>]*>/g, "\n")
+          .replace(/\n+/g, "\n")
+          .trim()
+      );
+    }
   } catch (error) {
     console.error("Error loading booking detail:", error);
     alert("Error memuat detail booking");
+  }
+}
+
+// Function to close booking detail modal
+function closeBookingDetailModal() {
+  const modal = document.getElementById("bookingDetailModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
   }
 }
 
@@ -2162,91 +2270,91 @@ async function uploadInsightHeaderImage(input) {
   if (!file) return;
 
   // Validate file type
-  if (!file.type.startsWith('image/')) {
-    alert('File harus berupa gambar (JPG, PNG, GIF, dll)');
-    input.value = '';
+  if (!file.type.startsWith("image/")) {
+    alert("File harus berupa gambar (JPG, PNG, GIF, dll)");
+    input.value = "";
     return;
   }
 
   // Validate file size (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    alert('Ukuran file maksimal 5MB');
-    input.value = '';
+    alert("Ukuran file maksimal 5MB");
+    input.value = "";
     return;
   }
 
   try {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     const response = await fetch(`${API_BASE}/upload`, {
-      method: 'POST',
-      body: formData
+      method: "POST",
+      body: formData,
     });
 
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || 'Gagal upload gambar');
+      throw new Error(result.error || "Gagal upload gambar");
     }
 
     // Set hidden input value
-    document.getElementById('insightHeaderImage').value = result.filePath;
+    document.getElementById("insightHeaderImage").value = result.filePath;
 
     // Show preview
-    const preview = document.getElementById('insightHeaderImagePreview');
-    const img = document.getElementById('insightHeaderImagePreviewImg');
+    const preview = document.getElementById("insightHeaderImagePreview");
+    const img = document.getElementById("insightHeaderImagePreviewImg");
     img.src = result.filePath;
-    preview.classList.remove('hidden');
+    preview.classList.remove("hidden");
 
-    console.log('✅ Insight header image uploaded:', result.filePath);
+    console.log("✅ Insight header image uploaded:", result.filePath);
   } catch (error) {
-    console.error('Error uploading insight header image:', error);
-    alert('Error upload gambar: ' + error.message);
-    input.value = '';
+    console.error("Error uploading insight header image:", error);
+    alert("Error upload gambar: " + error.message);
+    input.value = "";
   }
 }
 
 // Upload content image for Insight
 async function uploadInsightContentImage() {
   // Create temporary file input
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
 
   input.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('File harus berupa gambar (JPG, PNG, GIF, dll)');
+    if (!file.type.startsWith("image/")) {
+      alert("File harus berupa gambar (JPG, PNG, GIF, dll)");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Ukuran file maksimal 5MB');
+      alert("Ukuran file maksimal 5MB");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
       const response = await fetch(`${API_BASE}/upload`, {
-        method: 'POST',
-        body: formData
+        method: "POST",
+        body: formData,
       });
 
       const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error || 'Gagal upload gambar');
+        throw new Error(result.error || "Gagal upload gambar");
       }
 
       // Insert image tag at cursor position in textarea
-      const textarea = document.getElementById('articleContent');
+      const textarea = document.getElementById("articleContent");
       const imageTag = `\n<img src="${result.filePath}" alt="Gambar artikel" class="w-full rounded-lg my-4">\n`;
 
       const cursorPos = textarea.selectionStart;
@@ -2256,13 +2364,17 @@ async function uploadInsightContentImage() {
       textarea.value = textBefore + imageTag + textAfter;
 
       // Set cursor after inserted image
-      textarea.selectionStart = textarea.selectionEnd = cursorPos + imageTag.length;
+      textarea.selectionStart = textarea.selectionEnd =
+        cursorPos + imageTag.length;
       textarea.focus();
 
-      console.log('✅ Insight content image uploaded and inserted:', result.filePath);
+      console.log(
+        "✅ Insight content image uploaded and inserted:",
+        result.filePath
+      );
     } catch (error) {
-      console.error('Error uploading insight content image:', error);
-      alert('Error upload gambar: ' + error.message);
+      console.error("Error uploading insight content image:", error);
+      alert("Error upload gambar: " + error.message);
     }
   };
 
@@ -2271,9 +2383,9 @@ async function uploadInsightContentImage() {
 
 // Remove header image for Insight
 function removeInsightHeaderImage() {
-  document.getElementById('insightHeaderImage').value = '';
-  document.getElementById('insightHeaderImageFile').value = '';
-  document.getElementById('insightHeaderImagePreview').classList.add('hidden');
+  document.getElementById("insightHeaderImage").value = "";
+  document.getElementById("insightHeaderImageFile").value = "";
+  document.getElementById("insightHeaderImagePreview").classList.add("hidden");
 }
 
 // Expose functions to window

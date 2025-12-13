@@ -131,6 +131,72 @@ CREATE TABLE IF NOT EXISTS products (
   INDEX idx_stock (stock)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Buat tabel users (HARUS PERTAMA - tabel lain reference ini)
+CREATE TABLE IF NOT EXISTS users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  phone VARCHAR(20) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_email (email),
+  INDEX idx_phone (phone),
+  INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Buat tabel orders
+CREATE TABLE IF NOT EXISTS orders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  order_number VARCHAR(50) NOT NULL UNIQUE,
+  user_id INT,
+  customer_name VARCHAR(100),
+  customer_phone VARCHAR(20),
+  customer_email VARCHAR(100),
+  order_type ENUM('dine_in', 'take_away') NOT NULL,
+  store_location ENUM('kolaka', 'makassar', 'kendari') NOT NULL,
+  items JSON NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  points_earned INT DEFAULT 0,
+  status ENUM('pending', 'completed', 'expired', 'cancelled') DEFAULT 'pending',
+  payment_status ENUM('pending', 'paid') DEFAULT 'pending',
+  qr_code_data TEXT NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  completed_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order_number (order_number),
+  INDEX idx_user_id (user_id),
+  INDEX idx_status (status),
+  INDEX idx_payment_status (payment_status),
+  INDEX idx_expires_at (expires_at),
+  INDEX idx_created (created_at),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Buat tabel user_progress (untuk menyimpan progress Journey user)
+CREATE TABLE IF NOT EXISTS user_progress (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  unit_data JSON NOT NULL,
+  points INT DEFAULT 0,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Buat tabel user_cart (untuk menyimpan keranjang belanja user)
+CREATE TABLE IF NOT EXISTS user_cart (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  cart_data JSON NOT NULL,
+  last_qr_code TEXT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_cart (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Verifikasi tabel yang sudah dibuat
 SHOW TABLES;
 

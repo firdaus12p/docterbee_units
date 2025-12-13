@@ -107,6 +107,10 @@ router.post("/", async (req, res) => {
       customerAddress,
       promoCode,
       notes,
+      // Accept prices from frontend (already calculated with promo)
+      price: frontendPrice,
+      discountAmount: frontendDiscountAmount,
+      finalPrice: frontendFinalPrice,
     } = req.body;
 
     // Validation
@@ -139,14 +143,25 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // Get service price
-    const price = getServicePrice(serviceName);
+    // Use frontend prices if provided, otherwise calculate
+    let price = frontendPrice || getServicePrice(serviceName);
+    let discountAmount = frontendDiscountAmount || 0;
+    let finalPrice = frontendFinalPrice || price;
 
-    // Calculate discount if promo code provided
-    let discountAmount = 0;
-    let finalPrice = price;
+    console.log("💾 Booking - Harga yang diterima:", {
+      serviceName,
+      frontendPrice,
+      frontendDiscountAmount,
+      frontendFinalPrice,
+      calculatedPrice: getServicePrice(serviceName),
+      finalPrice: price,
+      finalDiscountAmount: discountAmount,
+      finalFinalPrice: finalPrice,
+      promoCode,
+    });
 
-    if (promoCode) {
+    // Only recalculate if frontend didn't provide prices AND promo code exists
+    if (!frontendPrice && promoCode) {
       const coupon = await queryOne(
         `SELECT * FROM coupons 
          WHERE code = ? 
@@ -168,6 +183,21 @@ router.post("/", async (req, res) => {
         finalPrice = Math.max(0, price - discountAmount);
 
         // Increment usage count
+        await query(
+          "UPDATE coupons SET used_count = used_count + 1 WHERE id = ?",
+          [coupon.id]
+        );
+      }
+    } else if (frontendPrice && promoCode) {
+      // If frontend provided prices with promo code, still increment coupon usage
+      const coupon = await queryOne(
+        `SELECT * FROM coupons 
+         WHERE code = ? 
+         AND is_active = 1`,
+        [promoCode]
+      );
+
+      if (coupon) {
         await query(
           "UPDATE coupons SET used_count = used_count + 1 WHERE id = ?",
           [coupon.id]

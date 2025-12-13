@@ -2,11 +2,11 @@
 // STORE CART - Shopping Cart Management
 // ============================================
 
-const API_BASE = "http://localhost:3000/api";
-
 // Cart state
 let cart = [];
-let currentUser = null; // TODO: Get from login system
+
+// Pending order state
+let pendingOrderData = null;
 
 // ============================================
 // CART FUNCTIONS
@@ -187,23 +187,76 @@ async function submitOrder() {
     return;
   }
 
-  // TODO: Get user info from login system
-  const customerName = "Guest User"; // Temporary
-  const customerPhone = ""; // Temporary
-  const customerEmail = ""; // Temporary
+  // Get guest customer data (if form is visible)
+  const guestInfoDiv = document.getElementById("guestCustomerInfo");
+  let guestData = null;
+
+  if (guestInfoDiv && !guestInfoDiv.classList.contains("hidden")) {
+    // Guest mode - validate required fields
+    const guestName = document.getElementById("guestName")?.value.trim();
+    const guestPhone = document.getElementById("guestPhone")?.value.trim();
+    const guestAddress = document.getElementById("guestAddress")?.value.trim();
+
+    if (!guestName) {
+      showToast("Nama harus diisi", "error");
+      document.getElementById("guestName")?.focus();
+      return;
+    }
+
+    if (!guestPhone) {
+      showToast("Nomor HP harus diisi", "error");
+      document.getElementById("guestPhone")?.focus();
+      return;
+    }
+
+    // Validate phone number format (basic)
+    if (!/^[0-9]{10,15}$/.test(guestPhone)) {
+      showToast("Format nomor HP tidak valid (10-15 digit)", "error");
+      document.getElementById("guestPhone")?.focus();
+      return;
+    }
+
+    guestData = {
+      name: guestName,
+      phone: guestPhone,
+      address: guestAddress,
+    };
+  }
+
+  // ✅ CHECK FOR PENDING ORDER FIRST
+  try {
+    const checkResponse = await fetch(
+      "/api/orders/check-pending",
+      {
+        credentials: "include",
+      }
+    );
+
+    const checkResult = await checkResponse.json();
+
+    if (checkResult.success && checkResult.has_pending) {
+      // User has pending order - show modal
+      showPendingOrderModal(checkResult.data);
+      return; // Stop checkout process
+    }
+  } catch (error) {
+    console.error("Error checking pending order:", error);
+    // Continue with checkout if check fails (for guest users)
+  }
 
   const totalAmount = calculateTotal();
 
   const orderData = {
-    user_id: currentUser?.id || null,
-    customer_name: customerName,
-    customer_phone: customerPhone,
-    customer_email: customerEmail,
     order_type: orderType,
     store_location: storeLocation,
     items: cart,
     total_amount: totalAmount,
   };
+
+  // Add guest data if available
+  if (guestData) {
+    orderData.guest_data = guestData;
+  }
 
   try {
     // Show loading
@@ -215,15 +268,23 @@ async function submitOrder() {
       Memproses...
     `;
 
-    const response = await fetch(`${API_BASE}/orders`, {
+    // Debug: log order data being sent
+    console.log("💾 Sending order data:", orderData);
+
+    const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Send session cookie
       body: JSON.stringify(orderData),
     });
 
     const result = await response.json();
+
+    // Debug: log response
+    console.log("📡 Response status:", response.status);
+    console.log("📡 Response data:", result);
 
     if (!result.success) {
       throw new Error(result.error || "Gagal membuat order");
@@ -409,7 +470,7 @@ function closeQRModal() {
 // POINTS CLAIMING
 // ============================================
 
-function claimOrderPoints(orderData) {
+async function claimOrderPoints(orderData) {
   // Check if points already claimed for this order
   const claimedOrders = getClaimedOrders();
 
@@ -418,28 +479,67 @@ function claimOrderPoints(orderData) {
     return;
   }
 
-  // Add points using global addPoints function from script.js
-  if (typeof window.addPoints === "function") {
-    window.addPoints(orderData.points_earned);
+  // If user is logged in, reload progress from database (points already added by backend)
+  if (
+    typeof window.UserDataSync !== "undefined" &&
+    window.UserDataSync.isEnabled()
+  ) {
+    console.log("🔄 Reloading user progress from database...");
 
-    // Mark order as claimed
-    claimedOrders.push(orderData.id);
-    localStorage.setItem(
-      "docterbee_claimed_orders",
-      JSON.stringify(claimedOrders)
-    );
+    try {
+      // Reload progress from backend (this will update localStorage with correct points)
+      await window.UserDataSync.loadProgress();
 
-    // Show toast notification
-    showToast(
-      `+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`,
-      "success"
-    );
+      // Refresh UI to show new points
+      if (typeof window.refreshNav === "function") {
+        window.refreshNav();
+      }
 
-    console.log(
-      `Successfully claimed ${orderData.points_earned} points for order ${orderData.id}`
-    );
+      // Mark order as claimed
+      claimedOrders.push(orderData.id);
+      localStorage.setItem(
+        "docterbee_claimed_orders",
+        JSON.stringify(claimedOrders)
+      );
+
+      // Show toast notification
+      showToast(
+        `+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`,
+        "success"
+      );
+
+      console.log(
+        `✅ Successfully loaded ${orderData.points_earned} points from database for order ${orderData.id}`
+      );
+    } catch (error) {
+      console.error("❌ Failed to reload progress:", error);
+    }
   } else {
-    console.error("addPoints function not available");
+    // Guest mode - add points to localStorage only
+    console.log("👤 Guest mode - adding points to localStorage");
+
+    if (typeof window.addPoints === "function") {
+      window.addPoints(orderData.points_earned);
+
+      // Mark order as claimed
+      claimedOrders.push(orderData.id);
+      localStorage.setItem(
+        "docterbee_claimed_orders",
+        JSON.stringify(claimedOrders)
+      );
+
+      // Show toast notification
+      showToast(
+        `+${orderData.points_earned} poin telah ditambahkan! 🎉`,
+        "success"
+      );
+
+      console.log(
+        `✅ Added ${orderData.points_earned} points to localStorage for order ${orderData.id}`
+      );
+    } else {
+      console.error("addPoints function not available");
+    }
   }
 }
 
@@ -454,12 +554,25 @@ function getClaimedOrders() {
 
 function saveCartToLocalStorage() {
   localStorage.setItem("docterbee_cart", JSON.stringify(cart));
+
+  // Auto-save to database if sync is enabled
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    window.UserDataSync.debouncedSaveCart();
+  }
 }
 
 function loadCartFromLocalStorage() {
   const savedCart = localStorage.getItem("docterbee_cart");
   if (savedCart) {
-    cart = JSON.parse(savedCart);
+    try {
+      const parsed = JSON.parse(savedCart);
+      // Ensure cart is always an array
+      cart = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error("Error parsing cart from localStorage:", error);
+      cart = [];
+      localStorage.removeItem("docterbee_cart"); // Clear corrupted data
+    }
     updateCartUI();
     updateCartCount();
   }
@@ -487,7 +600,9 @@ async function reopenLastOrderQR() {
 
   try {
     // Fetch latest order status from server
-    const response = await fetch(`${API_BASE}/orders/id/${lastOrder.id}`);
+    const response = await fetch(
+      `/api/orders/id/${lastOrder.id}`
+    );
     const result = await response.json();
 
     if (!result.success) {
@@ -549,6 +664,170 @@ function showToast(message, type = "success") {
 }
 
 // ============================================
+// PENDING ORDER MODAL FUNCTIONS
+// ============================================
+
+function showPendingOrderModal(orderData) {
+  pendingOrderData = orderData;
+  const modal = document.getElementById("pendingOrderModal");
+
+  // Populate order info
+  document.getElementById("pendingOrderNumber").textContent =
+    orderData.order_number;
+  document.getElementById("pendingOrderTotal").textContent =
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(orderData.total_amount);
+
+  // Format order type
+  const orderTypeText =
+    orderData.order_type === "dine_in" ? "Dine In" : "Take Away";
+  document.getElementById("pendingOrderType").textContent = orderTypeText;
+
+  // Format expiry date
+  const expiryDate = new Date(orderData.expires_at);
+  document.getElementById("pendingExpiresAt").textContent =
+    expiryDate.toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  // Display items
+  const itemsContainer = document.getElementById("pendingOrderItems");
+  const items = JSON.parse(orderData.items);
+  itemsContainer.innerHTML = items
+    .map(
+      (item) => `
+    <div class="flex justify-between text-xs text-slate-700">
+      <span>${item.name} x${item.quantity}</span>
+      <span class="font-semibold">${new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      }).format(item.price * item.quantity)}</span>
+    </div>
+  `
+    )
+    .join("");
+
+  // Generate QR Code
+  const qrContainer = document.getElementById("pendingQrcode");
+  qrContainer.innerHTML = ""; // Clear previous QR
+
+  new QRCode(qrContainer, {
+    text: orderData.qr_code_data,
+    width: 200,
+    height: 200,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
+  });
+
+  // Show modal
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  // Reinitialize Lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function closePendingOrderModal() {
+  const modal = document.getElementById("pendingOrderModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pendingOrderData = null;
+}
+
+async function cancelPendingOrderAndRetry() {
+  if (!pendingOrderData) {
+    showToast("Data order tidak ditemukan", "error");
+    return;
+  }
+
+  const confirmCancel = confirm(
+    `Apakah Anda yakin ingin membatalkan order ${pendingOrderData.order_number}?\n\n⚠️ Poin yang dijanjikan tidak akan diberikan jika order dibatalkan.`
+  );
+
+  if (!confirmCancel) {
+    return;
+  }
+
+  try {
+    // Call cancel endpoint
+    const response = await fetch(
+      `/api/orders/${pendingOrderData.id}/cancel`,
+      {
+        method: "PATCH",
+        credentials: "include",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal membatalkan order");
+    }
+
+    showToast("✅ Order berhasil dibatalkan", "success");
+    closePendingOrderModal();
+
+    // Wait a bit then retry checkout
+    setTimeout(() => {
+      submitOrder();
+    }, 500);
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    showToast("❌ Error: " + error.message, "error");
+  }
+}
+
+// Make functions globally accessible
+window.closePendingOrderModal = closePendingOrderModal;
+window.cancelPendingOrderAndRetry = cancelPendingOrderAndRetry;
+
+// ============================================
+// CUSTOMER INFO MANAGEMENT
+// ============================================
+
+async function initCustomerInfo() {
+  try {
+    // Check if user is logged in
+    const response = await fetch("/api/auth/check", {
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    const guestInfoDiv = document.getElementById("guestCustomerInfo");
+
+    if (data.loggedIn && data.user) {
+      // User is logged in - hide guest form
+      if (guestInfoDiv) {
+        guestInfoDiv.classList.add("hidden");
+      }
+    } else {
+      // Guest user - show form
+      if (guestInfoDiv) {
+        guestInfoDiv.classList.remove("hidden");
+      }
+    }
+  } catch (error) {
+    console.error("Error checking auth status:", error);
+    // Show guest form on error
+    const guestInfoDiv = document.getElementById("guestCustomerInfo");
+    if (guestInfoDiv) {
+      guestInfoDiv.classList.remove("hidden");
+    }
+  }
+}
+
+// ============================================
 // INIT
 // ============================================
 
@@ -556,6 +835,7 @@ function showToast(message, type = "success") {
 document.addEventListener("DOMContentLoaded", () => {
   loadCartFromLocalStorage();
   updateLastOrderButton();
+  initCustomerInfo();
 });
 
 // Expose functions to window

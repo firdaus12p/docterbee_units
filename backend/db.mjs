@@ -44,6 +44,24 @@ async function initializeTables() {
   const connection = await pool.getConnection();
 
   try {
+    // Create users table (FIRST - other tables reference this)
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        phone VARCHAR(20) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_email (email),
+        INDEX idx_phone (phone),
+        INDEX idx_active (is_active)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: users");
+
     // Create bookings table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS bookings (
@@ -75,53 +93,6 @@ async function initializeTables() {
     `);
     console.log("✅ Table: bookings");
 
-    // Check and add customer columns if not exist
-    try {
-      const [columns] = await connection.query(
-        "SHOW COLUMNS FROM bookings LIKE 'customer_name'"
-      );
-
-      if (columns.length === 0) {
-        console.log("⚙️  Adding customer columns to bookings table...");
-
-        await connection.query(`
-          ALTER TABLE bookings
-          ADD COLUMN customer_name VARCHAR(255) DEFAULT NULL AFTER mode,
-          ADD COLUMN customer_phone VARCHAR(20) DEFAULT NULL AFTER customer_name,
-          ADD COLUMN customer_age INT DEFAULT NULL AFTER customer_phone,
-          ADD COLUMN customer_gender ENUM('Laki-laki', 'Perempuan') DEFAULT NULL AFTER customer_age,
-          ADD COLUMN customer_address TEXT DEFAULT NULL AFTER customer_gender,
-          ADD INDEX idx_customer_phone (customer_phone)
-        `);
-
-        console.log("✅ Customer columns added successfully");
-      }
-    } catch (alterError) {
-      // If ALTER fails, it might be because columns already exist or other issues
-      console.log("ℹ️  Customer columns check:", alterError.message);
-    }
-
-    // Check and add price columns if not exist
-    try {
-      const [priceCol] = await connection.query(
-        "SHOW COLUMNS FROM bookings LIKE 'price'"
-      );
-
-      if (priceCol.length === 0) {
-        console.log("⚙️  Adding price columns to bookings table...");
-
-        await connection.query(`
-          ALTER TABLE bookings
-          ADD COLUMN price DECIMAL(10, 2) DEFAULT 0 COMMENT 'Harga asli service' AFTER mode,
-          ADD COLUMN final_price DECIMAL(10, 2) DEFAULT 0 COMMENT 'Harga setelah diskon' AFTER discount_amount
-        `);
-
-        console.log("✅ Price columns added successfully");
-      }
-    } catch (priceError) {
-      console.log("ℹ️  Price columns check:", priceError.message);
-    }
-
     // Create events table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS events (
@@ -145,47 +116,6 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: events");
-
-    // Add new columns if not exist (for existing databases)
-    try {
-      const [speakerCol] = await connection.query(
-        "SHOW COLUMNS FROM events LIKE 'speaker'"
-      );
-
-      if (speakerCol.length === 0) {
-        console.log("⚙️  Adding new event columns...");
-
-        await connection.query(`
-          ALTER TABLE events
-          ADD COLUMN speaker VARCHAR(255) DEFAULT NULL COMMENT 'Nama pemateri/host' AFTER link,
-          ADD COLUMN registration_fee DECIMAL(10, 2) DEFAULT 0 COMMENT 'Biaya pendaftaran (0 = gratis)' AFTER speaker,
-          ADD COLUMN registration_deadline DATE DEFAULT NULL COMMENT 'Tanggal akhir pendaftaran' AFTER registration_fee,
-          ADD COLUMN location VARCHAR(500) DEFAULT NULL COMMENT 'Lokasi offline atau link Zoom' AFTER registration_deadline
-        `);
-
-        console.log("✅ Event columns added successfully");
-      }
-    } catch (eventColError) {
-      console.log("ℹ️  Event columns check:", eventColError.message);
-    }
-
-    // Create articles table
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS articles (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        title VARCHAR(255) NOT NULL,
-        slug VARCHAR(255) UNIQUE NOT NULL,
-        content TEXT NOT NULL,
-        excerpt TEXT,
-        tags VARCHAR(500),
-        is_published TINYINT(1) DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_slug (slug),
-        INDEX idx_published (is_published)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
-    console.log("✅ Table: articles");
 
     // Create coupons table
     await connection.query(`
@@ -298,10 +228,39 @@ async function initializeTables() {
         INDEX idx_status (status),
         INDEX idx_payment_status (payment_status),
         INDEX idx_expires_at (expires_at),
-        INDEX idx_created (created_at)
+        INDEX idx_created (created_at),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: orders");
+
+    // Create user_progress table for Journey data sync
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS user_progress (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        unit_data JSON NOT NULL,
+        points INT DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: user_progress");
+
+    // Create user_cart table for Store cart data sync
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS user_cart (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        cart_data JSON NOT NULL,
+        last_qr_code TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user_cart (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: user_cart");
 
     console.log("📦 All tables initialized successfully");
   } catch (error) {

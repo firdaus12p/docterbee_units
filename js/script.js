@@ -2,24 +2,6 @@
    Docterbee Journey - Main JavaScript
    ======================================== */
 
-// ==================== API CONFIGURATION ====================
-/**
- * Production-ready API Base URL
- * Automatically uses current domain in production
- */
-const API_BASE = (() => {
-  const isDev =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  return isDev ? "http://localhost:3000" : window.location.origin;
-})();
-
-console.log("📍 API Base URL:", API_BASE);
-console.log(
-  "📍 Environment:",
-  API_BASE.includes("localhost") ? "DEVELOPMENT" : "PRODUCTION"
-);
-
 // ==================== DATA MODEL ====================
 
 const UNITS = [
@@ -261,6 +243,11 @@ function addPoints(value) {
   points += value;
   _setPoints(points);
   refreshNav();
+
+  // Auto-save to database if sync is enabled
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    window.UserDataSync.debouncedSaveProgress();
+  }
 }
 
 /**
@@ -319,6 +306,9 @@ function buildTabs() {
  * @param {string} unitId - Unit ID to display
  */
 function showUnit(unitId) {
+  // Track current unit globally for re-rendering after data loads
+  window.currentUnitId = unitId;
+
   const unit = UNITS.find((u) => u.id === unitId);
   if (!unit) return;
 
@@ -470,9 +460,23 @@ function escapeHtml(text) {
  * @param {number} value - Answer value (0 or 1)
  */
 function answer(unitId, key, value) {
-  const state = getState();
-  state[unitId] = state[unitId] || {};
+  // Get current state
+  let state = getState();
+
+  // Ensure state is an object
+  if (!state || typeof state !== "object") {
+    state = {};
+  }
+
+  // Ensure unit exists in state
+  if (!state[unitId] || typeof state[unitId] !== "object") {
+    state[unitId] = {};
+  }
+
+  // Set answer
   state[unitId][key] = value;
+
+  // Save state to localStorage
   setState(state);
 
   const element = document.getElementById("ans_" + unitId + "_" + key);
@@ -482,7 +486,8 @@ function answer(unitId, key, value) {
   if (value === 1) {
     element.textContent = "Terpenuhi";
     element.className = "status-answered";
-    addPoints(1);
+    // NOTE: Journey answers do NOT add points to "My Points & Rewards"
+    // Points only increase from product purchases (order completed)
   } else {
     element.textContent = "Belum melakukan";
     element.className = "status-unanswered";
@@ -504,6 +509,14 @@ function answer(unitId, key, value) {
       yesBtn.classList.remove("selected");
       noBtn.classList.add("selected");
     }
+  }
+
+  // Auto-save to database if sync is enabled
+  if (window.UserDataSync && window.UserDataSync.isEnabled()) {
+    console.log("🔄 Triggering debounced save to database...");
+    window.UserDataSync.debouncedSaveProgress();
+  } else {
+    console.log("👤 Guest mode - data saved to localStorage only");
   }
 }
 
@@ -546,11 +559,9 @@ function calcUnit(unitId) {
     }
   }
 
-  // Add bonus points
-  const bonusPoints = Math.floor(score / 20);
-  if (bonusPoints > 0) {
-    addPoints(bonusPoints);
-  }
+  // NOTE: Journey scoring does NOT add points to "My Points & Rewards"
+  // This is just for tracking daily health habits
+  // Points only increase from product purchases (order completed)
 }
 
 /**
@@ -623,11 +634,9 @@ function calcAll() {
     }
   }
 
-  // Add bonus points
-  const bonusPoints = Math.floor(total / 25);
-  if (bonusPoints > 0) {
-    addPoints(bonusPoints);
-  }
+  // NOTE: Journey scoring does NOT add points to "My Points & Rewards"
+  // This is just for tracking daily health habits
+  // Points only increase from product purchases (order completed)
 }
 
 // ==================== MOBILE MENU ====================
@@ -635,6 +644,92 @@ function calcAll() {
 /**
  * Initialize mobile menu functionality
  */
+// ============================================
+// LOGOUT FUNCTIONALITY
+// ============================================
+async function handleLogout() {
+  try {
+    const response = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Clear user data sync
+      if (window.UserDataSync) {
+        window.UserDataSync.clear();
+      }
+
+      alert("Logout berhasil");
+      window.location.href = "/";
+    } else {
+      alert("Logout gagal");
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+    alert("Terjadi kesalahan saat logout");
+  }
+}
+
+function initLogout() {
+  // Desktop logout button
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout);
+  }
+
+  // Mobile logout button
+  const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener("click", handleLogout);
+  }
+}
+
+/**
+ * Update login/logout button visibility based on auth status
+ */
+async function updateAuthButtons() {
+  try {
+    const response = await fetch("/api/auth/check", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    // Desktop buttons
+    const desktopLogoutBtn = document.getElementById("logoutBtn");
+
+    // Mobile buttons
+    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+    if (data.loggedIn) {
+      // User is logged in - show logout buttons
+      if (desktopLogoutBtn) desktopLogoutBtn.classList.remove("hidden");
+      if (mobileLogoutBtn) mobileLogoutBtn.classList.remove("hidden");
+      if (mobileLoginBtn) mobileLoginBtn.classList.add("hidden");
+    } else {
+      // User is not logged in - show login button
+      if (desktopLogoutBtn) desktopLogoutBtn.classList.add("hidden");
+      if (mobileLogoutBtn) mobileLogoutBtn.classList.add("hidden");
+      if (mobileLoginBtn) mobileLoginBtn.classList.remove("hidden");
+    }
+  } catch (error) {
+    console.error("Auth check error:", error);
+    // On error, assume not logged in - show login button
+    const desktopLogoutBtn = document.getElementById("logoutBtn");
+    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+    if (desktopLogoutBtn) desktopLogoutBtn.classList.add("hidden");
+    if (mobileLogoutBtn) mobileLogoutBtn.classList.add("hidden");
+    if (mobileLoginBtn) mobileLoginBtn.classList.remove("hidden");
+  }
+}
+
 // Flag to prevent multiple initializations
 let mobileMenuInitialized = false;
 
@@ -690,14 +785,20 @@ function initMobileMenu() {
 /**
  * Initialize application
  */
-function init() {
+async function init() {
   // Set current year in footer
   const yearElement = document.getElementById("year");
   if (yearElement) {
     yearElement.textContent = new Date().getFullYear();
   }
 
-  // Build tabs and show first unit
+  // Initialize user data sync FIRST (check if logged in and load data)
+  // This must happen before rendering UI to ensure data is available
+  if (window.UserDataSync && window.UserDataSync.autoInit) {
+    await window.UserDataSync.autoInit();
+  }
+
+  // Build tabs and show first unit (after data is loaded)
   buildTabs();
   showUnit(UNITS[0].id);
 
@@ -707,8 +808,14 @@ function init() {
     calcAllBtn.addEventListener("click", calcAll);
   }
 
+  // Initialize logout functionality
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons visibility
+  await updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -740,16 +847,26 @@ function generateSlots() {
   const slotsContainer = document.getElementById("slots");
   if (!slotsContainer) return;
 
-  slotsContainer.innerHTML = "";
   const hours = [9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20];
 
-  hours.forEach((hour) => {
-    const button = document.createElement("button");
-    button.className = "slot-button";
-    button.textContent = (hour < 10 ? "0" : "") + hour + ":00";
-    button.addEventListener("click", () => selectSlot(button.textContent));
-    slotsContainer.appendChild(button);
-  });
+  // Create select dropdown for time slots
+  slotsContainer.innerHTML = `
+    <select id="timeSlotSelect" class="booking-select w-full">
+      <option value="">Pilih jam yang tersedia...</option>
+      ${hours
+        .map((hour) => {
+          const timeStr = (hour < 10 ? "0" : "") + hour + ":00";
+          return `<option value="${timeStr}">${timeStr}</option>`;
+        })
+        .join("")}
+    </select>
+  `;
+
+  // Add event listener to the select element
+  const selectElement = document.getElementById("timeSlotSelect");
+  if (selectElement) {
+    selectElement.addEventListener("change", (e) => selectSlot(e.target.value));
+  }
 }
 
 /**
@@ -757,17 +874,19 @@ function generateSlots() {
  * @param {string} time - Selected time slot
  */
 function selectSlot(time) {
+  // Jika time kosong (user pilih default option), reset
+  if (!time) {
+    bookingState.selectedTime = null;
+    updateBookingSummary();
+    return;
+  }
+
   bookingState.selectedTime = time;
 
-  // Update slot buttons styling
-  const slots = document.getElementById("slots");
-  if (slots) {
-    Array.from(slots.children).forEach((button) => {
-      button.classList.remove("selected");
-      if (button.textContent === time) {
-        button.classList.add("selected");
-      }
-    });
+  // Update the select element value
+  const selectElement = document.getElementById("timeSlotSelect");
+  if (selectElement && selectElement.value !== time) {
+    selectElement.value = time;
   }
 
   updateBookingSummary();
@@ -965,7 +1084,7 @@ async function validatePromoCode() {
   promoResult.classList.remove("hidden");
 
   try {
-    const response = await fetch(API_BASE + "/api/coupons/validate", {
+    const response = await fetch("/api/coupons/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: code.toUpperCase() }),
@@ -1076,7 +1195,7 @@ async function saveBookingToDatabase() {
     : "offline";
 
   try {
-    const response = await fetch(API_BASE + "/api/bookings", {
+    const response = await fetch("/api/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1092,6 +1211,10 @@ async function saveBookingToDatabase() {
         customerAge: parseInt(customerAge),
         customerGender: customerGender,
         customerAddress: customerAddress,
+        // Send calculated prices from frontend
+        price: bookingState.price,
+        discountAmount: bookingState.discountAmount,
+        finalPrice: bookingState.finalPrice,
       }),
     });
 
@@ -1099,6 +1222,12 @@ async function saveBookingToDatabase() {
 
     if (result.success) {
       console.log("✅ Booking berhasil disimpan ke database:", result.data);
+      console.log("💰 Harga yang dikirim:", {
+        price: bookingState.price,
+        discountAmount: bookingState.discountAmount,
+        finalPrice: bookingState.finalPrice,
+        promoCode: promoCode,
+      });
       return true;
     } else {
       console.error("❌ Gagal menyimpan booking:", result.error);
@@ -1117,7 +1246,9 @@ async function saveBookingToDatabase() {
 async function loadServicePrice(serviceName) {
   try {
     const response = await fetch(
-      `${API_BASE}/api/bookings/prices/${encodeURIComponent(serviceName)}`
+      `/api/bookings/prices/${encodeURIComponent(
+        serviceName
+      )}`
     );
     const result = await response.json();
 
@@ -1284,8 +1415,14 @@ function initBooking() {
     }
   });
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -1359,7 +1496,7 @@ async function renderEvents() {
 
   try {
     // Build query params
-    let url = `${API_BASE}/api/events?limit=50`;
+    let url = "/api/events?limit=50";
     if (modeFilter !== "all") {
       url += `&mode=${modeFilter}`;
     }
@@ -1443,7 +1580,7 @@ async function renderEvents() {
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
         <div class="mt-3 flex flex-wrap gap-2">
-          <a href="booking.html?service=${encodeURIComponent(
+          <a href="/booking?service=${encodeURIComponent(
             event.title
           )}" class="btn-primary-sm">Daftar</a>
           ${
@@ -1506,8 +1643,14 @@ function initEvents() {
     topicSelect.addEventListener("change", renderEvents);
   }
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -1558,7 +1701,7 @@ async function renderInsightArticles() {
     '<div class="col-span-3 text-center text-slate-400 p-6">Loading articles...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/api/insight?limit=20`);
+    const response = await fetch("/api/insight?limit=20");
     const result = await response.json();
 
     if (!result.success || result.data.length === 0) {
@@ -1639,7 +1782,7 @@ async function summarizeArticleById(slug) {
     '<p class="text-slate-400">Loading article...</p>';
 
   try {
-    const response = await fetch(`${API_BASE}/api/insight/${slug}`);
+    const response = await fetch(`/api/insight/${slug}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -1694,8 +1837,14 @@ function initInsight() {
   // Render articles
   renderInsightArticles();
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -1882,7 +2031,7 @@ async function checkTranscript() {
   }
 
   try {
-    const response = await fetch(API_BASE + "/api/check-transcript", {
+    const response = await fetch("/api/check-transcript", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ youtubeUrl }),
@@ -2010,7 +2159,7 @@ async function analyzeMedia() {
     });
 
     // Call backend API
-    const response = await fetch(API_BASE + "/api/summarize", {
+    const response = await fetch("/api/summarize", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -2112,7 +2261,7 @@ async function analyzeMedia() {
             `
                 : `
               <li>Pastikan server backend berjalan: <code class="bg-slate-700 px-1 rounded">npm start</code></li>
-              <li>Cek koneksi ke <code class="bg-slate-700 px-1 rounded">${API_BASE}</code></li>
+              <li>Cek koneksi ke <code class="bg-slate-700 px-1 rounded">http://localhost:3000</code></li>
               <li>Periksa API key Gemini di file <code class="bg-slate-700 px-1 rounded">.env</code></li>
               <li>Lihat console browser (F12) untuk detail error</li>
             `
@@ -2359,8 +2508,14 @@ function initMedia() {
     btnLoadCustomAudio.addEventListener("click", loadCustomAudio);
   }
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -2392,7 +2547,7 @@ async function renderServices() {
     params.append("is_active", "1"); // Only show active services
 
     const response = await fetch(
-      `${API_BASE}/api/services?${params.toString()}`
+      `/api/services?${params.toString()}`
     );
     const result = await response.json();
 
@@ -2454,7 +2609,7 @@ async function renderServices() {
             </div>
             ${modeInfo}
             <a
-              href="booking.html?service=${encodeURIComponent(service.name)}"
+              href="/booking?service=${encodeURIComponent(service.name)}"
               class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-4 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md mt-3"
             >
               <i data-lucide="calendar" class="w-4 h-4"></i>
@@ -2553,8 +2708,14 @@ function initServices() {
     modeFilter.addEventListener("change", renderServices);
   }
 
+  // Initialize logout
+  initLogout();
+
   // Initialize mobile menu
   initMobileMenu();
+
+  // Update auth buttons
+  updateAuthButtons();
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -2661,7 +2822,7 @@ function showStoreTab(tabName) {
 // Fetch products from API
 async function loadProductsFromAPI() {
   try {
-    const response = await fetch(`${API_BASE}/api/products`);
+    const response = await fetch("/api/products");
     const result = await response.json();
 
     if (result.success && result.data) {
@@ -3059,8 +3220,6 @@ if (document.readyState === "loading") {
       initBooking();
     } else if (document.getElementById("events")) {
       initEvents();
-    } else if (document.getElementById("articles")) {
-      initInsight();
     } else if (document.getElementById("ytPlayer")) {
       initMedia();
     } else if (document.getElementById("storePageRoot")) {
@@ -3077,8 +3236,6 @@ if (document.readyState === "loading") {
     initBooking();
   } else if (document.getElementById("events")) {
     initEvents();
-  } else if (document.getElementById("articles")) {
-    initInsight();
   } else if (document.getElementById("ytPlayer")) {
     initMedia();
   } else if (document.getElementById("page-store")) {

@@ -21,21 +21,29 @@
       <div
         class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
       >
-        <a href="index.html" class="flex items-center gap-2">
+        <a href="/" class="flex items-center gap-2">
           <div class="logo-box"></div>
           <span class="font-semibold">Docterbee</span>
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
-          <a href="index.html" class="nav-link">Journey</a>
-          <a href="services.html" class="nav-link">Services</a>
-          <a href="store.html" class="nav-link">Store</a>
-          <a href="events.html" class="nav-link">Events</a>
-          <a href="insight.html" class="nav-link">Insight</a>
-          <a href="media.html" class="nav-link">Media</a>
-          <a href="ai-advisor.html" class="nav-link">AI Advisor</a>
+          <a href="/" id="guestNavItem" class="nav-link">Beranda</a>
+          <a href="/journey" class="nav-link">Journey</a>
+          <a href="/services" class="nav-link">Services</a>
+          <a href="/store" class="nav-link">Store</a>
+          <a href="/events" class="nav-link">Events</a>
+          <a href="/insight" class="nav-link">Insight</a>
+          <a href="/media" class="nav-link">Media</a>
+          <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
           <span class="points-display"> Points: <b id="navPoints">0</b> </span>
+          <button
+            id="logoutBtn"
+            class="hidden md:block text-sm text-red-600 hover:text-red-700 font-semibold"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
           <button
             id="hamburgerBtn"
             class="md:hidden hamburger-btn"
@@ -63,25 +71,39 @@
         </button>
       </div>
       <nav class="mobile-menu-nav">
-        <a href="index.html" class="mobile-nav-link">Journey</a>
-        <a href="services.html" class="mobile-nav-link">Services</a>
-        <a href="store.html" class="mobile-nav-link">Store</a>
-        <a href="events.html" class="mobile-nav-link">Events</a>
-        <a href="insight.html" class="mobile-nav-link">Insight</a>
-        <a href="media.html" class="mobile-nav-link">Media</a>
-        <a href="ai-advisor.html" class="mobile-nav-link">AI Advisor</a>
+        <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
+        <a href="/journey" class="mobile-nav-link">Journey</a>
+        <a href="/services" class="mobile-nav-link">Services</a>
+        <a href="/store" class="mobile-nav-link">Store</a>
+        <a href="/events" class="mobile-nav-link">Events</a>
+        <a href="/insight" class="mobile-nav-link">Insight</a>
+        <a href="/media" class="mobile-nav-link">Media</a>
+        <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
         <span class="points-display">
           Points: <b id="mobileNavPoints">0</b>
         </span>
+        <button
+          id="mobileLogoutBtn"
+          class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
+        >
+          Logout
+        </button>
+        <a
+          id="mobileLoginBtn"
+          href="/login"
+          class="hidden mt-4 w-full py-2 px-4 bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold rounded-lg transition-colors text-center block"
+        >
+          Login
+        </a>
       </div>
     </div>
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Booking Praktisi</h1>
-      <p class="text-slate-300/85 mb-6 max-w-2xl">
+      <p class="text-slate-900 mb-6 max-w-2xl">
         Pilih cabang, praktisi, tanggal, dan jam. *Demo ini hanya simulasi UI
         tanpa pembayaran.*
       </p>
@@ -89,17 +111,15 @@
       <!-- Selected Service Indicator -->
       <div
         id="serviceIndicator"
-        class="mb-6 hidden rounded-2xl border-2 border-amber-400/40 bg-gradient-to-r from-amber-900/20 to-slate-900/60 p-4"
+        class="mb-6 hidden rounded-2xl border-2 border-amber-400/40 bg-white p-4"
       >
         <div class="flex items-center gap-3">
-          <i data-lucide="check-circle" class="w-5 h-5 text-amber-400"></i>
+          <i data-lucide="check-circle" class="w-5 h-5 text-amber-500"></i>
           <div>
-            <div class="text-xs text-slate-300/70 mb-1">
-              Layanan yang dipilih:
-            </div>
+            <div class="text-xs text-slate-500 mb-1">Layanan yang dipilih:</div>
             <div
               id="serviceIndicatorText"
-              class="text-lg font-semibold text-amber-300"
+              class="text-lg font-semibold text-amber-500"
             ></div>
           </div>
         </div>
@@ -110,7 +130,7 @@
         <div class="booking-container space-y-4 md:col-span-2">
           <!-- Data Pribadi -->
           <div class="mb-4">
-            <div class="text-sm font-semibold text-amber-300 mb-3">
+            <div class="text-base font-bold text-amber-500 mb-3">
               Data Pribadi
             </div>
             <div class="grid md:grid-cols-2 gap-3">
@@ -171,7 +191,7 @@
           </div>
 
           <!-- Data Booking -->
-          <div class="text-sm font-semibold text-amber-300 mb-3">
+          <div class="text-base font-bold text-amber-500 mb-3">
             Detail Booking
           </div>
           <div class="grid md:grid-cols-2 gap-3">
@@ -255,11 +275,10 @@
           </div>
 
           <div>
-            <div class="text-sm mb-2 opacity-80">Pilih Jam</div>
-            <div
-              id="slots"
-              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2"
-            ></div>
+            <label class="booking-label">
+              Pilih Jam <span class="text-red-400">*</span>
+            </label>
+            <div id="slots"></div>
           </div>
 
           <div class="flex gap-3">
@@ -276,7 +295,7 @@
             <i data-lucide="shield-check" class="w-4 h-4 text-amber-300"></i>
             <b>Kebijakan</b>
           </div>
-          <ul class="list-disc pl-5 text-slate-300/85 space-y-1">
+          <ul class="list-disc pl-5 text-slate-900 space-y-1">
             <li>Data Anda akan disimpan dengan aman.</li>
             <li>Admin akan follow up melalui WhatsApp.</li>
             <li>Batal minimal 6 jam sebelum jadwal.</li>
@@ -286,19 +305,19 @@
             <i data-lucide="calendar" class="w-4 h-4 text-sky-300"></i>
             <b>Jam Operasional</b>
           </div>
-          <p class="text-slate-300/80">Senin–Sabtu, 09.00–20.00 WITA.</p>
+          <p class="text-slate-900">Senin–Sabtu, 09.00–20.00 WITA.</p>
         </aside>
       </div>
 
       <!-- Summary Section -->
-      <section class="mt-8 booking-container">
-        <div class="mb-4">
-          <div class="text-lg font-semibold">Ringkasan</div>
-        </div>
-        <div id="summary" class="text-sm text-slate-200">
-          <p class="opacity-70">
-            Pilih slot untuk melihat ringkasan pemesanan.
-          </p>
+      <section class="mt-8">
+        <div class="booking-container">
+          <div class="mb-4">
+            <div class="text-lg font-semibold">Ringkasan</div>
+          </div>
+          <div id="summary" class="text-sm text-slate-700">
+            <p>Pilih slot untuk melihat ringkasan pemesanan.</p>
+          </div>
         </div>
       </section>
     </main>
@@ -312,6 +331,9 @@
 
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="js/user-data-sync.js"></script>
+    <!-- Note: auth-check.js removed - Booking supports guest mode -->
     <script src="js/script.js"></script>
+    <script src="js/app-navbar.js"></script>
   </body>
 </html>
