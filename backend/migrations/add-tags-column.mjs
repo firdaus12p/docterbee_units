@@ -2,11 +2,11 @@
 // Migration: Add tags column to articles table
 // ============================================
 
-import { query } from '../db.mjs';
+import { query } from "../db.mjs";
 
 async function addTagsColumn() {
   try {
-    console.log('🔄 Adding tags column to articles table...');
+    console.log("🔄 Adding tags column to articles table...");
 
     // Check if column already exists
     const checkColumn = await query(
@@ -18,7 +18,7 @@ async function addTagsColumn() {
     );
 
     if (checkColumn.length > 0) {
-      console.log('✅ Column tags already exists');
+      console.log("✅ Column tags already exists");
       return;
     }
 
@@ -29,10 +29,9 @@ async function addTagsColumn() {
        AFTER excerpt`
     );
 
-    console.log('✅ Successfully added tags column to articles table');
-    
+    console.log("✅ Successfully added tags column to articles table");
   } catch (error) {
-    console.error('❌ Error adding tags column:', error);
+    console.error("❌ Error adding tags column:", error);
     throw error;
   }
 }
@@ -40,10 +39,10 @@ async function addTagsColumn() {
 // Run migration
 addTagsColumn()
   .then(() => {
-    console.log('✅ Migration completed successfully');
+    console.log("✅ Migration completed successfully");
     process.exit(0);
   })
   .catch((error) => {
-    console.error('❌ Migration failed:', error);
+    console.error("❌ Migration failed:", error);
     process.exit(1);
   });
