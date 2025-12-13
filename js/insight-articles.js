@@ -49,7 +49,7 @@ async function loadInsightArticles() {
 
   try {
     // Get published articles only
-    const response = await fetch("/api/articles");
+    const response = await fetch("/api/insight");
     const result = await response.json();
 
     if (!result.success) {
