@@ -36,10 +36,7 @@ router.get("/id/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const article = await queryOne(
-      "SELECT * FROM articles WHERE id = ?",
-      [id]
-    );
+    const article = await queryOne("SELECT * FROM articles WHERE id = ?", [id]);
 
     if (!article) {
       return res.status(404).json({
@@ -94,7 +91,8 @@ router.get("/:slug", async (req, res) => {
 // POST /api/insight - Create new article (admin only)
 router.post("/", async (req, res) => {
   try {
-    const { title, slug, content, excerpt, tags, category, header_image } = req.body;
+    const { title, slug, content, excerpt, tags, category, header_image } =
+      req.body;
 
     // Validation
     if (!title || !slug || !content) {
@@ -120,7 +118,15 @@ router.post("/", async (req, res) => {
       `INSERT INTO articles 
        (title, slug, content, excerpt, tags, category, header_image)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [title, slug, content, excerpt || null, tags || null, category || null, header_image || null]
+      [
+        title,
+        slug,
+        content,
+        excerpt || null,
+        tags || null,
+        category || null,
+        header_image || null,
+      ]
     );
 
     res.status(201).json({
@@ -145,7 +151,16 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, slug, content, excerpt, tags, category, header_image, isPublished } = req.body;
+    const {
+      title,
+      slug,
+      content,
+      excerpt,
+      tags,
+      category,
+      header_image,
+      isPublished,
+    } = req.body;
 
     // Check if article exists
     const existing = await queryOne(

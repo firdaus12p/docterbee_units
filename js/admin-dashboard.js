@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-// Check if already logged in - verify with backend
+  // Check if already logged in - verify with backend
   const session = sessionStorage.getItem("admin_session");
   if (session) {
     // Verify session with backend
@@ -169,7 +169,7 @@ async function checkAdminSession() {
       credentials: "include",
     });
     const data = await response.json();
-    
+
     if (data.success && data.isAdmin) {
       isLoggedIn = true;
       showDashboard();
@@ -194,7 +194,12 @@ async function handleLogin(e) {
   const password = document.getElementById("loginPassword").value;
   const loginError = document.getElementById("loginError");
 
-  console.log("[LOGIN] Username:", username, "| Password length:", password.length);
+  console.log(
+    "[LOGIN] Username:",
+    username,
+    "| Password length:",
+    password.length
+  );
 
   try {
     const response = await fetch(`${API_BASE}/admin/login`, {
@@ -236,7 +241,7 @@ async function handleLogout() {
   } catch (error) {
     console.error("[LOGOUT] Error:", error);
   }
-  
+
   isLoggedIn = false;
   sessionStorage.removeItem("admin_session");
   document.getElementById("loginOverlay").classList.remove("hidden");
@@ -836,7 +841,7 @@ function openArticleModal(id = null) {
     : "Artikel Baru";
   document.getElementById("articleForm").reset();
   document.getElementById("articleId").value = id || "";
-  
+
   // Reset header image preview (will be populated by editArticle if editing)
   document.getElementById("articleHeaderImage").value = "";
   document.getElementById("headerImagePreview").classList.add("hidden");
@@ -925,19 +930,29 @@ async function editArticle(id) {
       document.getElementById("articleExcerpt").value = article.excerpt || "";
       document.getElementById("articleContent").value = article.content || "";
       document.getElementById("articleTags").value = article.tags || "";
-      
+
       // Handle category
       if (article.category) {
         document.getElementById("articleCategory").value = article.category;
       }
-      
+
       // Handle header image
       const headerImageInput = document.getElementById("articleHeaderImage");
       const headerImagePreview = document.getElementById("headerImagePreview");
-      const headerImagePreviewImg = document.getElementById("headerImagePreviewImg");
-      
-      if (article.header_image && headerImageInput && headerImagePreview && headerImagePreviewImg) {
-        console.log("[editArticle] Setting header image:", article.header_image);
+      const headerImagePreviewImg = document.getElementById(
+        "headerImagePreviewImg"
+      );
+
+      if (
+        article.header_image &&
+        headerImageInput &&
+        headerImagePreview &&
+        headerImagePreviewImg
+      ) {
+        console.log(
+          "[editArticle] Setting header image:",
+          article.header_image
+        );
         headerImageInput.value = article.header_image;
         headerImagePreviewImg.src = article.header_image;
         headerImagePreview.classList.remove("hidden");
@@ -2514,7 +2529,8 @@ async function uploadContentImage() {
       const textAfter = textarea.value.substring(cursorPos);
 
       textarea.value = textBefore + imageTag + textAfter;
-      textarea.selectionStart = textarea.selectionEnd = cursorPos + imageTag.length;
+      textarea.selectionStart = textarea.selectionEnd =
+        cursorPos + imageTag.length;
       textarea.focus();
 
       console.log("✅ Article content image uploaded:", result.filePath);
