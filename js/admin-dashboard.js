@@ -2420,7 +2420,124 @@ function removeInsightHeaderImage() {
   document.getElementById("insightHeaderImagePreview").classList.add("hidden");
 }
 
+// ============================================
+// ARTICLES MANAGER - IMAGE UPLOAD FUNCTIONS
+// ============================================
+
+// Upload header image for Articles
+async function uploadHeaderImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("File harus berupa gambar (JPG, PNG, GIF, dll)");
+    input.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Ukuran file maksimal 5MB");
+    input.value = "";
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(`${API_BASE}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || "Gagal upload gambar");
+    }
+
+    document.getElementById("articleHeaderImage").value = result.filePath;
+
+    const preview = document.getElementById("headerImagePreview");
+    const img = document.getElementById("headerImagePreviewImg");
+    img.src = result.filePath;
+    preview.classList.remove("hidden");
+
+    console.log("✅ Article header image uploaded:", result.filePath);
+  } catch (error) {
+    console.error("Error uploading article header image:", error);
+    alert("Error upload gambar: " + error.message);
+    input.value = "";
+  }
+}
+
+// Upload content image for Articles
+async function uploadContentImage() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("File harus berupa gambar (JPG, PNG, GIF, dll)");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ukuran file maksimal 5MB");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`${API_BASE}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Gagal upload gambar");
+      }
+
+      const textarea = document.getElementById("articleContent");
+      const imageTag = `\n<img src="${result.filePath}" alt="Gambar artikel" class="w-full rounded-lg my-4">\n`;
+
+      const cursorPos = textarea.selectionStart;
+      const textBefore = textarea.value.substring(0, cursorPos);
+      const textAfter = textarea.value.substring(cursorPos);
+
+      textarea.value = textBefore + imageTag + textAfter;
+      textarea.selectionStart = textarea.selectionEnd = cursorPos + imageTag.length;
+      textarea.focus();
+
+      console.log("✅ Article content image uploaded:", result.filePath);
+    } catch (error) {
+      console.error("Error uploading article content image:", error);
+      alert("Error upload gambar: " + error.message);
+    }
+  };
+
+  input.click();
+}
+
+// Remove header image for Articles
+function removeHeaderImage() {
+  document.getElementById("articleHeaderImage").value = "";
+  document.getElementById("articleHeaderImageFile").value = "";
+  document.getElementById("headerImagePreview").classList.add("hidden");
+}
+
 // Expose functions to window
 window.uploadInsightHeaderImage = uploadInsightHeaderImage;
 window.uploadInsightContentImage = uploadInsightContentImage;
 window.removeInsightHeaderImage = removeInsightHeaderImage;
+window.uploadHeaderImage = uploadHeaderImage;
+window.uploadContentImage = uploadContentImage;
+window.removeHeaderImage = removeHeaderImage;

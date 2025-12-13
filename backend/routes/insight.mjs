@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const { limit = 20, offset = 0 } = req.query;
 
     const articles = await query(
-      `SELECT id, title, slug, excerpt, tags, created_at, updated_at 
+      `SELECT id, title, slug, excerpt, tags, header_image, category, created_at, updated_at 
        FROM articles 
        WHERE is_published = 1 
        ORDER BY created_at DESC 
