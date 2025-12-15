@@ -31,8 +31,37 @@
           <a href="/register" class="nav-link active">Daftar</a>
           <a href="/login" class="nav-link">Login</a>
         </nav>
+        <button
+          id="hamburgerBtn"
+          class="md:hidden hamburger-btn"
+          aria-label="Toggle menu"
+        >
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
       </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <span class="font-semibold">Menu</span>
+        <button
+          id="closeMobileMenu"
+          class="close-menu-btn"
+          aria-label="Close menu"
+        >
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <nav class="mobile-menu-nav">
+        <a href="/" class="mobile-nav-link">Home</a>
+        <a href="/register" class="mobile-nav-link">Daftar</a>
+        <a href="/login" class="mobile-nav-link">Login</a>
+      </nav>
+    </div>
 
     <!-- Register Form -->
     <main class="mx-auto max-w-6xl px-4 py-12">
@@ -88,7 +117,7 @@
                 <div class="card-face card-face-front">
                   <img id="cardFrontImageMobile" src="" alt="Card Front" class="card-image" />
                   <div class="card-overlay">
-                    <div class="card-info">
+                    <div class="card-info" id="cardInfoMobile">
                       <div class="card-name" id="cardNameDisplayMobile">Nama Anda</div>
                       <div class="card-phone" id="cardPhoneDisplayMobile">08xxxxxxxxxx</div>
                       <div class="card-points" id="cardPointsDisplayMobile">0 Points</div>
@@ -182,7 +211,7 @@
               <div class="card-face card-face-front">
                 <img id="cardFrontImage" src="" alt="Card Front" class="card-image" />
                 <div class="card-overlay">
-                  <div class="card-info">
+                  <div class="card-info" id="cardInfo">
                     <div class="card-name" id="cardNameDisplay">Nama Anda</div>
                     <div class="card-phone" id="cardPhoneDisplay">08xxxxxxxxxx</div>
                     <div class="card-points" id="cardPointsDisplay">0 Points</div>
@@ -215,6 +244,7 @@
     <script>
       lucide.createIcons();
     </script>
+    <script src="js/script.js"></script>
 
     <!-- Card Preview Logic -->
     <script>
@@ -269,6 +299,7 @@
       const cardBackImage = document.getElementById('cardBackImage');
       const cardNameDisplay = document.getElementById('cardNameDisplay');
       const cardPhoneDisplay = document.getElementById('cardPhoneDisplay');
+      const cardInfo = document.getElementById('cardInfo');
 
       // Mobile card elements
       const cardPreviewContainerMobile = document.getElementById('cardPreviewContainerMobile');
@@ -277,6 +308,7 @@
       const cardBackImageMobile = document.getElementById('cardBackImageMobile');
       const cardNameDisplayMobile = document.getElementById('cardNameDisplayMobile');
       const cardPhoneDisplayMobile = document.getElementById('cardPhoneDisplayMobile');
+      const cardInfoMobile = document.getElementById('cardInfoMobile');
 
       // Update card preview when name changes
       nameInput.addEventListener('input', function() {
@@ -309,6 +341,20 @@
           if (cardFrontImageMobile) cardFrontImageMobile.src = cardData.front;
           if (cardBackImageMobile) cardBackImageMobile.src = cardData.back;
           
+          // Apply smaller font and lower position for specific card types
+          const smallNameTypes = ['Mums-Baby', 'New-Couple', 'Pregnant-Preparation'];
+          if (smallNameTypes.includes(selectedType)) {
+            cardNameDisplay.classList.add('card-name-small');
+            if (cardNameDisplayMobile) cardNameDisplayMobile.classList.add('card-name-small');
+            if (cardInfo) cardInfo.classList.add('card-info-lower');
+            if (cardInfoMobile) cardInfoMobile.classList.add('card-info-lower');
+          } else {
+            cardNameDisplay.classList.remove('card-name-small');
+            if (cardNameDisplayMobile) cardNameDisplayMobile.classList.remove('card-name-small');
+            if (cardInfo) cardInfo.classList.remove('card-info-lower');
+            if (cardInfoMobile) cardInfoMobile.classList.remove('card-info-lower');
+          }
+          
           // Show preview, hide placeholder
           cardPreviewContainer.style.display = 'block';
           if (cardPlaceholder) cardPlaceholder.style.display = 'none';
@@ -318,6 +364,12 @@
           cardPreviewContainer.style.display = 'none';
           if (cardPlaceholder) cardPlaceholder.style.display = 'block';
           if (cardPreviewContainerMobile) cardPreviewContainerMobile.style.display = 'none';
+          
+          // Remove small class when no type selected
+          cardNameDisplay.classList.remove('card-name-small');
+          if (cardNameDisplayMobile) cardNameDisplayMobile.classList.remove('card-name-small');
+          if (cardInfo) cardInfo.classList.remove('card-info-lower');
+          if (cardInfoMobile) cardInfoMobile.classList.remove('card-info-lower');
         }
       });
 

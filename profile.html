@@ -243,7 +243,7 @@
               <div class="card-face card-face-front">
                 <img id="profileCardFrontImage" src="" alt="Card Front" class="card-image" />
                 <div class="card-overlay">
-                  <div class="card-info">
+                  <div class="card-info" id="profileCardInfo">
                     <div class="card-name" id="profileCardNameDisplay">Nama Anda</div>
                     <div class="card-phone" id="profileCardPhoneDisplay">08xxxxxxxxxx</div>
                     <div class="card-points" id="profileCardPointsDisplay">0 Points</div>
@@ -406,6 +406,18 @@
           document.getElementById('profileCardNameDisplay').textContent = user.name;
           document.getElementById('profileCardPhoneDisplay').textContent = user.phone;
           document.getElementById('profileCardPointsDisplay').textContent = `${points} Points`;
+          
+          // Apply smaller font and lower position for specific card types
+          const smallNameTypes = ['Mums-Baby', 'New-Couple', 'Pregnant-Preparation'];
+          const nameElement = document.getElementById('profileCardNameDisplay');
+          const infoElement = document.getElementById('profileCardInfo');
+          if (smallNameTypes.includes(cardType)) {
+            nameElement.classList.add('card-name-small');
+            if (infoElement) infoElement.classList.add('card-info-lower');
+          } else {
+            nameElement.classList.remove('card-name-small');
+            if (infoElement) infoElement.classList.remove('card-info-lower');
+          }
         }
 
         // Update points

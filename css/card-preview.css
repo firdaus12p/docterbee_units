@@ -68,7 +68,7 @@
 }
 
 .card-name {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -76,11 +76,22 @@
   margin-bottom: 0.25rem;
 }
 
+/* Smaller name for specific card types */
+.card-name-small {
+  font-size: 1rem;
+}
+
 .card-info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Lower position for specific card types */
+.card-info-lower {
+  padding-top: 8.8rem; /* ← UBAH DI SINI: Tambahkan nilai ini untuk posisi lebih ke bawah */
 }
 
 .card-phone {
@@ -200,7 +211,11 @@
   }
 
   .card-name {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
+  }
+
+  .card-name-small {
+    font-size: 0.9rem;
   }
 
   .card-phone,
@@ -223,11 +238,23 @@
   }
 
   .card-name {
-    font-size: 1.125rem;
+    font-size: 1rem;
+  }
+
+  .card-name-small {
+    font-size: 0.85rem;
   }
 
   .card-phone,
   .card-points {
     font-size: 0.7rem;
+  }
+
+  .card-info {
+    padding-top: 0.5rem;
+  }
+
+  .card-info-lower {
+    padding-top: 2rem; /* ← UBAH DI SINI JUGA untuk mobile: Tambahkan nilai ini */
   }
 }
