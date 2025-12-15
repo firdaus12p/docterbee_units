@@ -54,6 +54,34 @@
       mobileLogoutBtn.style.display = "block";
     }
 
+    // Show Profile button if exists
+    const profileBtn = document.getElementById("profileBtn");
+    const mobileProfileBtn = document.getElementById("mobileProfileBtn");
+    
+    if (profileBtn) {
+      profileBtn.classList.remove("hidden");
+      profileBtn.style.display = "block";
+    }
+    
+    if (mobileProfileBtn) {
+      mobileProfileBtn.classList.remove("hidden");
+      mobileProfileBtn.style.display = "block";
+    }
+
+    // Show Points display if exists
+    const pointsDisplay = document.getElementById("pointsDisplay");
+    const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
+    
+    if (pointsDisplay) {
+      pointsDisplay.classList.remove("hidden");
+      pointsDisplay.style.display = "block";
+    }
+    
+    if (mobilePointsDisplay) {
+      mobilePointsDisplay.classList.remove("hidden");
+      mobilePointsDisplay.style.display = "block";
+    }
+
     // Hide Beranda link for logged-in users
     const guestNavItem = document.getElementById("guestNavItem");
     const mobileGuestNavItem = document.getElementById("mobileGuestNavItem");
@@ -80,6 +108,34 @@
     if (mobileLogoutBtn) {
       mobileLogoutBtn.classList.add("hidden");
       mobileLogoutBtn.style.display = "none";
+    }
+
+    // Hide Profile button
+    const profileBtn = document.getElementById("profileBtn");
+    const mobileProfileBtn = document.getElementById("mobileProfileBtn");
+    
+    if (profileBtn) {
+      profileBtn.classList.add("hidden");
+      profileBtn.style.display = "none";
+    }
+    
+    if (mobileProfileBtn) {
+      mobileProfileBtn.classList.add("hidden");
+      mobileProfileBtn.style.display = "none";
+    }
+
+    // Hide Points display
+    const pointsDisplay = document.getElementById("pointsDisplay");
+    const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
+    
+    if (pointsDisplay) {
+      pointsDisplay.classList.add("hidden");
+      pointsDisplay.style.display = "none";
+    }
+    
+    if (mobilePointsDisplay) {
+      mobilePointsDisplay.classList.add("hidden");
+      mobilePointsDisplay.style.display = "none";
     }
 
     // Show Beranda link for guest users

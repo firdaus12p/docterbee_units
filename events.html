@@ -36,11 +36,15 @@
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
-          <span class="points-display"> Points: <b id="navPoints">0</b> </span>
+          <span class="points-display" id="pointsDisplay" style="display: none;"> Points: <b id="navPoints">0</b> </span>
+          <a href="/profile" id="profileBtn" class="nav-link" style="display: none;" title="Profile">
+            <i data-lucide="user" class="w-5 h-5"></i>
+          </a>
           <button
             id="logoutBtn"
             class="hidden md:block text-sm text-red-600 hover:text-red-700 font-semibold"
             aria-label="Logout"
+            style="display: none;"
           >
             Logout
           </button>
@@ -82,12 +86,17 @@
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
-        <span class="points-display">
+        <span class="points-display" id="mobilePointsDisplay" style="display: none;">
           Points: <b id="mobileNavPoints">0</b>
         </span>
+        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none;">
+          <i data-lucide="user" class="w-5 h-5 inline mr-2"></i>
+          Profile
+        </a>
         <button
           id="mobileLogoutBtn"
           class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
+          style="display: none;"
         >
           Logout
         </button>
