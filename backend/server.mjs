@@ -112,19 +112,6 @@ app.get("/index.html", (req, res) => {
   res.redirect(301, "/");
 });
 
-// Static files (after redirect to ensure .html is caught first)
-app.use(express.static(".")); // Serve static files from root directory
-app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
-
-// ============================================
-// CLEAN URLs - serve HTML files without extension
-// ============================================
-cleanUrlPages.forEach((page) => {
-  app.get(`/${page}`, (req, res) => {
-    res.sendFile(join(__dirname, "..", `${page}.html`));
-  });
-});
-
 // Initialize Google Generative AI
 const apiKey = process.env.GEMINI_API_KEY?.trim();
 console.log("🔑 API Key (first 10 chars):", apiKey?.substring(0, 10) + "...");
@@ -151,6 +138,9 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
   }
 })();
 
+// ============================================
+// API ROUTES (MUST BE BEFORE STATIC FILES)
+// ============================================
 // Mount API routers
 app.use("/api/auth", authRouter);
 app.use("/api/bookings", bookingsRouter);
@@ -165,6 +155,20 @@ app.use("/api/orders", ordersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/user-data", userDataRouter);
 app.use("/api/rewards", rewardsRouter);
+
+// ============================================
+// STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)
+// ============================================
+// Static files middleware
+app.use(express.static(".")); // Serve static files from root directory
+app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve uploaded files
+
+// CLEAN URLs - serve HTML files without extension
+cleanUrlPages.forEach((page) => {
+  app.get(`/${page}`, (req, res) => {
+    res.sendFile(join(__dirname, "..", `${page}.html`));
+  });
+});
 
 // ============================================
 // ADMIN AUTHENTICATION

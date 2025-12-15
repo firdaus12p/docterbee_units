@@ -93,7 +93,7 @@ router.get("/rewards", requireAuth, async (req, res) => {
   try {
     const userId = req.session.userId;
     const rewards = await query(
-      "SELECT id, reward_name, points_cost, redeemed_at FROM reward_redemptions WHERE user_id = ? ORDER BY redeemed_at DESC",
+      "SELECT id, reward_name, points_cost, redeemed_at, status FROM reward_redemptions WHERE user_id = ? ORDER BY redeemed_at DESC",
       [userId]
     );
 
@@ -151,15 +151,20 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
     const { rewardId } = req.body;
 
     // Record redemption
-    await query(
+    const redemptionResult = await query(
       "INSERT INTO reward_redemptions (user_id, reward_id, reward_name, points_cost) VALUES (?, ?, ?, ?)",
       [userId, rewardId || null, rewardName, pointsCost]
+    );
+
+    console.log(
+      `✅ Reward redeemed: User ${userId} redeemed "${rewardName}" for ${pointsCost} points (ID: ${redemptionResult.insertId})`
     );
 
     res.json({
       success: true,
       message: "Reward redeemed successfully",
       newPoints,
+      redemptionId: redemptionResult.insertId,
     });
   } catch (error) {
     console.error("Error redeeming reward:", error);

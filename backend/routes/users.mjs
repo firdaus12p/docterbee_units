@@ -218,8 +218,12 @@ router.get("/:id/rewards", async (req, res) => {
 
     // Get reward redemptions
     const rewards = await query(
-      "SELECT id, reward_name, points_cost, redeemed_at FROM reward_redemptions WHERE user_id = ? ORDER BY redeemed_at DESC",
+      "SELECT id, reward_name, points_cost, redeemed_at, status FROM reward_redemptions WHERE user_id = ? ORDER BY redeemed_at DESC",
       [id]
+    );
+
+    console.log(
+      `📊 Admin fetching rewards for user ${id} (${user.name}): Found ${rewards.length} redemptions`
     );
 
     res.json({
@@ -234,6 +238,56 @@ router.get("/:id/rewards", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal mengambil riwayat reward",
+    });
+  }
+});
+
+// ============================================
+// PATCH /api/users/:userId/rewards/:redemptionId/approve - Approve reward redemption (admin)
+// ============================================
+router.patch("/:userId/rewards/:redemptionId/approve", async (req, res) => {
+  try {
+    const { userId, redemptionId } = req.params;
+
+    // Check if redemption exists
+    const redemption = await queryOne(
+      "SELECT id, user_id, reward_name, status FROM reward_redemptions WHERE id = ? AND user_id = ?",
+      [redemptionId, userId]
+    );
+
+    if (!redemption) {
+      return res.status(404).json({
+        success: false,
+        error: "Redemption tidak ditemukan",
+      });
+    }
+
+    if (redemption.status === "approved") {
+      return res.status(400).json({
+        success: false,
+        error: "Redemption sudah di-approve",
+      });
+    }
+
+    // Update status to approved
+    await query(
+      "UPDATE reward_redemptions SET status = 'approved' WHERE id = ?",
+      [redemptionId]
+    );
+
+    console.log(
+      `✅ Admin approved redemption ${redemptionId} for user ${userId} (${redemption.reward_name})`
+    );
+
+    res.json({
+      success: true,
+      message: "Redemption berhasil di-approve",
+    });
+  } catch (error) {
+    console.error("Error approving redemption:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal approve redemption",
     });
   }
 });

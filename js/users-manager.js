@@ -342,7 +342,7 @@ function openRewardsModal(userId, userName, rewards) {
   if (!rewards || rewards.length === 0) {
     rewardsBody.innerHTML = `
       <tr>
-        <td colspan="3" class="px-4 py-8 text-center text-slate-400">
+        <td colspan="6" class="px-4 py-8 text-center text-slate-400">
           Belum ada riwayat penukaran reward
         </td>
       </tr>
@@ -359,6 +359,24 @@ function openRewardsModal(userId, userName, rewards) {
           minute: "2-digit",
         });
 
+        const status = reward.status || "pending";
+        const statusBadge =
+          status === "approved"
+            ? `<span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs font-semibold">Approved</span>`
+            : `<span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs font-semibold">Pending</span>`;
+
+        const actionButton =
+          status === "approved"
+            ? `<span class="text-slate-500 text-xs">-</span>`
+            : `<button 
+                onclick="approveRedemption(${userId}, ${
+                reward.id
+              }, '${escapeHtml(reward.reward_name)}')" 
+                class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded transition"
+              >
+                Di Claim
+              </button>`;
+
         return `
           <tr class="border-t border-slate-800 hover:bg-slate-800/30">
             <td class="px-4 py-3 text-slate-300 text-center">${index + 1}</td>
@@ -369,6 +387,8 @@ function openRewardsModal(userId, userName, rewards) {
               reward.points_cost
             } poin</td>
             <td class="px-4 py-3 text-slate-400 text-xs">${formattedDate}</td>
+            <td class="px-4 py-3 text-center">${statusBadge}</td>
+            <td class="px-4 py-3 text-center">${actionButton}</td>
           </tr>
         `;
       })
@@ -394,6 +414,49 @@ function closeRewardsModal() {
   modal.classList.remove("flex");
 }
 
+// ============================================
+// Approve Reward Redemption
+// ============================================
+async function approveRedemption(userId, redemptionId, rewardName) {
+  if (!confirm(`Approve penukaran reward "${rewardName}"?`)) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/users/${userId}/rewards/${redemptionId}/approve`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert("Redemption berhasil di-approve!");
+      // Refresh the rewards list
+      const userName = document.getElementById("rewardUserName").textContent;
+      const userRewardsResponse = await fetch(
+        `${API_BASE}/users/${userId}/rewards`,
+        {
+          credentials: "include",
+        }
+      );
+      const userRewardsData = await userRewardsResponse.json();
+      if (userRewardsData.success) {
+        openRewardsModal(userId, userName, userRewardsData.data.rewards);
+      }
+    } else {
+      alert(data.error || "Gagal approve redemption");
+    }
+  } catch (error) {
+    console.error("Error approving redemption:", error);
+    alert("Terjadi kesalahan saat approve redemption");
+  }
+}
+
 // Export functions for use in HTML
 if (typeof window !== "undefined") {
   window.loadUsers = loadUsers;
@@ -404,4 +467,5 @@ if (typeof window !== "undefined") {
   window.toggleUserStatus = toggleUserStatus;
   window.confirmDeleteUser = confirmDeleteUser;
   window.deleteUser = deleteUser;
+  window.approveRedemption = approveRedemption;
 }
