@@ -349,8 +349,44 @@
                 </div>
               </div>
 
+              <!-- Coupon Code Input -->
+              <div class="border-t border-gray-200 pt-4">
+                <label class="block text-sm font-semibold text-slate-900 mb-2">
+                  Kode Promo (Opsional)
+                </label>
+                <div class="flex gap-2">
+                  <input 
+                    type="text" 
+                    id="storeCouponCode"
+                    placeholder="Masukkan kode promo"
+                    class="flex-1 bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-amber-400 focus:outline-none transition uppercase"
+                  />
+                  <button 
+                    id="validateStoreCouponBtn"
+                    onclick="validateStoreCoupon()"
+                    class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg transition text-sm whitespace-nowrap"
+                  >
+                    Gunakan
+                  </button>
+                </div>
+                <!-- Coupon Status -->
+                <div id="storeCouponStatus" class="mt-2 text-xs hidden"></div>
+                <!-- Discount Display -->
+                <div id="storeDiscountInfo" class="mt-2 text-sm text-emerald-600 font-semibold hidden">
+                  <!-- Will show discount amount -->
+                </div>
+              </div>
+
               <!-- Total & Submit -->
               <div class="border-t border-gray-200 pt-4">
+                <div id="storeOriginalTotal" class="flex items-center justify-between mb-2 text-sm text-slate-600 hidden">
+                  <span>Subtotal</span>
+                  <span>Rp <span id="storeOriginalAmount">0</span></span>
+                </div>
+                <div id="storeDiscountAmount" class="flex items-center justify-between mb-2 text-sm text-emerald-600 hidden">
+                  <span>Diskon Promo</span>
+                  <span>- Rp <span id="storeDiscountValue">0</span></span>
+                </div>
                 <div class="flex items-center justify-between mb-4">
                   <span class="text-lg font-semibold text-slate-900">Total Pembayaran</span>
                   <span class="text-2xl font-bold text-amber-500">
@@ -613,9 +649,16 @@
             <div id="pointsBig" class="text-5xl font-bold text-amber-500 mb-4">
               0
             </div>
-            <p class="text-xs text-slate-500 italic">
+            <p class="text-xs text-slate-500 italic mb-3">
               Poin akan otomatis bertambah saat pesanan Anda di-accept oleh admin
             </p>
+            <button 
+              onclick="refreshPoints()"
+              class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg transition-all transform hover:scale-105"
+            >
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              Refresh Poin
+            </button>
           </div>
         </div>
 
@@ -682,17 +725,6 @@
         </div>
 
         <div id="locationGrid" class="grid gap-4 md:grid-cols-3"></div>
-
-        <!-- Shopping Cart -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-4">
-          <h3 class="font-semibold text-amber-500 mb-3">
-            <i data-lucide="shopping-bag" class="w-4 h-4 inline mr-1"></i>
-            Keranjang Belanja
-          </h3>
-          <div id="cartList" class="text-sm text-slate-900">
-            <p class="text-slate-900">Belum ada item di keranjang.</p>
-          </div>
-        </div>
       </section>
     </main>
 
@@ -825,6 +857,15 @@
           <p id="qrWarningText" class="text-xs text-slate-500 mb-3">
             ⚠️ QR code akan kadaluarsa sesuai waktu yang ditentukan
           </p>
+
+          <button 
+            id="checkOrderStatusBtn"
+            onclick="checkOrderStatus()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 mb-2"
+          >
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            Cek Status Pesanan
+          </button>
 
           <button 
             onclick="closeQRModal()"

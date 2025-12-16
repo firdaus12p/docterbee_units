@@ -14,8 +14,7 @@ const UNITS = [
         key: "subuh",
         q: "Sudah shalat Subuh tepat waktu & terkena cahaya fajar 5–10 menit?",
         dalil: "QS 7:205; adab Subuh",
-        sains:
-          "Cahaya fajar → sirkadian → dopamin/serotonin → semangat & fokus",
+        sains: "Cahaya fajar → sirkadian → dopamin/serotonin → semangat & fokus",
         nbsn: 'Neuron: niat & syukur. Sensorik: cahaya pagi. Biomolekul: madu + air hangat. Nature: napas 2"',
       },
       {
@@ -209,7 +208,7 @@ function _db(name, value) {
   if (value === undefined) {
     try {
       return JSON.parse(localStorage.getItem(name) || "{}");
-    } catch (e) {
+    } catch {
       return {};
     }
   } else {
@@ -329,25 +328,17 @@ function showUnit(unitId) {
         <div class="question-head flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div>
             <div class="font-semibold">${escapeHtml(item.q)}</div>
-            <div class="text-xs text-slate-900 mt-1 font-medium">${escapeHtml(
-              item.dalil
-            )}</div>
+            <div class="text-xs text-slate-900 mt-1 font-medium">${escapeHtml(item.dalil)}</div>
           </div>
-          <div class="text-xs ${
-            unit.color
-          } font-semibold">Dalil · Sains · NBSN</div>
+          <div class="text-xs ${unit.color} font-semibold">Dalil · Sains · NBSN</div>
         </div>
         <div class="mt-3 flex flex-wrap gap-2">
-          <button class="btn-yes ${
-            isAnswered ? "selected" : ""
-          }" data-unit="${unitId}" data-key="${
+          <button class="btn-yes ${isAnswered ? "selected" : ""}" data-unit="${unitId}" data-key="${
         item.key
       }" data-value="1">Ya</button>
           <button class="btn-no ${
             !isAnswered && answers[item.key] === 0 ? "selected" : ""
-          }" data-unit="${unitId}" data-key="${
-        item.key
-      }" data-value="0">Belum</button>
+          }" data-unit="${unitId}" data-key="${item.key}" data-value="0">Belum</button>
           <button class="btn-info" data-unit="${unitId}" data-key="${
         item.key
       }">Lihat Penjelasan</button>
@@ -357,9 +348,7 @@ function showUnit(unitId) {
           <div><b>Sains:</b> ${escapeHtml(item.sains)}</div>
           <div><b>NBSN:</b> ${escapeHtml(item.nbsn)}</div>
         </div>
-        <div class="${statusClass}" id="ans_${unitId}_${
-        item.key
-      }">${statusText}</div>
+        <div class="${statusClass}" id="ans_${unitId}_${item.key}">${statusText}</div>
       </div>
     `;
     })
@@ -391,9 +380,9 @@ function showUnit(unitId) {
 
 /**
  * Attach event listeners to unit buttons
- * @param {string} unitId - Current unit ID
+ * @param {string} _unitId - Current unit ID (unused but kept for API consistency)
  */
-function attachUnitEventListeners(unitId) {
+function attachUnitEventListeners(_unitId) {
   // Answer buttons (Ya/Belum)
   const answerButtons = document.querySelectorAll(".btn-yes, .btn-no");
   answerButtons.forEach((btn) => {
@@ -485,12 +474,8 @@ function answer(unitId, key, value) {
   }
 
   // Update button selected states
-  const yesBtn = document.querySelector(
-    `.btn-yes[data-unit="${unitId}"][data-key="${key}"]`
-  );
-  const noBtn = document.querySelector(
-    `.btn-no[data-unit="${unitId}"][data-key="${key}"]`
-  );
+  const yesBtn = document.querySelector(`.btn-yes[data-unit="${unitId}"][data-key="${key}"]`);
+  const noBtn = document.querySelector(`.btn-no[data-unit="${unitId}"][data-key="${key}"]`);
 
   if (yesBtn && noBtn) {
     if (value === 1) {
@@ -973,29 +958,17 @@ async function confirmBooking() {
   const customerPhone = document.getElementById("customerPhone")?.value.trim();
   const customerAge = document.getElementById("customerAge")?.value;
   const customerGender = document.getElementById("customerGender")?.value;
-  const customerAddress = document
-    .getElementById("customerAddress")
-    ?.value.trim();
+  const customerAddress = document.getElementById("customerAddress")?.value.trim();
 
-  if (
-    !customerName ||
-    !customerPhone ||
-    !customerAge ||
-    !customerGender ||
-    !customerAddress
-  ) {
-    alert(
-      "⚠️ Mohon lengkapi semua data pribadi yang bertanda * (wajib diisi)."
-    );
+  if (!customerName || !customerPhone || !customerAge || !customerGender || !customerAddress) {
+    alert("⚠️ Mohon lengkapi semua data pribadi yang bertanda * (wajib diisi).");
     return;
   }
 
   // Validasi nomor HP format Indonesia
   const phoneRegex = /^(08|\+?628)[0-9]{8,13}$/;
   if (!phoneRegex.test(customerPhone.replace(/[\s-]/g, ""))) {
-    alert(
-      "⚠️ Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx atau +628xx-xxxx-xxxx"
-    );
+    alert("⚠️ Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx atau +628xx-xxxx-xxxx");
     return;
   }
 
@@ -1012,19 +985,11 @@ async function confirmBooking() {
     return;
   }
 
-  // Get form values
-  const branch = document.getElementById("branch")?.value || "";
-  const practitioner = document.getElementById("pract")?.value || "";
-  const mode = document.getElementById("mode")?.value || "";
-  const time = bookingState.selectedTime;
-  const service = bookingState.serviceName || "";
-  const promoCode =
-    document.getElementById("promoCode")?.value.trim().toUpperCase() || "";
-
-  // Save to database
+  // Save to database (form values are read in saveBookingToDatabase function)
   const saved = await saveBookingToDatabase();
 
   if (saved) {
+    const service = bookingState.serviceName || "";
     alert(
       `✅ Booking berhasil disimpan!\n\n` +
         `Halo ${customerName},\n` +
@@ -1075,25 +1040,30 @@ async function validatePromoCode() {
   promoResult.classList.remove("hidden");
 
   try {
+    // Get current booking price for validation
+    const bookingPrice = bookingState.price || 0;
+
     const response = await fetch("/api/coupons/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: code.toUpperCase() }),
+      body: JSON.stringify({
+        code: code.toUpperCase(),
+        booking_value: bookingPrice,
+        type: "services", // Specify this is for services/booking
+      }),
+      credentials: "include", // Include session cookie for user tracking
     });
 
     const result = await response.json();
 
     if (result.success && result.valid) {
-      promoResult.className =
-        "text-sm text-emerald-400 bg-emerald-900/20 p-3 rounded-lg";
+      promoResult.className = "text-sm text-emerald-400 bg-emerald-900/20 p-3 rounded-lg";
       promoResult.innerHTML = `
         <div class="flex items-center gap-2 mb-1">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <b>Kode promo valid!</b>
         </div>
-        <div class="text-xs opacity-80">${escapeHtml(
-          result.data.description || ""
-        )}</div>
+        <div class="text-xs opacity-80">${escapeHtml(result.data.description || "")}</div>
         <div class="mt-1">
           Diskon: <b>${
             result.data.discountType === "percentage"
@@ -1114,14 +1084,28 @@ async function validatePromoCode() {
       // Update price display with discount
       updatePriceDisplay();
     } else {
-      promoResult.className =
-        "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
-      promoResult.innerHTML = `
-        <div class="flex items-center gap-2">
-          <i data-lucide="x-circle" class="w-4 h-4"></i>
-          <span>${escapeHtml(result.error || "Kode promo tidak valid")}</span>
-        </div>
-      `;
+      // Handle already used error with special styling
+      if (result.alreadyUsed) {
+        promoResult.className = "text-sm text-amber-400 bg-amber-900/20 p-3 rounded-lg";
+        promoResult.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+            <b>Kupon sudah digunakan</b>
+          </div>
+          <div class="text-xs opacity-80">${escapeHtml(
+            result.error || "Anda sudah pernah menggunakan kode promo ini"
+          )}</div>
+        `;
+      } else {
+        // Generic error
+        promoResult.className = "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
+        promoResult.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i data-lucide="x-circle" class="w-4 h-4"></i>
+            <span>${escapeHtml(result.error || "Kode promo tidak valid")}</span>
+          </div>
+        `;
+      }
 
       if (typeof lucide !== "undefined") {
         lucide.createIcons();
@@ -1135,8 +1119,7 @@ async function validatePromoCode() {
   } catch (error) {
     console.error("Error validating promo:", error);
     promoResult.className = "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
-    promoResult.textContent =
-      "Gagal memvalidasi kode promo. Pastikan server backend berjalan.";
+    promoResult.textContent = "Gagal memvalidasi kode promo. Pastikan server backend berjalan.";
     bookingState.validatedCoupon = null;
 
     // Update price display (remove discount)
@@ -1149,22 +1132,18 @@ async function validatePromoCode() {
 // Save booking to database
 async function saveBookingToDatabase() {
   // Get customer data
-  const customerName =
-    document.getElementById("customerName")?.value.trim() || "";
-  const customerPhone =
-    document.getElementById("customerPhone")?.value.trim() || "";
+  const customerName = document.getElementById("customerName")?.value.trim() || "";
+  const customerPhone = document.getElementById("customerPhone")?.value.trim() || "";
   const customerAge = document.getElementById("customerAge")?.value;
   const customerGender = document.getElementById("customerGender")?.value || "";
-  const customerAddress =
-    document.getElementById("customerAddress")?.value.trim() || "";
+  const customerAddress = document.getElementById("customerAddress")?.value.trim() || "";
 
   // Get booking data
   const dateRaw = document.getElementById("date")?.value;
   const branch = document.getElementById("branch")?.value || "";
   const practitioner = document.getElementById("pract")?.value || "";
   const mode = document.getElementById("mode")?.value || "";
-  const promoCode =
-    document.getElementById("promoCode")?.value.trim().toUpperCase() || null;
+  const promoCode = document.getElementById("promoCode")?.value.trim().toUpperCase() || null;
   const time = bookingState.selectedTime;
   const service = bookingState.serviceName || "";
 
@@ -1181,9 +1160,7 @@ async function saveBookingToDatabase() {
   }
 
   // Extract mode value (remove text in parentheses)
-  const modeValue = mode.toLowerCase().includes("online")
-    ? "online"
-    : "offline";
+  const modeValue = mode.toLowerCase().includes("online") ? "online" : "offline";
 
   try {
     const response = await fetch("/api/bookings", {
@@ -1236,9 +1213,7 @@ async function saveBookingToDatabase() {
 // Load service price from API
 async function loadServicePrice(serviceName) {
   try {
-    const response = await fetch(
-      `/api/bookings/prices/${encodeURIComponent(serviceName)}`
-    );
+    const response = await fetch(`/api/bookings/prices/${encodeURIComponent(serviceName)}`);
     const result = await response.json();
 
     if (result.success) {
@@ -1271,9 +1246,7 @@ function updatePriceDisplay() {
   priceSummary?.classList.remove("hidden");
 
   // Format price
-  const formattedPrice = new Intl.NumberFormat("id-ID").format(
-    bookingState.price
-  );
+  const formattedPrice = new Intl.NumberFormat("id-ID").format(bookingState.price);
   displayPrice.textContent = `Rp ${formattedPrice}`;
 
   // Calculate discount if coupon is validated
@@ -1283,9 +1256,7 @@ function updatePriceDisplay() {
   if (bookingState.validatedCoupon) {
     const coupon = bookingState.validatedCoupon;
     if (coupon.discountType === "percentage") {
-      discountAmount = Math.round(
-        (bookingState.price * coupon.discountValue) / 100
-      );
+      discountAmount = Math.round((bookingState.price * coupon.discountValue) / 100);
     } else {
       discountAmount = coupon.discountValue;
     }
@@ -1293,9 +1264,7 @@ function updatePriceDisplay() {
 
     // Show discount row
     discountRow?.classList.remove("hidden");
-    const formattedDiscount = new Intl.NumberFormat("id-ID").format(
-      discountAmount
-    );
+    const formattedDiscount = new Intl.NumberFormat("id-ID").format(discountAmount);
     displayDiscount.textContent = `- Rp ${formattedDiscount}`;
   } else {
     // Hide discount row
@@ -1334,9 +1303,7 @@ function initBooking() {
 
     // Show service indicator
     const serviceIndicator = document.getElementById("serviceIndicator");
-    const serviceIndicatorText = document.getElementById(
-      "serviceIndicatorText"
-    );
+    const serviceIndicatorText = document.getElementById("serviceIndicatorText");
     if (serviceIndicator && serviceIndicatorText) {
       serviceIndicatorText.textContent = bookingState.serviceName;
       serviceIndicator.classList.remove("hidden");
@@ -1425,52 +1392,6 @@ function initBooking() {
 // ==================== EVENTS PAGE FUNCTIONS ====================
 
 /**
- * Events data
- */
-const EVENTS_DATA = [
-  {
-    title: "Cara Hidup Rasulullah – Pagi Sehat",
-    mode: "online",
-    topic: "quranic",
-    date: "2025-11-05 19:30",
-    host: "Ust. Malik & dr. Aisyah",
-    brief: "Ritme ibadah, tidur, hidrasi, dan sarapan Qur'ani.",
-  },
-  {
-    title: "Cold-Pressed & Biomolekul Antioksidan",
-    mode: "offline",
-    topic: "nutrition",
-    date: "2025-11-09 10:00",
-    host: "Praktisi Docterbee",
-    brief: "Praktik memilih bahan lokal & demo pressing.",
-  },
-  {
-    title: "Puasa, Autofagi, & Metabolisme",
-    mode: "online",
-    topic: "science",
-    date: "2025-11-12 19:30",
-    host: "dr. Fawwaz",
-    brief: "Efek puasa pada perbaikan sel & sensitivitas insulin.",
-  },
-  {
-    title: "Parenting Qur'ani Anti-Stres",
-    mode: "offline",
-    topic: "parenting",
-    date: "2025-11-16 09:00",
-    host: "Psikolog Docterbee",
-    brief: "Emotional regulation & rutinitas keluarga.",
-  },
-  {
-    title: "Produktivitas & Shalat Tepat Waktu",
-    mode: "online",
-    topic: "productivity",
-    date: "2025-11-19 20:00",
-    host: "Coach Docterbee",
-    brief: "Timeboxing, fokus, dan dzikir kerja.",
-  },
-];
-
-/**
  * Render events based on filters
  */
 async function renderEvents() {
@@ -1511,9 +1432,7 @@ async function renderEvents() {
       // Format registration fee
       const feeText =
         event.registration_fee && event.registration_fee > 0
-          ? `Rp ${new Intl.NumberFormat("id-ID").format(
-              event.registration_fee
-            )}`
+          ? `Rp ${new Intl.NumberFormat("id-ID").format(event.registration_fee)}`
           : "GRATIS";
 
       // Format registration deadline
@@ -1659,8 +1578,7 @@ const INSIGHT_DATA = [
   {
     title: "Madu 3–5mm & Autofagi",
     tag: "Sains · Nutrisi",
-    brief:
-      "Bagaimana komponen bioaktif madu mikro mendukung proses perbaikan sel.",
+    brief: "Bagaimana komponen bioaktif madu mikro mendukung proses perbaikan sel.",
   },
   {
     title: "Puasa Senin-Kamis & Metabolisme",
@@ -1767,16 +1685,14 @@ async function summarizeArticleById(slug) {
 
   if (!resultContainer) return;
 
-  resultContainer.innerHTML =
-    '<p class="text-slate-400">Loading article...</p>';
+  resultContainer.innerHTML = '<p class="text-slate-400">Loading article...</p>';
 
   try {
     const response = await fetch(`/api/insight/${slug}`);
     const result = await response.json();
 
     if (!result.success) {
-      resultContainer.innerHTML =
-        '<p class="text-red-400">Artikel tidak ditemukan</p>';
+      resultContainer.innerHTML = '<p class="text-red-400">Artikel tidak ditemukan</p>';
       return;
     }
 
@@ -1808,8 +1724,7 @@ async function summarizeArticleById(slug) {
     addPoints(2);
   } catch (error) {
     console.error("Error loading article:", error);
-    resultContainer.innerHTML =
-      '<p class="text-red-400">Gagal memuat artikel</p>';
+    resultContainer.innerHTML = '<p class="text-red-400">Gagal memuat artikel</p>';
   }
 }
 
@@ -1881,9 +1796,7 @@ function renderPodcastList() {
     const button = document.createElement("button");
     button.className = "podcast-item";
     button.textContent = podcast.title;
-    button.addEventListener("click", () =>
-      playPodcast(podcast.title, podcast.url)
-    );
+    button.addEventListener("click", () => playPodcast(podcast.title, podcast.url));
     podcastList.appendChild(button);
   });
 }
@@ -1943,8 +1856,7 @@ function loadYouTube() {
   const videoId = extractYouTubeId(ytUrl);
 
   if (!videoId) {
-    ytPlayer.innerHTML =
-      '<div class="p-6 text-center text-slate-400">URL tidak valid.</div>';
+    ytPlayer.innerHTML = '<div class="p-6 text-center text-slate-400">URL tidak valid.</div>';
     return;
   }
 
@@ -2004,8 +1916,7 @@ async function checkTranscript() {
   // Show loading
   if (btnCheck) {
     btnCheck.disabled = true;
-    btnCheck.innerHTML =
-      '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Checking...';
+    btnCheck.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Checking...';
     lucide.createIcons();
   }
 
@@ -2039,9 +1950,7 @@ async function checkTranscript() {
                 <div class="font-medium text-emerald-300 mb-1">✅ Transcript Tersedia!</div>
                 <div class="text-sm text-slate-300">${data.message}</div>
                 <div class="text-xs text-slate-400 mt-1">
-                  ${
-                    data.segmentCount
-                  } segmen • ${data.characterCount.toLocaleString()} karakter
+                  ${data.segmentCount} segmen • ${data.characterCount.toLocaleString()} karakter
                 </div>
               </div>
             </div>
@@ -2083,8 +1992,7 @@ async function checkTranscript() {
     // Reset button
     if (btnCheck) {
       btnCheck.disabled = false;
-      btnCheck.innerHTML =
-        '<i data-lucide="search" class="w-3 h-3"></i> Check Transcript';
+      btnCheck.innerHTML = '<i data-lucide="search" class="w-3 h-3"></i> Check Transcript';
       lucide.createIcons();
     }
   }
@@ -2224,22 +2132,16 @@ async function analyzeMedia() {
 
     // Show error with troubleshooting
     aiResult.innerHTML = `
-      <div class="ai-analysis-card border-${
-        isQuotaError ? "amber" : "red"
-      }-500/30">
+      <div class="ai-analysis-card border-${isQuotaError ? "amber" : "red"}-500/30">
         <div class="font-semibold mb-2 flex items-center gap-2 text-${
           isQuotaError ? "amber" : "red"
         }-400">
-          <i data-lucide="${
-            isQuotaError ? "clock" : "alert-triangle"
-          }" class="w-5 h-5"></i>
+          <i data-lucide="${isQuotaError ? "clock" : "alert-triangle"}" class="w-5 h-5"></i>
           ${isQuotaError ? "Kuota API Tercapai" : "Gagal Menganalisis"}
         </div>
         <p class="text-slate-300 mb-3">${escapeHtml(error.message)}</p>
         <div class="text-sm text-slate-400">
-          <p class="font-semibold mb-1">${
-            isQuotaError ? "Solusi" : "Troubleshooting"
-          }:</p>
+          <p class="font-semibold mb-1">${isQuotaError ? "Solusi" : "Troubleshooting"}:</p>
           <ul class="list-disc pl-5 space-y-1">
             ${
               isQuotaError
@@ -2267,8 +2169,7 @@ async function analyzeMedia() {
     // Reset button state
     if (btnAnalyze) {
       btnAnalyze.disabled = false;
-      btnAnalyze.innerHTML =
-        '<i data-lucide="sparkles" class="w-4 h-4"></i> Analisis AI';
+      btnAnalyze.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Analisis AI';
       lucide.createIcons();
     }
 
@@ -2292,16 +2193,10 @@ function markdownToHtml(text) {
   let html = escapeHtml(text);
 
   // Convert **bold** to <strong>
-  html = html.replace(
-    /\*\*(.+?)\*\*/g,
-    "<strong class='font-semibold text-slate-100'>$1</strong>"
-  );
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong class='font-semibold text-slate-100'>$1</strong>");
 
   // Convert *italic* to <em> (only if not part of **bold**)
-  html = html.replace(
-    /(?<!\*)\*([^*]+?)\*(?!\*)/g,
-    "<em class='italic text-slate-200'>$1</em>"
-  );
+  html = html.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em class='italic text-slate-200'>$1</em>");
 
   // Convert `code` to <code>
   html = html.replace(
@@ -2319,9 +2214,7 @@ function formatAISummary(text, metadata = {}) {
   let metadataBadge = "";
   if (metadata.source) {
     const sourceLabel =
-      metadata.source === "auto-transcript"
-        ? "✨ Auto Transcript"
-        : "📝 User Notes";
+      metadata.source === "auto-transcript" ? "✨ Auto Transcript" : "📝 User Notes";
     const sourceColor =
       metadata.source === "auto-transcript"
         ? "bg-emerald-400/10 border-emerald-400/30 text-emerald-300"
@@ -2356,9 +2249,7 @@ function formatAISummary(text, metadata = {}) {
     if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
       // Close previous section
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join(
-          ""
-        )}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join("")}</ul>`;
         currentList = [];
       }
 
@@ -2370,10 +2261,7 @@ function formatAISummary(text, metadata = {}) {
       if (headerText.includes("Selaras") || headerText.includes("selaras")) {
         iconName = "check-circle";
         iconColor = "text-emerald-400";
-      } else if (
-        headerText.includes("Koreksi") ||
-        headerText.includes("koreksi")
-      ) {
+      } else if (headerText.includes("Koreksi") || headerText.includes("koreksi")) {
         iconName = "alert-circle";
         iconColor = "text-amber-400";
       } else if (headerText.includes("Sains") || headerText.includes("sains")) {
@@ -2406,9 +2294,7 @@ function formatAISummary(text, metadata = {}) {
     // Regular paragraph
     else if (trimmed) {
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join(
-          ""
-        )}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join("")}</ul>`;
         currentList = [];
       }
       html += `<p class="text-slate-200/85">${markdownToHtml(trimmed)}</p>`;
@@ -2417,9 +2303,7 @@ function formatAISummary(text, metadata = {}) {
 
   // Close remaining list
   if (currentList.length > 0) {
-    html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join(
-      ""
-    )}</ul>`;
+    html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join("")}</ul>`;
   }
 
   // Close last section
@@ -2570,9 +2454,7 @@ async function renderServices() {
         return `
           <div class="event-card">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-              <div class="text-lg font-semibold text-slate-900">${escapeHtml(
-                service.name
-              )}</div>
+              <div class="text-lg font-semibold text-slate-900">${escapeHtml(service.name)}</div>
               ${categoryBadge}
             </div>
             <p class="text-sm text-slate-900 mb-3">
@@ -2655,9 +2537,7 @@ function getModeInfoHTML(mode) {
 
   return `
     <div class="flex items-center gap-2 mb-3 text-xs text-slate-900">
-      <i data-lucide="${
-        icons[mode] || "video"
-      }" class="w-3.5 h-3.5 text-emerald-400"></i>
+      <i data-lucide="${icons[mode] || "video"}" class="w-3.5 h-3.5 text-emerald-400"></i>
       <span>${labels[mode] || mode}</span>
     </div>
   `;
@@ -2753,7 +2633,7 @@ function _storeGet(key, defaultValue) {
   try {
     const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : defaultValue;
-  } catch (e) {
+  } catch {
     return defaultValue;
   }
 }
@@ -2804,7 +2684,7 @@ function showStoreTab(tabName) {
     targetTab.classList.remove("bg-slate-800", "text-slate-300");
     targetTab.classList.add("bg-amber-400", "text-slate-900");
   }
-  
+
   // Reload rewards when switching to points tab
   if (tabName === "points") {
     loadAndRenderRewards();
@@ -2824,6 +2704,8 @@ async function loadProductsFromAPI() {
         name: product.name,
         cat: product.category, // API uses "category" field
         price: parseFloat(product.price),
+        member_price: product.member_price ? parseFloat(product.member_price) : null,
+        promo_text: product.promo_text || null,
         description: product.description,
         image: product.image_url,
         stock: product.stock,
@@ -2837,6 +2719,90 @@ async function loadProductsFromAPI() {
   }
 }
 
+// Check if user is logged in (member)
+let isUserLoggedIn = false;
+
+async function checkUserLoginStatus() {
+  try {
+    const response = await fetch("/api/auth/check", {
+      credentials: "include",
+    });
+    const result = await response.json();
+    isUserLoggedIn = result.success && result.loggedIn;
+    return isUserLoggedIn;
+  } catch (error) {
+    console.error("Error checking login status:", error);
+    isUserLoggedIn = false;
+    return false;
+  }
+}
+
+// Render product pricing with member/normal price display
+function renderProductPricing(product) {
+  const hasMemberPrice = product.member_price !== null && product.member_price > 0;
+
+  // If logged in and has member price: show member price large, normal price strikethrough
+  if (isUserLoggedIn && hasMemberPrice) {
+    const savings = product.price - product.member_price;
+    const savingsPercent = Math.round((savings / product.price) * 100);
+    return `
+      <div class="space-y-1">
+        <div class="text-emerald-600 font-bold text-xl">
+          Rp ${product.member_price.toLocaleString("id-ID")}
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 text-sm line-through">
+            Rp ${product.price.toLocaleString("id-ID")}
+          </span>
+          <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded">
+            Hemat ${savingsPercent}%
+          </span>
+        </div>
+        ${
+          product.promo_text
+            ? `<div class="text-xs text-amber-600 font-medium">${escapeHtml(
+                product.promo_text
+              )}</div>`
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  // If guest and has member price: show normal price + member CTA
+  if (!isUserLoggedIn && hasMemberPrice) {
+    return `
+      <div class="space-y-1">
+        <div class="text-amber-500 font-bold text-lg">
+          Rp ${product.price.toLocaleString("id-ID")}
+        </div>
+        <a href="/login.html" class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold hover:text-emerald-700">
+          🔐 Hemat hingga 20% untuk member
+        </a>
+        ${
+          product.promo_text
+            ? `<div class="text-xs text-amber-600 font-medium">${escapeHtml(
+                product.promo_text
+              )}</div>`
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  // No member price: just show normal price
+  return `
+    <div class="text-amber-500 font-bold text-lg">
+      Rp ${product.price.toLocaleString("id-ID")}
+    </div>
+    ${
+      product.promo_text
+        ? `<div class="text-xs text-amber-600 font-medium">${escapeHtml(product.promo_text)}</div>`
+        : ""
+    }
+  `;
+}
+
 // Filter products by category
 async function filterStoreCategory(category) {
   const grid = document.getElementById("productGrid");
@@ -2845,6 +2811,9 @@ async function filterStoreCategory(category) {
   // Show loading state
   grid.innerHTML =
     '<div class="col-span-full text-center text-slate-400 py-8">Loading products...</div>';
+
+  // Check login status for member pricing
+  await checkUserLoginStatus();
 
   // Load products if not already loaded
   if (PRODUCTS.length === 0) {
@@ -2886,9 +2855,7 @@ async function filterStoreCategory(category) {
           <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-semibold">${getCategoryLabel(
             p.cat
           )}</div>
-          <div class="font-semibold text-slate-900 text-lg">${escapeHtml(
-            p.name
-          )}</div>
+          <div class="font-semibold text-slate-900 text-lg">${escapeHtml(p.name)}</div>
           ${
             p.description
               ? `<p class="text-sm text-slate-600 mt-1 line-clamp-2">${escapeHtml(
@@ -2897,18 +2864,18 @@ async function filterStoreCategory(category) {
               : ""
           }
         </div>
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div class="text-amber-500 font-bold text-lg">Rp ${p.price.toLocaleString(
-            "id-ID"
-          )}</div>
-          ${
-            p.stock > 0
-              ? `<button class="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${p.id}')">
-                  <i data-lucide="plus" class="w-3 h-3"></i>
-                  Tambah
-                </button>`
-              : `<span class="text-xs text-red-500 font-semibold">Stok Habis</span>`
-          }
+        <div class="flex flex-col gap-2">
+          ${renderProductPricing(p)}
+          <div class="flex items-center justify-between gap-2">
+            ${
+              p.stock > 0
+                ? `<button class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${p.id}')">
+                    <i data-lucide="plus" class="w-3 h-3"></i>
+                    Tambah
+                  </button>`
+                : `<span class="text-xs text-red-500 font-semibold">Stok Habis</span>`
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -2946,9 +2913,7 @@ function addToCart(productId) {
   const numId = typeof productId === "string" ? parseInt(productId) : productId;
 
   // Try to find product with both number and string comparison
-  const product = PRODUCTS.find(
-    (p) => p.id === numId || p.id === productId || p.id == productId
-  );
+  const product = PRODUCTS.find((p) => p.id === numId || p.id === productId || p.id == productId);
 
   // Debug log
   console.log("Looking for product ID:", productId, "converted to:", numId);
@@ -2965,14 +2930,12 @@ function addToCart(productId) {
     return;
   }
 
+  // Determine price to use: member price if logged in and available, otherwise normal price
+  const priceToUse = isUserLoggedIn && product.member_price ? product.member_price : product.price;
+
   // Call the new addToStoreCart from store-cart.js
   if (typeof window.addToStoreCart === "function") {
-    window.addToStoreCart(
-      product.id,
-      product.name,
-      product.price,
-      product.image
-    );
+    window.addToStoreCart(product.id, product.name, priceToUse, product.image);
   } else {
     console.error("addToStoreCart function not found");
   }
@@ -3008,8 +2971,7 @@ function updateCartDisplay() {
   }
 
   if (cart.length === 0) {
-    cartContainer.innerHTML =
-      '<div class="text-sm text-slate-400">Keranjang masih kosong</div>';
+    cartContainer.innerHTML = '<div class="text-sm text-slate-400">Keranjang masih kosong</div>';
     return;
   }
 
@@ -3022,13 +2984,11 @@ function updateCartDisplay() {
       <div class="flex items-center justify-between text-sm border-b border-slate-800 pb-2">
         <div class="flex-1">
           <div class="font-medium text-slate-200">${escapeHtml(item.name)}</div>
-          <div class="text-xs text-slate-400">${
-            item.qty
-          } × Rp ${item.price.toLocaleString("id-ID")}</div>
+          <div class="text-xs text-slate-400">${item.qty} × Rp ${item.price.toLocaleString(
+        "id-ID"
+      )}</div>
         </div>
-        <div class="font-semibold text-amber-300">Rp ${subtotal.toLocaleString(
-          "id-ID"
-        )}</div>
+        <div class="font-semibold text-amber-300">Rp ${subtotal.toLocaleString("id-ID")}</div>
       </div>
     `;
     })
@@ -3070,9 +3030,7 @@ async function redeemReward(cost, rewardName, rewardId = null) {
   const current = data.value || 0;
 
   if (current < cost) {
-    alert(
-      `Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`
-    );
+    alert(`Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`);
     return;
   }
 
@@ -3102,18 +3060,14 @@ async function redeemReward(cost, rewardName, rewardId = null) {
       _db("db_points", { value: newValue });
       addPoints(0); // Trigger nav refresh
       updatePointsView();
-      alert(
-        `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
-      );
+      alert(`Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`);
     } else {
       // Fallback to local storage only
       const newValue = current - cost;
       _db("db_points", { value: newValue });
       addPoints(0);
       updatePointsView();
-      alert(
-        `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
-      );
+      alert(`Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`);
     }
   } catch (error) {
     console.error("Error redeeming reward:", error);
@@ -3122,9 +3076,7 @@ async function redeemReward(cost, rewardName, rewardId = null) {
     _db("db_points", { value: newValue });
     addPoints(0);
     updatePointsView();
-    alert(
-      `Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`
-    );
+    alert(`Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`);
   }
 }
 
@@ -3150,10 +3102,125 @@ async function loadAndRenderRewards() {
   }
 }
 
+/**
+ * Refresh points display - reload from server and update UI
+ * Called from HTML onclick
+ */
+// eslint-disable-next-line no-unused-vars
+async function refreshPoints() {
+  const pointsBigEl = document.getElementById("pointsBig");
+  const refreshBtn = event?.target?.closest("button");
+
+  // Show loading state
+  if (pointsBigEl) {
+    pointsBigEl.innerHTML =
+      '<i data-lucide="loader-2" class="w-12 h-12 animate-spin inline-block"></i>';
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  }
+
+  // Disable button during refresh
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.classList.add("opacity-50", "cursor-not-allowed");
+  }
+
+  try {
+    // Check if user is logged in first
+    const authResponse = await fetch("/api/auth/me", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!authResponse.ok || authResponse.status === 401) {
+      throw new Error("Anda harus login terlebih dahulu untuk melihat poin");
+    }
+
+    // Fetch latest user data including points
+    const response = await fetch("/api/user-data/progress", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to fetch points");
+    }
+
+    const data = await response.json();
+
+    if (data.success && data.data) {
+      // Update points display
+      const newPoints = data.data.points || 0;
+      if (pointsBigEl) {
+        // Animate number change
+        animatePointsChange(pointsBigEl, parseInt(pointsBigEl.textContent) || 0, newPoints);
+      }
+
+      // Update navbar points
+      if (typeof refreshNav === "function") {
+        refreshNav();
+      }
+
+      // Show success feedback (silent update, no alert)
+      console.log("✅ Points refreshed successfully");
+    } else {
+      throw new Error(data.error || "Failed to fetch points");
+    }
+  } catch (error) {
+    console.error("Error refreshing points:", error);
+
+    // Show user-friendly message
+    const errorMessage = error.message.includes("login")
+      ? "⚠️ Silakan login untuk melihat poin Anda"
+      : "❌ Gagal memuat poin terbaru";
+
+    alert(errorMessage);
+
+    // Restore previous value or show 0
+    if (pointsBigEl && pointsBigEl.textContent.includes("loader")) {
+      pointsBigEl.textContent = "0";
+    }
+  } finally {
+    // Re-enable button
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.classList.remove("opacity-50", "cursor-not-allowed");
+    }
+  }
+}
+
+/**
+ * Animate points number change
+ */
+function animatePointsChange(element, from, to) {
+  const duration = 800;
+  const startTime = performance.now();
+  const difference = to - from;
+
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Easing function
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + difference * easeOut);
+
+    element.textContent = current;
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
 // Render rewards from API data
 function renderRewards(rewards) {
-  const rewardsContainer = document.querySelector('.grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4');
-  
+  const rewardsContainer = document.querySelector(".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4");
+
   if (!rewardsContainer) {
     console.warn("Rewards container not found");
     return;
@@ -3167,14 +3234,21 @@ function renderRewards(rewards) {
 
       return `
         <button
-          onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name).replace(/'/g, "\\'")}', ${reward.id})"
+          onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name).replace(
+        /'/g,
+        "\\'"
+      )}', ${reward.id})"
           class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${hoverBorderClass} hover:bg-${hoverBgClass} transition text-left"
         >
           <div class="text-xs text-${colorClass} mb-1 font-semibold">
             ${reward.points_cost} poin
           </div>
           <div class="font-semibold text-sm text-slate-900">${escapeHtml(reward.name)}</div>
-          ${reward.description ? `<p class="text-xs text-slate-600 mt-1">${escapeHtml(reward.description)}</p>` : ''}
+          ${
+            reward.description
+              ? `<p class="text-xs text-slate-600 mt-1">${escapeHtml(reward.description)}</p>`
+              : ""
+          }
         </button>
       `;
     })
@@ -3183,8 +3257,8 @@ function renderRewards(rewards) {
 
 // Render default fallback rewards (if API fails)
 function renderDefaultRewards() {
-  const rewardsContainer = document.querySelector('.grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4');
-  
+  const rewardsContainer = document.querySelector(".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4");
+
   if (!rewardsContainer) {
     return;
   }
@@ -3235,19 +3309,11 @@ function renderLocations() {
           <i data-lucide="map-pin" class="w-5 h-5 text-amber-500"></i>
         </div>
         <div class="flex-1">
-          <div class="font-semibold text-slate-900 mb-1">${escapeHtml(
-            loc.name
-          )}</div>
-          <div class="text-xs text-slate-900 mb-2">${escapeHtml(
-            loc.address
-          )}</div>
+          <div class="font-semibold text-slate-900 mb-1">${escapeHtml(loc.name)}</div>
+          <div class="text-xs text-slate-900 mb-2">${escapeHtml(loc.address)}</div>
           <div class="text-xs text-slate-700 space-y-1">
-            <div><i data-lucide="phone" class="w-3 h-3 inline"></i> ${escapeHtml(
-              loc.phone
-            )}</div>
-            <div><i data-lucide="clock" class="w-3 h-3 inline"></i> ${escapeHtml(
-              loc.hours
-            )}</div>
+            <div><i data-lucide="phone" class="w-3 h-3 inline"></i> ${escapeHtml(loc.phone)}</div>
+            <div><i data-lucide="clock" class="w-3 h-3 inline"></i> ${escapeHtml(loc.hours)}</div>
           </div>
         </div>
       </div>
@@ -3329,7 +3395,7 @@ function initStorePage() {
   updateCartDisplay();
   updatePointsView();
   showStoreTab("store"); // Default tab
-  
+
   // Load rewards from API
   loadAndRenderRewards();
 

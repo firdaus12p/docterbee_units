@@ -117,20 +117,8 @@ router.post("/", async (req, res) => {
     }
 
     // Validate customer data if provided
-    if (
-      customerName ||
-      customerPhone ||
-      customerAge ||
-      customerGender ||
-      customerAddress
-    ) {
-      if (
-        !customerName ||
-        !customerPhone ||
-        !customerAge ||
-        !customerGender ||
-        !customerAddress
-      ) {
+    if (customerName || customerPhone || customerAge || customerGender || customerAddress) {
+      if (!customerName || !customerPhone || !customerAge || !customerGender || !customerAddress) {
         return res.status(400).json({
           success: false,
           error: "Data pribadi harus diisi lengkap",
@@ -166,10 +154,7 @@ router.post("/", async (req, res) => {
         finalPrice = Math.max(0, price - discountAmount);
 
         // Increment usage count
-        await query(
-          "UPDATE coupons SET used_count = used_count + 1 WHERE id = ?",
-          [coupon.id]
-        );
+        await query("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?", [coupon.id]);
       }
     } else if (frontendPrice && promoCode) {
       // If frontend provided prices with promo code, still increment coupon usage
@@ -181,10 +166,7 @@ router.post("/", async (req, res) => {
       );
 
       if (coupon) {
-        await query(
-          "UPDATE coupons SET used_count = used_count + 1 WHERE id = ?",
-          [coupon.id]
-        );
+        await query("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?", [coupon.id]);
       }
     }
 
@@ -212,6 +194,23 @@ router.post("/", async (req, res) => {
         notes || null,
       ]
     );
+
+    // Record coupon usage for logged-in users (one-time per user)
+    if (promoCode && req.session?.userId) {
+      const userId = req.session.userId;
+      const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
+        promoCode.toUpperCase(),
+      ]);
+
+      if (coupon) {
+        // Insert into coupon_usage to track one-time usage per user
+        await query(
+          `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
+           VALUES (?, ?, 'service', ?)`,
+          [userId, coupon.id, result.insertId]
+        );
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -251,9 +250,7 @@ router.patch("/:id", async (req, res) => {
     const { status, notes } = req.body;
 
     // Check if booking exists
-    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [
-      id,
-    ]);
+    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [id]);
     if (!existing) {
       return res.status(404).json({
         success: false,
@@ -283,10 +280,7 @@ router.patch("/:id", async (req, res) => {
 
     params.push(id);
 
-    await query(
-      `UPDATE bookings SET ${updates.join(", ")} WHERE id = ?`,
-      params
-    );
+    await query(`UPDATE bookings SET ${updates.join(", ")} WHERE id = ?`, params);
 
     res.json({
       success: true,
@@ -340,9 +334,7 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params;
 
     // Check if booking exists
-    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [
-      id,
-    ]);
+    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [id]);
     if (!existing) {
       return res.status(404).json({
         success: false,

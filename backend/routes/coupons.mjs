@@ -6,7 +6,7 @@ const router = express.Router();
 // POST /api/coupons/validate - Validate promo code (public)
 router.post("/validate", async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, booking_value, type } = req.body;
 
     if (!code) {
       return res.status(400).json({
@@ -32,6 +32,55 @@ router.post("/validate", async (req, res) => {
       });
     }
 
+    // Check if user already used this coupon (one-time per user)
+    const userId = req.session?.userId;
+    if (userId) {
+      const alreadyUsed = await queryOne(
+        "SELECT id FROM coupon_usage WHERE user_id = ? AND coupon_id = ?",
+        [userId, coupon.id]
+      );
+
+      if (alreadyUsed) {
+        return res.status(400).json({
+          success: false,
+          valid: false,
+          error: "Anda sudah pernah menggunakan kode promo ini",
+          alreadyUsed: true,
+        });
+      }
+    }
+
+    // Validate coupon type
+    if (type && coupon.coupon_type !== "both" && coupon.coupon_type !== type) {
+      return res.status(400).json({
+        success: false,
+        valid: false,
+        error: `Kode promo ini hanya untuk ${
+          coupon.coupon_type === "store" ? "produk" : "layanan"
+        }`,
+      });
+    }
+
+    // Check minimum booking value
+    if (booking_value !== undefined && booking_value < coupon.min_booking_value) {
+      return res.status(400).json({
+        success: false,
+        valid: false,
+        error: `Minimal pembelian Rp ${coupon.min_booking_value.toLocaleString("id-ID")}`,
+        minBookingValue: coupon.min_booking_value,
+      });
+    }
+
+    // Calculate discount amount
+    let discountAmount = 0;
+    if (booking_value !== undefined) {
+      if (coupon.discount_type === "percentage") {
+        discountAmount = (booking_value * coupon.discount_value) / 100;
+      } else {
+        discountAmount = coupon.discount_value;
+      }
+    }
+
     res.json({
       success: true,
       valid: true,
@@ -41,7 +90,9 @@ router.post("/validate", async (req, res) => {
         description: coupon.description,
         discountType: coupon.discount_type,
         discountValue: coupon.discount_value,
+        discountAmount: discountAmount,
         minBookingValue: coupon.min_booking_value,
+        couponType: coupon.coupon_type,
       },
     });
   } catch (error) {
@@ -123,6 +174,7 @@ router.post("/", async (req, res) => {
       minBookingValue,
       maxUses,
       expiresAt,
+      couponType,
     } = req.body;
 
     // Validation
@@ -133,10 +185,18 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Validate couponType
+    const validCouponTypes = ["store", "services", "both"];
+    const finalCouponType = couponType || "both";
+    if (!validCouponTypes.includes(finalCouponType)) {
+      return res.status(400).json({
+        success: false,
+        error: "Tipe kupon tidak valid (store, services, atau both)",
+      });
+    }
+
     // Check if code already exists
-    const existing = await queryOne("SELECT id FROM coupons WHERE code = ?", [
-      code.toUpperCase(),
-    ]);
+    const existing = await queryOne("SELECT id FROM coupons WHERE code = ?", [code.toUpperCase()]);
     if (existing) {
       return res.status(400).json({
         success: false,
@@ -147,8 +207,8 @@ router.post("/", async (req, res) => {
     // Insert coupon
     const result = await query(
       `INSERT INTO coupons 
-       (code, description, discount_type, discount_value, min_booking_value, max_uses, expires_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       (code, description, discount_type, discount_value, min_booking_value, max_uses, expires_at, coupon_type)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         code.toUpperCase(),
         description || null,
@@ -157,6 +217,7 @@ router.post("/", async (req, res) => {
         minBookingValue || 0,
         maxUses || null,
         expiresAt || null,
+        finalCouponType,
       ]
     );
 
@@ -189,17 +250,27 @@ router.patch("/:id", async (req, res) => {
       maxUses,
       isActive,
       expiresAt,
+      couponType,
     } = req.body;
 
     // Check if coupon exists
-    const existing = await queryOne("SELECT id FROM coupons WHERE id = ?", [
-      id,
-    ]);
+    const existing = await queryOne("SELECT id FROM coupons WHERE id = ?", [id]);
     if (!existing) {
       return res.status(404).json({
         success: false,
         error: "Kode promo tidak ditemukan",
       });
+    }
+
+    // Validate couponType if being updated
+    if (couponType !== undefined) {
+      const validCouponTypes = ["store", "services", "both"];
+      if (!validCouponTypes.includes(couponType)) {
+        return res.status(400).json({
+          success: false,
+          error: "Tipe kupon tidak valid (store, services, atau both)",
+        });
+      }
     }
 
     const updates = [];
@@ -212,6 +283,10 @@ router.patch("/:id", async (req, res) => {
     if (discountType) {
       updates.push("discount_type = ?");
       params.push(discountType);
+    }
+    if (couponType !== undefined) {
+      updates.push("coupon_type = ?");
+      params.push(couponType);
     }
     if (discountValue !== undefined) {
       updates.push("discount_value = ?");
@@ -243,10 +318,7 @@ router.patch("/:id", async (req, res) => {
 
     params.push(id);
 
-    await query(
-      `UPDATE coupons SET ${updates.join(", ")} WHERE id = ?`,
-      params
-    );
+    await query(`UPDATE coupons SET ${updates.join(", ")} WHERE id = ?`, params);
 
     res.json({
       success: true,
@@ -267,9 +339,7 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params;
 
     // Check if coupon exists
-    const existing = await queryOne("SELECT id FROM coupons WHERE id = ?", [
-      id,
-    ]);
+    const existing = await queryOne("SELECT id FROM coupons WHERE id = ?", [id]);
     if (!existing) {
       return res.status(404).json({
         success: false,

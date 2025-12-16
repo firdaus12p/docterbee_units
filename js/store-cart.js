@@ -8,6 +8,9 @@ let cart = [];
 // Pending order state
 let pendingOrderData = null;
 
+// Coupon state for store
+let storeCouponData = null;
+
 // ============================================
 // CART FUNCTIONS
 // ============================================
@@ -111,9 +114,7 @@ function updateCartUI() {
       }
       <div class="flex-1">
         <h4 class="font-semibold text-sm text-slate-900">${item.name}</h4>
-        <p class="text-xs text-amber-500 font-bold">Rp ${item.price.toLocaleString(
-          "id-ID"
-        )}</p>
+        <p class="text-xs text-amber-500 font-bold">Rp ${item.price.toLocaleString("id-ID")}</p>
       </div>
       <div class="flex items-center gap-2">
         <button 
@@ -122,9 +123,7 @@ function updateCartUI() {
         >
           <i data-lucide="minus" class="w-3 h-3"></i>
         </button>
-        <span class="w-8 text-center font-semibold text-sm">${
-          item.quantity
-        }</span>
+        <span class="w-8 text-center font-semibold text-sm">${item.quantity}</span>
         <button 
           onclick="updateQuantity(${item.id}, 1)"
           class="w-7 h-7 rounded-full bg-amber-400 hover:bg-amber-500 flex items-center justify-center transition"
@@ -144,9 +143,8 @@ function updateCartUI() {
     )
     .join("");
 
-  // Update total
-  const total = calculateTotal();
-  cartTotalElement.textContent = total.toLocaleString("id-ID");
+  // Update total with discount applied (if coupon exists)
+  updateCartUIWithDiscount();
 
   // Re-initialize Lucide icons
   if (typeof lucide !== "undefined") {
@@ -162,6 +160,205 @@ function updateCartCount() {
 }
 
 // ============================================
+// COUPON VALIDATION FOR STORE
+// ============================================
+
+// eslint-disable-next-line no-unused-vars
+async function validateStoreCoupon() {
+  const couponInput = document.getElementById("storeCouponCode");
+  const validateBtn = document.getElementById("validateStoreCouponBtn");
+  const statusDiv = document.getElementById("storeCouponStatus");
+  const discountInfo = document.getElementById("storeDiscountInfo");
+
+  const code = couponInput?.value?.trim().toUpperCase();
+
+  if (!code) {
+    showToast("Masukkan kode promo", "error");
+    couponInput?.focus();
+    return;
+  }
+
+  // Show loading
+  const originalBtnText = validateBtn.textContent;
+  validateBtn.disabled = true;
+  validateBtn.textContent = "...";
+
+  try {
+    const subtotal = calculateTotal();
+
+    const response = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        code: code,
+        booking_value: subtotal,
+        type: "store", // Specify this is for store
+        validate_only: false, // Actually apply the coupon
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success || !result.valid) {
+      throw new Error(result.error || "Kode promo tidak valid");
+    }
+
+    // Coupon is valid - store all data for recalculation
+    storeCouponData = result.data;
+
+    // Build discount info text
+    let discountInfoText = "";
+    if (storeCouponData.discountType === "percentage") {
+      discountInfoText = `Diskon ${storeCouponData.discountValue}%`;
+    } else {
+      discountInfoText = `Diskon Rp ${storeCouponData.discountValue.toLocaleString("id-ID")}`;
+    }
+
+    // Show success message with discount info
+    statusDiv.innerHTML = `
+      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-700">
+        ✅ <strong>${code}</strong> - ${storeCouponData.description || discountInfoText}
+        ${
+          storeCouponData.minBookingValue > 0
+            ? `<br><small>Min. belanja: Rp ${storeCouponData.minBookingValue.toLocaleString(
+                "id-ID"
+              )}</small>`
+            : ""
+        }
+      </div>
+    `;
+    statusDiv.classList.remove("hidden");
+
+    // Disable input and change button
+    couponInput.disabled = true;
+    validateBtn.textContent = "✓ Diterapkan";
+    validateBtn.disabled = true;
+    validateBtn.classList.remove("bg-emerald-500", "hover:bg-emerald-600");
+    validateBtn.classList.add("bg-slate-400", "cursor-not-allowed");
+
+    // Update cart display with discount (will recalculate based on current total)
+    updateCartUIWithDiscount();
+
+    // Show calculated discount amount in info
+    const calculatedDiscount = storeCouponData.discountAmount || 0;
+    discountInfo.textContent = `💰 Hemat: Rp ${calculatedDiscount.toLocaleString("id-ID")}`;
+    discountInfo.classList.remove("hidden");
+
+    showToast("✅ Kode promo berhasil diterapkan", "success");
+  } catch (error) {
+    console.error("Error validating coupon:", error);
+    statusDiv.innerHTML = `
+      <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-red-700">
+        ❌ ${error.message}
+      </div>
+    `;
+    statusDiv.classList.remove("hidden");
+    storeCouponData = null;
+    updateCartUI(); // Reset to original
+    showToast(error.message, "error");
+  } finally {
+    validateBtn.disabled = false;
+    validateBtn.textContent = originalBtnText;
+  }
+}
+
+// Update cart UI with discount applied
+function updateCartUIWithDiscount() {
+  const originalTotal = calculateTotal();
+  let finalTotal = originalTotal;
+  let discountAmount = 0;
+
+  // Calculate discount if coupon applied
+  if (storeCouponData) {
+    // Check if cart meets minimum booking value
+    const minBookingValue = storeCouponData.minBookingValue || 0;
+
+    if (originalTotal < minBookingValue) {
+      // Cart total below minimum - remove coupon and show warning
+      const code = storeCouponData.code;
+      clearStoreCoupon();
+      showToast(
+        `⚠️ Kode promo ${code} memerlukan minimal pembelian Rp ${minBookingValue.toLocaleString(
+          "id-ID"
+        )}`,
+        "error"
+      );
+
+      // Update display without discount
+      document.getElementById("storeOriginalTotal").classList.add("hidden");
+      document.getElementById("storeDiscountAmount").classList.add("hidden");
+      document.getElementById("cartTotal").textContent = originalTotal.toLocaleString("id-ID");
+      return;
+    }
+
+    // Recalculate discount based on current total
+    if (storeCouponData.discountType === "percentage") {
+      discountAmount = Math.round((originalTotal * storeCouponData.discountValue) / 100);
+    } else {
+      // Fixed amount discount
+      discountAmount = storeCouponData.discountValue;
+    }
+
+    // Ensure discount doesn't exceed total
+    discountAmount = Math.min(discountAmount, originalTotal);
+    finalTotal = Math.max(0, originalTotal - discountAmount);
+
+    // Update discount amount in storeCouponData for checkout
+    storeCouponData.discountAmount = discountAmount;
+
+    // Show original total and discount
+    document.getElementById("storeOriginalAmount").textContent =
+      originalTotal.toLocaleString("id-ID");
+    document.getElementById("storeDiscountValue").textContent =
+      discountAmount.toLocaleString("id-ID");
+    document.getElementById("storeOriginalTotal").classList.remove("hidden");
+    document.getElementById("storeDiscountAmount").classList.remove("hidden");
+
+    // Update discount info display
+    const discountInfo = document.getElementById("storeDiscountInfo");
+    if (discountInfo) {
+      discountInfo.textContent = `💰 Hemat: Rp ${discountAmount.toLocaleString("id-ID")}`;
+      discountInfo.classList.remove("hidden");
+    }
+  } else {
+    // Hide discount rows if no coupon
+    document.getElementById("storeOriginalTotal").classList.add("hidden");
+    document.getElementById("storeDiscountAmount").classList.add("hidden");
+
+    const discountInfo = document.getElementById("storeDiscountInfo");
+    if (discountInfo) {
+      discountInfo.classList.add("hidden");
+    }
+  }
+
+  // Update final total
+  document.getElementById("cartTotal").textContent = finalTotal.toLocaleString("id-ID");
+}
+
+// Clear coupon data
+function clearStoreCoupon() {
+  storeCouponData = null;
+  const couponInput = document.getElementById("storeCouponCode");
+  const validateBtn = document.getElementById("validateStoreCouponBtn");
+  const statusDiv = document.getElementById("storeCouponStatus");
+  const discountInfo = document.getElementById("storeDiscountInfo");
+
+  if (couponInput) couponInput.disabled = false;
+  if (couponInput) couponInput.value = "";
+  if (validateBtn) {
+    validateBtn.disabled = false;
+    validateBtn.textContent = "Gunakan";
+    validateBtn.classList.remove("bg-slate-400", "cursor-not-allowed");
+    validateBtn.classList.add("bg-emerald-500", "hover:bg-emerald-600");
+  }
+  if (statusDiv) statusDiv.classList.add("hidden");
+  if (discountInfo) discountInfo.classList.add("hidden");
+
+  updateCartUI(); // Reset to original display
+}
+
+// ============================================
 // ORDER SUBMISSION
 // ============================================
 
@@ -172,9 +369,7 @@ async function submitOrder() {
   }
 
   // Get order details
-  const orderType = document.querySelector(
-    'input[name="orderType"]:checked'
-  )?.value;
+  const orderType = document.querySelector('input[name="orderType"]:checked')?.value;
   const storeLocation = document.getElementById("storeLocation")?.value;
 
   if (!orderType) {
@@ -225,12 +420,9 @@ async function submitOrder() {
 
   // ✅ CHECK FOR PENDING ORDER FIRST
   try {
-    const checkResponse = await fetch(
-      "/api/orders/check-pending",
-      {
-        credentials: "include",
-      }
-    );
+    const checkResponse = await fetch("/api/orders/check-pending", {
+      credentials: "include",
+    });
 
     const checkResult = await checkResponse.json();
 
@@ -244,13 +436,25 @@ async function submitOrder() {
     // Continue with checkout if check fails (for guest users)
   }
 
-  const totalAmount = calculateTotal();
+  const originalTotal = calculateTotal();
+  let finalTotal = originalTotal;
+  let discountAmount = 0;
+  let couponCode = null;
+
+  // Apply coupon discount if available
+  if (storeCouponData) {
+    discountAmount = storeCouponData.discountAmount || 0;
+    finalTotal = Math.max(0, originalTotal - discountAmount);
+    couponCode = storeCouponData.code;
+  }
 
   const orderData = {
     order_type: orderType,
     store_location: storeLocation,
     items: cart,
-    total_amount: totalAmount,
+    total_amount: finalTotal,
+    coupon_code: couponCode,
+    coupon_discount: discountAmount,
   };
 
   // Add guest data if available
@@ -302,6 +506,9 @@ async function submitOrder() {
     updateCartCount();
     saveCartToLocalStorage();
 
+    // Clear coupon
+    clearStoreCoupon();
+
     submitButton.disabled = false;
     submitButton.innerHTML = originalText;
   } catch (error) {
@@ -342,8 +549,7 @@ function showQRCodeModal(orderData) {
   pointsEl.textContent = orderData.points_earned;
 
   // Check if order is completed
-  const isCompleted =
-    orderData.status === "completed" || orderData.status === "paid";
+  const isCompleted = orderData.status === "completed" || orderData.status === "paid";
 
   if (isCompleted) {
     // Show "Pesanan Di Proses" view (no QR code)
@@ -367,8 +573,7 @@ function showQRCodeModal(orderData) {
   } else {
     // Show "Pesanan Berhasil" view (with QR code and countdown)
     modalTitle.textContent = "Pesanan Berhasil!";
-    modalSubtitle.textContent =
-      "Tunjukkan QR code ini ke kasir untuk memproses pesanan Anda";
+    modalSubtitle.textContent = "Tunjukkan QR code ini ke kasir untuk memproses pesanan Anda";
     qrCodeContainerDiv.style.display = "block";
     warningText.style.display = "block";
     expiryLabel.textContent = "Berlaku Hingga:";
@@ -425,15 +630,14 @@ function startCountdown(expiryDate, countdownEl) {
       return;
     }
 
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    countdownEl.textContent = `${String(hours).padStart(2, "0")}:${String(
-      minutes
-    ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    countdownEl.textContent = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+      2,
+      "0"
+    )}:${String(seconds).padStart(2, "0")}`;
 
     // Change color based on time remaining
     if (distance < 5 * 60 * 1000) {
@@ -466,6 +670,72 @@ function closeQRModal() {
   }
 }
 
+/**
+ * Check order status - refresh QR modal with latest order data
+ */
+async function checkOrderStatus() {
+  const checkBtn = document.getElementById("checkOrderStatusBtn");
+  const orderNumberEl = document.getElementById("qrOrderNumber");
+  const orderNumber = orderNumberEl?.textContent;
+
+  if (!orderNumber || orderNumber === "-") {
+    showToast("❌ Order number tidak ditemukan", "error");
+    return;
+  }
+
+  // Show loading state
+  if (checkBtn) {
+    checkBtn.disabled = true;
+    checkBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Mengecek...';
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  }
+
+  try {
+    // Fetch order status from backend
+    const response = await fetch(`/api/orders/status/${encodeURIComponent(orderNumber)}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.order) {
+      // Close current modal
+      closeQRModal();
+
+      // Reopen with updated data
+      setTimeout(() => {
+        showQRCodeModal(data.order);
+
+        // Show feedback based on status
+        if (data.order.status === "completed" || data.order.status === "paid") {
+          showToast("✅ Pesanan sudah di-accept! Poin Anda telah ditambahkan.", "success");
+        } else if (data.order.status === "pending") {
+          showToast("⏳ Pesanan masih pending, belum di-accept admin", "info");
+        } else {
+          showToast(`ℹ️ Status: ${data.order.status}`, "info");
+        }
+      }, 100);
+    } else {
+      throw new Error(data.error || "Gagal mengecek status order");
+    }
+  } catch (error) {
+    console.error("Error checking order status:", error);
+    showToast("❌ Gagal mengecek status pesanan. Coba lagi.", "error");
+  } finally {
+    // Restore button state
+    if (checkBtn) {
+      checkBtn.disabled = false;
+      checkBtn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Cek Status Pesanan';
+      if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
+    }
+  }
+}
+
 // ============================================
 // POINTS CLAIMING
 // ============================================
@@ -480,10 +750,7 @@ async function claimOrderPoints(orderData) {
   }
 
   // If user is logged in, reload progress from database (points already added by backend)
-  if (
-    typeof window.UserDataSync !== "undefined" &&
-    window.UserDataSync.isEnabled()
-  ) {
+  if (typeof window.UserDataSync !== "undefined" && window.UserDataSync.isEnabled()) {
     console.log("🔄 Reloading user progress from database...");
 
     try {
@@ -497,16 +764,10 @@ async function claimOrderPoints(orderData) {
 
       // Mark order as claimed
       claimedOrders.push(orderData.id);
-      localStorage.setItem(
-        "docterbee_claimed_orders",
-        JSON.stringify(claimedOrders)
-      );
+      localStorage.setItem("docterbee_claimed_orders", JSON.stringify(claimedOrders));
 
       // Show toast notification
-      showToast(
-        `+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`,
-        "success"
-      );
+      showToast(`+${orderData.points_earned} poin telah ditambahkan ke akun Anda! 🎉`, "success");
 
       console.log(
         `✅ Successfully loaded ${orderData.points_earned} points from database for order ${orderData.id}`
@@ -523,16 +784,10 @@ async function claimOrderPoints(orderData) {
 
       // Mark order as claimed
       claimedOrders.push(orderData.id);
-      localStorage.setItem(
-        "docterbee_claimed_orders",
-        JSON.stringify(claimedOrders)
-      );
+      localStorage.setItem("docterbee_claimed_orders", JSON.stringify(claimedOrders));
 
       // Show toast notification
-      showToast(
-        `+${orderData.points_earned} poin telah ditambahkan! 🎉`,
-        "success"
-      );
+      showToast(`+${orderData.points_earned} poin telah ditambahkan! 🎉`, "success");
 
       console.log(
         `✅ Added ${orderData.points_earned} points to localStorage for order ${orderData.id}`
@@ -600,9 +855,7 @@ async function reopenLastOrderQR() {
 
   try {
     // Fetch latest order status from server
-    const response = await fetch(
-      `/api/orders/id/${lastOrder.id}`
-    );
+    const response = await fetch(`/api/orders/id/${lastOrder.id}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -672,30 +925,26 @@ function showPendingOrderModal(orderData) {
   const modal = document.getElementById("pendingOrderModal");
 
   // Populate order info
-  document.getElementById("pendingOrderNumber").textContent =
-    orderData.order_number;
-  document.getElementById("pendingOrderTotal").textContent =
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(orderData.total_amount);
+  document.getElementById("pendingOrderNumber").textContent = orderData.order_number;
+  document.getElementById("pendingOrderTotal").textContent = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(orderData.total_amount);
 
   // Format order type
-  const orderTypeText =
-    orderData.order_type === "dine_in" ? "Dine In" : "Take Away";
+  const orderTypeText = orderData.order_type === "dine_in" ? "Dine In" : "Take Away";
   document.getElementById("pendingOrderType").textContent = orderTypeText;
 
   // Format expiry date
   const expiryDate = new Date(orderData.expires_at);
-  document.getElementById("pendingExpiresAt").textContent =
-    expiryDate.toLocaleString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  document.getElementById("pendingExpiresAt").textContent = expiryDate.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   // Display items
   const itemsContainer = document.getElementById("pendingOrderItems");
@@ -761,13 +1010,10 @@ async function cancelPendingOrderAndRetry() {
 
   try {
     // Call cancel endpoint
-    const response = await fetch(
-      `/api/orders/${pendingOrderData.id}/cancel`,
-      {
-        method: "PATCH",
-        credentials: "include",
-      }
-    );
+    const response = await fetch(`/api/orders/${pendingOrderData.id}/cancel`, {
+      method: "PATCH",
+      credentials: "include",
+    });
 
     const result = await response.json();
 

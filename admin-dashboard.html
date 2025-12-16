@@ -681,6 +681,21 @@
                   </div>
                 </div>
                 <div>
+                  <label class="block text-sm mb-2">Tipe Kupon</label>
+                  <select
+                    id="couponType"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    required
+                  >
+                    <option value="both">Produk & Layanan</option>
+                    <option value="store">Hanya Produk</option>
+                    <option value="services">Hanya Layanan</option>
+                  </select>
+                  <small class="text-slate-400"
+                    >Tentukan di mana kupon ini bisa digunakan</small
+                  >
+                </div>
+                <div>
                   <label class="block text-sm mb-2"
                     >Min. Nilai Booking (Rp)</label
                   >
@@ -971,17 +986,25 @@
           <!-- Product Modal -->
           <div
             id="productModal"
-            class="fixed inset-0 bg-black/60 z-40 hidden flex items-center justify-center p-4 overflow-y-auto"
+            class="fixed inset-0 bg-black/60 z-40 hidden flex items-center justify-center p-4"
           >
             <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl my-8"
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div class="p-6 border-b border-slate-800">
+              <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold" id="productModalTitle">
                   Tambah Produk
                 </h3>
+                <button
+                  type="button"
+                  id="closeProductModalBtn"
+                  class="text-slate-400 hover:text-slate-200"
+                  onclick="closeProductModal()"
+                >
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
               </div>
-              <form id="productForm" class="p-6 space-y-4">
+              <form id="productForm" class="space-y-4">
                 <input type="hidden" id="productId" />
 
                 <div>
@@ -1017,7 +1040,7 @@
 
                   <div>
                     <label class="block text-sm mb-2"
-                      >Harga (Rp) <span class="text-red-400">*</span></label
+                      >Harga Normal (Rp) <span class="text-red-400">*</span></label
                     >
                     <input
                       type="text"
@@ -1027,9 +1050,39 @@
                       required
                     />
                     <p class="text-xs text-slate-400 mt-1">
-                      Gunakan titik sebagai pemisah ribuan (contoh: 20.000)
+                      Gunakan titik sebagai pemisah ribuan
                     </p>
                   </div>
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Harga Member (Rp)</label
+                    >
+                    <input
+                      type="text"
+                      id="productMemberPrice"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-emerald-400 focus:outline-none"
+                      placeholder="18.000"
+                    />
+                    <p class="text-xs text-slate-400 mt-1">
+                      Kosongkan jika tidak ada harga member
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm mb-2"
+                    >Teks Promosi</label
+                  >
+                  <input
+                    type="text"
+                    id="productPromoText"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="PROMO RAMADAN - Diskon hingga 20%"
+                  />
+                  <p class="text-xs text-slate-400 mt-1">
+                    Teks promosi opsional yang akan ditampilkan di card produk
+                  </p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
