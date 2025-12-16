@@ -1,5 +1,6 @@
 // Admin Dashboard JavaScript
-const API_BASE = "/api";
+// eslint-disable-next-line no-var
+var API_BASE = "/api";
 
 console.log("🚀 Admin Dashboard Loaded");
 console.log("📍 API Base URL:", API_BASE);
@@ -2248,31 +2249,7 @@ function getProductCategoryIcon(category) {
 }
 
 // ========== UTILITIES ==========
-
-function escapeHtml(text) {
-  const map = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  };
-  return String(text).replace(/[&<>"']/g, (m) => map[m]);
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatNumber(num) {
-  return new Intl.NumberFormat("id-ID").format(num);
-}
+// Note: escapeHtml, formatDate, formatNumber are defined in utils.js (global)
 
 /**
  * Format price input with thousand separator (dots)

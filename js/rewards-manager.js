@@ -211,7 +211,7 @@ async function saveReward(event) {
     const data = await response.json();
 
     if (data.success) {
-      showSuccessModal(data.message || "Reward berhasil disimpan");
+      window.showSuccessModal(data.message || "Reward berhasil disimpan");
       closeRewardModal();
       await loadRewards();
     } else {
@@ -225,7 +225,7 @@ async function saveReward(event) {
 
 // Delete reward
 function deleteReward(id, name) {
-  openDeleteModal(
+  window.openDeleteModal(
     () => confirmDeleteReward(id),
     `Hapus reward "${name}"?`,
     "Reward yang sudah dihapus tidak dapat dikembalikan. Riwayat penukaran reward ini akan tetap tersimpan."
@@ -242,7 +242,7 @@ async function confirmDeleteReward(id) {
     const data = await response.json();
 
     if (data.success) {
-      showSuccessModal("Reward berhasil dihapus");
+      window.showSuccessModal("Reward berhasil dihapus");
       await loadRewards();
     } else {
       alert(data.error || "Gagal menghapus reward");

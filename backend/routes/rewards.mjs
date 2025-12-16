@@ -5,23 +5,12 @@ const router = express.Router();
 
 // Middleware for admin authentication
 function requireAdmin(req, res, next) {
-  // Debug logging for troubleshooting
-  console.log("🔐 Session check:", {
-    sessionExists: !!req.session,
-    isAdmin: req.session?.isAdmin,
-    sessionID: req.sessionID,
-  });
-
-  // Check if admin is logged in via admin dashboard
   if (!req.session || !req.session.isAdmin) {
-    console.error("❌ Unauthorized access attempt to admin endpoint");
     return res.status(401).json({
       success: false,
       error: "Unauthorized - Admin login required",
     });
   }
-
-  console.log("✅ Admin access granted");
   next();
 }
 

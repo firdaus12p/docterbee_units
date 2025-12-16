@@ -317,7 +317,7 @@ function cleanYoutubeUrl(url) {
     }
 
     return url; // Return original if can't clean
-  } catch (e) {
+  } catch (_e) {
     return url; // Return original if parsing fails
   }
 }
@@ -360,7 +360,7 @@ async function fetchTranscriptWithRetry(videoId) {
       console.log(`📋 Available caption tracks: ${tracks.length}`);
 
       // Try to find Indonesian or first available track
-      let selectedTrack =
+      const selectedTrack =
         tracks.find(
           (t) =>
             t.language_code === "id" ||

@@ -92,7 +92,8 @@ async function loadUserProgress() {
 
     const result = await response.json();
     if (result.success) {
-      let { unitData, points } = result.data;
+      const { points } = result.data;
+      let { unitData } = result.data;
 
       // Backend returns unitData as STRING, parse it to object
       if (typeof unitData === "string") {
@@ -109,12 +110,12 @@ async function loadUserProgress() {
       localStorage.setItem("db_points", JSON.stringify({ value: points }));
 
       // Refresh UI if on journey page
-      if (typeof refreshNav === "function") refreshNav();
+      if (typeof window.refreshNav === "function") window.refreshNav();
 
       // Re-render current unit to show selected answers
-      if (typeof showUnit === "function" && window.currentUnitId) {
+      if (typeof window.showUnit === "function" && window.currentUnitId) {
         console.log("🔄 Re-rendering unit to show loaded data...");
-        showUnit(window.currentUnitId);
+        window.showUnit(window.currentUnitId);
       }
     }
   } catch (error) {
@@ -213,7 +214,7 @@ async function loadUserCart() {
       }
 
       // Refresh cart UI if on store page
-      if (typeof updateCartDisplay === "function") updateCartDisplay();
+      if (typeof window.updateCartDisplay === "function") window.updateCartDisplay();
     }
   } catch (error) {
     console.error("Error loading cart:", error);
@@ -267,7 +268,7 @@ async function clearUserCart() {
   if (!syncEnabled) {
     // User not logged in - just clear localStorage
     localStorage.removeItem("docterbee_cart");
-    if (typeof updateCartDisplay === "function") updateCartDisplay();
+    if (typeof window.updateCartDisplay === "function") window.updateCartDisplay();
     return;
   }
 
@@ -283,7 +284,7 @@ async function clearUserCart() {
         console.warn("⚠️ User session expired. Cart cleared locally only.");
         syncEnabled = false;
         localStorage.removeItem("docterbee_cart");
-        if (typeof updateCartDisplay === "function") updateCartDisplay();
+        if (typeof window.updateCartDisplay === "function") window.updateCartDisplay();
         return;
       }
       throw new Error("Failed to clear cart");
@@ -293,7 +294,7 @@ async function clearUserCart() {
     localStorage.removeItem("docterbee_cart");
 
     // Refresh cart UI
-    if (typeof updateCartDisplay === "function") updateCartDisplay();
+    if (typeof window.updateCartDisplay === "function") window.updateCartDisplay();
   } catch (error) {
     console.error("Error clearing cart:", error);
   }

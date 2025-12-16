@@ -222,10 +222,6 @@ router.get("/:id/rewards", async (req, res) => {
       [id]
     );
 
-    console.log(
-      `📊 Admin fetching rewards for user ${id} (${user.name}): Found ${rewards.length} redemptions`
-    );
-
     res.json({
       success: true,
       data: {
@@ -273,10 +269,6 @@ router.patch("/:userId/rewards/:redemptionId/approve", async (req, res) => {
     await query(
       "UPDATE reward_redemptions SET status = 'approved' WHERE id = ?",
       [redemptionId]
-    );
-
-    console.log(
-      `✅ Admin approved redemption ${redemptionId} for user ${userId} (${redemption.reward_name})`
     );
 
     res.json({

@@ -156,10 +156,6 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
       [userId, rewardId || null, rewardName, pointsCost]
     );
 
-    console.log(
-      `✅ Reward redeemed: User ${userId} redeemed "${rewardName}" for ${pointsCost} points (ID: ${redemptionResult.insertId})`
-    );
-
     res.json({
       success: true,
       message: "Reward redeemed successfully",

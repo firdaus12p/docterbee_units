@@ -260,19 +260,7 @@ async function deleteUser(userId) {
   }
 }
 
-// ============================================
-// Escape HTML for XSS prevention
-// ============================================
-function escapeHtml(text) {
-  const map = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  };
-  return text ? String(text).replace(/[&<>"']/g, (m) => map[m]) : "";
-}
+// Note: escapeHtml is defined in utils.js (global)
 
 // ============================================
 // Initialize Users Section

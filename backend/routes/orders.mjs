@@ -1,43 +1,12 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
-import crypto from "crypto";
+import {
+  generateOrderNumber,
+  calculateExpiryTime,
+  calculatePoints,
+} from "../utils/helpers.mjs";
 
 const router = express.Router();
-
-// ============================================
-// HELPER: Generate Order Number
-// ============================================
-function generateOrderNumber() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const random = crypto.randomBytes(3).toString("hex").toUpperCase();
-  return `ORD-${year}${month}${day}-${random}`;
-}
-
-// ============================================
-// HELPER: Calculate Expiry Time
-// ============================================
-function calculateExpiryTime(orderType) {
-  const now = new Date();
-  if (orderType === "dine_in") {
-    // 30 minutes for dine in
-    now.setMinutes(now.getMinutes() + 30);
-  } else {
-    // 2 hours for take away
-    now.setHours(now.getHours() + 2);
-  }
-  return now;
-}
-
-// ============================================
-// HELPER: Calculate Points
-// ============================================
-function calculatePoints(totalAmount) {
-  // 1 point per 10,000 IDR
-  return Math.floor(totalAmount / 10000);
-}
 
 // ============================================
 // GET /api/orders/check-pending - Check if user has pending order
@@ -408,17 +377,11 @@ router.patch("/:id/complete", async (req, res) => {
             newPoints,
             order.user_id,
           ]);
-          console.log(
-            `✅ Added ${order.points_earned} points to user ${order.user_id} (total: ${newPoints})`
-          );
         } else {
           // New user - create progress record with initial points
           await query(
             "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, ?, ?)",
             [order.user_id, JSON.stringify({}), order.points_earned]
-          );
-          console.log(
-            `✅ Created progress for user ${order.user_id} with ${order.points_earned} points`
           );
         }
       } catch (pointError) {
@@ -574,10 +537,6 @@ router.post("/:id/assign-points-by-phone", async (req, res) => {
 
     // Update order with user_id
     await query("UPDATE orders SET user_id = ? WHERE id = ?", [user.id, id]);
-
-    console.log(
-      `✅ Added ${pointsToAdd} points to user ${user.id} (${user.name}) from order ${order.order_number}`
-    );
 
     res.json({
       success: true,
