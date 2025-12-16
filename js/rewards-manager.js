@@ -47,27 +47,23 @@ function displayRewards(rewards) {
   grid.innerHTML = rewards
     .map(
       (reward) => `
-    <div class="booking-container p-4 hover:border-${
-      reward.color_theme
-    }-400/50 transition">
+    <div class="booking-container p-4 hover:border-${reward.color_theme}-400/50 transition">
       <div class="flex justify-between items-start mb-3">
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-2">
-            <h3 class="font-semibold text-white">${escapeHtml(reward.name)}</h3>
+            <h3 class="font-semibold text-slate-900">${escapeHtml(reward.name)}</h3>
             ${
               reward.is_active
-                ? '<span class="text-xs bg-emerald-900/30 text-emerald-400 px-2 py-0.5 rounded">Aktif</span>'
-                : '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded">Nonaktif</span>'
+                ? '<span class="text-xs bg-emerald-500/20 text-emerald-700 font-semibold px-2 py-0.5 rounded">Aktif</span>'
+                : '<span class="text-xs bg-slate-200 text-slate-600 font-semibold px-2 py-0.5 rounded">Nonaktif</span>'
             }
           </div>
-          <div class="text-2xl font-bold text-${reward.color_theme}-400 mb-2">
+          <div class="text-2xl font-bold text-${reward.color_theme}-600 mb-2">
             ${reward.points_cost} Poin
           </div>
           ${
             reward.description
-              ? `<p class="text-sm text-slate-400 mb-3">${escapeHtml(
-                  reward.description
-                )}</p>`
+              ? `<p class="text-sm text-slate-600 mb-3">${escapeHtml(reward.description)}</p>`
               : ""
           }
         </div>
@@ -82,9 +78,7 @@ function displayRewards(rewards) {
           Edit
         </button>
         <button
-          onclick="deleteReward(${reward.id}, '${escapeHtml(
-        reward.name
-      ).replace(/'/g, "\\'")}')"
+          onclick="deleteReward(${reward.id}, '${escapeHtml(reward.name).replace(/'/g, "\\'")}')"
           class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"
         >
           <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -144,11 +138,9 @@ async function editReward(id) {
       // Populate form fields
       document.getElementById("rewardId").value = reward.id;
       document.getElementById("rewardName").value = reward.name;
-      document.getElementById("rewardDescription").value =
-        reward.description || "";
+      document.getElementById("rewardDescription").value = reward.description || "";
       document.getElementById("rewardPoints").value = reward.points_cost;
-      document.getElementById("rewardColor").value =
-        reward.color_theme || "amber";
+      document.getElementById("rewardColor").value = reward.color_theme || "amber";
       document.getElementById("rewardActive").checked = reward.is_active === 1;
       document.getElementById("rewardSortOrder").value = reward.sort_order || 0;
 
@@ -172,8 +164,7 @@ async function saveReward(event) {
   const points = parseInt(document.getElementById("rewardPoints").value);
   const color = document.getElementById("rewardColor").value;
   const isActive = document.getElementById("rewardActive").checked ? 1 : 0;
-  const sortOrder =
-    parseInt(document.getElementById("rewardSortOrder").value) || 0;
+  const sortOrder = parseInt(document.getElementById("rewardSortOrder").value) || 0;
 
   // Validation
   if (!name) {
@@ -196,9 +187,7 @@ async function saveReward(event) {
   };
 
   try {
-    const url = id
-      ? `${API_BASE}/rewards/admin/${id}`
-      : `${API_BASE}/rewards/admin`;
+    const url = id ? `${API_BASE}/rewards/admin/${id}` : `${API_BASE}/rewards/admin`;
     const method = id ? "PATCH" : "POST";
 
     const response = await fetch(url, {

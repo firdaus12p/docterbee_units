@@ -37,8 +37,7 @@ const isProduction = process.env.NODE_ENV === "production";
 // Session middleware (MUST be before routes)
 app.use(
   session({
-    secret:
-      process.env.SESSION_SECRET || "docterbee-secret-key-change-in-production",
+    secret: process.env.SESSION_SECRET || "docterbee-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -132,9 +131,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
     console.log("📦 Database ready\n");
   } catch (error) {
     console.error("❌ Database initialization failed:", error.message);
-    console.error(
-      "⚠️  Server will continue but API routes may not work properly\n"
-    );
+    console.error("⚠️  Server will continue but API routes may not work properly\n");
   }
 })();
 
@@ -314,8 +311,7 @@ function cleanYoutubeUrl(url) {
   try {
     // Remove tracking parameters like si=, feature=, etc
     const urlObj = new URL(url);
-    const videoId =
-      urlObj.searchParams.get("v") || url.split("/").pop().split("?")[0];
+    const videoId = urlObj.searchParams.get("v") || url.split("/").pop().split("?")[0];
 
     // Return clean URL
     if (videoId && videoId.length === 11) {
@@ -378,12 +374,8 @@ async function fetchTranscriptWithRetry(videoId) {
         console.log(
           `✅ Using caption track: ${selectedTrack.name.text} (${selectedTrack.language_code})`
         );
-        console.log(
-          `   Is auto-generated: ${selectedTrack.kind === "asr" ? "Yes" : "No"}`
-        );
-        console.log(
-          `   Base URL: ${selectedTrack.base_url ? "Available" : "Missing"}`
-        );
+        console.log(`   Is auto-generated: ${selectedTrack.kind === "asr" ? "Yes" : "No"}`);
+        console.log(`   Base URL: ${selectedTrack.base_url ? "Available" : "Missing"}`);
 
         // Method 1: Try using getTranscript() if available
         try {
@@ -391,13 +383,10 @@ async function fetchTranscriptWithRetry(videoId) {
           const transcriptData = await info.getTranscript();
 
           if (transcriptData && transcriptData.transcript) {
-            const segments =
-              transcriptData.transcript.content?.body?.initial_segments;
+            const segments = transcriptData.transcript.content?.body?.initial_segments;
 
             if (segments && segments.length > 0) {
-              console.log(
-                `✅ Got ${segments.length} segments via getTranscript()`
-              );
+              console.log(`✅ Got ${segments.length} segments via getTranscript()`);
 
               const transcript = segments
                 .map((seg) => ({
@@ -408,54 +397,39 @@ async function fetchTranscriptWithRetry(videoId) {
                 .filter((t) => t.text.trim());
 
               if (transcript.length > 0) {
-                console.log(
-                  `✅ SUCCESS! Formatted ${transcript.length} segments`
-                );
-                console.log(
-                  `📊 First: "${transcript[0].text.substring(0, 50)}..."`
-                );
+                console.log(`✅ SUCCESS! Formatted ${transcript.length} segments`);
+                console.log(`📊 First: "${transcript[0].text.substring(0, 50)}..."`);
                 return transcript;
               }
             }
           }
           console.log(`⚠️  getTranscript() returned no usable data`);
         } catch (getTranscriptError) {
-          console.log(
-            `❌ getTranscript() failed: ${getTranscriptError.message}`
-          );
+          console.log(`❌ getTranscript() failed: ${getTranscriptError.message}`);
         }
 
         // Method 2: Fetch and parse caption XML directly
         if (selectedTrack.base_url) {
           try {
-            console.log(
-              `🔄 Method 2: Downloading caption XML from base_url...`
-            );
-            console.log(
-              `   URL: ${selectedTrack.base_url.substring(0, 80)}...`
-            );
+            console.log(`🔄 Method 2: Downloading caption XML from base_url...`);
+            console.log(`   URL: ${selectedTrack.base_url.substring(0, 80)}...`);
 
             // Add headers to mimic browser request
             const captionResponse = await fetch(selectedTrack.base_url, {
               headers: {
-                "User-Agent":
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 Accept: "text/xml,application/xml",
                 "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
               },
             });
 
             if (!captionResponse.ok) {
-              throw new Error(
-                `HTTP ${captionResponse.status}: ${captionResponse.statusText}`
-              );
+              throw new Error(`HTTP ${captionResponse.status}: ${captionResponse.statusText}`);
             }
 
             const captionXML = await captionResponse.text();
 
-            console.log(
-              `📥 Downloaded caption XML (${captionXML.length} bytes)`
-            );
+            console.log(`📥 Downloaded caption XML (${captionXML.length} bytes)`);
 
             // Check if XML is actually empty or invalid
             if (!captionXML || captionXML.length === 0) {
@@ -493,9 +467,7 @@ async function fetchTranscriptWithRetry(videoId) {
               console.log(
                 `✅ SUCCESS! Parsed ${transcript.length} transcript segments from youtubei.js`
               );
-              console.log(
-                `📊 First segment: "${transcript[0].text.substring(0, 50)}..."`
-              );
+              console.log(`📊 First segment: "${transcript[0].text.substring(0, 50)}..."`);
               return transcript;
             } else {
               console.log(`⚠️  Parsed XML but found no text segments`);
@@ -536,10 +508,7 @@ app.post("/api/ai-advisor", async (req, res) => {
       });
     }
 
-    console.log(
-      "🧠 AI Advisor - Pertanyaan user:",
-      question.substring(0, 100) + "..."
-    );
+    console.log("🧠 AI Advisor - Pertanyaan user:", question.substring(0, 100) + "...");
 
     const modelName = "gemini-2.5-flash";
     const model = genAI.getGenerativeModel({ model: modelName });
@@ -608,11 +577,7 @@ PENTING:
     const response = await result.response;
     let text = response.text();
 
-    console.log(
-      "✅ AI Advisor analisis selesai, panjang:",
-      text.length,
-      "karakter"
-    );
+    console.log("✅ AI Advisor analisis selesai, panjang:", text.length, "karakter");
 
     // Clean up response (remove markdown code blocks if any)
     text = text
@@ -638,11 +603,7 @@ PENTING:
     }
 
     // Validate structure
-    if (
-      !jsonResponse.verdict ||
-      !jsonResponse.recommendations ||
-      !jsonResponse.nbsnAnalysis
-    ) {
+    if (!jsonResponse.verdict || !jsonResponse.recommendations || !jsonResponse.nbsnAnalysis) {
       return res.json({
         success: true,
         fallbackMode: true,
@@ -669,13 +630,10 @@ PENTING:
     }
 
     if (error.message.includes("quota") || error.message.includes("429")) {
-      const isPerMinute =
-        error.message.includes("per minute") || error.message.includes("RPM");
+      const isPerMinute = error.message.includes("per minute") || error.message.includes("RPM");
 
       return res.status(429).json({
-        error: isPerMinute
-          ? "Per-minute quota (15 RPM) tercapai"
-          : "Daily quota tercapai",
+        error: isPerMinute ? "Per-minute quota (15 RPM) tercapai" : "Daily quota tercapai",
         details: isPerMinute
           ? "Tunggu 60 detik lalu coba lagi"
           : "Quota harian habis, coba besok atau upgrade",
@@ -735,8 +693,7 @@ app.post("/api/check-transcript", async (req, res) => {
           return res.json({
             available: false,
             error: "Transcript kosong",
-            message:
-              "Video memiliki subtitle, tapi isinya kosong. Mohon tulis catatan manual.",
+            message: "Video memiliki subtitle, tapi isinya kosong. Mohon tulis catatan manual.",
           });
         }
       } else {
@@ -744,8 +701,7 @@ app.post("/api/check-transcript", async (req, res) => {
         return res.json({
           available: false,
           error: "Tidak ada data transcript",
-          message:
-            "Video tidak mengembalikan data subtitle. Mohon tulis catatan manual.",
+          message: "Video tidak mengembalikan data subtitle. Mohon tulis catatan manual.",
         });
       }
     } catch (error) {
@@ -808,10 +764,7 @@ app.post("/api/summarize", async (req, res) => {
 
           const transcriptData = await fetchTranscriptWithRetry(videoId);
 
-          console.log(
-            "📊 Raw transcript data items:",
-            transcriptData?.length || 0
-          );
+          console.log("📊 Raw transcript data items:", transcriptData?.length || 0);
 
           if (transcriptData && transcriptData.length > 0) {
             transcript = transcriptData.map((t) => t.text).join(" ");
@@ -846,8 +799,7 @@ app.post("/api/summarize", async (req, res) => {
             transcriptError =
               "Video tidak memiliki subtitle/captions yang tersedia. Kemungkinan: (1) Video tidak memiliki CC sama sekali, (2) CC dinonaktifkan oleh creator, atau (3) Video memiliki batasan regional.";
           } else if (errorMsg.includes("Transcript is disabled")) {
-            transcriptError =
-              "Transcript dinonaktifkan untuk video ini oleh creator.";
+            transcriptError = "Transcript dinonaktifkan untuk video ini oleh creator.";
           } else if (errorMsg.includes("Too Many Requests")) {
             transcriptError =
               "Terlalu banyak request ke YouTube. Silakan tunggu beberapa saat dan coba lagi.";
@@ -867,21 +819,16 @@ app.post("/api/summarize", async (req, res) => {
     // Validation: need either transcript or notes
     if (!hasTranscript && (!notes || notes.trim() === "")) {
       return res.status(400).json({
-        error:
-          "Transcript tidak tersedia. Mohon tulis catatan/ringkasan video secara manual.",
+        error: "Transcript tidak tersedia. Mohon tulis catatan/ringkasan video secara manual.",
         transcriptError,
       });
     }
 
     // Log what we're analyzing
     if (hasTranscript) {
-      console.log(
-        "📝 Menganalisis: AUTO TRANSCRIPT (" + transcript.length + " karakter)"
-      );
+      console.log("📝 Menganalisis: AUTO TRANSCRIPT (" + transcript.length + " karakter)");
     } else {
-      console.log(
-        "📝 Menganalisis: USER NOTES (" + notes.length + " karakter)"
-      );
+      console.log("📝 Menganalisis: USER NOTES (" + notes.length + " karakter)");
     }
 
     // Use Gemini API directly
@@ -903,13 +850,7 @@ KONTEN YANG HARUS DIANALISIS (Sumber: ${contentSource}):
 ${contentToAnalyze}
 ---END KONTEN---
 
-${
-  youtubeUrl
-    ? `\n📹 Video YouTube: ${youtubeUrl}\n${
-        videoId ? `Video ID: ${videoId}` : ""
-      }`
-    : ""
-}
+${youtubeUrl ? `\n📹 Video YouTube: ${youtubeUrl}\n${videoId ? `Video ID: ${videoId}` : ""}` : ""}
 
 TUGAS:
 Analisis KONTEN DI ATAS (yang ada di antara ---BEGIN KONTEN--- dan ---END KONTEN---) dari perspektif kesehatan Islami dan berikan penjelasan dalam Bahasa Indonesia yang mencakup:
@@ -972,10 +913,8 @@ PENTING:
     }
 
     if (error.message.includes("quota") || error.message.includes("429")) {
-      const isPerMinute =
-        error.message.includes("per minute") || error.message.includes("RPM");
-      const isDaily =
-        error.message.includes("per day") || error.message.includes("RPD");
+      const isPerMinute = error.message.includes("per minute") || error.message.includes("RPM");
+      const isDaily = error.message.includes("per day") || error.message.includes("RPD");
 
       let quotaType = "API quota";
       let waitTime = "beberapa menit";
@@ -984,8 +923,7 @@ PENTING:
       if (isPerMinute) {
         quotaType = "Per-minute quota (15 RPM)";
         waitTime = "60 detik";
-        details =
-          "Free tier: 15 requests per menit. Tunggu 1 menit lalu coba lagi.";
+        details = "Free tier: 15 requests per menit. Tunggu 1 menit lalu coba lagi.";
       } else if (isDaily) {
         quotaType = "Daily quota (1,500 RPD)";
         waitTime = "24 jam";
@@ -1067,8 +1005,6 @@ app.get("/api", (req, res) => {
 app.listen(PORT, () => {
   console.log("🚀 Docterbee Backend Server");
   console.log(`📡 Server berjalan di http://localhost:${PORT}`);
-  console.log(
-    `🔑 Gemini API: ${genAI ? "✅ Configured" : "⚠️  Not configured"}`
-  );
+  console.log(`🔑 Gemini API: ${genAI ? "✅ Configured" : "⚠️  Not configured"}`);
   console.log("⏳ Menunggu request...\n");
 });
