@@ -3,22 +3,17 @@ import { query, queryOne } from "../db.mjs";
 
 const router = express.Router();
 
-// Service price mapping (dalam Rupiah)
-const SERVICE_PRICES = {
-  "Bekam Profesional": 150000,
-  "Pijat Refleksi": 100000,
-  "Ahli Gizi": 200000,
-  "Konsultasi Kehamilan": 250000,
-  "Perawat Home Care": 300000,
-  Psikolog: 350000,
-  "Dokter Umum": 150000,
-  Spesialis: 500000,
-  "Family Practitioner Certification": 2000000,
-};
-
-// Helper function to get service price
-function getServicePrice(serviceName) {
-  return SERVICE_PRICES[serviceName] || 0;
+/**
+ * Get service price from database
+ * @param {string} serviceName - Name of the service
+ * @returns {Promise<number>} Price in IDR (0 if not found)
+ */
+async function getServicePrice(serviceName) {
+  const service = await queryOne(
+    "SELECT price FROM services WHERE name = ? AND is_active = 1 LIMIT 1",
+    [serviceName]
+  );
+  return service?.price || 0;
 }
 
 // GET /api/bookings - List all bookings with optional filters
@@ -122,20 +117,8 @@ router.post("/", async (req, res) => {
     }
 
     // Validate customer data if provided
-    if (
-      customerName ||
-      customerPhone ||
-      customerAge ||
-      customerGender ||
-      customerAddress
-    ) {
-      if (
-        !customerName ||
-        !customerPhone ||
-        !customerAge ||
-        !customerGender ||
-        !customerAddress
-      ) {
+    if (customerName || customerPhone || customerAge || customerGender || customerAddress) {
+      if (!customerName || !customerPhone || !customerAge || !customerGender || !customerAddress) {
         return res.status(400).json({
           success: false,
           error: "Data pribadi harus diisi lengkap",
@@ -143,22 +126,10 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // Use frontend prices if provided, otherwise calculate
-    let price = frontendPrice || getServicePrice(serviceName);
+    // Use frontend prices if provided, otherwise get from database
+    const price = frontendPrice || (await getServicePrice(serviceName));
     let discountAmount = frontendDiscountAmount || 0;
     let finalPrice = frontendFinalPrice || price;
-
-    console.log("💾 Booking - Harga yang diterima:", {
-      serviceName,
-      frontendPrice,
-      frontendDiscountAmount,
-      frontendFinalPrice,
-      calculatedPrice: getServicePrice(serviceName),
-      finalPrice: price,
-      finalDiscountAmount: discountAmount,
-      finalFinalPrice: finalPrice,
-      promoCode,
-    });
 
     // Only recalculate if frontend didn't provide prices AND promo code exists
     if (!frontendPrice && promoCode) {
@@ -183,10 +154,7 @@ router.post("/", async (req, res) => {
         finalPrice = Math.max(0, price - discountAmount);
 
         // Increment usage count
-        await query(
-          "UPDATE coupons SET used_count = used_count + 1 WHERE id = ?",
-          [coupon.id]
-        );
+        await query("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?", [coupon.id]);
       }
     } else if (frontendPrice && promoCode) {
       // If frontend provided prices with promo code, still increment coupon usage
@@ -198,10 +166,7 @@ router.post("/", async (req, res) => {
       );
 
       if (coupon) {
-        await query(
-          "UPDATE coupons SET used_count = used_count + 1 WHERE id = ?",
-          [coupon.id]
-        );
+        await query("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?", [coupon.id]);
       }
     }
 
@@ -229,6 +194,23 @@ router.post("/", async (req, res) => {
         notes || null,
       ]
     );
+
+    // Record coupon usage for logged-in users (one-time per user)
+    if (promoCode && req.session?.userId) {
+      const userId = req.session.userId;
+      const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
+        promoCode.toUpperCase(),
+      ]);
+
+      if (coupon) {
+        // Insert into coupon_usage to track one-time usage per user
+        await query(
+          `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
+           VALUES (?, ?, 'service', ?)`,
+          [userId, coupon.id, result.insertId]
+        );
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -268,9 +250,7 @@ router.patch("/:id", async (req, res) => {
     const { status, notes } = req.body;
 
     // Check if booking exists
-    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [
-      id,
-    ]);
+    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [id]);
     if (!existing) {
       return res.status(404).json({
         success: false,
@@ -300,10 +280,7 @@ router.patch("/:id", async (req, res) => {
 
     params.push(id);
 
-    await query(
-      `UPDATE bookings SET ${updates.join(", ")} WHERE id = ?`,
-      params
-    );
+    await query(`UPDATE bookings SET ${updates.join(", ")} WHERE id = ?`, params);
 
     res.json({
       success: true,
@@ -325,19 +302,8 @@ router.get("/prices/:serviceName", async (req, res) => {
     const { serviceName } = req.params;
     const decodedServiceName = decodeURIComponent(serviceName);
 
-    // Try to get price from services table first
-    const service = await queryOne(
-      "SELECT price FROM services WHERE name = ? AND is_active = 1 LIMIT 1",
-      [decodedServiceName]
-    );
-
-    let price = 0;
-    if (service && service.price) {
-      price = service.price;
-    } else {
-      // Fallback to hardcoded prices if not in database
-      price = getServicePrice(decodedServiceName);
-    }
+    // Get price from database
+    const price = await getServicePrice(decodedServiceName);
 
     if (price === 0) {
       return res.status(404).json({
@@ -368,9 +334,7 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params;
 
     // Check if booking exists
-    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [
-      id,
-    ]);
+    const existing = await queryOne("SELECT id FROM bookings WHERE id = ?", [id]);
     if (!existing) {
       return res.status(404).json({
         success: false,

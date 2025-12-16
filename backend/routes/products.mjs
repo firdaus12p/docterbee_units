@@ -73,7 +73,8 @@ router.get("/:id", async (req, res) => {
 // POST /api/products - Create new product
 router.post("/", async (req, res) => {
   try {
-    const { name, category, price, description, image_url, stock } = req.body;
+    const { name, category, price, member_price, promo_text, description, image_url, stock } =
+      req.body;
 
     // Validation
     if (!name || !category || !price || !description) {
@@ -83,13 +84,27 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Validate member_price
+    if (member_price !== null && member_price !== undefined && member_price !== "") {
+      const memberPriceNum = parseFloat(member_price);
+      const normalPriceNum = parseFloat(price);
+
+      if (memberPriceNum <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: "Harga member harus lebih dari 0",
+        });
+      }
+      if (memberPriceNum >= normalPriceNum) {
+        return res.status(400).json({
+          success: false,
+          error: "Harga member harus lebih rendah dari harga normal",
+        });
+      }
+    }
+
     // Validate category
-    const validCategories = [
-      "Zona Sunnah",
-      "1001 Rempah",
-      "Zona Honey",
-      "Cold Pressed",
-    ];
+    const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed"];
     if (!validCategories.includes(category)) {
       return res.status(400).json({
         success: false,
@@ -98,9 +113,18 @@ router.post("/", async (req, res) => {
     }
 
     const result = await query(
-      `INSERT INTO products (name, category, price, description, image_url, stock)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, category, price, description, image_url || null, stock || 0]
+      `INSERT INTO products (name, category, price, member_price, promo_text, description, image_url, stock)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        name,
+        category,
+        price,
+        member_price || null,
+        promo_text || null,
+        description,
+        image_url || null,
+        stock || 0,
+      ]
     );
 
     res.status(201).json({
@@ -128,14 +152,20 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, price, description, image_url, stock, is_active } =
-      req.body;
+    const {
+      name,
+      category,
+      price,
+      member_price,
+      promo_text,
+      description,
+      image_url,
+      stock,
+      is_active,
+    } = req.body;
 
     // Check if product exists
-    const existingProduct = await queryOne(
-      "SELECT * FROM products WHERE id = ?",
-      [id]
-    );
+    const existingProduct = await queryOne("SELECT * FROM products WHERE id = ?", [id]);
 
     if (!existingProduct) {
       return res.status(404).json({
@@ -146,16 +176,34 @@ router.patch("/:id", async (req, res) => {
 
     // Validate category if provided
     if (category) {
-      const validCategories = [
-        "Zona Sunnah",
-        "1001 Rempah",
-        "Zona Honey",
-        "Cold Pressed",
-      ];
+      const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed"];
       if (!validCategories.includes(category)) {
         return res.status(400).json({
           success: false,
           error: "Kategori tidak valid",
+        });
+      }
+    }
+
+    // Validate member_price if being updated
+    if (member_price !== undefined && member_price !== null && member_price !== "") {
+      const memberPriceNum = parseFloat(member_price);
+
+      if (memberPriceNum <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: "Harga member harus lebih dari 0",
+        });
+      }
+
+      // Get current/new price for validation
+      const normalPriceNum =
+        price !== undefined ? parseFloat(price) : parseFloat(existingProduct.price);
+
+      if (memberPriceNum >= normalPriceNum) {
+        return res.status(400).json({
+          success: false,
+          error: "Harga member harus lebih rendah dari harga normal",
         });
       }
     }
@@ -175,6 +223,14 @@ router.patch("/:id", async (req, res) => {
     if (price !== undefined) {
       updates.push("price = ?");
       params.push(price);
+    }
+    if (member_price !== undefined) {
+      updates.push("member_price = ?");
+      params.push(member_price || null);
+    }
+    if (promo_text !== undefined) {
+      updates.push("promo_text = ?");
+      params.push(promo_text || null);
     }
     if (description !== undefined) {
       updates.push("description = ?");
@@ -202,16 +258,10 @@ router.patch("/:id", async (req, res) => {
 
     params.push(id);
 
-    await query(
-      `UPDATE products SET ${updates.join(", ")} WHERE id = ?`,
-      params
-    );
+    await query(`UPDATE products SET ${updates.join(", ")} WHERE id = ?`, params);
 
     // Get updated product
-    const updatedProduct = await queryOne(
-      "SELECT * FROM products WHERE id = ?",
-      [id]
-    );
+    const updatedProduct = await queryOne("SELECT * FROM products WHERE id = ?", [id]);
 
     res.json({
       success: true,
@@ -232,10 +282,7 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params;
 
     // Check if product exists
-    const existingProduct = await queryOne(
-      "SELECT * FROM products WHERE id = ?",
-      [id]
-    );
+    const existingProduct = await queryOne("SELECT * FROM products WHERE id = ?", [id]);
 
     if (!existingProduct) {
       return res.status(404).json({

@@ -75,7 +75,7 @@
             class="text-red-400 text-sm hidden text-center"
           ></p>
           <p class="text-slate-500 text-xs text-center">
-            Default: admin / docterbee2025
+            Credentials required. Check .env file.
           </p>
         </form>
       </div>
@@ -164,6 +164,14 @@
             <i data-lucide="receipt" class="w-4 h-4"></i>
             <span class="hidden sm:inline">Orders Manager</span>
             <span class="sm:hidden">Orders</span>
+          </button>
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="rewards"
+          >
+            <i data-lucide="gift" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Rewards Manager</span>
+            <span class="sm:hidden">Rewards</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
@@ -673,6 +681,21 @@
                   </div>
                 </div>
                 <div>
+                  <label class="block text-sm mb-2">Tipe Kupon</label>
+                  <select
+                    id="couponType"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    required
+                  >
+                    <option value="both">Produk & Layanan</option>
+                    <option value="store">Hanya Produk</option>
+                    <option value="services">Hanya Layanan</option>
+                  </select>
+                  <small class="text-slate-400"
+                    >Tentukan di mana kupon ini bisa digunakan</small
+                  >
+                </div>
+                <div>
                   <label class="block text-sm mb-2"
                     >Min. Nilai Booking (Rp)</label
                   >
@@ -963,17 +986,25 @@
           <!-- Product Modal -->
           <div
             id="productModal"
-            class="fixed inset-0 bg-black/60 z-40 hidden flex items-center justify-center p-4 overflow-y-auto"
+            class="fixed inset-0 bg-black/60 z-40 hidden flex items-center justify-center p-4"
           >
             <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl my-8"
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div class="p-6 border-b border-slate-800">
+              <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold" id="productModalTitle">
                   Tambah Produk
                 </h3>
+                <button
+                  type="button"
+                  id="closeProductModalBtn"
+                  class="text-slate-400 hover:text-slate-200"
+                  onclick="closeProductModal()"
+                >
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
               </div>
-              <form id="productForm" class="p-6 space-y-4">
+              <form id="productForm" class="space-y-4">
                 <input type="hidden" id="productId" />
 
                 <div>
@@ -1009,7 +1040,7 @@
 
                   <div>
                     <label class="block text-sm mb-2"
-                      >Harga (Rp) <span class="text-red-400">*</span></label
+                      >Harga Normal (Rp) <span class="text-red-400">*</span></label
                     >
                     <input
                       type="text"
@@ -1019,9 +1050,39 @@
                       required
                     />
                     <p class="text-xs text-slate-400 mt-1">
-                      Gunakan titik sebagai pemisah ribuan (contoh: 20.000)
+                      Gunakan titik sebagai pemisah ribuan
                     </p>
                   </div>
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Harga Member (Rp)</label
+                    >
+                    <input
+                      type="text"
+                      id="productMemberPrice"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-emerald-400 focus:outline-none"
+                      placeholder="18.000"
+                    />
+                    <p class="text-xs text-slate-400 mt-1">
+                      Kosongkan jika tidak ada harga member
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm mb-2"
+                    >Teks Promosi</label
+                  >
+                  <input
+                    type="text"
+                    id="productPromoText"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="PROMO RAMADAN - Diskon hingga 20%"
+                  />
+                  <p class="text-xs text-slate-400 mt-1">
+                    Teks promosi opsional yang akan ditampilkan di card produk
+                  </p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1182,6 +1243,142 @@
       </div>
 
       <!-- ============================================ -->
+      <!-- SECTION: REWARDS MANAGER -->
+      <!-- ============================================ -->
+      <section id="section-rewards" class="dashboard-section hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 class="text-xl sm:text-2xl font-bold">Rewards Manager</h2>
+          <button
+            id="btnNewReward"
+            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
+          >
+            + Tambah Reward
+          </button>
+        </div>
+        <div
+          id="rewardsGrid"
+          class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        >
+          <div class="booking-container p-6 text-center text-slate-400">
+            Loading...
+          </div>
+        </div>
+
+        <!-- Reward Form Modal -->
+        <div
+          id="rewardModal"
+          class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+        >
+          <div
+            class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="rewardModalTitle" class="text-xl font-bold">
+                Tambah Reward Baru
+              </h3>
+              <button
+                id="closeRewardModal"
+                class="text-slate-400 hover:text-slate-200 transition"
+              >
+                <i data-lucide="x" class="w-6 h-6"></i>
+              </button>
+            </div>
+            <form id="rewardForm" class="space-y-4">
+              <input type="hidden" id="rewardId" />
+
+              <div>
+                <label class="block text-sm mb-2">Nama Reward <span class="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  id="rewardName"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  placeholder="Contoh: Diskon 10%"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Deskripsi</label>
+                <textarea
+                  id="rewardDescription"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  rows="2"
+                  placeholder="Deskripsi singkat reward (opsional)"
+                ></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Biaya Poin <span class="text-red-400">*</span></label>
+                <input
+                  type="number"
+                  id="rewardPoints"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  placeholder="Contoh: 20"
+                  min="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Warna Tema</label>
+                <select
+                  id="rewardColor"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                >
+                  <option value="amber">Amber (Kuning)</option>
+                  <option value="emerald">Emerald (Hijau)</option>
+                  <option value="purple">Purple (Ungu)</option>
+                  <option value="sky">Sky (Biru Muda)</option>
+                  <option value="blue">Blue (Biru)</option>
+                  <option value="rose">Rose (Merah Muda)</option>
+                </select>
+                <p class="text-xs text-slate-500 mt-1">Warna untuk tampilan di halaman Store</p>
+              </div>
+
+              <div>
+                <label class="block text-sm mb-2">Urutan Tampilan</label>
+                <input
+                  type="number"
+                  id="rewardSortOrder"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                  placeholder="0"
+                  value="0"
+                  min="0"
+                />
+                <p class="text-xs text-slate-500 mt-1">Reward dengan urutan lebih kecil ditampilkan terlebih dahulu</p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rewardActive"
+                  class="w-4 h-4 bg-slate-800 border-slate-700 rounded focus:ring-amber-400"
+                  checked
+                />
+                <label for="rewardActive" class="text-sm">Aktif (tampilkan di halaman Store)</label>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onclick="closeRewardModal()"
+                  class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  class="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-900 py-2 rounded-lg font-semibold transition"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================ -->
       <!-- SECTION: ORDERS MANAGER -->
       <!-- ============================================ -->
       <section id="section-orders" class="dashboard-section hidden">
@@ -1265,206 +1462,6 @@
         </div>
       </section>
 
-      <!-- ============================================ -->
-      <!-- ARTICLE FORM MODAL -->
-      <!-- ============================================ -->
-      <div
-        id="articleFormModal"
-        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
-      >
-        <div
-          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
-        >
-          <!-- Modal Header -->
-          <div class="flex justify-between items-center mb-6">
-            <h3 id="articleModalTitle" class="text-2xl font-bold text-white">
-              Tambah Artikel Baru
-            </h3>
-            <button
-              id="closeArticleModal"
-              class="text-slate-400 hover:text-white transition"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Article Form -->
-          <form id="articleForm" class="space-y-4">
-            <input type="hidden" id="articleId" value="">
-
-            <!-- Title -->
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">
-                Judul Artikel <span class="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                id="articleTitle"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-amber-400 focus:outline-none"
-                placeholder="Contoh: Manfaat Madu untuk Kesehatan"
-                required
-              >
-            </div>
-
-            <!-- Category -->
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">
-                Kategori <span class="text-red-400">*</span>
-              </label>
-              <select
-                id="articleCategory"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-amber-400 focus:outline-none"
-                required
-              >
-                <option value="Nutrisi">Nutrisi</option>
-                <option value="Ibadah">Ibadah</option>
-                <option value="Kebiasaan">Kebiasaan</option>
-                <option value="Sains">Sains</option>
-              </select>
-            </div>
-
-            <!-- Excerpt -->
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">
-                Ringkasan Singkat
-              </label>
-              <input
-                type="text"
-                id="articleExcerpt"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-amber-400 focus:outline-none"
-                placeholder="Ringkasan 1-2 kalimat untuk preview"
-              >
-            </div>
-
-            <!-- Header Image Upload -->
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">
-                Gambar Hero (Header)
-              </label>
-              
-              <!-- File Input -->
-              <input
-                type="file"
-                id="articleHeaderImageFile"
-                accept="image/*"
-                onchange="uploadHeaderImage(this)"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
-              >
-              
-              <!-- Hidden input untuk menyimpan path -->
-              <input type="hidden" id="articleHeaderImage">
-              
-              <!-- Preview Image -->
-              <div id="headerImagePreview" class="hidden mt-3">
-                <div class="relative inline-block">
-                  <img 
-                    id="headerImagePreviewImg" 
-                    src="" 
-                    alt="Preview" 
-                    class="w-full max-w-md h-48 object-cover rounded-lg border-2 border-slate-700"
-                  >
-                  <button
-                    type="button"
-                    onclick="removeHeaderImage()"
-                    class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition"
-                    title="Hapus gambar"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              
-              <p class="text-xs text-slate-400 mt-1">
-                Upload gambar (JPG, PNG, GIF). Maksimal 5MB. Gambar akan muncul di card artikel dan di atas artikel.
-              </p>
-            </div>
-
-            <!-- Content -->
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">
-                Konten Artikel <span class="text-red-400">*</span>
-              </label>
-              
-              <!-- Upload Image Button -->
-              <div class="mb-2">
-                <button
-                  type="button"
-                  onclick="uploadContentImage()"
-                  class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                  </svg>
-                  <span>Upload Gambar ke Konten</span>
-                </button>
-                <p class="text-xs text-slate-400 mt-1">
-                  Klik untuk upload gambar. Gambar akan di-insert di posisi cursor.
-                </p>
-              </div>
-              
-              <textarea
-                id="articleContent"
-                rows="12"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-amber-400 focus:outline-none font-mono text-sm"
-                placeholder="Tulis konten artikel di sini... (support HTML)"
-                required
-              ></textarea>
-              <p class="text-xs text-slate-400 mt-1">
-                Anda bisa menggunakan HTML untuk formatting (h2, p, strong, em, ul, ol, img, dll)
-              </p>
-            </div>
-
-            <!-- Author -->
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">
-                Nama Penulis
-              </label>
-              <input
-                type="text"
-                id="articleAuthor"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-amber-400 focus:outline-none"
-                placeholder="Admin"
-                value="Admin"
-              >
-            </div>
-
-            <!-- Published Status -->
-            <div class="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="articlePublished"
-                class="w-4 h-4 rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500"
-                checked
-              >
-              <label for="articlePublished" class="text-sm text-white">
-                Publish artikel (tampilkan di halaman Insight)
-              </label>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex gap-3 pt-4">
-              <button
-                type="submit"
-                class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-lg transition"
-              >
-                Save Article
-              </button>
-              <button
-                type="button"
-                onclick="closeArticleModal()"
-                class="px-6 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 rounded-lg transition"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <!-- SECTION: USERS MANAGER -->
       <section id="section-users" class="dashboard-section hidden">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -1486,12 +1483,13 @@
                   <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Phone</th>
                   <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Terdaftar</th>
                   <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Status</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Points</th>
                   <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
                 <tr>
-                  <td colspan="7" class="px-4 py-8 text-center text-slate-400">
+                  <td colspan="8" class="px-4 py-8 text-center text-slate-400">
                     Memuat data users...
                   </td>
                 </tr>
@@ -1500,6 +1498,69 @@
           </div>
         </div>
       </section>
+
+      <!-- Rewards History Modal -->
+      <div
+        id="rewardsModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+      >
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <!-- Modal Header -->
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">
+                <i data-lucide="award" class="w-6 h-6 inline mr-2 text-emerald-400"></i>
+                Riwayat Penukaran Reward
+              </h3>
+              <p class="text-sm text-slate-400">
+                User: <span class="text-white font-semibold" id="rewardUserName">-</span> 
+                <span class="text-slate-500">(ID: <span id="rewardUserId">-</span>)</span>
+              </p>
+            </div>
+            <button
+              onclick="closeRewardsModal()"
+              class="text-slate-400 hover:text-white transition"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Rewards Table -->
+          <div class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-800">
+                <tr>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">No</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Nama Reward</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Poin Digunakan</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Tanggal</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Status</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="rewardsHistoryBody">
+                <tr>
+                  <td colspan="6" class="px-4 py-8 text-center text-slate-400">
+                    Memuat riwayat reward...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Close Button -->
+          <div class="mt-6">
+            <button
+              onclick="closeRewardsModal()"
+              class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 rounded-lg transition"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Footer -->
       <footer
@@ -1622,8 +1683,11 @@
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- Utility functions must be loaded first -->
+    <script src="js/utils.js"></script>
     <script src="js/admin-dashboard.js"></script>
     <script src="js/orders-manager.js"></script>
     <script src="js/users-manager.js"></script>
+    <script src="js/rewards-manager.js"></script>
   </body>
 </html>

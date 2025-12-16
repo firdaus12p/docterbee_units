@@ -1,43 +1,8 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
-import crypto from "crypto";
+import { generateOrderNumber, calculateExpiryTime, calculatePoints } from "../utils/helpers.mjs";
 
 const router = express.Router();
-
-// ============================================
-// HELPER: Generate Order Number
-// ============================================
-function generateOrderNumber() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const random = crypto.randomBytes(3).toString("hex").toUpperCase();
-  return `ORD-${year}${month}${day}-${random}`;
-}
-
-// ============================================
-// HELPER: Calculate Expiry Time
-// ============================================
-function calculateExpiryTime(orderType) {
-  const now = new Date();
-  if (orderType === "dine_in") {
-    // 30 minutes for dine in
-    now.setMinutes(now.getMinutes() + 30);
-  } else {
-    // 2 hours for take away
-    now.setHours(now.getHours() + 2);
-  }
-  return now;
-}
-
-// ============================================
-// HELPER: Calculate Points
-// ============================================
-function calculatePoints(totalAmount) {
-  // 1 point per 10,000 IDR
-  return Math.floor(totalAmount / 10000);
-}
 
 // ============================================
 // GET /api/orders/check-pending - Check if user has pending order
@@ -78,9 +43,7 @@ router.get("/check-pending", async (req, res) => {
 
     if (now > expiresAt) {
       // Auto-expire order
-      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
-        pendingOrder.id,
-      ]);
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [pendingOrder.id]);
 
       return res.json({
         success: true,
@@ -108,8 +71,15 @@ router.get("/check-pending", async (req, res) => {
 // ============================================
 router.post("/", async (req, res) => {
   try {
-    const { guest_data, order_type, store_location, items, total_amount } =
-      req.body;
+    const {
+      guest_data,
+      order_type,
+      store_location,
+      items,
+      total_amount,
+      coupon_code,
+      coupon_discount,
+    } = req.body;
 
     // Get user data from session OR guest_data
     const userId = req.session?.userId || null;
@@ -146,8 +116,7 @@ router.post("/", async (req, res) => {
     if (!order_type || !store_location || !items || !total_amount) {
       return res.status(400).json({
         success: false,
-        error:
-          "Order type, store location, items, dan total amount harus diisi",
+        error: "Order type, store location, items, dan total amount harus diisi",
       });
     }
 
@@ -170,13 +139,17 @@ router.post("/", async (req, res) => {
     // QR code data (order number)
     const qrCodeData = orderNumber;
 
+    // Calculate original_total if coupon used
+    const original_total =
+      coupon_code && coupon_discount > 0 ? total_amount + coupon_discount : null;
+
     // Insert order
     const result = await query(
       `INSERT INTO orders 
        (order_number, user_id, customer_name, customer_phone, customer_address,
         order_type, store_location, items, total_amount, points_earned, 
-        qr_code_data, expires_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        qr_code_data, expires_at, coupon_code, coupon_discount, original_total)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         orderNumber,
         userId,
@@ -190,8 +163,34 @@ router.post("/", async (req, res) => {
         pointsEarned,
         qrCodeData,
         expiresAt,
+        coupon_code || null,
+        coupon_discount || 0,
+        original_total,
       ]
     );
+
+    // Increment coupon used_count if coupon was used
+    if (coupon_code) {
+      await query(`UPDATE coupons SET used_count = used_count + 1 WHERE code = ?`, [
+        coupon_code.toUpperCase(),
+      ]);
+
+      // Record coupon usage for logged-in users (one-time per user)
+      if (userId) {
+        const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
+          coupon_code.toUpperCase(),
+        ]);
+
+        if (coupon) {
+          // Insert into coupon_usage to track one-time usage per user
+          await query(
+            `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
+             VALUES (?, ?, 'store', ?)`,
+            [userId, coupon.id, result.insertId]
+          );
+        }
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -265,9 +264,7 @@ router.get("/id/:id", async (req, res) => {
   try {
     const orderId = parseInt(req.params.id);
 
-    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [
-      orderId,
-    ]);
+    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [orderId]);
 
     if (!order) {
       return res.status(404).json({
@@ -282,9 +279,7 @@ router.get("/id/:id", async (req, res) => {
 
     if (now > expiresAt && order.status === "pending") {
       // Auto-expire order
-      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
-        order.id,
-      ]);
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [order.id]);
       order.status = "expired";
     }
 
@@ -308,10 +303,7 @@ router.get("/:orderNumber", async (req, res) => {
   try {
     const { orderNumber } = req.params;
 
-    const order = await queryOne(
-      "SELECT * FROM orders WHERE order_number = ?",
-      [orderNumber]
-    );
+    const order = await queryOne("SELECT * FROM orders WHERE order_number = ?", [orderNumber]);
 
     if (!order) {
       return res.status(404).json({
@@ -326,9 +318,7 @@ router.get("/:orderNumber", async (req, res) => {
 
     if (now > expiresAt && order.status === "pending") {
       // Auto-expire order
-      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [
-        order.id,
-      ]);
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [order.id]);
       order.status = "expired";
     }
 
@@ -408,18 +398,13 @@ router.patch("/:id/complete", async (req, res) => {
             newPoints,
             order.user_id,
           ]);
-          console.log(
-            `✅ Added ${order.points_earned} points to user ${order.user_id} (total: ${newPoints})`
-          );
         } else {
           // New user - create progress record with initial points
-          await query(
-            "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, ?, ?)",
-            [order.user_id, JSON.stringify({}), order.points_earned]
-          );
-          console.log(
-            `✅ Created progress for user ${order.user_id} with ${order.points_earned} points`
-          );
+          await query("INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, ?, ?)", [
+            order.user_id,
+            JSON.stringify({}),
+            order.points_earned,
+          ]);
         }
       } catch (pointError) {
         console.error("❌ Error adding points to user:", pointError);
@@ -540,26 +525,23 @@ router.post("/:id/assign-points-by-phone", async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        error:
-          "User dengan nomor HP ini tidak terdaftar. Points tidak dapat di-assign.",
+        error: "User dengan nomor HP ini tidak terdaftar. Points tidak dapat di-assign.",
       });
     }
 
     // Get current user progress
-    const progress = await queryOne(
-      "SELECT points FROM user_progress WHERE user_id = ?",
-      [user.id]
-    );
+    const progress = await queryOne("SELECT points FROM user_progress WHERE user_id = ?", [
+      user.id,
+    ]);
 
     let currentPoints = 0;
     if (progress) {
       currentPoints = progress.points || 0;
     } else {
       // Create user_progress if not exists
-      await query(
-        "INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, '{}', 0)",
-        [user.id]
-      );
+      await query("INSERT INTO user_progress (user_id, unit_data, points) VALUES (?, '{}', 0)", [
+        user.id,
+      ]);
     }
 
     // Calculate new points
@@ -567,17 +549,13 @@ router.post("/:id/assign-points-by-phone", async (req, res) => {
     const newPoints = currentPoints + pointsToAdd;
 
     // Update user_progress with new points
-    await query(
-      "UPDATE user_progress SET points = ?, updated_at = NOW() WHERE user_id = ?",
-      [newPoints, user.id]
-    );
+    await query("UPDATE user_progress SET points = ?, updated_at = NOW() WHERE user_id = ?", [
+      newPoints,
+      user.id,
+    ]);
 
     // Update order with user_id
     await query("UPDATE orders SET user_id = ? WHERE id = ?", [user.id, id]);
-
-    console.log(
-      `✅ Added ${pointsToAdd} points to user ${user.id} (${user.name}) from order ${order.order_number}`
-    );
 
     res.json({
       success: true,
@@ -631,6 +609,75 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal menghapus order",
+    });
+  }
+});
+
+// ============================================
+// GET /api/orders/status/:orderNumber - Get order status by order number
+// ============================================
+router.get("/status/:orderNumber", async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+
+    if (!orderNumber) {
+      return res.status(400).json({
+        success: false,
+        error: "Order number is required",
+      });
+    }
+
+    // Fetch order by order_number
+    const order = await queryOne(
+      `SELECT id, order_number, user_id, customer_name, customer_phone, 
+              total_amount, items, status, qr_code_data, expires_at, 
+              store_location, order_type, created_at
+       FROM orders 
+       WHERE order_number = ?`,
+      [orderNumber]
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order not found",
+      });
+    }
+
+    // Calculate points earned
+    const pointsEarned = calculatePoints(order.total_amount);
+
+    // Check if order expired
+    const now = new Date();
+    const expiresAt = new Date(order.expires_at);
+
+    // Auto-expire if needed
+    if (order.status === "pending" && now > expiresAt) {
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [order.id]);
+      order.status = "expired";
+    }
+
+    return res.json({
+      success: true,
+      order: {
+        id: order.id,
+        order_number: order.order_number,
+        status: order.status,
+        total_amount: order.total_amount,
+        items: order.items,
+        qr_code_data: order.qr_code_data,
+        expires_at: order.expires_at,
+        store_location: order.store_location,
+        order_type: order.order_type,
+        points_earned: pointsEarned,
+        created_at: order.created_at,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Gagal mengecek status order",
     });
   }
 });

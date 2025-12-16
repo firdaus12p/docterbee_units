@@ -89,7 +89,7 @@ async function loadOrders() {
               ${pointsStatus}
             </td>
             <td class="px-4 py-3 text-xs text-slate-400">
-              ${formatDate(order.created_at)}
+              ${formatOrderDateTime(order.created_at)}
             </td>
             <td class="px-4 py-3">
               <div class="flex flex-col gap-2">
@@ -497,7 +497,8 @@ function getExpiryStatus(expiresAt, status) {
   return "";
 }
 
-function formatDate(dateString) {
+// Note: Using local function instead of global formatDate because orders need time display
+function formatOrderDateTime(dateString) {
   const date = new Date(dateString);
   return date.toLocaleString("id-ID", {
     day: "2-digit",

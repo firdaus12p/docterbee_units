@@ -219,6 +219,7 @@ function showError(message) {
 
 // ============================================
 // HELPER FUNCTIONS
+// Note: escapeHtml and formatDate are defined in utils.js (global)
 // ============================================
 function getCategoryColor(category) {
   const colors = {
@@ -228,21 +229,6 @@ function getCategoryColor(category) {
     Sains: "bg-orange-100 text-orange-700",
   };
   return colors[category] || "bg-gray-100 text-gray-700";
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 // ============================================

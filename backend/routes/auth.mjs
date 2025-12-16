@@ -9,7 +9,7 @@ const router = express.Router();
 // ============================================
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, card_type } = req.body;
 
     // Validation
     if (!name || !email || !phone || !password) {
@@ -65,10 +65,22 @@ router.post("/register", async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Validate card_type or use default
+    const validCardTypes = [
+      'Active-Worker',
+      'Family-Member',
+      'Healthy-Smart-Kids',
+      'Mums-Baby',
+      'New-Couple',
+      'Pregnant-Preparation',
+      'Senja-Ceria'
+    ];
+    const finalCardType = validCardTypes.includes(card_type) ? card_type : 'Active-Worker';
+
     // Insert user
     const result = await query(
-      `INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)`,
-      [name, email, phone, hashedPassword]
+      `INSERT INTO users (name, email, phone, password, card_type) VALUES (?, ?, ?, ?, ?)`,
+      [name, email, phone, hashedPassword, finalCardType]
     );
 
     // Create session
@@ -85,6 +97,7 @@ router.post("/register", async (req, res) => {
         name,
         email,
         phone,
+        card_type: finalCardType,
       },
     });
   } catch (error) {
@@ -192,7 +205,7 @@ router.get("/me", async (req, res) => {
     }
 
     const user = await queryOne(
-      "SELECT id, name, email, phone, created_at FROM users WHERE id = ? AND is_active = 1",
+      "SELECT id, name, email, phone, card_type, created_at FROM users WHERE id = ? AND is_active = 1",
       [req.session.userId]
     );
 

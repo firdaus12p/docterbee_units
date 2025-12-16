@@ -12,6 +12,7 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/card-preview.css" />
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
@@ -30,12 +31,43 @@
           <a href="/register" class="nav-link active">Daftar</a>
           <a href="/login" class="nav-link">Login</a>
         </nav>
+        <button
+          id="hamburgerBtn"
+          class="md:hidden hamburger-btn"
+          aria-label="Toggle menu"
+        >
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
       </div>
     </header>
 
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <span class="font-semibold">Menu</span>
+        <button
+          id="closeMobileMenu"
+          class="close-menu-btn"
+          aria-label="Close menu"
+        >
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <nav class="mobile-menu-nav">
+        <a href="/" class="mobile-nav-link">Home</a>
+        <a href="/register" class="mobile-nav-link">Daftar</a>
+        <a href="/login" class="mobile-nav-link">Login</a>
+      </nav>
+    </div>
+
     <!-- Register Form -->
-    <main class="mx-auto max-w-md px-4 py-12">
-      <div class="bg-white rounded-2xl shadow-lg p-8">
+    <main class="mx-auto max-w-6xl px-4 py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <!-- Left Column: Form -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
         <h1 class="text-3xl font-bold text-center mb-2">Daftar Akun Baru</h1>
         <p class="text-center text-slate-600 mb-8">
           Bergabunglah untuk memulai perjalanan kesehatan Anda
@@ -54,6 +86,56 @@
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
               placeholder="Nama lengkap Anda"
             />
+          </div>
+
+          <div class="mb-4">
+            <label for="card_type" class="block text-sm font-semibold mb-2"
+              >Pilih Jenis Kartu Member</label
+            >
+            <select
+              id="card_type"
+              name="card_type"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
+            >
+              <option value="">-- Pilih Jenis Kartu --</option>
+              <option value="Active-Worker">Active Worker</option>
+              <option value="Family-Member">Family Member</option>
+              <option value="Healthy-Smart-Kids">Healthy & Smart Kids</option>
+              <option value="Mums-Baby">Mums & Baby</option>
+              <option value="New-Couple">New Couple</option>
+              <option value="Pregnant-Preparation">Pregnant Preparation</option>
+              <option value="Senja-Ceria">Senja Ceria</option>
+            </select>
+          </div>
+
+          <!-- Card Preview (Mobile Only) -->
+          <div class="lg:hidden mb-4">
+            <div class="card-preview-container" id="cardPreviewContainerMobile" style="display: none;">
+              <div class="card-flip-wrapper" id="cardFlipWrapperMobile">
+                <!-- Front Face -->
+                <div class="card-face card-face-front">
+                  <img id="cardFrontImageMobile" src="" alt="Card Front" class="card-image" />
+                  <div class="card-overlay">
+                    <div class="card-info" id="cardInfoMobile">
+                      <div class="card-name" id="cardNameDisplayMobile">Nama Anda</div>
+                      <div class="card-phone" id="cardPhoneDisplayMobile">08xxxxxxxxxx</div>
+                      <div class="card-points" id="cardPointsDisplayMobile">0 Points</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Back Face -->
+                <div class="card-face card-face-back">
+                  <img id="cardBackImageMobile" src="" alt="Card Back" class="card-image" />
+                </div>
+              </div>
+              <div class="card-flip-hint">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Klik kartu untuk melihat bagian belakang
+              </div>
+            </div>
           </div>
 
           <div class="mb-4">
@@ -116,12 +198,193 @@
           >
         </p>
       </div>
+
+      <!-- Right Column: Card Preview (Desktop) -->
+      <div class="hidden lg:block">
+        <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-24">
+          <h2 class="text-xl font-bold text-center mb-4">Preview Kartu Member</h2>
+          
+          <!-- Card Preview Container -->
+          <div class="card-preview-container" id="cardPreviewContainer" style="display: none;">
+            <div class="card-flip-wrapper" id="cardFlipWrapper">
+              <!-- Front Face -->
+              <div class="card-face card-face-front">
+                <img id="cardFrontImage" src="" alt="Card Front" class="card-image" />
+                <div class="card-overlay">
+                  <div class="card-info" id="cardInfo">
+                    <div class="card-name" id="cardNameDisplay">Nama Anda</div>
+                    <div class="card-phone" id="cardPhoneDisplay">08xxxxxxxxxx</div>
+                    <div class="card-points" id="cardPointsDisplay">0 Points</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Back Face -->
+              <div class="card-face card-face-back">
+                <img id="cardBackImage" src="" alt="Card Back" class="card-image" />
+              </div>
+            </div>
+            <div class="card-flip-hint">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Klik kartu untuk melihat bagian belakang
+            </div>
+          </div>
+
+          <div class="text-center text-sm text-slate-500 mt-4" id="cardPlaceholder">
+            Pilih jenis kartu untuk melihat preview
+          </div>
+        </div>
+      </div>
+    </div>
     </main>
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
       lucide.createIcons();
+    </script>
+    <script src="js/utils.js"></script>
+    <script src="js/script.js"></script>
+
+    <!-- Card Preview Logic -->
+    <script>
+      // Card type mapping for file names
+      const cardTypeMapping = {
+        'Active-Worker': {
+          front: '/uploads/gambar_kartu/depan/Background-Active-Worker.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Active-Worker.png',
+          label: 'Active Worker'
+        },
+        'Family-Member': {
+          front: '/uploads/gambar_kartu/depan/Background-Family-Member.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Family-Member.png',
+          label: 'Family Member'
+        },
+        'Healthy-Smart-Kids': {
+          front: '/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Healthy-&-Smart-Kids.png',
+          label: 'Healthy & Smart Kids'
+        },
+        'Mums-Baby': {
+          front: '/uploads/gambar_kartu/depan/Background-Mums-&-Baby.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Mums-&-Baby.png',
+          label: 'Mums & Baby'
+        },
+        'New-Couple': {
+          front: '/uploads/gambar_kartu/depan/Background-New-Couple.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-New-Couple.png',
+          label: 'New Couple'
+        },
+        'Pregnant-Preparation': {
+          front: '/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Pregnant-Preparatiom.png',
+          label: 'Pregnant Preparation'
+        },
+        'Senja-Ceria': {
+          front: '/uploads/gambar_kartu/depan/Background-Senja-Ceria.png',
+          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Senja-Ceria.png',
+          label: 'Senja Ceria'
+        }
+      };
+
+      const nameInput = document.getElementById('name');
+      const phoneInput = document.getElementById('phone');
+      const cardTypeSelect = document.getElementById('card_type');
+      
+      // Desktop card elements
+      const cardPreviewContainer = document.getElementById('cardPreviewContainer');
+      const cardPlaceholder = document.getElementById('cardPlaceholder');
+      const cardFlipWrapper = document.getElementById('cardFlipWrapper');
+      const cardFrontImage = document.getElementById('cardFrontImage');
+      const cardBackImage = document.getElementById('cardBackImage');
+      const cardNameDisplay = document.getElementById('cardNameDisplay');
+      const cardPhoneDisplay = document.getElementById('cardPhoneDisplay');
+      const cardInfo = document.getElementById('cardInfo');
+
+      // Mobile card elements
+      const cardPreviewContainerMobile = document.getElementById('cardPreviewContainerMobile');
+      const cardFlipWrapperMobile = document.getElementById('cardFlipWrapperMobile');
+      const cardFrontImageMobile = document.getElementById('cardFrontImageMobile');
+      const cardBackImageMobile = document.getElementById('cardBackImageMobile');
+      const cardNameDisplayMobile = document.getElementById('cardNameDisplayMobile');
+      const cardPhoneDisplayMobile = document.getElementById('cardPhoneDisplayMobile');
+      const cardInfoMobile = document.getElementById('cardInfoMobile');
+
+      // Update card preview when name changes
+      nameInput.addEventListener('input', function() {
+        const name = this.value.trim();
+        const displayName = name || 'Nama Anda';
+        cardNameDisplay.textContent = displayName;
+        if (cardNameDisplayMobile) cardNameDisplayMobile.textContent = displayName;
+      });
+
+      // Update card preview when phone changes
+      phoneInput.addEventListener('input', function() {
+        const phone = this.value.trim();
+        const displayPhone = phone || '08xxxxxxxxxx';
+        cardPhoneDisplay.textContent = displayPhone;
+        if (cardPhoneDisplayMobile) cardPhoneDisplayMobile.textContent = displayPhone;
+      });
+
+      // Update card preview when card type changes
+      cardTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        
+        if (selectedType && cardTypeMapping[selectedType]) {
+          const cardData = cardTypeMapping[selectedType];
+          
+          // Update desktop images
+          cardFrontImage.src = cardData.front;
+          cardBackImage.src = cardData.back;
+          
+          // Update mobile images
+          if (cardFrontImageMobile) cardFrontImageMobile.src = cardData.front;
+          if (cardBackImageMobile) cardBackImageMobile.src = cardData.back;
+          
+          // Apply smaller font and lower position for specific card types
+          const smallNameTypes = ['Mums-Baby', 'New-Couple', 'Pregnant-Preparation'];
+          if (smallNameTypes.includes(selectedType)) {
+            cardNameDisplay.classList.add('card-name-small');
+            if (cardNameDisplayMobile) cardNameDisplayMobile.classList.add('card-name-small');
+            if (cardInfo) cardInfo.classList.add('card-info-lower');
+            if (cardInfoMobile) cardInfoMobile.classList.add('card-info-lower');
+          } else {
+            cardNameDisplay.classList.remove('card-name-small');
+            if (cardNameDisplayMobile) cardNameDisplayMobile.classList.remove('card-name-small');
+            if (cardInfo) cardInfo.classList.remove('card-info-lower');
+            if (cardInfoMobile) cardInfoMobile.classList.remove('card-info-lower');
+          }
+          
+          // Show preview, hide placeholder
+          cardPreviewContainer.style.display = 'block';
+          if (cardPlaceholder) cardPlaceholder.style.display = 'none';
+          if (cardPreviewContainerMobile) cardPreviewContainerMobile.style.display = 'block';
+        } else {
+          // Hide preview if no type selected, show placeholder
+          cardPreviewContainer.style.display = 'none';
+          if (cardPlaceholder) cardPlaceholder.style.display = 'block';
+          if (cardPreviewContainerMobile) cardPreviewContainerMobile.style.display = 'none';
+          
+          // Remove small class when no type selected
+          cardNameDisplay.classList.remove('card-name-small');
+          if (cardNameDisplayMobile) cardNameDisplayMobile.classList.remove('card-name-small');
+          if (cardInfo) cardInfo.classList.remove('card-info-lower');
+          if (cardInfoMobile) cardInfoMobile.classList.remove('card-info-lower');
+        }
+      });
+
+      // Flip card on click (desktop)
+      cardFlipWrapper.addEventListener('click', function() {
+        this.classList.toggle('flipped');
+      });
+
+      // Flip card on click (mobile)
+      if (cardFlipWrapperMobile) {
+        cardFlipWrapperMobile.addEventListener('click', function() {
+          this.classList.toggle('flipped');
+        });
+      }
     </script>
 
     <!-- Register Logic -->
@@ -135,8 +398,9 @@
         const email = document.getElementById("email").value.trim();
         const phone = document.getElementById("phone").value.trim();
         const password = document.getElementById("password").value;
+        const card_type = document.getElementById("card_type").value;
 
-        if (!name || !email || !phone || !password) {
+        if (!name || !email || !phone || !password || !card_type) {
           alert("Semua field harus diisi");
           return;
         }
@@ -155,7 +419,7 @@
                 "Content-Type": "application/json",
               },
               credentials: "include",
-              body: JSON.stringify({ name, email, phone, password }),
+              body: JSON.stringify({ name, email, phone, password, card_type }),
             }
           );
 

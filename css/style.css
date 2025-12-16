@@ -17,8 +17,7 @@ html {
 }
 
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, Arial, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   scroll-behavior: auto; /* Changed from smooth to auto */
   background-color: #f9fafb;
   color: #0f172a;
@@ -38,10 +37,7 @@ main {
 }
 
 /* Prevent overflow ONLY on page-level containers, NOT modals */
-body
-  > div:not([id*="modal"]):not([id*="Modal"]):not([class*="modal"]):not(
-    [class*="Modal"]
-  ),
+body > div:not([id*="modal"]):not([id*="Modal"]):not([class*="modal"]):not([class*="Modal"]),
 body > section,
 body > aside,
 body > article,
@@ -164,8 +160,7 @@ body > footer {
     text-shadow: 0 0 5px rgba(234, 88, 12, 0.3);
   }
   50% {
-    text-shadow: 0 0 15px rgba(234, 88, 12, 0.6),
-      0 0 25px rgba(234, 88, 12, 0.4);
+    text-shadow: 0 0 15px rgba(234, 88, 12, 0.6), 0 0 25px rgba(234, 88, 12, 0.4);
   }
 }
 
@@ -203,12 +198,7 @@ header {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transform: rotate(45deg);
   animation: shimmer 3s infinite;
 }
@@ -406,19 +396,14 @@ header {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(234, 88, 12, 0.05) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(234, 88, 12, 0.05) 0%, transparent 70%);
   animation: rotate 20s linear infinite;
   pointer-events: none;
 }
 
 .hero-section:hover {
   border-color: rgba(234, 88, 12, 0.3);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
-    inset 0 0 20px rgba(234, 88, 12, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(234, 88, 12, 0.05);
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
@@ -518,12 +503,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.2), transparent);
   transition: left 0.5s ease;
 }
 
@@ -542,8 +522,7 @@ header {
   background: linear-gradient(135deg, #ea580c, #f97316);
   color: white;
   border-color: #ea580c;
-  box-shadow: 0 0 15px rgba(234, 88, 12, 0.4),
-    inset 0 0 10px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(234, 88, 12, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
   animation: glow 2s ease-in-out infinite;
 }
 
@@ -584,12 +563,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.08),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.08), transparent);
   transition: left 0.6s ease;
 }
 
@@ -687,15 +661,13 @@ header {
   background: linear-gradient(135deg, #10b981, #059669);
   border: none;
   color: white;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3),
-    0 4px 12px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3), 0 4px 12px rgba(16, 185, 129, 0.5);
   transform: scale(1.05);
 }
 
 .btn-yes.selected:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.3),
-    0 6px 15px rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.3), 0 6px 15px rgba(52, 211, 153, 0.6);
 }
 
 .btn-no {
@@ -741,15 +713,13 @@ header {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   border: none;
   color: white;
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3),
-    0 4px 12px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), 0 4px 12px rgba(239, 68, 68, 0.5);
   transform: scale(1.05);
 }
 
 .btn-no.selected:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3),
-    0 6px 15px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), 0 6px 15px rgba(239, 68, 68, 0.6);
 }
 
 .btn-info {
@@ -918,11 +888,7 @@ header {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(234, 88, 12, 0.03) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(234, 88, 12, 0.03) 0%, transparent 70%);
   animation: rotate 25s linear infinite;
   pointer-events: none;
 }
@@ -1136,12 +1102,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.05),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.05), transparent);
   transition: left 0.5s ease;
 }
 
@@ -1226,12 +1187,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.05),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.05), transparent);
   transition: left 0.6s ease;
 }
 
@@ -1309,12 +1265,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.05),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.05), transparent);
   transition: left 0.6s ease;
 }
 
@@ -1435,12 +1386,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.03),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.03), transparent);
   transition: left 0.8s ease;
 }
 
@@ -1564,12 +1510,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.2), transparent);
   transition: left 0.5s ease;
 }
 
@@ -1668,12 +1609,7 @@ header {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(234, 88, 12, 0.05),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.05), transparent);
   transition: left 0.5s ease;
 }
 
@@ -1781,11 +1717,7 @@ header {
 
 .dashboard-tab.active {
   border-color: #ea580c;
-  background: linear-gradient(
-    135deg,
-    rgba(234, 88, 12, 0.2),
-    rgba(234, 88, 12, 0.05)
-  );
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.2), rgba(234, 88, 12, 0.05));
   color: #ea580c;
   box-shadow: 0 0 20px rgba(234, 88, 12, 0.2);
 }
@@ -1837,16 +1769,21 @@ header {
   scrollbar-width: thin;
   scrollbar-color: rgba(251, 191, 36, 0.7) rgba(71, 85, 105, 0.3);
   scroll-behavior: smooth;
-  /* Add subtle gradient fade on edges to indicate scrollable content */
   position: relative;
-  /* Enable smooth scrolling with snap points */
   scroll-snap-type: x proximity;
   touch-action: pan-x;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  width: 100%;
 }
 
 .store-tab-scroll button {
   scroll-snap-align: start;
   flex-shrink: 0;
+  min-width: fit-content;
 }
 
 /* Visual indicator for scrollable content - removed to prevent overlay on buttons */
@@ -1881,11 +1818,18 @@ header {
   position: relative;
   scroll-snap-type: x proximity;
   touch-action: pan-x;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  width: 100%;
 }
 
 .store-category-scroll button {
   scroll-snap-align: start;
   flex-shrink: 0;
+  min-width: fit-content;
 }
 
 .store-category-scroll::-webkit-scrollbar {
@@ -2101,37 +2045,51 @@ header {
     font-size: 0.75rem !important;
   }
 
-  /* Store tab scroll - more visible scrollbar on mobile */
+  /* Store tab scroll - enhanced for mobile touch */
+  .store-tab-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-x: auto !important;
+    scroll-behavior: smooth;
+  }
+
   .store-tab-scroll::-webkit-scrollbar {
-    height: 12px !important;
+    height: 8px !important;
   }
 
   .store-tab-scroll::-webkit-scrollbar-track {
-    background: rgba(71, 85, 105, 0.5) !important;
-    border-radius: 6px !important;
+    background: rgba(71, 85, 105, 0.4) !important;
+    border-radius: 4px !important;
   }
 
   .store-tab-scroll::-webkit-scrollbar-thumb {
-    background: rgba(251, 191, 36, 1) !important;
-    border: 2px solid rgba(15, 23, 42, 0.3) !important;
-    border-radius: 6px !important;
+    background: rgba(251, 191, 36, 0.9) !important;
+    border: 1px solid rgba(15, 23, 42, 0.2) !important;
+    border-radius: 4px !important;
   }
 
-  .store-tab-scroll::-webkit-scrollbar-thumb:active {
-    background: rgba(245, 158, 11, 1) !important;
+  /* Store category scroll - enhanced for mobile touch */
+  .store-category-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-x: auto !important;
+    scroll-behavior: smooth;
   }
 
-  /* Store category scroll - same mobile enhancements */
   .store-category-scroll::-webkit-scrollbar {
-    height: 12px !important;
+    height: 8px !important;
   }
 
   .store-category-scroll::-webkit-scrollbar-track {
-    background: rgba(71, 85, 105, 0.5) !important;
-    border-radius: 6px !important;
+    background: rgba(71, 85, 105, 0.4) !important;
+    border-radius: 4px !important;
   }
 
   .store-category-scroll::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.9) !important;
+    border: 1px solid rgba(15, 23, 42, 0.2) !important;
+    border-radius: 4px !important;
+  }
+
+  .store-category-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(251, 191, 36, 1) !important;
     border: 2px solid rgba(15, 23, 42, 0.3) !important;
     border-radius: 6px !important;

@@ -1,10 +1,11 @@
 // Admin Dashboard JavaScript
-const API_BASE = "/api";
+var API_BASE = "/api";
 
 console.log("🚀 Admin Dashboard Loaded");
 console.log("📍 API Base URL:", API_BASE);
 
 // Simple authentication (can be improved with JWT later)
+// eslint-disable-next-line no-unused-vars
 let isLoggedIn = false;
 
 // Initialize
@@ -41,82 +42,38 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Booking section
-  document
-    .getElementById("refreshBookings")
-    .addEventListener("click", loadBookings);
-  document
-    .getElementById("filterBookingStatus")
-    .addEventListener("change", loadBookings);
+  document.getElementById("refreshBookings").addEventListener("click", loadBookings);
+  document.getElementById("filterBookingStatus").addEventListener("change", loadBookings);
 
   // Insight section
-  document
-    .getElementById("btnNewArticle")
-    .addEventListener("click", () => openArticleModal());
-  document
-    .getElementById("closeArticleModal")
-    .addEventListener("click", closeArticleModal);
-  document
-    .getElementById("cancelArticle")
-    .addEventListener("click", closeArticleModal);
-  document
-    .getElementById("articleForm")
-    .addEventListener("submit", handleArticleSubmit);
+  document.getElementById("btnNewArticle").addEventListener("click", () => openArticleModal());
+  document.getElementById("closeArticleModal").addEventListener("click", closeArticleModal);
+  document.getElementById("cancelArticle").addEventListener("click", closeArticleModal);
+  document.getElementById("articleForm").addEventListener("submit", handleArticleSubmit);
 
   // Events section
-  document
-    .getElementById("btnNewEvent")
-    .addEventListener("click", () => openEventModal());
-  document
-    .getElementById("closeEventModal")
-    .addEventListener("click", closeEventModal);
-  document
-    .getElementById("cancelEvent")
-    .addEventListener("click", closeEventModal);
-  document
-    .getElementById("eventForm")
-    .addEventListener("submit", handleEventSubmit);
+  document.getElementById("btnNewEvent").addEventListener("click", () => openEventModal());
+  document.getElementById("closeEventModal").addEventListener("click", closeEventModal);
+  document.getElementById("cancelEvent").addEventListener("click", closeEventModal);
+  document.getElementById("eventForm").addEventListener("submit", handleEventSubmit);
 
   // Coupons section
-  document
-    .getElementById("btnNewCoupon")
-    .addEventListener("click", () => openCouponModal());
-  document
-    .getElementById("closeCouponModal")
-    .addEventListener("click", closeCouponModal);
-  document
-    .getElementById("cancelCoupon")
-    .addEventListener("click", closeCouponModal);
-  document
-    .getElementById("couponForm")
-    .addEventListener("submit", handleCouponSubmit);
+  document.getElementById("btnNewCoupon").addEventListener("click", () => openCouponModal());
+  document.getElementById("closeCouponModal").addEventListener("click", closeCouponModal);
+  document.getElementById("cancelCoupon").addEventListener("click", closeCouponModal);
+  document.getElementById("couponForm").addEventListener("submit", handleCouponSubmit);
 
   // Services section
-  document
-    .getElementById("btnNewService")
-    .addEventListener("click", () => openServiceModal());
-  document
-    .getElementById("cancelService")
-    .addEventListener("click", closeServiceModal);
-  document
-    .getElementById("serviceForm")
-    .addEventListener("submit", handleServiceSubmit);
+  document.getElementById("btnNewService").addEventListener("click", () => openServiceModal());
+  document.getElementById("cancelService").addEventListener("click", closeServiceModal);
+  document.getElementById("serviceForm").addEventListener("submit", handleServiceSubmit);
 
   // Products section
-  document
-    .getElementById("btnNewProduct")
-    .addEventListener("click", () => openProductModal());
-  document
-    .getElementById("cancelProduct")
-    .addEventListener("click", closeProductModal);
-  document
-    .getElementById("productForm")
-    .addEventListener("submit", handleProductSubmit);
-  document
-    .getElementById("productImage")
-    .addEventListener("change", handleProductImageChange);
-  document
-    .getElementById("removeProductImageBtn")
-    .addEventListener("click", removeProductImage);
+  document.getElementById("btnNewProduct").addEventListener("click", () => openProductModal());
+  document.getElementById("cancelProduct").addEventListener("click", closeProductModal);
+  document.getElementById("productForm").addEventListener("submit", handleProductSubmit);
+  document.getElementById("productImage").addEventListener("change", handleProductImageChange);
+  document.getElementById("removeProductImageBtn").addEventListener("click", removeProductImage);
 
   // Price input formatters for all price fields
   const priceInputs = [
@@ -124,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "eventRegistrationFee",
     "couponMinBookingValue",
     "productPrice",
+    "productMemberPrice",
   ];
 
   priceInputs.forEach((inputId) => {
@@ -150,9 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeDeleteModal();
     }
   });
-  document
-    .getElementById("cancelDelete")
-    .addEventListener("click", closeDeleteModal);
+  document.getElementById("cancelDelete").addEventListener("click", closeDeleteModal);
 
   // Close modal on overlay click
   document.getElementById("deleteModal").addEventListener("click", (e) => {
@@ -296,6 +252,16 @@ function switchSection(section) {
     if (typeof window.loadOrders === "function") {
       window.loadOrders();
     }
+  } else if (section === "rewards") {
+    // Load rewards from rewards-manager.js
+    if (typeof initRewardsManager === "function") {
+      initRewardsManager();
+    }
+  } else if (section === "users") {
+    // Load users from users-manager.js
+    if (typeof initUsersManager === "function") {
+      initUsersManager();
+    }
   }
 }
 
@@ -305,8 +271,7 @@ async function loadBookings() {
   const status = document.getElementById("filterBookingStatus").value;
   const tbody = document.getElementById("bookingsTableBody");
 
-  tbody.innerHTML =
-    '<tr><td colspan="11" class="text-center p-6 text-white">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" class="text-center p-6 text-white">Loading...</td></tr>';
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
@@ -319,40 +284,24 @@ async function loadBookings() {
           (booking, index) => `
         <tr class="border-b border-slate-200 hover:bg-slate-50">
           <td class="p-3 text-slate-900 font-semibold">#${index + 1}</td>
-          <td class="p-3 text-slate-900">${escapeHtml(
-            booking.service_name
-          )}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(booking.service_name)}</td>
           <td class="p-3 text-slate-900">${escapeHtml(booking.branch)}</td>
-          <td class="p-3 text-slate-900">${escapeHtml(
-            booking.practitioner
-          )}</td>
-          <td class="p-3 text-slate-900">${formatDate(
-            booking.booking_date
-          )}</td>
-          <td class="p-3 text-slate-900">${escapeHtml(
-            booking.booking_time
-          )}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(booking.practitioner)}</td>
+          <td class="p-3 text-slate-900">${formatDate(booking.booking_date)}</td>
+          <td class="p-3 text-slate-900">${escapeHtml(booking.booking_time)}</td>
           <td class="p-3">
             <span class="px-2 py-1 rounded text-xs font-semibold ${
-              booking.mode === "online"
-                ? "bg-emerald-500 text-white"
-                : "bg-amber-500 text-white"
+              booking.mode === "online" ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
             }">
               ${booking.mode}
             </span>
           </td>
           <td class="p-3 text-slate-900">
-            ${
-              booking.price
-                ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price)
-                : "-"
-            }
+            ${booking.price ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price) : "-"}
             ${
               booking.discount_amount > 0
                 ? '<div class="text-xs text-red-600 font-semibold">- Rp ' +
-                  new Intl.NumberFormat("id-ID").format(
-                    booking.discount_amount
-                  ) +
+                  new Intl.NumberFormat("id-ID").format(booking.discount_amount) +
                   "</div>"
                 : ""
             }
@@ -360,8 +309,7 @@ async function loadBookings() {
           <td class="p-3 font-bold text-amber-600">
             ${
               booking.final_price
-                ? "Rp " +
-                  new Intl.NumberFormat("id-ID").format(booking.final_price)
+                ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.final_price)
                 : booking.price
                 ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price)
                 : "-"
@@ -419,14 +367,12 @@ async function loadBookings() {
         });
       });
 
-      tbody
-        .querySelectorAll('[data-action="delete-booking"]')
-        .forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const id = this.getAttribute("data-id");
-            deleteBooking(parseInt(id));
-          });
+      tbody.querySelectorAll('[data-action="delete-booking"]').forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const id = this.getAttribute("data-id");
+          deleteBooking(parseInt(id));
         });
+      });
 
       // Refresh Lucide icons
       if (typeof lucide !== "undefined" && lucide.createIcons) {
@@ -448,9 +394,7 @@ async function loadBookings() {
 
 // Helper function to check if table has overflow and manage scrollbar visibility
 function checkTableOverflow() {
-  const container = document.querySelector(
-    ".booking-container.overflow-x-auto"
-  );
+  const container = document.querySelector(".booking-container.overflow-x-auto");
   if (container) {
     const table = container.querySelector("table");
     if (table) {
@@ -487,9 +431,7 @@ async function deleteBooking(id) {
           showSuccessModal("Booking berhasil dihapus secara permanen");
           loadBookings();
         } else {
-          alert(
-            "Gagal menghapus booking: " + (result.error || "Unknown error")
-          );
+          alert("Gagal menghapus booking: " + (result.error || "Unknown error"));
         }
       } catch (error) {
         console.error("Error deleting booking:", error);
@@ -542,9 +484,7 @@ async function viewBookingDetail(id) {
         <!-- Header Section -->
         <div class="flex items-start justify-between">
           <div>
-            <h4 class="text-xl font-bold text-white mb-1">${escapeHtml(
-              booking.service_name
-            )}</h4>
+            <h4 class="text-xl font-bold text-white mb-1">${escapeHtml(booking.service_name)}</h4>
             <p class="text-sm text-slate-400">Booking ID: #${booking.id}</p>
           </div>
           <span class="px-3 py-1 rounded-lg text-xs font-semibold border ${
@@ -560,27 +500,23 @@ async function viewBookingDetail(id) {
             <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i>
             <div class="flex-1">
               <p class="text-xs text-slate-400">Tanggal & Waktu</p>
-              <p class="text-white font-medium">${formatDate(
-                booking.booking_date
-              )} • ${escapeHtml(booking.booking_time)}</p>
+              <p class="text-white font-medium">${formatDate(booking.booking_date)} • ${escapeHtml(
+      booking.booking_time
+    )}</p>
             </div>
           </div>
           <div class="flex items-center gap-3">
             <i data-lucide="map-pin" class="w-5 h-5 text-amber-400"></i>
             <div class="flex-1">
               <p class="text-xs text-slate-400">Cabang</p>
-              <p class="text-white font-medium">${escapeHtml(
-                booking.branch
-              )}</p>
+              <p class="text-white font-medium">${escapeHtml(booking.branch)}</p>
             </div>
           </div>
           <div class="flex items-center gap-3">
             <i data-lucide="user-check" class="w-5 h-5 text-amber-400"></i>
             <div class="flex-1">
               <p class="text-xs text-slate-400">Praktisi</p>
-              <p class="text-white font-medium">${escapeHtml(
-                booking.practitioner
-              )}</p>
+              <p class="text-white font-medium">${escapeHtml(booking.practitioner)}</p>
             </div>
           </div>
           <div class="flex items-center gap-3">
@@ -590,9 +526,7 @@ async function viewBookingDetail(id) {
             <div class="flex-1">
               <p class="text-xs text-slate-400">Mode</p>
               <span class="inline-block px-2 py-1 rounded text-xs font-semibold ${
-                booking.mode === "online"
-                  ? "bg-emerald-500 text-white"
-                  : "bg-amber-500 text-white"
+                booking.mode === "online" ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
               }">${booking.mode.toUpperCase()}</span>
             </div>
           </div>
@@ -610,9 +544,7 @@ async function viewBookingDetail(id) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <p class="text-xs text-slate-400">Nama Lengkap</p>
-              <p class="text-white font-medium">${escapeHtml(
-                booking.customer_name
-              )}</p>
+              <p class="text-white font-medium">${escapeHtml(booking.customer_name)}</p>
             </div>
             <div>
               <p class="text-xs text-slate-400">No. HP / WhatsApp</p>
@@ -626,15 +558,11 @@ async function viewBookingDetail(id) {
             </div>
             <div>
               <p class="text-xs text-slate-400">Umur</p>
-              <p class="text-white font-medium">${
-                booking.customer_age
-              } tahun</p>
+              <p class="text-white font-medium">${booking.customer_age} tahun</p>
             </div>
             <div>
               <p class="text-xs text-slate-400">Jenis Kelamin</p>
-              <p class="text-white font-medium">${escapeHtml(
-                booking.customer_gender
-              )}</p>
+              <p class="text-white font-medium">${escapeHtml(booking.customer_gender)}</p>
             </div>
           </div>
           <div>
@@ -660,20 +588,18 @@ async function viewBookingDetail(id) {
           <div class="space-y-2">
             <div class="flex justify-between items-center">
               <span class="text-slate-300">Harga Layanan</span>
-              <span class="text-white font-semibold">Rp ${new Intl.NumberFormat(
-                "id-ID"
-              ).format(booking.price)}</span>
+              <span class="text-white font-semibold">Rp ${new Intl.NumberFormat("id-ID").format(
+                booking.price
+              )}</span>
             </div>
             ${
               booking.discount_amount > 0
                 ? `
             <div class="flex justify-between items-center text-red-400">
-              <span>Diskon ${
-                booking.promo_code ? `(${booking.promo_code})` : ""
-              }</span>
-              <span class="font-semibold">- Rp ${new Intl.NumberFormat(
-                "id-ID"
-              ).format(booking.discount_amount)}</span>
+              <span>Diskon ${booking.promo_code ? `(${booking.promo_code})` : ""}</span>
+              <span class="font-semibold">- Rp ${new Intl.NumberFormat("id-ID").format(
+                booking.discount_amount
+              )}</span>
             </div>
             `
                 : ""
@@ -681,9 +607,9 @@ async function viewBookingDetail(id) {
             <hr class="border-slate-700">
             <div class="flex justify-between items-center text-lg">
               <span class="text-amber-300 font-semibold">Total Bayar</span>
-              <span class="text-amber-300 font-bold">Rp ${new Intl.NumberFormat(
-                "id-ID"
-              ).format(booking.final_price || booking.price)}</span>
+              <span class="text-amber-300 font-bold">Rp ${new Intl.NumberFormat("id-ID").format(
+                booking.final_price || booking.price
+              )}</span>
             </div>
           </div>
         </div>
@@ -700,9 +626,7 @@ async function viewBookingDetail(id) {
             <i data-lucide="sticky-note" class="w-4 h-4"></i>
             Catatan
           </h5>
-          <p class="text-slate-300 text-sm leading-relaxed">${escapeHtml(
-            booking.notes
-          )}</p>
+          <p class="text-slate-300 text-sm leading-relaxed">${escapeHtml(booking.notes)}</p>
         </div>
         `
             : ""
@@ -713,9 +637,7 @@ async function viewBookingDetail(id) {
           <p>Dibuat: ${new Date(booking.created_at).toLocaleString("id-ID")}</p>
           ${
             booking.updated_at
-              ? `<p>Terakhir diupdate: ${new Date(
-                  booking.updated_at
-                ).toLocaleString("id-ID")}</p>`
+              ? `<p>Terakhir diupdate: ${new Date(booking.updated_at).toLocaleString("id-ID")}</p>`
               : ""
           }
         </div>
@@ -763,8 +685,7 @@ function closeBookingDetailModal() {
 
 async function loadArticles() {
   const grid = document.getElementById("articlesGrid");
-  grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+  grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     const response = await fetch(`${API_BASE}/insight`);
@@ -775,19 +696,11 @@ async function loadArticles() {
         .map(
           (article) => `
         <div class="booking-container p-5">
-          <h3 class="font-semibold mb-2 text-slate-900">${escapeHtml(
-            article.title
-          )}</h3>
-          <p class="text-sm text-slate-700 mb-3">${escapeHtml(
-            article.excerpt || ""
-          )}</p>
+          <h3 class="font-semibold mb-2 text-slate-900">${escapeHtml(article.title)}</h3>
+          <p class="text-sm text-slate-700 mb-3">${escapeHtml(article.excerpt || "")}</p>
           <div class="text-xs text-slate-600 mb-3">
             <span>${formatDate(article.created_at)}</span>
-            ${
-              article.tags
-                ? `<span class="ml-2">${escapeHtml(article.tags)}</span>`
-                : ""
-            }
+            ${article.tags ? `<span class="ml-2">${escapeHtml(article.tags)}</span>` : ""}
           </div>
           <div class="flex gap-2">
             <button 
@@ -836,15 +749,21 @@ async function loadArticles() {
 
 function openArticleModal(id = null) {
   document.getElementById("articleModal").classList.remove("hidden");
-  document.getElementById("articleModalTitle").textContent = id
-    ? "Edit Artikel"
-    : "Artikel Baru";
-  document.getElementById("articleForm").reset();
-  document.getElementById("articleId").value = id || "";
+  document.getElementById("articleModalTitle").textContent = id ? "Edit Artikel" : "Artikel Baru";
 
+<<<<<<< HEAD
   // Reset header image preview (will be populated by editArticle if editing)
   document.getElementById("articleHeaderImage").value = "";
   document.getElementById("headerImagePreview").classList.add("hidden");
+=======
+  // Only reset form if creating new article (not editing)
+  if (!id) {
+    document.getElementById("articleForm").reset();
+    document.getElementById("articleId").value = "";
+    // Hide image preview for new article
+    document.getElementById("insightHeaderImagePreview").classList.add("hidden");
+  }
+>>>>>>> antigravity
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
@@ -890,9 +809,7 @@ async function handleArticleSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      showSuccessModal(
-        id ? "Artikel berhasil diupdate" : "Artikel berhasil dibuat"
-      );
+      showSuccessModal(id ? "Artikel berhasil diupdate" : "Artikel berhasil dibuat");
       closeArticleModal();
       loadArticles();
     } else {
@@ -912,7 +829,10 @@ async function handleArticleSubmit(e) {
 
 async function editArticle(id) {
   try {
+<<<<<<< HEAD
     // Use /insight/id/:id endpoint to get article by ID (not slug)
+=======
+>>>>>>> antigravity
     const response = await fetch(`${API_BASE}/insight/id/${id}`);
     const result = await response.json();
 
@@ -930,6 +850,19 @@ async function editArticle(id) {
       document.getElementById("articleExcerpt").value = article.excerpt || "";
       document.getElementById("articleContent").value = article.content || "";
       document.getElementById("articleTags").value = article.tags || "";
+      document.getElementById("articleCategory").value = article.category || "";
+      document.getElementById("insightHeaderImage").value = article.header_image || "";
+
+      // Show preview image if header_image exists
+      if (article.header_image) {
+        const previewDiv = document.getElementById("insightHeaderImagePreview");
+        const previewImg = document.getElementById("insightHeaderImagePreviewImg");
+        previewImg.src = article.header_image;
+        previewDiv.classList.remove("hidden");
+      } else {
+        // Hide preview if no image
+        document.getElementById("insightHeaderImagePreview").classList.add("hidden");
+      }
 
       // Handle category
       if (article.category) {
@@ -984,9 +917,7 @@ async function deleteArticle(id) {
           showSuccessModal("Artikel berhasil dihapus secara permanen");
           loadArticles();
         } else {
-          alert(
-            "Gagal menghapus artikel: " + (result.error || "Unknown error")
-          );
+          alert("Gagal menghapus artikel: " + (result.error || "Unknown error"));
         }
       } catch (error) {
         console.error("Error deleting article:", error);
@@ -1000,14 +931,11 @@ async function deleteArticle(id) {
 
 async function loadEvents() {
   const grid = document.getElementById("eventsGrid");
-  grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+  grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     // Admin: includeInactive=true to see all events (active & inactive)
-    const response = await fetch(
-      `${API_BASE}/events?limit=100&includeInactive=true`
-    );
+    const response = await fetch(`${API_BASE}/events?limit=100&includeInactive=true`);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
@@ -1085,9 +1013,7 @@ async function loadEvents() {
 
 function openEventModal(id = null) {
   document.getElementById("eventModal").classList.remove("hidden");
-  document.getElementById("eventModalTitle").textContent = id
-    ? "Edit Event"
-    : "Event Baru";
+  document.getElementById("eventModalTitle").textContent = id ? "Edit Event" : "Event Baru";
   document.getElementById("eventForm").reset();
   document.getElementById("eventId").value = id || "";
 
@@ -1120,11 +1046,8 @@ async function handleEventSubmit(e) {
     topic: document.getElementById("eventTopic").value,
     description: document.getElementById("eventDescription").value,
     speaker: document.getElementById("eventSpeaker").value,
-    registrationFee: parsePriceInput(
-      document.getElementById("eventRegistrationFee").value
-    ),
-    registrationDeadline: document.getElementById("eventRegistrationDeadline")
-      .value,
+    registrationFee: parsePriceInput(document.getElementById("eventRegistrationFee").value),
+    registrationDeadline: document.getElementById("eventRegistrationDeadline").value,
     location: document.getElementById("eventLocation").value,
     link: document.getElementById("eventLink").value,
   };
@@ -1141,9 +1064,7 @@ async function handleEventSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      showSuccessModal(
-        id ? "Event berhasil diupdate" : "Event berhasil dibuat"
-      );
+      showSuccessModal(id ? "Event berhasil diupdate" : "Event berhasil dibuat");
       closeEventModal();
       loadEvents();
     } else {
@@ -1164,9 +1085,7 @@ async function handleEventSubmit(e) {
 async function editEvent(id) {
   try {
     // Admin: includeInactive=true to edit inactive events
-    const response = await fetch(
-      `${API_BASE}/events/${id}?includeInactive=true`
-    );
+    const response = await fetch(`${API_BASE}/events/${id}?includeInactive=true`);
     const result = await response.json();
 
     if (result.success) {
@@ -1188,20 +1107,18 @@ async function editEvent(id) {
       // Then populate with data AFTER opening
       document.getElementById("eventId").value = event.id;
       document.getElementById("eventTitle").value = event.title || "";
-      document.getElementById("eventDate").value = formatDateForInput(
-        event.event_date
-      );
+      document.getElementById("eventDate").value = formatDateForInput(event.event_date);
       document.getElementById("eventMode").value = event.mode || "online";
       document.getElementById("eventTopic").value = event.topic || "quranic";
-      document.getElementById("eventDescription").value =
-        event.description || "";
+      document.getElementById("eventDescription").value = event.description || "";
       document.getElementById("eventSpeaker").value = event.speaker || "";
       // Format registration fee with thousand separator
       document.getElementById("eventRegistrationFee").value = parseInt(
         event.registration_fee || 0
       ).toLocaleString("id-ID");
-      document.getElementById("eventRegistrationDeadline").value =
-        formatDateForInput(event.registration_deadline);
+      document.getElementById("eventRegistrationDeadline").value = formatDateForInput(
+        event.registration_deadline
+      );
       document.getElementById("eventLocation").value = event.location || "";
       document.getElementById("eventLink").value = event.link || "";
     }
@@ -1239,8 +1156,7 @@ async function deleteEvent(id) {
 
 async function loadCoupons() {
   const grid = document.getElementById("couponsGrid");
-  grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+  grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     const response = await fetch(`${API_BASE}/coupons`);
@@ -1252,20 +1168,14 @@ async function loadCoupons() {
           (coupon) => `
         <div class="booking-container p-5">
           <div class="flex items-start justify-between mb-2">
-            <h3 class="font-semibold text-amber-600">${escapeHtml(
-              coupon.code
-            )}</h3>
+            <h3 class="font-semibold text-amber-600">${escapeHtml(coupon.code)}</h3>
             <span class="text-xs px-2 py-1 rounded font-semibold ${
-              coupon.is_active
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-slate-200 text-slate-600"
+              coupon.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
             }">
               ${coupon.is_active ? "Aktif" : "Nonaktif"}
             </span>
           </div>
-          <p class="text-sm text-slate-700 mb-2">${escapeHtml(
-            coupon.description || ""
-          )}</p>
+          <p class="text-sm text-slate-700 mb-2">${escapeHtml(coupon.description || "")}</p>
           <div class="text-sm mb-3">
             <div>
               <span class="text-slate-900">Diskon:</span>
@@ -1278,14 +1188,8 @@ async function loadCoupons() {
               </span>
             </div>
             <div class="text-xs text-slate-600">
-              Used: ${coupon.used_count} ${
-            coupon.max_uses ? `/ ${coupon.max_uses}` : ""
-          }
-              ${
-                coupon.expires_at
-                  ? `<br>Expires: ${formatDate(coupon.expires_at)}`
-                  : ""
-              }
+              Used: ${coupon.used_count} ${coupon.max_uses ? `/ ${coupon.max_uses}` : ""}
+              ${coupon.expires_at ? `<br>Expires: ${formatDate(coupon.expires_at)}` : ""}
             </div>
           </div>
           <div class="flex gap-2">
@@ -1338,10 +1242,15 @@ function openCouponModal(id = null) {
   document.getElementById("couponModalTitle").textContent = id
     ? "Edit Kode Promo"
     : "Kode Promo Baru";
-  document.getElementById("couponForm").reset();
-  document.getElementById("couponId").value = id || "";
-  document.getElementById("couponMinBookingValue").value = "0";
-  document.getElementById("couponIsActive").checked = true;
+
+  // Only reset form if creating new coupon (not editing)
+  if (!id) {
+    document.getElementById("couponForm").reset();
+    document.getElementById("couponId").value = "";
+    document.getElementById("couponMinBookingValue").value = "0";
+    document.getElementById("couponIsActive").checked = true;
+    document.getElementById("couponExpiresAt").value = "";
+  }
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
@@ -1369,9 +1278,8 @@ async function handleCouponSubmit(e) {
     code: document.getElementById("couponCode").value.toUpperCase(),
     description: document.getElementById("couponDescription").value,
     discountType: document.getElementById("couponDiscountType").value,
-    discountValue: parseFloat(
-      document.getElementById("couponDiscountValue").value
-    ),
+    discountValue: parseFloat(document.getElementById("couponDiscountValue").value),
+    couponType: document.getElementById("couponType").value,
     minBookingValue: parsePriceInput(
       document.getElementById("couponMinBookingValue")?.value || "0"
     ),
@@ -1392,9 +1300,7 @@ async function handleCouponSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      showSuccessModal(
-        id ? "Kode promo berhasil diupdate" : "Kode promo berhasil dibuat"
-      );
+      showSuccessModal(id ? "Kode promo berhasil diupdate" : "Kode promo berhasil dibuat");
       closeCouponModal();
       loadCoupons();
     } else {
@@ -1425,6 +1331,7 @@ async function editCoupon(id) {
 
       // Then populate with data AFTER opening
       document.getElementById("couponId").value = coupon.id;
+<<<<<<< HEAD
       document.getElementById("couponCode").value = coupon.code || "";
       document.getElementById("couponDescription").value =
         coupon.description || "";
@@ -1432,6 +1339,13 @@ async function editCoupon(id) {
         coupon.discount_type || "percentage";
       document.getElementById("couponDiscountValue").value =
         coupon.discount_value || "";
+=======
+      document.getElementById("couponCode").value = coupon.code;
+      document.getElementById("couponDescription").value = coupon.description || "";
+      document.getElementById("couponDiscountType").value = coupon.discount_type;
+      document.getElementById("couponDiscountValue").value = coupon.discount_value;
+      document.getElementById("couponType").value = coupon.coupon_type || "both";
+>>>>>>> antigravity
       // Format min booking value with thousand separator
       document.getElementById("couponMinBookingValue").value = parseInt(
         coupon.min_booking_value || 0
@@ -1442,10 +1356,16 @@ async function editCoupon(id) {
           .replace(" ", "T")
           .substring(0, 16);
       }
+<<<<<<< HEAD
       document.getElementById("couponIsActive").checked =
         coupon.is_active === 1;
     } else {
       alert("Gagal memuat kode promo: " + (result.error || "Unknown error"));
+=======
+      document.getElementById("couponIsActive").checked = coupon.is_active === 1;
+
+      openCouponModal(id);
+>>>>>>> antigravity
     }
   } catch (error) {
     console.error("Error loading coupon:", error);
@@ -1590,34 +1510,22 @@ async function loadServices() {
         (service) => `
         <tr class="border-t border-slate-700 hover:bg-slate-800">
           <td class="px-3 py-3 text-white">${service.id}</td>
-          <td class="px-3 py-3 font-semibold text-white">${escapeHtml(
-            service.name
-          )}</td>
+          <td class="px-3 py-3 font-semibold text-white">${escapeHtml(service.name)}</td>
           <td class="px-3 py-3">
-            <span class="text-xs rounded-full px-2 py-1 ${getCategoryBadgeClass(
-              service.category
-            )}">
+            <span class="text-xs rounded-full px-2 py-1 ${getCategoryBadgeClass(service.category)}">
               ${getCategoryLabel(service.category)}
             </span>
           </td>
-          <td class="px-3 py-3 text-white font-medium">Rp ${formatNumber(
-            service.price
-          )}</td>
-          <td class="px-3 py-3 text-xs text-white">${escapeHtml(
-            service.branch
-          )}</td>
+          <td class="px-3 py-3 text-white font-medium">Rp ${formatNumber(service.price)}</td>
+          <td class="px-3 py-3 text-xs text-white">${escapeHtml(service.branch)}</td>
           <td class="px-3 py-3">
-            <span class="text-xs rounded-full px-2 py-1 ${getModeBadgeClass(
-              service.mode
-            )}">
+            <span class="text-xs rounded-full px-2 py-1 ${getModeBadgeClass(service.mode)}">
               ${getModeLabel(service.mode)}
             </span>
           </td>
           <td class="px-3 py-3">
             <span class="text-xs rounded-full px-2 py-1 font-semibold ${
-              service.is_active
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-slate-200 text-slate-600"
+              service.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
             }">
               ${service.is_active ? "Aktif" : "Nonaktif"}
             </span>
@@ -1632,9 +1540,10 @@ async function loadServices() {
                 Edit
               </button>
               <button
-                onclick="deleteService(${service.id}, '${escapeHtml(
-          service.name
-        ).replace(/'/g, "\\'")}')"
+                onclick="deleteService(${service.id}, '${escapeHtml(service.name).replace(
+          /'/g,
+          "\\'"
+        )}')"
                 class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded text-xs"
                 title="Hapus"
               >
@@ -1704,11 +1613,9 @@ function openServiceModal(id = null) {
   document.getElementById("serviceIsActive").checked = true;
 
   // Uncheck all branch checkboxes
-  document
-    .querySelectorAll('input[name="serviceBranch"]')
-    .forEach((checkbox) => {
-      checkbox.checked = false;
-    });
+  document.querySelectorAll('input[name="serviceBranch"]').forEach((checkbox) => {
+    checkbox.checked = false;
+  });
 
   if (id) {
     title.textContent = "Edit Service";
@@ -1745,14 +1652,10 @@ async function handleServiceSubmit(e) {
   const name = document.getElementById("serviceName").value.trim();
   const category = document.getElementById("serviceCategory").value;
   const priceFormatted = document.getElementById("servicePrice").value;
-  const description = document
-    .getElementById("serviceDescription")
-    .value.trim();
+  const description = document.getElementById("serviceDescription").value.trim();
 
   // Get selected branches from checkboxes
-  const branchCheckboxes = document.querySelectorAll(
-    'input[name="serviceBranch"]:checked'
-  );
+  const branchCheckboxes = document.querySelectorAll('input[name="serviceBranch"]:checked');
   const selectedBranches = Array.from(branchCheckboxes).map((cb) => cb.value);
   const branch = selectedBranches.join(", ");
 
@@ -1763,9 +1666,7 @@ async function handleServiceSubmit(e) {
   }
 
   const mode = document.getElementById("serviceMode").value;
-  const practitioner = document
-    .getElementById("servicePractitioner")
-    .value.trim();
+  const practitioner = document.getElementById("servicePractitioner").value.trim();
   const is_active = document.getElementById("serviceIsActive").checked;
 
   const data = {
@@ -1795,9 +1696,7 @@ async function handleServiceSubmit(e) {
       throw new Error(result.error || "Gagal menyimpan data");
     }
 
-    showSuccessModal(
-      id ? "Layanan berhasil diupdate" : "Layanan berhasil dibuat"
-    );
+    showSuccessModal(id ? "Layanan berhasil diupdate" : "Layanan berhasil dibuat");
     closeServiceModal();
     loadServices();
   } catch (error) {
@@ -1831,23 +1730,17 @@ async function editService(id) {
     document.getElementById("serviceName").value = service.name;
     document.getElementById("serviceCategory").value = service.category;
     // Format price with thousand separator
-    document.getElementById("servicePrice").value = parseInt(
-      service.price
-    ).toLocaleString("id-ID");
+    document.getElementById("servicePrice").value = parseInt(service.price).toLocaleString("id-ID");
     document.getElementById("serviceDescription").value = service.description;
 
     // Parse branch string and check appropriate checkboxes
     const branches = service.branch.split(",").map((b) => b.trim());
-    document
-      .querySelectorAll('input[name="serviceBranch"]')
-      .forEach((checkbox) => {
-        checkbox.checked = branches.includes(checkbox.value);
-      });
+    document.querySelectorAll('input[name="serviceBranch"]').forEach((checkbox) => {
+      checkbox.checked = branches.includes(checkbox.value);
+    });
     document.getElementById("serviceMode").value = service.mode;
-    document.getElementById("servicePractitioner").value =
-      service.practitioner || "";
-    document.getElementById("serviceIsActive").checked =
-      service.is_active === 1;
+    document.getElementById("servicePractitioner").value = service.practitioner || "";
+    document.getElementById("serviceIsActive").checked = service.is_active === 1;
   } catch (error) {
     console.error("Error loading service:", error);
     alert("Error: " + error.message);
@@ -1883,8 +1776,7 @@ function deleteService(id, name) {
 
 async function loadProducts() {
   const grid = document.getElementById("productsGrid");
-  grid.innerHTML =
-    '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+  grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
     const response = await fetch(`${API_BASE}/products`);
@@ -1919,14 +1811,10 @@ async function loadProducts() {
               <span class="text-xs px-2 py-1 rounded ${getProductCategoryBadgeClass(
                 product.category
               )}">
-                ${getProductCategoryIcon(product.category)} ${escapeHtml(
-            product.category
-          )}
+                ${getProductCategoryIcon(product.category)} ${escapeHtml(product.category)}
               </span>
             </div>
-            <div class="font-bold text-amber-600">Rp ${formatNumber(
-              product.price
-            )}</div>
+            <div class="font-bold text-amber-600">Rp ${formatNumber(product.price)}</div>
             <div class="text-xs text-slate-700">
               Stok: <span class="font-semibold ${
                 product.stock > 0 ? "text-emerald-600" : "text-red-600"
@@ -2075,9 +1963,10 @@ async function handleProductSubmit(e) {
   const category = document.getElementById("productCategory").value;
   const priceInput = document.getElementById("productPrice").value.trim();
   const price = parsePriceInput(priceInput);
-  const description = document
-    .getElementById("productDescription")
-    .value.trim();
+  const memberPriceInput = document.getElementById("productMemberPrice").value.trim();
+  const memberPrice = memberPriceInput ? parsePriceInput(memberPriceInput) : null;
+  const promoText = document.getElementById("productPromoText").value.trim();
+  const description = document.getElementById("productDescription").value.trim();
   const stock = parseInt(document.getElementById("productStock").value) || 0;
   const imageFile = document.getElementById("productImage").files[0];
   const existingImageUrl = document.getElementById("productImageUrl").value;
@@ -2090,6 +1979,18 @@ async function handleProductSubmit(e) {
   if (!priceInput || price <= 0) {
     alert("Mohon masukkan harga yang valid (contoh: 20.000)");
     return;
+  }
+
+  // Validate member price if provided
+  if (memberPrice !== null) {
+    if (memberPrice <= 0) {
+      alert("Harga member harus lebih besar dari 0");
+      return;
+    }
+    if (memberPrice >= price) {
+      alert("Harga member harus lebih kecil dari harga normal");
+      return;
+    }
   }
 
   // Set flag and disable button
@@ -2126,6 +2027,8 @@ async function handleProductSubmit(e) {
       name,
       category,
       price,
+      member_price: memberPrice,
+      promo_text: promoText || null,
       description,
       image_url,
       stock,
@@ -2145,9 +2048,7 @@ async function handleProductSubmit(e) {
     const result = await response.json();
 
     if (result.success) {
-      showSuccessModal(
-        id ? "Produk berhasil diupdate" : "Produk baru berhasil ditambahkan"
-      );
+      showSuccessModal(id ? "Produk berhasil diupdate" : "Produk baru berhasil ditambahkan");
       closeProductModal();
       loadProducts();
     } else {
@@ -2186,9 +2087,17 @@ async function editProduct(id) {
     document.getElementById("productName").value = product.name;
     document.getElementById("productCategory").value = product.category;
     // Format price with thousand separator
-    document.getElementById("productPrice").value = parseInt(
-      product.price
-    ).toLocaleString("id-ID");
+    document.getElementById("productPrice").value = parseInt(product.price).toLocaleString("id-ID");
+    // Format member price if exists
+    if (product.member_price !== null && product.member_price !== undefined) {
+      document.getElementById("productMemberPrice").value = parseInt(
+        product.member_price
+      ).toLocaleString("id-ID");
+    } else {
+      document.getElementById("productMemberPrice").value = "";
+    }
+    // Populate promo text
+    document.getElementById("productPromoText").value = product.promo_text || "";
     document.getElementById("productDescription").value = product.description;
     document.getElementById("productStock").value = product.stock || 0;
 
@@ -2254,31 +2163,7 @@ function getProductCategoryIcon(category) {
 }
 
 // ========== UTILITIES ==========
-
-function escapeHtml(text) {
-  const map = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  };
-  return String(text).replace(/[&<>"']/g, (m) => map[m]);
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatNumber(num) {
-  return new Intl.NumberFormat("id-ID").format(num);
-}
+// Note: escapeHtml, formatDate, formatNumber are defined in utils.js (global)
 
 /**
  * Format price input with thousand separator (dots)
@@ -2411,14 +2296,10 @@ async function uploadInsightContentImage() {
       textarea.value = textBefore + imageTag + textAfter;
 
       // Set cursor after inserted image
-      textarea.selectionStart = textarea.selectionEnd =
-        cursorPos + imageTag.length;
+      textarea.selectionStart = textarea.selectionEnd = cursorPos + imageTag.length;
       textarea.focus();
 
-      console.log(
-        "✅ Insight content image uploaded and inserted:",
-        result.filePath
-      );
+      console.log("✅ Insight content image uploaded and inserted:", result.filePath);
     } catch (error) {
       console.error("Error uploading insight content image:", error);
       alert("Error upload gambar: " + error.message);

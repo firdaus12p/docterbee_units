@@ -3,15 +3,9 @@
 // ============================================
 
 // ============================================
-// HELPER FUNCTIONS (Must be defined first)
+// HELPER FUNCTIONS
+// Note: escapeHtml and formatDate are defined in utils.js (global)
 // ============================================
-function escapeHtml(text) {
-  if (!text) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
 function getCategoryColor(category) {
   const colors = {
     Nutrisi: "bg-green-100 text-green-700",
@@ -20,16 +14,6 @@ function getCategoryColor(category) {
     Sains: "bg-orange-100 text-orange-700",
   };
   return colors[category] || "bg-gray-100 text-gray-700";
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 }
 
 // ============================================
@@ -154,7 +138,7 @@ async function filterArticlesByCategory() {
   if (!articlesContainer) return;
 
   try {
-    const response = await fetch(`${API_BASE}/articles`);
+    const response = await fetch("/api/articles");
     const result = await response.json();
 
     if (!result.success) {

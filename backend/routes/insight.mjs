@@ -31,7 +31,11 @@ router.get("/", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // GET /api/insight/id/:id - Get single article by ID (for admin editing)
+=======
+// GET /api/insight/id/:id - Get single article by ID (admin only, no published filter)
+>>>>>>> antigravity
 router.get("/id/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,7 +54,11 @@ router.get("/id/:id", async (req, res) => {
       data: article,
     });
   } catch (error) {
+<<<<<<< HEAD
     console.error("Error fetching article by ID:", error);
+=======
+    console.error("Error fetching article:", error);
+>>>>>>> antigravity
     res.status(500).json({
       success: false,
       error: "Gagal mengambil detail artikel",

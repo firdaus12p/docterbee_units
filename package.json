@@ -6,7 +6,11 @@
   "main": "backend/server.mjs",
   "scripts": {
     "start": "node backend/server.mjs",
-    "dev": "node --watch backend/server.mjs"
+    "dev": "node --watch backend/server.mjs",
+    "lint": "eslint backend/**/*.mjs js/**/*.js --ignore-pattern node_modules",
+    "lint:fix": "eslint backend/**/*.mjs js/**/*.js --fix --ignore-pattern node_modules",
+    "test": "node --test tests/",
+    "migrate:seed-rewards": "node -e \"import('./backend/migrations/seed-default-rewards.mjs').then(m => m.up())\""
   },
   "keywords": [
     "docterbee",
@@ -29,5 +33,10 @@
     "node-fetch": "^3.3.2",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^16.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0"
   }
 }

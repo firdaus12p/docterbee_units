@@ -14,7 +14,8 @@ dotenv.config({ path: join(__dirname, "..", ".env") });
 const dbConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : "",
+  password:
+    process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : "",
   database: process.env.DB_NAME || "docterbee_units",
   port: parseInt(process.env.DB_PORT) || 3307,
   waitForConnections: true,
@@ -261,6 +262,42 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: user_cart");
+
+    // Create rewards table for managing available rewards
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS rewards (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        points_cost INT NOT NULL,
+        color_theme VARCHAR(50) DEFAULT 'amber' COMMENT 'UI color: amber, emerald, purple, sky, blue, rose',
+        is_active TINYINT(1) DEFAULT 1,
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_active (is_active),
+        INDEX idx_sort_order (sort_order)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: rewards");
+
+    // Create reward_redemptions table for tracking reward history
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS reward_redemptions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        reward_id INT DEFAULT NULL,
+        reward_name VARCHAR(255) NOT NULL,
+        points_cost INT NOT NULL,
+        redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (reward_id) REFERENCES rewards(id) ON DELETE SET NULL,
+        INDEX idx_user_id (user_id),
+        INDEX idx_reward_id (reward_id),
+        INDEX idx_redeemed_at (redeemed_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: reward_redemptions");
 
     console.log("📦 All tables initialized successfully");
   } catch (error) {
