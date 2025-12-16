@@ -3,6 +3,7 @@
 ## ✅ **REPOSITORY AMAN - Sudah Dikonfigurasi**
 
 Repository ini sudah dikonfigurasi dengan keamanan yang tepat untuk:
+
 - ✅ Push ke GitHub (public/private)
 - ✅ Clone di VPS production
 - ✅ Proteksi credentials & API keys
@@ -12,58 +13,72 @@ Repository ini sudah dikonfigurasi dengan keamanan yang tepat untuk:
 ## 📋 **File Yang Di-Ignore (Tidak Di-Push ke GitHub)**
 
 ### 1. **Environment Variables (CRITICAL)**
+
 ```
 .env                    # API keys, database credentials
 .env.*                  # Any .env variants
 rules-for-ai.md         # Internal AI agent instructions
 ```
+
 **Bahaya:** Mengandung Gemini API key, MySQL password, session secrets
 
 ### 2. **Documentation Folder (INTERNAL)**
+
 ```
 docs/                   # Semua file dokumentasi internal
 ```
+
 **Alasan:** Bisa mengandung API keys, credentials, atau info sensitif
 
 ### 3. **Troubleshooting Scripts (CREDENTIALS)**
+
 ```
 troubleshoot-*.sh       # Shell scripts (kecuali *-safe.sh)
 troubleshoot-*.bat      # Batch scripts (kecuali *-safe.bat)
 debug-*.sh
 debug-*.bat
 ```
+
 **Bahaya:** Script lama mengandung hardcoded credentials
 
 ### 4. **Linting & Test Results (TEMPORARY)**
+
 ```
 lint-output.txt
 lint-result.txt
 eslint-report.html
 test-results/
 ```
+
 **Alasan:** File temporary, setiap developer bisa generate sendiri
 
 ### 5. **Runtime Data (SERVER ONLY)**
+
 ```
 uploads/                # User uploaded files
 logs/                   # Application logs
 *.log
 ```
+
 **Alasan:** File spesifik server, ukuran besar
 
 ### 6. **Node Modules (DEPENDENCIES)**
+
 ```
 node_modules/           # NPM packages
 ```
+
 **Alasan:** Ukuran besar, bisa di-install via `npm install`
 
 ### 7. **IDE & Cache (LOCAL)**
+
 ```
 .vscode/
 .idea/
 .npm
 .eslintcache
 ```
+
 **Alasan:** Konfigurasi editor lokal
 
 ---
@@ -95,6 +110,7 @@ nano .env
 ```
 
 **Isi .env di VPS:**
+
 ```env
 # Gemini API (GENERATE BARU!)
 GEMINI_API_KEY=your_new_production_api_key_here
@@ -119,6 +135,7 @@ NODE_ENV=production
 ```
 
 **🔑 PENTING: Generate session secret baru:**
+
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
@@ -209,6 +226,7 @@ bash troubleshoot-rewards-safe.sh admin your_password
 ```
 
 **Windows (local development):**
+
 ```cmd
 set ADMIN_USERNAME=admin
 set ADMIN_PASSWORD=your_password
@@ -219,24 +237,25 @@ troubleshoot-rewards-safe.bat
 
 ## 📊 **File Structure (Git vs VPS)**
 
-| File/Folder | Git Tracked? | Di VPS? | Notes |
-|-------------|-------------|---------|-------|
-| `.env` | ❌ NO | ✅ YES | Manual setup di VPS |
-| `.env.example` | ✅ YES | ✅ YES | Template only |
-| `docs/` | ❌ NO | ⚠️ OPTIONAL | Keep local only |
-| `troubleshoot-*.sh` | ❌ NO | ✅ YES | Create locally di VPS |
-| `troubleshoot-*-safe.sh` | ✅ YES | ✅ YES | Safe to use |
-| `lint-output.txt` | ❌ NO | ❌ NO | Temporary file |
-| `node_modules/` | ❌ NO | ✅ YES | Via `npm install` |
-| `uploads/` | ❌ NO | ✅ YES | Runtime data |
-| Backend code | ✅ YES | ✅ YES | Application code |
-| Frontend code | ✅ YES | ✅ YES | HTML/CSS/JS |
+| File/Folder              | Git Tracked? | Di VPS?     | Notes                 |
+| ------------------------ | ------------ | ----------- | --------------------- |
+| `.env`                   | ❌ NO        | ✅ YES      | Manual setup di VPS   |
+| `.env.example`           | ✅ YES       | ✅ YES      | Template only         |
+| `docs/`                  | ❌ NO        | ⚠️ OPTIONAL | Keep local only       |
+| `troubleshoot-*.sh`      | ❌ NO        | ✅ YES      | Create locally di VPS |
+| `troubleshoot-*-safe.sh` | ✅ YES       | ✅ YES      | Safe to use           |
+| `lint-output.txt`        | ❌ NO        | ❌ NO       | Temporary file        |
+| `node_modules/`          | ❌ NO        | ✅ YES      | Via `npm install`     |
+| `uploads/`               | ❌ NO        | ✅ YES      | Runtime data          |
+| Backend code             | ✅ YES       | ✅ YES      | Application code      |
+| Frontend code            | ✅ YES       | ✅ YES      | HTML/CSS/JS           |
 
 ---
 
 ## 🚨 **Emergency: If Credentials Leaked**
 
 ### **1. API Key Leaked:**
+
 ```bash
 # Generate new API key
 # → https://aistudio.google.com/app/apikey
@@ -253,6 +272,7 @@ pm2 restart docterbee
 ```
 
 ### **2. Database Password Leaked:**
+
 ```bash
 # Change MySQL password
 mysql -u root -p
@@ -267,6 +287,7 @@ pm2 restart docterbee
 ```
 
 ### **3. Session Secret Leaked:**
+
 ```bash
 # Generate new secret
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"

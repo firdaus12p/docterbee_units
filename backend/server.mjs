@@ -174,9 +174,15 @@ cleanUrlPages.forEach((page) => {
 // ADMIN AUTHENTICATION
 // ============================================
 
-// Admin credentials from environment variables
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "docterbee2025";
+// Admin credentials from environment variables (NO FALLBACK - MUST BE IN .env)
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  console.error("❌ ADMIN_USERNAME and ADMIN_PASSWORD must be set in .env file!");
+  console.error("   Copy .env.example to .env and set admin credentials.");
+  process.exit(1);
+}
 
 // POST /api/admin/login - Admin login
 app.post("/api/admin/login", (req, res) => {
