@@ -25,6 +25,9 @@ yarn-error.log*
 # ===============================
 uploads/
 uploads/**
+# Exception: Track template card images (needed for production)
+!uploads/gambar_kartu/
+!uploads/gambar_kartu/**
 logs/
 *.log
 
