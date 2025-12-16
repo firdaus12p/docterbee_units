@@ -54,6 +54,24 @@ desktop.ini
 .eslintcache
 
 # ===============================
+# LINTING & TEST RESULTS (TEMPORARY)
+# ===============================
+lint-output.txt
+lint-result.txt
+eslint-report.html
+test-results/
+
+# ===============================
+# TROUBLESHOOTING SCRIPTS (LOCAL ONLY - MAY CONTAIN CREDENTIALS)
+# ===============================
+troubleshoot-*.sh
+troubleshoot-*.bat
+!troubleshoot-*-safe.sh
+!troubleshoot-*-safe.bat
+debug-*.sh
+debug-*.bat
+
+# ===============================
 # AI / MCP / COPILOT (LOCAL ONLY)
 # ===============================
 .gemini/
