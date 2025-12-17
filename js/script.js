@@ -2804,6 +2804,31 @@ function renderProductPricing(product) {
   `;
 }
 
+// Add product to cart (wrapper function for store)
+// eslint-disable-next-line no-unused-vars
+function addToCart(productId) {
+  const product = PRODUCTS.find((p) => p.id === parseInt(productId));
+  
+  if (!product) {
+    showToast("Produk tidak ditemukan", "error");
+    return;
+  }
+  
+  // Check stock availability
+  if (product.stock === 0) {
+    showToast("Maaf, produk ini sedang habis stok", "error");
+    return;
+  }
+  
+  // Call store cart function
+  if (typeof window.addToStoreCart === "function") {
+    window.addToStoreCart(product.id, product.name, product.price, product.image);
+  } else {
+    console.error("addToStoreCart function not available");
+    showToast("Error: Tidak dapat menambahkan ke keranjang", "error");
+  }
+}
+
 // Filter products by category
 async function filterStoreCategory(category) {
   const grid = document.getElementById("productGrid");
@@ -2867,6 +2892,19 @@ async function filterStoreCategory(category) {
         </div>
         <div class="flex flex-col gap-2">
           ${renderProductPricing(p)}
+          
+          <!-- Stock Indicator -->
+          <div class="flex items-center justify-between">
+            ${
+              p.stock === 0
+                ? '<span class="text-xs bg-red-500/20 text-red-600 px-2 py-1 rounded font-semibold">Stok Habis</span>'
+                : p.stock <= 5
+                ? `<span class="text-xs bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-semibold">Stok Tersisa: ${p.stock}</span>`
+                : `<span class="text-xs bg-emerald-500/20 text-emerald-600 px-2 py-1 rounded font-semibold">Stok: ${p.stock}</span>`
+            }
+          </div>
+          
+          <!-- Add to Cart Button -->
           <div class="flex items-center justify-between gap-2">
             ${
               p.stock > 0
@@ -2874,7 +2912,10 @@ async function filterStoreCategory(category) {
                     <i data-lucide="plus" class="w-3 h-3"></i>
                     Tambah
                   </button>`
-                : `<span class="text-xs text-red-500 font-semibold">Stok Habis</span>`
+                : `<button disabled class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-slate-300 text-slate-500 px-3 py-2 text-sm font-semibold cursor-not-allowed">
+                    <i data-lucide="x-circle" class="w-3 h-3"></i>
+                    Tidak Tersedia
+                  </button>`
             }
           </div>
           ${

@@ -436,6 +436,38 @@ async function submitOrder() {
     // Continue with checkout if check fails (for guest users)
   }
 
+  // ✅ VALIDATE STOCK AVAILABILITY BEFORE CHECKOUT
+  try {
+    // Fetch current product stock from API
+    const stockResponse = await fetch("/api/products");
+    const stockData = await stockResponse.json();
+
+    if (stockData.success && stockData.data) {
+      const products = stockData.data;
+
+      // Check each cart item against current stock
+      for (const cartItem of cart) {
+        const product = products.find((p) => p.id === cartItem.id);
+
+        if (!product) {
+          showToast(`Produk "${cartItem.name}" tidak ditemukan`, "error");
+          return;
+        }
+
+        if (product.stock < cartItem.quantity) {
+          showToast(
+            `Stok tidak cukup untuk "${cartItem.name}". Tersedia: ${product.stock}, diminta: ${cartItem.quantity}`,
+            "error"
+          );
+          return;
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error validating stock:", error);
+    // Continue with order - backend will validate again
+  }
+
   const originalTotal = calculateTotal();
   let finalTotal = originalTotal;
   let discountAmount = 0;

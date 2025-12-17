@@ -143,67 +143,122 @@ router.post("/", async (req, res) => {
     const original_total =
       coupon_code && coupon_discount > 0 ? total_amount + coupon_discount : null;
 
-    // Insert order
-    const result = await query(
-      `INSERT INTO orders 
+    // ============================================
+    // STOCK VALIDATION & DEDUCTION (with race condition prevention)
+    // ============================================
+    try {
+      // Start transaction for atomic stock operations
+      await query("START TRANSACTION");
+
+      // Validate and lock stock for all products
+      for (const item of items) {
+        // Skip if not a product (could be service/booking)
+        if (!item.product_id) continue;
+
+        // Lock row to prevent concurrent modifications (race condition prevention)
+        const product = await queryOne(
+          "SELECT id, name, stock FROM products WHERE id = ? FOR UPDATE",
+          [item.product_id]
+        );
+
+        if (!product) {
+          throw new Error(`Produk dengan ID ${item.product_id} tidak ditemukan`);
+        }
+
+        // Check stock availability
+        if (product.stock < item.quantity) {
+          throw new Error(
+            `Stok tidak cukup untuk ${product.name}. Tersedia: ${product.stock}, diminta: ${item.quantity}`
+          );
+        }
+      }
+
+      // Deduct stock for all products (atomic operation)
+      for (const item of items) {
+        if (!item.product_id) continue;
+
+        await query("UPDATE products SET stock = stock - ? WHERE id = ?", [
+          item.quantity,
+          item.product_id,
+        ]);
+      }
+
+      // Insert order
+      const result = await query(
+        `INSERT INTO orders 
        (order_number, user_id, customer_name, customer_phone, customer_address,
         order_type, store_location, items, total_amount, points_earned, 
         qr_code_data, expires_at, coupon_code, coupon_discount, original_total)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        orderNumber,
-        userId,
-        customerName,
-        customerPhone,
-        customerAddress,
-        order_type,
-        store_location,
-        JSON.stringify(items),
-        total_amount,
-        pointsEarned,
-        qrCodeData,
-        expiresAt,
-        coupon_code || null,
-        coupon_discount || 0,
-        original_total,
-      ]
-    );
+        [
+          orderNumber,
+          userId,
+          customerName,
+          customerPhone,
+          customerAddress,
+          order_type,
+          store_location,
+          JSON.stringify(items),
+          total_amount,
+          pointsEarned,
+          qrCodeData,
+          expiresAt,
+          coupon_code || null,
+          coupon_discount || 0,
+          original_total,
+        ]
+      );
 
-    // Increment coupon used_count if coupon was used
-    if (coupon_code) {
-      await query(`UPDATE coupons SET used_count = used_count + 1 WHERE code = ?`, [
-        coupon_code.toUpperCase(),
-      ]);
-
-      // Record coupon usage for logged-in users (one-time per user)
-      if (userId) {
-        const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
+      // Increment coupon used_count if coupon was used
+      if (coupon_code) {
+        await query(`UPDATE coupons SET used_count = used_count + 1 WHERE code = ?`, [
           coupon_code.toUpperCase(),
         ]);
 
-        if (coupon) {
-          // Insert into coupon_usage to track one-time usage per user
-          await query(
-            `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
+        // Record coupon usage for logged-in users (one-time per user)
+        if (userId) {
+          const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
+            coupon_code.toUpperCase(),
+          ]);
+
+          if (coupon) {
+            // Insert into coupon_usage to track one-time usage per user
+            await query(
+              `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
              VALUES (?, ?, 'store', ?)`,
-            [userId, coupon.id, result.insertId]
-          );
+              [userId, coupon.id, result.insertId]
+            );
+          }
         }
       }
-    }
 
-    res.status(201).json({
-      success: true,
-      message: "Order berhasil dibuat",
-      data: {
-        id: result.insertId,
-        order_number: orderNumber,
-        qr_code_data: qrCodeData,
-        expires_at: expiresAt,
-        points_earned: pointsEarned,
-        status: "pending",
-      },
-    });
+      // Commit transaction - all operations successful
+      await query("COMMIT");
+
+      res.status(201).json({
+        success: true,
+        message: "Order berhasil dibuat",
+        data: {
+          id: result.insertId,
+          order_number: orderNumber,
+          qr_code_data: qrCodeData,
+          expires_at: expiresAt,
+          points_earned: pointsEarned,
+          status: "pending",
+        },
+      });
+    } catch (stockError) {
+      // Rollback transaction on any error
+      await query("ROLLBACK");
+
+      console.error("Error in stock validation/deduction:", stockError);
+
+      // Return user-friendly error message
+      return res.status(400).json({
+        success: false,
+        error: stockError.message || "Gagal memproses order",
+      });
+    }
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).json({
