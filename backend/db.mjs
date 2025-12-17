@@ -216,6 +216,7 @@ async function initializeTables() {
         user_id INT,
         customer_name VARCHAR(100),
         customer_phone VARCHAR(20),
+        customer_address TEXT DEFAULT NULL,
         customer_email VARCHAR(100),
         order_type ENUM('dine_in', 'take_away') NOT NULL,
         store_location ENUM('kolaka', 'makassar', 'kendari') NOT NULL,
@@ -226,6 +227,9 @@ async function initializeTables() {
         payment_status ENUM('pending', 'paid') DEFAULT 'pending',
         qr_code_data TEXT NOT NULL,
         expires_at TIMESTAMP NOT NULL,
+        coupon_code VARCHAR(50) DEFAULT NULL,
+        coupon_discount DECIMAL(10, 2) DEFAULT 0,
+        original_total DECIMAL(10, 2) DEFAULT NULL,
         completed_at TIMESTAMP NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -346,6 +350,20 @@ async function runMigrations(connection) {
     // Migration: Add promo_text to products table  
     await safeAddColumn(connection, 'products', 'promo_text', 
       'VARCHAR(255) DEFAULT NULL AFTER member_price');
+    
+    // Migration: Add coupon columns to orders table
+    await safeAddColumn(connection, 'orders', 'coupon_code', 
+      'VARCHAR(50) DEFAULT NULL AFTER expires_at');
+    
+    await safeAddColumn(connection, 'orders', 'coupon_discount', 
+      'DECIMAL(10, 2) DEFAULT 0 AFTER coupon_code');
+    
+    await safeAddColumn(connection, 'orders', 'original_total', 
+      'DECIMAL(10, 2) DEFAULT NULL AFTER coupon_discount');
+    
+    // Migration: Add customer_address to orders table
+    await safeAddColumn(connection, 'orders', 'customer_address', 
+      'TEXT DEFAULT NULL AFTER customer_phone');
     
     console.log("✅ Migrations completed");
   } catch (error) {
