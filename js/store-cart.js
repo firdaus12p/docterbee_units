@@ -1,6 +1,8 @@
 // ============================================
 // STORE CART - Shopping Cart Management
 // ============================================
+// Modal utilities are defined in modal-utils.js
+/* global showConfirm */
 
 // Cart state
 let cart = [];
@@ -1032,13 +1034,17 @@ async function cancelPendingOrderAndRetry() {
     return;
   }
 
-  const confirmCancel = confirm(
-    `Apakah Anda yakin ingin membatalkan order ${pendingOrderData.order_number}?\n\n⚠️ Poin yang dijanjikan tidak akan diberikan jika order dibatalkan.`
+  showConfirm(
+    `Apakah Anda yakin ingin membatalkan order ${pendingOrderData.order_number}?\n\n⚠️ Poin yang dijanjikan tidak akan diberikan jika order dibatalkan.`,
+    async () => {
+      await performCancelOrder();
+    },
+    null,
+    "Konfirmasi Batal Order"
   );
+}
 
-  if (!confirmCancel) {
-    return;
-  }
+async function performCancelOrder() {
 
   try {
     // Call cancel endpoint

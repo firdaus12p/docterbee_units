@@ -124,6 +124,7 @@
     <script>
       lucide.createIcons();
     </script>
+    <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
 
@@ -141,7 +142,7 @@
         const password = document.getElementById("password").value;
 
         if (!email || !password) {
-          alert("Email dan password harus diisi");
+          showWarning("Email dan password harus diisi");
           return;
         }
 
@@ -162,14 +163,19 @@
             const userId = data.data.id;
             await window.UserDataSync.init(userId);
 
-            alert("Login berhasil! Selamat datang " + data.data.name);
-            window.location.href = "/journey";
+            showSuccess(
+              `Selamat datang, ${data.data.name}! Anda akan diarahkan ke Journey.`,
+              "Login Berhasil"
+            );
+            setTimeout(() => {
+              window.location.href = "/journey";
+            }, 1500);
           } else {
-            alert(data.error || "Login gagal");
+            showError(data.error || "Login gagal. Periksa email dan password Anda.");
           }
         } catch (error) {
           console.error("Login error:", error);
-          alert("Terjadi kesalahan saat login. Pastikan server berjalan.");
+          showError("Terjadi kesalahan saat login. Pastikan server berjalan.");
         }
       });
     </script>

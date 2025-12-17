@@ -2,6 +2,8 @@
 // ORDERS MANAGER - Admin Dashboard
 // ============================================
 // Note: API_BASE is already defined in admin-dashboard.js
+// Modal utilities are defined in modal-utils.js
+/* global showSuccess, showError, showWarning, showConfirm */
 
 // ============================================
 // LOAD ORDERS
@@ -185,7 +187,7 @@ function openQRScanner() {
     )
     .catch((err) => {
       console.error("Error starting QR scanner:", err);
-      alert("Gagal membuka camera. Pastikan browser memiliki akses ke camera.");
+      showError("Gagal membuka camera. Pastikan browser memiliki akses ke camera.");
     });
 }
 
@@ -366,7 +368,7 @@ async function viewOrderDetails(orderNumber) {
     }
   } catch (error) {
     console.error("Error viewing order:", error);
-    alert("Error: " + error.message);
+    showError("Error: " + error.message);
   }
 }
 
@@ -381,31 +383,28 @@ function closeOrderDetailsModal() {
 // ============================================
 
 async function completeOrder(orderId) {
-  if (
-    !confirm(
-      "Complete order ini? Status akan berubah menjadi PAID dan COMPLETED."
-    )
-  ) {
-    return;
-  }
+  showConfirm(
+    "Complete order ini? Status akan berubah menjadi PAID dan COMPLETED.",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/orders/${orderId}/complete`, {
+          method: "PATCH",
+        });
 
-  try {
-    const response = await fetch(`${API_BASE}/orders/${orderId}/complete`, {
-      method: "PATCH",
-    });
+        const result = await response.json();
 
-    const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || "Gagal complete order");
+        }
 
-    if (!result.success) {
-      throw new Error(result.error || "Gagal complete order");
+        showSuccess("Order berhasil di-complete!");
+        loadOrders(); // Reload orders
+      } catch (error) {
+        console.error("Error completing order:", error);
+        showError("Error: " + error.message);
+      }
     }
-
-    alert("✅ Order berhasil di-complete!");
-    loadOrders(); // Reload orders
-  } catch (error) {
-    console.error("Error completing order:", error);
-    alert("Error: " + error.message);
-  }
+  );
 }
 
 // ============================================
@@ -413,31 +412,30 @@ async function completeOrder(orderId) {
 // ============================================
 
 async function deleteOrder(orderId) {
-  if (
-    !confirm(
-      "Hapus order ini? Data akan dihapus permanen dan tidak dapat dikembalikan."
-    )
-  ) {
-    return;
-  }
+  showConfirm(
+    "Hapus order ini? Data akan dihapus permanen dan tidak dapat dikembalikan.",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+          method: "DELETE",
+        });
 
-  try {
-    const response = await fetch(`${API_BASE}/orders/${orderId}`, {
-      method: "DELETE",
-    });
+        const result = await response.json();
 
-    const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || "Gagal menghapus order");
+        }
 
-    if (!result.success) {
-      throw new Error(result.error || "Gagal menghapus order");
-    }
-
-    alert("✅ Order berhasil dihapus!");
-    loadOrders(); // Reload orders
-  } catch (error) {
-    console.error("Error deleting order:", error);
-    alert("Error: " + error.message);
-  }
+        showSuccess("Order berhasil dihapus!");
+        loadOrders(); // Reload orders
+      } catch (error) {
+        console.error("Error deleting order:", error);
+        showError("Error: " + error.message);
+      }
+    },
+    null,
+    "Konfirmasi Hapus Order"
+  );
 }
 
 async function completeOrderFromModal(orderId) {
@@ -596,7 +594,7 @@ async function submitAssignPoints() {
   const phone = document.getElementById("assignPhoneInput").value.trim();
 
   if (!phone) {
-    alert("Nomor HP harus diisi");
+    showWarning("Nomor HP harus diisi");
     return;
   }
 
@@ -636,7 +634,7 @@ async function submitAssignPoints() {
     submitBtn.innerHTML = originalText;
   } catch (error) {
     console.error("Error assigning points:", error);
-    alert("❌ Error: " + error.message);
+    showError("❌ Error: " + error.message);
 
     const submitBtn = document.querySelector(
       "#assignPointsModal button[type='submit']"

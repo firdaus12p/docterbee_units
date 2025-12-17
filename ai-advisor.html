@@ -253,6 +253,7 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
     <script>
@@ -379,7 +380,7 @@
         const question = document.getElementById("questionInput").value.trim();
 
         if (!question) {
-          alert("Tolong tulis pertanyaan/perilaku terlebih dahulu.");
+          showWarning("Tolong tulis pertanyaan/perilaku terlebih dahulu.");
           return;
         }
 
@@ -862,14 +863,16 @@
               window.UserDataSync.clear();
             }
 
-            alert("Logout berhasil");
-            window.location.href = "/";
+            showSuccess("Logout berhasil! Anda akan diarahkan ke halaman utama.", "Logout Berhasil");
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 1500);
           } else {
-            alert("Logout gagal");
+            showError("Logout gagal");
           }
         } catch (error) {
           console.error("Logout error:", error);
-          alert("Terjadi kesalahan saat logout");
+          showError("Terjadi kesalahan saat logout");
         }
       }
 

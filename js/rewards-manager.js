@@ -1,6 +1,8 @@
 // ============================================
 // REWARDS MANAGER
 // ============================================
+// Modal utilities are defined in modal-utils.js
+/* global showSuccess, showError, showWarning, showConfirm */
 
 let currentRewardId = null;
 
@@ -146,11 +148,11 @@ async function editReward(id) {
 
       openRewardModal(id);
     } else {
-      alert(data.error || "Gagal memuat data reward");
+      showError(data.error || "Gagal memuat data reward");
     }
   } catch (error) {
     console.error("Error fetching reward:", error);
-    alert("Terjadi kesalahan saat memuat data reward");
+    showError("Terjadi kesalahan saat memuat data reward");
   }
 }
 
@@ -168,12 +170,12 @@ async function saveReward(event) {
 
   // Validation
   if (!name) {
-    alert("Nama reward harus diisi");
+    showWarning("Nama reward harus diisi");
     return;
   }
 
   if (isNaN(points) || points < 1) {
-    alert("Poin harus lebih dari 0");
+    showWarning("Poin harus lebih dari 0");
     return;
   }
 
@@ -200,45 +202,47 @@ async function saveReward(event) {
     const data = await response.json();
 
     if (data.success) {
-      window.showSuccessModal(data.message || "Reward berhasil disimpan");
+      showSuccess(data.message || "Reward berhasil disimpan");
       closeRewardModal();
       await loadRewards();
     } else {
-      alert(data.error || "Gagal menyimpan reward");
+      showError(data.error || "Gagal menyimpan reward");
     }
   } catch (error) {
     console.error("Error saving reward:", error);
-    alert("Terjadi kesalahan saat menyimpan reward");
+    showError("Terjadi kesalahan saat menyimpan reward");
   }
 }
 
 // Delete reward
-function deleteReward(id, name) {
-  window.openDeleteModal(
-    () => confirmDeleteReward(id),
-    `Hapus reward "${name}"?`,
-    "Reward yang sudah dihapus tidak dapat dikembalikan. Riwayat penukaran reward ini akan tetap tersimpan."
+async function deleteReward(id, name) {
+  showConfirm(
+    `Hapus reward "${name}"?\n\nReward yang sudah dihapus tidak dapat dikembalikan. Riwayat penukaran reward ini akan tetap tersimpan.`,
+    async () => {
+      await performDeleteReward(id);
+    }
   );
 }
 
-async function confirmDeleteReward(id) {
+async function performDeleteReward(id) {
+
   try {
     const response = await fetch(`${API_BASE}/rewards/admin/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (data.success) {
-      window.showSuccessModal("Reward berhasil dihapus");
-      await loadRewards();
-    } else {
-      alert(data.error || "Gagal menghapus reward");
+    if (!result.success) {
+      throw new Error(result.error || "Gagal menghapus reward");
     }
+
+    showSuccess("Reward berhasil dihapus!");
+    loadRewards(); // Reload rewards list
   } catch (error) {
     console.error("Error deleting reward:", error);
-    alert("Terjadi kesalahan saat menghapus reward");
+    showError("Error: " + error.message);
   }
 }
 

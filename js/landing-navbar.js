@@ -1,5 +1,7 @@
 // Landing Page Navbar - Authentication-based Display
 // This script checks if user is logged in and adjusts navbar accordingly
+// Modal utilities are defined in modal-utils.js (optional dependency)
+/* global showError, showConfirm */
 
 (function () {
   "use strict";
@@ -81,7 +83,7 @@
   }
 
   // Handle logout
-  async function handleLogout() {
+  async function performLogout() {
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
@@ -89,15 +91,40 @@
       });
 
       if (response.ok) {
-        alert("Anda telah logout. Sampai jumpa!");
-        // Reload page to show guest navbar
+        // Directly reload without success modal (user already confirmed)
         window.location.reload();
       } else {
-        alert("Gagal logout. Silakan coba lagi.");
+        if (typeof showError === "function") {
+          showError("Gagal logout. Silakan coba lagi.");
+        } else {
+          alert("Gagal logout. Silakan coba lagi.");
+        }
       }
     } catch (error) {
       console.error("Logout error:", error);
-      alert("Terjadi kesalahan saat logout.");
+      if (typeof showError === "function") {
+        showError("Terjadi kesalahan saat logout.");
+      } else {
+        alert("Terjadi kesalahan saat logout.");
+      }
+    }
+  }
+
+  function handleLogout() {
+    if (typeof showConfirm === "function") {
+      showConfirm(
+        "Apakah Anda yakin ingin logout?",
+        () => {
+          performLogout();
+        },
+        null,
+        "Konfirmasi Logout"
+      );
+    } else {
+      // Fallback if modal-utils.js not loaded
+      if (confirm("Apakah Anda yakin ingin logout?")) {
+        performLogout();
+      }
     }
   }
 

@@ -244,6 +244,7 @@
     <script>
       lucide.createIcons();
     </script>
+    <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
 
@@ -401,12 +402,12 @@
         const card_type = document.getElementById("card_type").value;
 
         if (!name || !email || !phone || !password || !card_type) {
-          alert("Semua field harus diisi");
+          showWarning("Semua field harus diisi");
           return;
         }
 
         if (password.length < 6) {
-          alert("Password minimal 6 karakter");
+          showWarning("Password minimal 6 karakter");
           return;
         }
 
@@ -426,18 +427,21 @@
           const data = await response.json();
 
           if (data.success) {
-            alert(
-              "Pendaftaran berhasil! Selamat datang " +
+            showSuccess(
+              "Selamat datang " +
                 data.data.name +
-                ". Silakan login untuk melanjutkan."
+                "! Silakan login untuk melanjutkan.",
+              "Pendaftaran Berhasil"
             );
-            window.location.href = "/login";
+            setTimeout(() => {
+              window.location.href = "/login";
+            }, 1500);
           } else {
-            alert(data.error || "Pendaftaran gagal");
+            showError(data.error || "Pendaftaran gagal");
           }
         } catch (error) {
           console.error("Register error:", error);
-          alert("Terjadi kesalahan saat mendaftar. Pastikan server berjalan.");
+          showError("Terjadi kesalahan saat mendaftar. Pastikan server berjalan.");
         }
       });
     </script>

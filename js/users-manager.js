@@ -2,6 +2,8 @@
 // USERS MANAGER - Admin Dashboard
 // ============================================
 // API_BASE is defined in admin-dashboard.js
+// Modal utilities are defined in modal-utils.js
+/* global showSuccess, showError, showWarning, showConfirm */
 
 // ============================================
 // Load Users
@@ -160,13 +162,19 @@ document.getElementById("userForm")?.addEventListener("submit", async (e) => {
   const password = document.getElementById("userPassword").value;
 
   if (password.length < 6) {
-    alert("Password minimal 6 karakter");
+    showWarning("Password minimal 6 karakter");
     return;
   }
+  
+  showConfirm(
+    "Reset password untuk user ini?",
+    async () => {
+      await performPasswordReset(userId, password);
+    }
+  );
+});
 
-  if (!confirm("Reset password untuk user ini?")) {
-    return;
-  }
+async function performPasswordReset(userId, password) {
 
   try {
     const response = await fetch(`${API_BASE}/users/${userId}/password`, {
@@ -180,60 +188,60 @@ document.getElementById("userForm")?.addEventListener("submit", async (e) => {
     const data = await response.json();
 
     if (data.success) {
-      alert("Password berhasil direset!");
+      showSuccess("Password berhasil direset!");
       closeUserModal();
       usersLoaded = false;
       loadUsers();
     } else {
-      alert(data.error || "Gagal reset password");
+      showError(data.error || "Gagal reset password");
     }
   } catch (error) {
     console.error("Error resetting password:", error);
-    alert("Terjadi kesalahan saat reset password");
+    showError("Terjadi kesalahan saat reset password");
   }
-});
+}
 
 // ============================================
 // Toggle User Status
 // ============================================
 async function toggleUserStatus(userId) {
-  if (!confirm("Ubah status user ini?")) {
-    return;
-  }
+  showConfirm(
+    "Ubah status user ini?",
+    async () => {
+      try {
+        const response = await fetch(`${API_BASE}/users/${userId}/toggle`, {
+          method: "PATCH",
+        });
 
-  try {
-    const response = await fetch(`${API_BASE}/users/${userId}/toggle`, {
-      method: "PATCH",
-    });
+        const data = await response.json();
 
-    const data = await response.json();
-
-    if (data.success) {
-      alert(data.message);
-      usersLoaded = false;
-      loadUsers();
-    } else {
-      alert(data.error || "Gagal mengubah status user");
+        if (data.success) {
+          showSuccess(data.message);
+          usersLoaded = false;
+          loadUsers();
+        } else {
+          showError(data.error || "Gagal mengubah status user");
+        }
+      } catch (error) {
+        console.error("Error toggling user status:", error);
+        showError("Terjadi kesalahan saat mengubah status user");
+      }
     }
-  } catch (error) {
-    console.error("Error toggling user status:", error);
-    alert("Terjadi kesalahan saat mengubah status user");
-  }
+  );
 }
 
 // ============================================
 // Confirm Delete User
 // ============================================
 function confirmDeleteUser(userId, userName) {
-  if (
-    !confirm(
-      `Hapus user "${userName}"?\n\nPeringatan: Data user akan dihapus permanen dari database!`
-    )
-  ) {
-    return;
-  }
-
-  deleteUser(userId);
+  showConfirm(
+    `Hapus user "${userName}"?\n\nPeringatan: Data user akan dihapus permanen dari database!`,
+    () => {
+      deleteUser(userId);
+    },
+    null,
+    "Konfirmasi Hapus User"
+  );
 }
 
 // ============================================
@@ -248,15 +256,15 @@ async function deleteUser(userId) {
     const data = await response.json();
 
     if (data.success) {
-      alert("User berhasil dihapus!");
+      showSuccess("User berhasil dihapus!");
       usersLoaded = false;
       loadUsers();
     } else {
-      alert(data.error || "Gagal menghapus user");
+      showError(data.error || "Gagal menghapus user");
     }
   } catch (error) {
     console.error("Error deleting user:", error);
-    alert("Terjadi kesalahan saat menghapus user");
+    showError("Terjadi kesalahan saat menghapus user");
   }
 }
 
@@ -310,11 +318,11 @@ async function viewUserRewards(userId, userName) {
     if (data.success) {
       openRewardsModal(userId, userName, data.data.rewards);
     } else {
-      alert(data.error || "Gagal memuat riwayat reward");
+      showError(data.error || "Gagal memuat riwayat reward");
     }
   } catch (error) {
     console.error("Error fetching user rewards:", error);
-    alert("Terjadi kesalahan saat memuat riwayat reward");
+    showError("Terjadi kesalahan saat memuat riwayat reward");
   }
 }
 
@@ -406,43 +414,44 @@ function closeRewardsModal() {
 // Approve Reward Redemption
 // ============================================
 async function approveRedemption(userId, redemptionId, rewardName) {
-  if (!confirm(`Approve penukaran reward "${rewardName}"?`)) {
-    return;
-  }
+  showConfirm(
+    `Approve penukaran reward "${rewardName}"?`,
+    async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/users/${userId}/rewards/${redemptionId}/approve`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }
+        );
 
-  try {
-    const response = await fetch(
-      `${API_BASE}/users/${userId}/rewards/${redemptionId}/approve`,
-      {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      }
-    );
+        const data = await response.json();
 
-    const data = await response.json();
-
-    if (data.success) {
-      alert("Redemption berhasil di-approve!");
-      // Refresh the rewards list
-      const userName = document.getElementById("rewardUserName").textContent;
-      const userRewardsResponse = await fetch(
-        `${API_BASE}/users/${userId}/rewards`,
-        {
-          credentials: "include",
+        if (data.success) {
+          showSuccess("Redemption berhasil di-approve!");
+          // Refresh the rewards list
+          const userName = document.getElementById("rewardUserName").textContent;
+          const userRewardsResponse = await fetch(
+            `${API_BASE}/users/${userId}/rewards`,
+            {
+              credentials: "include",
+            }
+          );
+          const userRewardsData = await userRewardsResponse.json();
+          if (userRewardsData.success) {
+            openRewardsModal(userId, userName, userRewardsData.data.rewards);
+          }
+        } else {
+          showError(data.error || "Gagal approve redemption");
         }
-      );
-      const userRewardsData = await userRewardsResponse.json();
-      if (userRewardsData.success) {
-        openRewardsModal(userId, userName, userRewardsData.data.rewards);
+      } catch (error) {
+        console.error("Error approving redemption:", error);
+        showError("Terjadi kesalahan saat approve redemption");
       }
-    } else {
-      alert(data.error || "Gagal approve redemption");
     }
-  } catch (error) {
-    console.error("Error approving redemption:", error);
-    alert("Terjadi kesalahan saat approve redemption");
-  }
+  );
 }
 
 // Export functions for use in HTML

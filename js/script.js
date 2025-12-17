@@ -1,6 +1,8 @@
 /* ========================================
    Docterbee Journey - Main JavaScript
    ======================================== */
+// Modal utilities are defined in modal-utils.js
+/* global showSuccess, showError, showWarning, showConfirm, showInfo */
 
 // ==================== DATA MODEL ====================
 
@@ -621,9 +623,9 @@ function calcAll() {
  * Initialize mobile menu functionality
  */
 // ============================================
-// LOGOUT FUNCTIONALITY
+// LOGOUT HANDLER
 // ============================================
-async function handleLogout() {
+async function performLogout() {
   try {
     const response = await fetch("/api/auth/logout", {
       method: "POST",
@@ -638,15 +640,26 @@ async function handleLogout() {
         window.UserDataSync.clear();
       }
 
-      alert("Logout berhasil");
+      // Directly redirect without success modal (user already confirmed)
       window.location.href = "/";
     } else {
-      alert("Logout gagal");
+      showError("Logout gagal. Silakan coba lagi.");
     }
   } catch (error) {
     console.error("Logout error:", error);
-    alert("Terjadi kesalahan saat logout");
+    showError("Terjadi kesalahan saat logout. Silakan coba lagi.");
   }
+}
+
+async function handleLogout() {
+  showConfirm(
+    "Apakah Anda yakin ingin logout?",
+    () => {
+      performLogout();
+    },
+    null,
+    "Konfirmasi Logout"
+  );
 }
 
 function initLogout() {
@@ -961,27 +974,27 @@ async function confirmBooking() {
   const customerAddress = document.getElementById("customerAddress")?.value.trim();
 
   if (!customerName || !customerPhone || !customerAge || !customerGender || !customerAddress) {
-    alert("⚠️ Mohon lengkapi semua data pribadi yang bertanda * (wajib diisi).");
+    showWarning("Mohon lengkapi semua data pribadi yang bertanda * (wajib diisi).");
     return;
   }
 
   // Validasi nomor HP format Indonesia
   const phoneRegex = /^(08|\+?628)[0-9]{8,13}$/;
   if (!phoneRegex.test(customerPhone.replace(/[\s-]/g, ""))) {
-    alert("⚠️ Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx atau +628xx-xxxx-xxxx");
+    showWarning("Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx atau +628xx-xxxx-xxxx");
     return;
   }
 
   // Validasi umur
   if (customerAge < 1 || customerAge > 150) {
-    alert("⚠️ Umur tidak valid. Masukkan umur antara 1-150 tahun.");
+    showWarning("Umur tidak valid. Masukkan umur antara 1-150 tahun.");
     return;
   }
 
   // Validasi data booking
   const dateRaw = document.getElementById("date")?.value;
   if (!dateRaw || !bookingState.selectedTime) {
-    alert("⚠️ Pilih tanggal dan jam terlebih dahulu.");
+    showWarning("Pilih tanggal dan jam terlebih dahulu.");
     return;
   }
 
@@ -990,12 +1003,12 @@ async function confirmBooking() {
 
   if (saved) {
     const service = bookingState.serviceName || "";
-    alert(
-      `✅ Booking berhasil disimpan!\n\n` +
-        `Halo ${customerName},\n` +
+    showSuccess(
+      `Halo ${customerName},\n` +
         `Booking Anda untuk ${service} telah tersimpan.\n\n` +
         `Admin kami akan segera menghubungi Anda di ${customerPhone} untuk konfirmasi jadwal.\n\n` +
-        `Terima kasih! 🙏`
+        `Terima kasih! 🙏`,
+      "Booking Berhasil"
     );
 
     // Reset form setelah sukses
@@ -1015,8 +1028,8 @@ async function confirmBooking() {
       promoResult.classList.add("hidden");
     }
   } else {
-    alert(
-      `❌ Gagal menyimpan booking.\n\n` +
+    showError(
+      `Gagal menyimpan booking.\n\n` +
         `Mohon coba lagi atau hubungi admin kami jika masalah berlanjut.`
     );
   }
@@ -1893,7 +1906,7 @@ function loadCustomAudio() {
   const customUrl = document.getElementById("customAudioUrl")?.value.trim();
 
   if (!customUrl) {
-    alert("Tempel URL .mp3 terlebih dahulu.");
+    showWarning("Tempel URL .mp3 terlebih dahulu.");
     return;
   }
 
@@ -1909,7 +1922,7 @@ async function checkTranscript() {
   const transcriptStatus = document.getElementById("transcriptStatus");
 
   if (!youtubeUrl) {
-    alert("Masukkan URL YouTube terlebih dahulu.");
+    showWarning("Masukkan URL YouTube terlebih dahulu.");
     return;
   }
 
@@ -2012,7 +2025,7 @@ async function analyzeMedia() {
 
   // Validation
   if (!youtubeUrl && !notes) {
-    alert("Masukkan URL YouTube atau catatan terlebih dahulu.");
+    showWarning("Masukkan URL YouTube atau catatan terlebih dahulu.");
     return;
   }
 
@@ -2088,7 +2101,7 @@ async function analyzeMedia() {
             "⚠️ Transcript tidak tersedia untuk video ini. Silakan tulis catatan/ringkasan video secara manual...";
 
           // Show alert to user
-          alert(
+          showError(
             "Transcript YouTube tidak tersedia untuk video ini.\n\n" +
               "Solusi:\n" +
               "1. Tonton video dan tulis ringkasan di kolom 'Catatan'\n" +
@@ -3037,54 +3050,56 @@ async function redeemReward(cost, rewardName, rewardId = null) {
   const current = data.value || 0;
 
   if (current < cost) {
-    alert(`Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`);
+    showWarning(`Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`);
     return;
   }
 
-  // Confirm redemption
-  if (!confirm(`Tukar ${cost} poin untuk ${rewardName}?`)) {
-    return;
-  }
+  showConfirm(
+    `Tukar ${cost} poin untuk ${rewardName}?`,
+    async () => {
+      try {
+        // Save to server if logged in
+        const response = await fetch("/api/user-data/rewards/redeem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            rewardId: rewardId,
+            rewardName: rewardName,
+            pointsCost: cost,
+          }),
+        });
 
-  try {
-    // Save to server if logged in
-    const response = await fetch("/api/user-data/rewards/redeem", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        rewardId: rewardId,
-        rewardName: rewardName,
-        pointsCost: cost,
-      }),
-    });
+        const result = await response.json();
 
-    const result = await response.json();
-
-    if (result.success) {
-      // Update local storage
-      const newValue = result.newPoints;
-      _db("db_points", { value: newValue });
-      addPoints(0); // Trigger nav refresh
-      updatePointsView();
-      alert(`Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`);
-    } else {
-      // Fallback to local storage only
-      const newValue = current - cost;
-      _db("db_points", { value: newValue });
-      addPoints(0);
-      updatePointsView();
-      alert(`Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`);
-    }
-  } catch (error) {
-    console.error("Error redeeming reward:", error);
-    // Fallback to local storage only
-    const newValue = current - cost;
-    _db("db_points", { value: newValue });
-    addPoints(0);
-    updatePointsView();
-    alert(`Selamat! Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`);
-  }
+        if (result.success) {
+          // Update local storage
+          const newValue = result.newPoints;
+          _db("db_points", { value: newValue });
+          addPoints(0); // Trigger nav refresh
+          updatePointsView();
+          showSuccess(`Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`, "Redeem Berhasil");
+        } else {
+          // Fallback to local storage only
+          const newValue = current - cost;
+          _db("db_points", { value: newValue });
+          addPoints(0);
+          updatePointsView();
+          showSuccess(`Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`, "Redeem Berhasil");
+        }
+      } catch (error) {
+        console.error("Error redeeming reward:", error);
+        // Fallback to local storage only
+        const newValue = current - cost;
+        _db("db_points", { value: newValue });
+        addPoints(0);
+        updatePointsView();
+        showSuccess(`Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`, "Redeem Berhasil");
+      }
+    },
+    null,
+    "Konfirmasi Redeem"
+  );
 }
 
 // Load rewards from API and render them dynamically
@@ -3179,11 +3194,11 @@ async function refreshPoints() {
     console.error("Error refreshing points:", error);
 
     // Show user-friendly message
-    const errorMessage = error.message.includes("login")
-      ? "⚠️ Silakan login untuk melihat poin Anda"
-      : "❌ Gagal memuat poin terbaru";
-
-    alert(errorMessage);
+    if (error.message.includes("login")) {
+      showWarning("Silakan login untuk melihat poin Anda");
+    } else {
+      showError("Gagal memuat poin terbaru");
+    }
 
     // Restore previous value or show 0
     if (pointsBigEl && pointsBigEl.textContent.includes("loader")) {
@@ -3350,7 +3365,7 @@ function checkIn(locationId) {
 
   // Tambah 5 points untuk check-in
   addPoints(5);
-  alert(`Check-in berhasil di ${loc.name}! +5 points`);
+  showSuccess(`Check-in berhasil di ${loc.name}! +5 points`, "Check-in Berhasil");
 }
 
 // Set pickup location
@@ -3377,7 +3392,7 @@ function setPickup(locationId) {
     }
   }
 
-  alert(`Lokasi pickup diset ke ${loc.name}`);
+  showSuccess(`Lokasi pickup diset ke ${loc.name}`, "Pickup Location Set");
 }
 
 // Initialize store page
