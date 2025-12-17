@@ -89,11 +89,19 @@ CREATE TABLE IF NOT EXISTS articles (
   content TEXT NOT NULL,
   excerpt TEXT,
   tags VARCHAR(500),
+  category VARCHAR(100) DEFAULT NULL,
+  header_image VARCHAR(500) DEFAULT NULL,
+  author VARCHAR(100) DEFAULT 'Admin',
+  views INT DEFAULT 0,
+  article_type ENUM('general', 'product') NOT NULL DEFAULT 'general',
+  product_id INT DEFAULT NULL,
   is_published TINYINT(1) DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_slug (slug),
-  INDEX idx_published (is_published)
+  INDEX idx_published (is_published),
+  INDEX idx_article_type (article_type),
+  INDEX idx_product_id (product_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Buat tabel coupons

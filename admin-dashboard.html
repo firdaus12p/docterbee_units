@@ -407,6 +407,40 @@
                   </p>
                 </div>
                 
+                <!-- Tipe Artikel -->
+                <div>
+                  <label class="block text-sm mb-2">Tipe Artikel</label>
+                  <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="articleType" id="articleTypeGeneral" value="general" checked 
+                        class="w-4 h-4 accent-amber-400" onchange="toggleProductSelect()">
+                      <span class="text-sm">Umum</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="articleType" id="articleTypeProduct" value="product" 
+                        class="w-4 h-4 accent-amber-400" onchange="toggleProductSelect()">
+                      <span class="text-sm">Untuk Produk</span>
+                    </label>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Pilih "Untuk Produk" jika artikel ini adalah informasi terkait produk tertentu
+                  </p>
+                </div>
+
+                <!-- Pilihan Produk (hidden by default) -->
+                <div id="productSelectContainer" class="hidden">
+                  <label class="block text-sm mb-2">Pilih Produk <span class="text-red-400">*</span></label>
+                  <select id="articleProductId" 
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none">
+                    <option value="">-- Pilih Produk --</option>
+                    <!-- Options loaded dynamically -->
+                  </select>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Artikel ini akan ditampilkan sebagai tombol "Baca Artikel" di halaman Store untuk produk yang dipilih
+                  </p>
+                </div>
+                
+                
                 <div class="flex gap-2">
                   <button
                     type="submit"

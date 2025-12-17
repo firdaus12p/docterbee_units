@@ -189,8 +189,11 @@ async function initializeTables() {
         content LONGTEXT NOT NULL,
         excerpt TEXT,
         header_image VARCHAR(500) DEFAULT NULL,
-        category ENUM('Nutrisi', 'Ibadah', 'Kebiasaan', 'Sains') NOT NULL,
+        tags VARCHAR(500) DEFAULT NULL,
+        category VARCHAR(100) DEFAULT NULL,
         author VARCHAR(100) DEFAULT 'Admin',
+        article_type ENUM('general', 'product') NOT NULL DEFAULT 'general',
+        product_id INT DEFAULT NULL,
         is_published TINYINT(1) DEFAULT 1,
         views INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -198,7 +201,9 @@ async function initializeTables() {
         INDEX idx_slug (slug),
         INDEX idx_category (category),
         INDEX idx_published (is_published),
-        INDEX idx_created (created_at)
+        INDEX idx_created (created_at),
+        INDEX idx_article_type (article_type),
+        INDEX idx_product_id (product_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: articles");
@@ -300,11 +305,93 @@ async function initializeTables() {
     console.log("✅ Table: reward_redemptions");
 
     console.log("📦 All tables initialized successfully");
+    
+    // Run migrations for existing tables
+    await runMigrations(connection);
   } catch (error) {
     console.error("❌ Error initializing tables:", error.message);
     throw error;
   } finally {
     connection.release();
+  }
+}
+
+// Run migrations for existing tables (idempotent - safe to run multiple times)
+async function runMigrations(connection) {
+  console.log("🔄 Running migrations...");
+  
+  try {
+    // Migration: Add article_type column to articles table
+    await safeAddColumn(connection, 'articles', 'article_type', 
+      "ENUM('general', 'product') NOT NULL DEFAULT 'general' AFTER category");
+    
+    // Migration: Add product_id column to articles table
+    await safeAddColumn(connection, 'articles', 'product_id', 
+      'INT DEFAULT NULL AFTER article_type');
+    
+    // Migration: Add tags column to articles table (if missing)
+    await safeAddColumn(connection, 'articles', 'tags', 
+      'VARCHAR(500) DEFAULT NULL AFTER header_image');
+    
+    // Migration: Add index for article_type
+    await safeAddIndex(connection, 'articles', 'idx_article_type', 'article_type');
+    
+    // Migration: Add index for product_id
+    await safeAddIndex(connection, 'articles', 'idx_product_id', 'product_id');
+    
+    // Migration: Add member_price to products table
+    await safeAddColumn(connection, 'products', 'member_price', 
+      'DECIMAL(10, 2) DEFAULT NULL AFTER price');
+    
+    // Migration: Add promo_text to products table  
+    await safeAddColumn(connection, 'products', 'promo_text', 
+      'VARCHAR(255) DEFAULT NULL AFTER member_price');
+    
+    console.log("✅ Migrations completed");
+  } catch (error) {
+    console.error("❌ Migration error:", error.message);
+    // Don't throw - migrations failing shouldn't stop the server
+  }
+}
+
+// Helper: Safely add column if it doesn't exist
+async function safeAddColumn(connection, table, column, definition) {
+  try {
+    const [columns] = await connection.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+      [table, column]
+    );
+    
+    if (columns.length === 0) {
+      await connection.query(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+      console.log(`  ✅ Added column: ${table}.${column}`);
+    }
+  } catch (error) {
+    // Ignore if column already exists
+    if (!error.message.includes('Duplicate column')) {
+      console.error(`  ⚠️ Could not add column ${table}.${column}:`, error.message);
+    }
+  }
+}
+
+// Helper: Safely add index if it doesn't exist
+async function safeAddIndex(connection, table, indexName, column) {
+  try {
+    const [indexes] = await connection.query(
+      `SHOW INDEX FROM ${table} WHERE Key_name = ?`,
+      [indexName]
+    );
+    
+    if (indexes.length === 0) {
+      await connection.query(`ALTER TABLE ${table} ADD INDEX ${indexName} (${column})`);
+      console.log(`  ✅ Added index: ${table}.${indexName}`);
+    }
+  } catch (error) {
+    // Ignore if index already exists
+    if (!error.message.includes('Duplicate key name')) {
+      console.error(`  ⚠️ Could not add index ${table}.${indexName}:`, error.message);
+    }
   }
 }
 

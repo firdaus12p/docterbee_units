@@ -761,6 +761,40 @@ function openArticleModal(id = null) {
 
 function closeArticleModal() {
   document.getElementById("articleModal").classList.add("hidden");
+  // Reset product select state
+  document.getElementById("productSelectContainer").classList.add("hidden");
+  document.getElementById("articleTypeGeneral").checked = true;
+}
+
+// Toggle product select visibility based on article type
+function toggleProductSelect() {
+  const container = document.getElementById("productSelectContainer");
+  const isProduct = document.getElementById("articleTypeProduct").checked;
+  container.classList.toggle("hidden", !isProduct);
+  if (isProduct) {
+    loadProductsForArticle();
+  }
+}
+
+// Load products for article dropdown
+async function loadProductsForArticle() {
+  const select = document.getElementById("articleProductId");
+  if (!select) return;
+  
+  // Check if already loaded
+  if (select.options.length > 1) return;
+  
+  try {
+    const response = await fetch(`${API_BASE}/products?is_active=1`);
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      select.innerHTML = '<option value="">-- Pilih Produk --</option>' + 
+        result.data.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    }
+  } catch (error) {
+    console.error("Error loading products for article:", error);
+  }
 }
 
 let isSubmittingArticle = false;
@@ -776,6 +810,18 @@ async function handleArticleSubmit(e) {
   submitBtn.textContent = "Menyimpan...";
 
   const id = document.getElementById("articleId").value;
+  const isProductType = document.getElementById("articleTypeProduct").checked;
+  const productId = isProductType ? document.getElementById("articleProductId").value : null;
+  
+  // Validate product selection if type is product
+  if (isProductType && !productId) {
+    alert("Silakan pilih produk untuk artikel tipe produk");
+    isSubmittingArticle = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    return;
+  }
+  
   const data = {
     title: document.getElementById("articleTitle").value,
     slug: document.getElementById("articleSlug").value,
@@ -784,6 +830,8 @@ async function handleArticleSubmit(e) {
     tags: document.getElementById("articleTags").value,
     category: document.getElementById("articleCategory").value || null,
     header_image: document.getElementById("insightHeaderImage").value || null,
+    article_type: isProductType ? "product" : "general",
+    product_id: productId,
   };
 
   try {
@@ -841,6 +889,19 @@ async function editArticle(id) {
       } else {
         // Hide preview if no image
         document.getElementById("insightHeaderImagePreview").classList.add("hidden");
+      }
+      
+      // Set article type and product
+      if (article.article_type === "product") {
+        document.getElementById("articleTypeProduct").checked = true;
+        await loadProductsForArticle();
+        document.getElementById("productSelectContainer").classList.remove("hidden");
+        if (article.product_id) {
+          document.getElementById("articleProductId").value = article.product_id;
+        }
+      } else {
+        document.getElementById("articleTypeGeneral").checked = true;
+        document.getElementById("productSelectContainer").classList.add("hidden");
       }
 
       openArticleModal(id);

@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const { limit = 20, offset = 0 } = req.query;
 
     const articles = await query(
-      `SELECT id, title, slug, excerpt, tags, created_at, updated_at 
+      `SELECT id, title, slug, excerpt, tags, category, article_type, product_id, created_at, updated_at 
        FROM articles 
        WHERE is_published = 1 
        ORDER BY created_at DESC 
@@ -58,6 +58,29 @@ router.get("/id/:id", async (req, res) => {
   }
 });
 
+// GET /api/insight/product/:productId - Get article by product ID
+router.get("/product/:productId", async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const article = await queryOne(
+      "SELECT * FROM articles WHERE product_id = ? AND is_published = 1",
+      [productId]
+    );
+
+    res.json({
+      success: true,
+      data: article || null,
+    });
+  } catch (error) {
+    console.error("Error fetching article by product:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil artikel produk",
+    });
+  }
+});
+
 // GET /api/insight/:slug - Get single article by slug
 router.get("/:slug", async (req, res) => {
   try {
@@ -91,7 +114,7 @@ router.get("/:slug", async (req, res) => {
 // POST /api/insight - Create new article (admin only)
 router.post("/", async (req, res) => {
   try {
-    const { title, slug, content, excerpt, tags, category, header_image } =
+    const { title, slug, content, excerpt, tags, category, header_image, article_type, product_id } =
       req.body;
 
     // Validation
@@ -113,11 +136,15 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Validate article_type
+    const validArticleType = article_type === "product" ? "product" : "general";
+    const validProductId = validArticleType === "product" && product_id ? parseInt(product_id) : null;
+
     // Insert article
     const result = await query(
       `INSERT INTO articles 
-       (title, slug, content, excerpt, tags, category, header_image)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       (title, slug, content, excerpt, tags, category, header_image, article_type, product_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         slug,
@@ -126,6 +153,8 @@ router.post("/", async (req, res) => {
         tags || null,
         category || null,
         header_image || null,
+        validArticleType,
+        validProductId,
       ]
     );
 
@@ -160,6 +189,8 @@ router.patch("/:id", async (req, res) => {
       category,
       header_image,
       isPublished,
+      article_type,
+      product_id,
     } = req.body;
 
     // Check if article exists
@@ -222,6 +253,15 @@ router.patch("/:id", async (req, res) => {
     if (isPublished !== undefined) {
       updates.push("is_published = ?");
       params.push(isPublished ? 1 : 0);
+    }
+    if (article_type !== undefined) {
+      const validArticleType = article_type === "product" ? "product" : "general";
+      updates.push("article_type = ?");
+      params.push(validArticleType);
+    }
+    if (product_id !== undefined) {
+      updates.push("product_id = ?");
+      params.push(product_id ? parseInt(product_id) : null);
     }
 
     if (updates.length === 0) {

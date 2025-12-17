@@ -2709,6 +2709,7 @@ async function loadProductsFromAPI() {
         description: product.description,
         image: product.image_url,
         stock: product.stock,
+        article_slug: product.article_slug || null,
       }));
       return true;
     }
@@ -2876,6 +2877,15 @@ async function filterStoreCategory(category) {
                 : `<span class="text-xs text-red-500 font-semibold">Stok Habis</span>`
             }
           </div>
+          ${
+            p.article_slug
+              ? `<a href="/article?slug=${encodeURIComponent(p.article_slug)}" 
+                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 text-sm font-semibold transition-all">
+                   <i data-lucide="book-open" class="w-4 h-4"></i>
+                   Baca Artikel
+                 </a>`
+              : ""
+          }
         </div>
       </div>
     </div>

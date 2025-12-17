@@ -8,24 +8,26 @@ router.get("/", async (req, res) => {
   try {
     const { category, is_active } = req.query;
 
-    let sql = "SELECT * FROM products WHERE 1=1";
+    let sql = `SELECT p.*, 
+      (SELECT a.slug FROM articles a WHERE a.product_id = p.id AND a.is_published = 1 LIMIT 1) as article_slug
+    FROM products p WHERE 1=1`;
     const params = [];
 
     // Filter by category
     if (category && category !== "all") {
-      sql += " AND category = ?";
+      sql += " AND p.category = ?";
       params.push(category);
     }
 
     // Filter by active status (default: only active)
     if (is_active !== undefined) {
-      sql += " AND is_active = ?";
+      sql += " AND p.is_active = ?";
       params.push(is_active === "true" || is_active === "1" ? 1 : 0);
     } else {
-      sql += " AND is_active = 1"; // Default: only show active products
+      sql += " AND p.is_active = 1"; // Default: only show active products
     }
 
-    sql += " ORDER BY created_at DESC";
+    sql += " ORDER BY p.created_at DESC";
 
     const products = await query(sql, params);
 
