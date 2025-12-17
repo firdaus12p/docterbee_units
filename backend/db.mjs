@@ -52,6 +52,7 @@ async function initializeTables() {
         name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL UNIQUE,
         phone VARCHAR(20) NOT NULL UNIQUE,
+        card_type ENUM('Active-Worker', 'Family-Member', 'Healthy-Smart-Kids', 'Mums-Baby', 'New-Couple', 'Pregnant-Preparation', 'Senja-Ceria') DEFAULT 'Active-Worker',
         password VARCHAR(255) NOT NULL,
         is_active TINYINT(1) DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -364,6 +365,10 @@ async function runMigrations(connection) {
     // Migration: Add customer_address to orders table
     await safeAddColumn(connection, 'orders', 'customer_address', 
       'TEXT DEFAULT NULL AFTER customer_phone');
+    
+    // Migration: Add card_type to users table
+    await safeAddColumn(connection, 'users', 'card_type', 
+      "ENUM('Active-Worker', 'Family-Member', 'Healthy-Smart-Kids', 'Mums-Baby', 'New-Couple', 'Pregnant-Preparation', 'Senja-Ceria') DEFAULT 'Active-Worker' AFTER phone");
     
     console.log("✅ Migrations completed");
   } catch (error) {

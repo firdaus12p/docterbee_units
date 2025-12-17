@@ -2805,7 +2805,8 @@ function renderProductPricing(product) {
 }
 
 // Add product to cart (wrapper function for store)
-// eslint-disable-next-line no-unused-vars
+// showToast is defined in store-cart.js which loads after this file
+/* global showToast */
 function addToCart(productId) {
   const product = PRODUCTS.find((p) => p.id === parseInt(productId));
   
@@ -2958,54 +2959,9 @@ function getCategoryLabel(cat) {
   return labels[cat] || cat;
 }
 
-// Add product to cart (Updated to use store-cart.js)
-function addToCart(productId) {
-  // Convert productId to number if it's a string
-  const numId = typeof productId === "string" ? parseInt(productId) : productId;
+// Duplicate addToCart function removed - using the one defined at line 2810
 
-  // Try to find product with both number and string comparison
-  const product = PRODUCTS.find((p) => p.id === numId || p.id === productId || p.id == productId);
 
-  // Debug log
-  console.log("Looking for product ID:", productId, "converted to:", numId);
-  console.log("Product found:", product);
-  console.log("PRODUCTS array:", PRODUCTS);
-  console.log(
-    "Product IDs in array:",
-    PRODUCTS.map((p) => ({ id: p.id, type: typeof p.id }))
-  );
-
-  if (!product) {
-    console.error("Product not found with ID:", productId);
-    alert("Product tidak ditemukan. ID: " + productId);
-    return;
-  }
-
-  // Determine price to use: member price if logged in and available, otherwise normal price
-  const priceToUse = isUserLoggedIn && product.member_price ? product.member_price : product.price;
-
-  // Call the new addToStoreCart from store-cart.js
-  if (typeof window.addToStoreCart === "function") {
-    window.addToStoreCart(product.id, product.name, priceToUse, product.image);
-  } else {
-    console.error("addToStoreCart function not found");
-  }
-
-  // Show feedback
-  const btn = event.target.closest("button");
-  if (btn) {
-    const original = btn.innerHTML;
-    btn.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> OK';
-    btn.classList.add("bg-emerald-600");
-    setTimeout(() => {
-      btn.innerHTML = original;
-      btn.classList.remove("bg-emerald-600");
-      if (typeof lucide !== "undefined" && lucide.createIcons) {
-        lucide.createIcons();
-      }
-    }, 800);
-  }
-}
 
 // Update cart display in locator section
 function updateCartDisplay() {

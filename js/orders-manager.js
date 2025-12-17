@@ -206,7 +206,7 @@ function closeQRScanner() {
   }
 }
 
-async function onScanSuccess(decodedText, decodedResult) {
+async function onScanSuccess(decodedText, _decodedResult) {
   console.log(`QR Code scanned: ${decodedText}`);
 
   // Stop scanner
@@ -216,7 +216,7 @@ async function onScanSuccess(decodedText, decodedResult) {
   await viewOrderDetails(decodedText);
 }
 
-function onScanError(errorMessage) {
+function onScanError(_errorMessage) {
   // Ignore scan errors (happens frequently)
 }
 
