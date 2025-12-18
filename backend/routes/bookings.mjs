@@ -206,7 +206,7 @@ router.post("/", async (req, res) => {
         // Insert into coupon_usage to track one-time usage per user
         await query(
           `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
-           VALUES (?, ?, 'service', ?)`,
+           VALUES (?, ?, 'services', ?)`,
           [userId, coupon.id, result.insertId]
         );
       }
