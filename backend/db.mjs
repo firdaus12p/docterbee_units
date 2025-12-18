@@ -167,12 +167,14 @@ async function initializeTables() {
         min_booking_value DECIMAL(10, 2) DEFAULT 0,
         max_uses INT DEFAULT NULL,
         used_count INT DEFAULT 0,
+        coupon_type ENUM('store', 'services', 'both') DEFAULT 'both' COMMENT 'Where coupon can be used',
         is_active TINYINT(1) DEFAULT 1,
         expires_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_code (code),
-        INDEX idx_active (is_active)
+        INDEX idx_active (is_active),
+        INDEX idx_type (coupon_type)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Table: coupons");
@@ -407,29 +409,15 @@ async function runMigrations(connection) {
     await safeAddColumn(connection, 'users', 'card_type', 
       "ENUM('Active-Worker', 'Family-Member', 'Healthy-Smart-Kids', 'Mums-Baby', 'New-Couple', 'Pregnant-Preparation', 'Senja-Ceria') DEFAULT 'Active-Worker' AFTER phone");
     
-    // Migration: Create coupons table if not exists
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS coupons (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        code VARCHAR(50) NOT NULL UNIQUE,
-        description TEXT,
-        discount_type ENUM('percentage', 'fixed') NOT NULL DEFAULT 'percentage',
-        discount_value DECIMAL(10, 2) NOT NULL,
-        min_booking_value DECIMAL(10, 2) DEFAULT 0,
-        max_uses INT DEFAULT NULL COMMENT 'NULL = unlimited',
-        used_count INT DEFAULT 0,
-        expires_at TIMESTAMP NULL,
-        coupon_type ENUM('store', 'services', 'both') DEFAULT 'both' COMMENT 'Where coupon can be used',
-        is_active TINYINT(1) DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_code (code),
-        INDEX idx_active (is_active),
-        INDEX idx_expires (expires_at),
-        INDEX idx_type (coupon_type)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
-    console.log("✅ Migration: coupons table");
+    // Migration: Add coupon_type to coupons table (for existing tables that don't have it)
+    await safeAddColumn(connection, 'coupons', 'coupon_type',
+      "ENUM('store', 'services', 'both') DEFAULT 'both' COMMENT 'Where coupon can be used' AFTER used_count");
+    
+    // Migration: Add index for coupon_type
+    await safeAddIndex(connection, 'coupons', 'idx_type', 'coupon_type');
+    
+    // Note: coupons table is already created in initializeTables()
+    // The safeAddColumn above handles adding coupon_type to existing tables
     
     // Migration: Create coupon_usage table if not exists
     await connection.query(`
