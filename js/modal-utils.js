@@ -7,6 +7,11 @@
 // MODAL HTML STRUCTURE (Auto-inject on first use)
 // ============================================
 
+// Track timeouts and handlers to prevent race conditions when new modal is shown
+let modalAutoCloseTimeout = null;
+let modalEscHandler = null;
+let modalCloseAnimationTimeout = null; // Track close animation timeout
+
 function ensureModalContainer() {
   if (document.getElementById("customModalContainer")) return;
 
@@ -47,6 +52,26 @@ function ensureModalContainer() {
 function showModal(options) {
   ensureModalContainer();
 
+  // Clear any existing timeouts from previous modal
+  // This prevents race conditions when a new modal is shown before the old timeout fires
+  if (modalAutoCloseTimeout) {
+    clearTimeout(modalAutoCloseTimeout);
+    modalAutoCloseTimeout = null;
+  }
+  
+  // Clear close animation timeout - THIS IS THE KEY FIX
+  // Without this, the 200ms hide timeout from previous closeModal() would hide the new modal
+  if (modalCloseAnimationTimeout) {
+    clearTimeout(modalCloseAnimationTimeout);
+    modalCloseAnimationTimeout = null;
+  }
+  
+  // Remove any existing ESC key handler
+  if (modalEscHandler) {
+    document.removeEventListener("keydown", modalEscHandler);
+    modalEscHandler = null;
+  }
+
   const {
     title = "Notification",
     message = "",
@@ -56,6 +81,7 @@ function showModal(options) {
     onConfirm = null,
     onCancel = null,
     showCancel = false,
+    autoCloseDelay = 5000, // Default 5 seconds (increased from 3s for better readability)
   } = options;
 
   const container = document.getElementById("customModalContainer");
@@ -156,21 +182,22 @@ function showModal(options) {
     }
   };
 
-  // Close on ESC key
-  const escHandler = (e) => {
+  // Close on ESC key - store handler reference for cleanup
+  modalEscHandler = (e) => {
     if (e.key === "Escape") {
       closeModal();
       if (onCancel) onCancel();
-      document.removeEventListener("keydown", escHandler);
     }
   };
-  document.addEventListener("keydown", escHandler);
+  document.addEventListener("keydown", modalEscHandler);
 
-  // Auto-close after 3 seconds for alert types (not confirm)
-  if (type !== "confirm") {
-    setTimeout(() => {
+  // Auto-close after specified delay for alert types (not confirm)
+  // Default is 5 seconds for better readability
+  // Store timeout reference so it can be cleared if a new modal is shown
+  if (type !== "confirm" && autoCloseDelay > 0) {
+    modalAutoCloseTimeout = setTimeout(() => {
       closeModal();
-    }, 3000);
+    }, autoCloseDelay);
   }
 }
 
@@ -180,10 +207,24 @@ function closeModal() {
 
   if (!container || !box) return;
 
+  // Clear auto-close timeout
+  if (modalAutoCloseTimeout) {
+    clearTimeout(modalAutoCloseTimeout);
+    modalAutoCloseTimeout = null;
+  }
+
+  // Remove ESC key handler
+  if (modalEscHandler) {
+    document.removeEventListener("keydown", modalEscHandler);
+    modalEscHandler = null;
+  }
+
   box.classList.remove("scale-100", "opacity-100");
   box.classList.add("scale-95", "opacity-0");
 
-  setTimeout(() => {
+  // Use tracked timeout so it can be cancelled if a new modal is shown immediately
+  // This is critical to prevent race conditions
+  modalCloseAnimationTimeout = setTimeout(() => {
     container.classList.add("hidden");
     container.style.display = "none";
   }, 200);

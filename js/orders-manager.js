@@ -623,8 +623,8 @@ async function submitAssignPoints() {
     }
 
     // Success
-    alert(
-      `✅ ${result.message}\n\n${result.data.points_added} points berhasil diberikan ke ${result.data.user.name}`
+    showSuccess(
+      `${result.message}\n\n${result.data.points_added} points berhasil diberikan ke ${result.data.user.name}`
     );
 
     closeAssignPointsModal();

@@ -944,10 +944,11 @@ function showToast(message, type = "success") {
 
   document.body.appendChild(toast);
 
+  // Display for 5 seconds (increased from 3s for better readability)
   setTimeout(() => {
     toast.style.opacity = "0";
     setTimeout(() => toast.remove(), 300);
-  }, 3000);
+  }, 5000);
 }
 
 // ============================================

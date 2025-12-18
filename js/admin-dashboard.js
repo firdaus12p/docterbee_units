@@ -1431,11 +1431,11 @@ function showSuccessModal(message) {
       content.classList.add("scale-100", "opacity-100");
     }, 10);
 
-    // Auto close after 2 seconds
+    // Auto close after 4 seconds (increased from 2s for better readability)
     if (successTimeout) clearTimeout(successTimeout);
     successTimeout = setTimeout(() => {
       closeSuccessModal();
-    }, 2000);
+    }, 4000);
 
     // Close on click outside
     modal.onclick = (e) => {
