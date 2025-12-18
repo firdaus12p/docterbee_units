@@ -64,6 +64,43 @@ async function initializeTables() {
     `);
     console.log("✅ Table: users");
 
+    // Create admins table for admin authentication
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS admins (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL COMMENT 'bcrypt hashed password',
+        email VARCHAR(100) DEFAULT NULL,
+        role ENUM('super-admin', 'admin', 'moderator') DEFAULT 'admin',
+        is_active TINYINT(1) DEFAULT 1,
+        last_login TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_username (username),
+        INDEX idx_role (role),
+        INDEX idx_active (is_active)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: admins");
+
+    // Create admin_login_history table for audit log
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS admin_login_history (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        admin_id INT DEFAULT NULL COMMENT 'NULL for failed attempts when admin not found',
+        username VARCHAR(50) NOT NULL,
+        ip_address VARCHAR(45) DEFAULT NULL,
+        user_agent TEXT DEFAULT NULL,
+        login_status ENUM('success', 'failed') NOT NULL,
+        login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE SET NULL,
+        INDEX idx_admin_id (admin_id),
+        INDEX idx_login_at (login_at),
+        INDEX idx_status (login_status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: admin_login_history");
+
     // Create bookings table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS bookings (
@@ -461,8 +498,21 @@ async function safeAddIndex(connection, table, indexName, column) {
 // Execute query helper
 async function query(sql, params) {
   try {
-    const [results] = await pool.execute(sql, params);
-    return results;
+    // Transaction control statements don't support prepared statement protocol
+    // Use pool.query() for these commands instead of pool.execute()
+    const transactionCommands = ['START TRANSACTION', 'COMMIT', 'ROLLBACK', 'BEGIN'];
+    const sqlTrimmed = sql.trim().toUpperCase();
+    const isTransactionCommand = transactionCommands.some(cmd => sqlTrimmed.startsWith(cmd));
+    
+    if (isTransactionCommand) {
+      // Use query() for transaction commands (no prepared statements)
+      const [results] = await pool.query(sql, params);
+      return results;
+    } else {
+      // Use execute() for regular queries (with prepared statements)
+      const [results] = await pool.execute(sql, params);
+      return results;
+    }
   } catch (error) {
     console.error("❌ Query error:", error.message);
     throw error;

@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Innertube } from "youtubei.js";
-import { testConnection, initializeTables } from "./db.mjs";
+import { testConnection, initializeTables, query, queryOne } from "./db.mjs";
 import authRouter from "./routes/auth.mjs";
 import bookingsRouter from "./routes/bookings.mjs";
 import eventsRouter from "./routes/events.mjs";
@@ -20,6 +20,7 @@ import ordersRouter from "./routes/orders.mjs";
 import usersRouter from "./routes/users.mjs";
 import userDataRouter from "./routes/user-data.mjs";
 import rewardsRouter from "./routes/rewards.mjs";
+import bcrypt from "bcrypt";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -167,22 +168,13 @@ cleanUrlPages.forEach((page) => {
   });
 });
 
+
 // ============================================
-// ADMIN AUTHENTICATION
+// ADMIN AUTHENTICATION (Database-based with bcrypt)
 // ============================================
 
-// Admin credentials from environment variables (NO FALLBACK - MUST BE IN .env)
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
-if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
-  console.error("❌ ADMIN_USERNAME and ADMIN_PASSWORD must be set in .env file!");
-  console.error("   Copy .env.example to .env and set admin credentials.");
-  process.exit(1);
-}
-
-// POST /api/admin/login - Admin login
-app.post("/api/admin/login", (req, res) => {
+// POST /api/admin/login - Admin login with database authentication
+app.post("/api/admin/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -193,22 +185,69 @@ app.post("/api/admin/login", (req, res) => {
       });
     }
 
-    // Validate credentials against environment variables
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Set admin session
-      req.session.isAdmin = true;
-      req.session.adminUsername = username;
+    // Query admin from database
+    const admin = await queryOne(
+      "SELECT * FROM admins WHERE username = ? AND is_active = 1",
+      [username]
+    );
 
-      res.json({
-        success: true,
-        message: "Admin login berhasil",
-      });
-    } else {
-      res.status(401).json({
+    if (!admin) {
+      // Log failed attempt (admin not found) - use NULL for admin_id
+      await query(
+        `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
+         VALUES (NULL, ?, ?, ?, 'failed')`,
+        [username, req.ip, req.get("user-agent")]
+      );
+
+      return res.status(401).json({
         success: false,
         error: "Username atau password salah",
       });
     }
+
+    // Verify password with bcrypt
+    const passwordMatch = await bcrypt.compare(password, admin.password);
+
+    if (!passwordMatch) {
+      // Log failed attempt (wrong password)
+      await query(
+        `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
+         VALUES (?, ?, ?, ?, 'failed')`,
+        [admin.id, username, req.ip, req.get("user-agent")]
+      );
+
+      return res.status(401).json({
+        success: false,
+        error: "Username atau password salah",
+      });
+    }
+
+    // Update last_login timestamp
+    await query("UPDATE admins SET last_login = NOW() WHERE id = ?", [admin.id]);
+
+    // Log successful login
+    await query(
+      `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
+       VALUES (?, ?, ?, ?, 'success')`,
+      [admin.id, username, req.ip, req.get("user-agent")]
+    );
+
+    // Set admin session
+    req.session.isAdmin = true;
+    req.session.adminId = admin.id;
+    req.session.adminUsername = admin.username;
+    req.session.adminRole = admin.role;
+
+    res.json({
+      success: true,
+      message: "Admin login berhasil",
+      admin: {
+        id: admin.id,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role,
+      },
+    });
   } catch (error) {
     console.error("Admin login error:", error);
     res.status(500).json({
