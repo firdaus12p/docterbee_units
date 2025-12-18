@@ -291,15 +291,25 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/insight/:id - Delete article (admin only)
+// DELETE /api/insight/:id - Delete article permanently (admin only)
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if article exists
-    const existing = await queryOne("SELECT id FROM articles WHERE id = ?", [
-      id,
-    ]);
+    // Validate ID is a number
+    const articleId = parseInt(id);
+    if (isNaN(articleId) || articleId <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "ID artikel tidak valid",
+      });
+    }
+
+    // Check if article exists and get header_image for potential cleanup
+    const existing = await queryOne(
+      "SELECT id, title, header_image FROM articles WHERE id = ?",
+      [articleId]
+    );
     if (!existing) {
       return res.status(404).json({
         success: false,
@@ -307,12 +317,15 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Soft delete by setting is_published = 0
-    await query("UPDATE articles SET is_published = 0 WHERE id = ?", [id]);
+    // Hard delete - permanently remove from database
+    await query("DELETE FROM articles WHERE id = ?", [articleId]);
+
+    // Log deletion for audit trail
+    console.log(`📝 Article deleted: ID=${articleId}, Title="${existing.title}"`);
 
     res.json({
       success: true,
-      message: "Artikel berhasil dihapus",
+      message: "Artikel berhasil dihapus secara permanen",
     });
   } catch (error) {
     console.error("Error deleting article:", error);

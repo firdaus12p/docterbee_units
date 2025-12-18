@@ -10,7 +10,9 @@
     "lint": "eslint backend/**/*.mjs js/**/*.js --ignore-pattern node_modules",
     "lint:fix": "eslint backend/**/*.mjs js/**/*.js --fix --ignore-pattern node_modules",
     "test": "node --test tests/",
-    "migrate:seed-rewards": "node -e \"import('./backend/migrations/seed-default-rewards.mjs').then(m => m.up())\""
+    "migrate:seed-rewards": "node -e \"import('./backend/migrations/seed-default-rewards.mjs').then(m => m.up())\"",
+    "create-admin": "node backend/scripts/create-default-admin.mjs",
+    "setup": "npm run create-admin && npm run migrate:seed-rewards"
   },
   "keywords": [
     "docterbee",

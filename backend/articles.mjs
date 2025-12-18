@@ -191,18 +191,42 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/articles/:id - Delete article
+// DELETE /api/articles/:id - Delete article permanently
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const existing = await queryOne("SELECT id FROM articles WHERE id = ?", [id]);
-    if (!existing) {
-      return res.status(404).json({ success: false, error: "Article not found" });
+    // Validate ID is a number
+    const articleId = parseInt(id);
+    if (isNaN(articleId) || articleId <= 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "ID artikel tidak valid" 
+      });
     }
 
-    await query("DELETE FROM articles WHERE id = ?", [id]);
-    res.json({ success: true, message: "Article deleted successfully" });
+    // Check if article exists and get info for logging
+    const existing = await queryOne(
+      "SELECT id, title FROM articles WHERE id = ?", 
+      [articleId]
+    );
+    if (!existing) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Article not found" 
+      });
+    }
+
+    // Hard delete - permanently remove from database
+    await query("DELETE FROM articles WHERE id = ?", [articleId]);
+    
+    // Log deletion for audit trail
+    console.log(`📝 Article deleted: ID=${articleId}, Title="${existing.title}"`);
+
+    res.json({ 
+      success: true, 
+      message: "Article deleted successfully" 
+    });
   } catch (error) {
     console.error("Error deleting article:", error);
     res.status(500).json({ success: false, error: error.message });
