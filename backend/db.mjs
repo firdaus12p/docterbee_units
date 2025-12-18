@@ -419,18 +419,29 @@ async function runMigrations(connection) {
     // Note: coupons table is already created in initializeTables()
     // The safeAddColumn above handles adding coupon_type to existing tables
     
-    // Migration: Create coupon_usage table if not exists
+    // Migration: Add order_type to coupon_usage table
+    await safeAddColumn(connection, 'coupon_usage', 'order_type',
+      "ENUM('store', 'services') DEFAULT 'store' COMMENT 'Type of order this coupon was used for' AFTER coupon_id");
+    
+    // Migration: Add order_id to coupon_usage table
+    await safeAddColumn(connection, 'coupon_usage', 'order_id',
+      "INT DEFAULT NULL COMMENT 'ID of the order/booking this coupon was used for' AFTER order_type");
+    
+    // Migration: Create coupon_usage table if not exists (for fresh installs)
     await connection.query(`
       CREATE TABLE IF NOT EXISTS coupon_usage (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         coupon_id INT NOT NULL,
+        order_type ENUM('store', 'services') DEFAULT 'store' COMMENT 'Type of order this coupon was used for',
+        order_id INT DEFAULT NULL COMMENT 'ID of the order/booking this coupon was used for',
         used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE CASCADE,
-        UNIQUE KEY unique_user_coupon (user_id, coupon_id),
+        UNIQUE KEY unique_user_coupon_type (user_id, coupon_id, order_type),
         INDEX idx_user (user_id),
-        INDEX idx_coupon (coupon_id)
+        INDEX idx_coupon (coupon_id),
+        INDEX idx_order_type (order_type)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log("✅ Migration: coupon_usage table");
