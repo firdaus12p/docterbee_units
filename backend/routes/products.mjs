@@ -278,13 +278,25 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/products/:id - Soft delete product
+// DELETE /api/products/:id - Permanently delete product from database
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if product exists
-    const existingProduct = await queryOne("SELECT * FROM products WHERE id = ?", [id]);
+    // Validate ID
+    const productId = parseInt(id);
+    if (isNaN(productId) || productId <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "ID produk tidak valid",
+      });
+    }
+
+    // Check if product exists and get info for logging
+    const existingProduct = await queryOne(
+      "SELECT id, name FROM products WHERE id = ?",
+      [productId]
+    );
 
     if (!existingProduct) {
       return res.status(404).json({
@@ -293,12 +305,15 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Soft delete (set is_active = 0)
-    await query("UPDATE products SET is_active = 0 WHERE id = ?", [id]);
+    // Hard delete - permanently remove from database
+    await query("DELETE FROM products WHERE id = ?", [productId]);
+
+    // Log deletion for audit trail
+    console.log(`📝 Product deleted: ID=${productId}, Name="${existingProduct.name}"`);
 
     res.json({
       success: true,
-      message: "Produk berhasil dihapus",
+      message: "Produk berhasil dihapus secara permanen",
     });
   } catch (error) {
     console.error("Error deleting product:", error);

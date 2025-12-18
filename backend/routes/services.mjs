@@ -280,16 +280,26 @@ router.patch("/:id", async (req, res) => {
 
 /**
  * DELETE /api/services/:id
- * Soft delete service (set is_active = 0)
+ * Permanently delete service from database
  */
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if service exists
-    const existing = await queryOne("SELECT * FROM services WHERE id = ?", [
-      id,
-    ]);
+    // Validate ID
+    const serviceId = parseInt(id);
+    if (isNaN(serviceId) || serviceId <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "ID layanan tidak valid",
+      });
+    }
+
+    // Check if service exists and get info for logging
+    const existing = await queryOne(
+      "SELECT id, name FROM services WHERE id = ?",
+      [serviceId]
+    );
 
     if (!existing) {
       return res.status(404).json({
@@ -298,12 +308,15 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Soft delete
-    await query("UPDATE services SET is_active = 0 WHERE id = ?", [id]);
+    // Hard delete - permanently remove from database
+    await query("DELETE FROM services WHERE id = ?", [serviceId]);
+
+    // Log deletion for audit trail
+    console.log(`📝 Service deleted: ID=${serviceId}, Name="${existing.name}"`);
 
     res.json({
       success: true,
-      message: "Layanan berhasil dihapus",
+      message: "Layanan berhasil dihapus secara permanen",
     });
   } catch (error) {
     console.error("Error deleting service:", error);
