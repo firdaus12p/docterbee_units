@@ -10,6 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/card-preview.css" />
@@ -98,15 +99,10 @@
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
-    <header
-      class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200"
-    >
-      <div
-        class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
-      >
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
+      <div class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
         <a href="/" class="flex items-center gap-2">
-          <div class="logo-box"></div>
-          <span class="font-semibold">Docterbee</span>
+          <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="/" id="guestNavItem" class="nav-link">Beranda</a>
@@ -119,23 +115,27 @@
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
-          <span class="points-display" id="pointsDisplay" style="display: none;"> Points: <b id="pointsValue">0</b> </span>
-          <a href="/profile" id="profileBtn" class="nav-link active" style="display: none;" title="Profile">
+          <span class="points-display" id="pointsDisplay" style="display: none">
+            Points: <b id="pointsValue">0</b>
+          </span>
+          <a
+            href="/profile"
+            id="profileBtn"
+            class="nav-link active"
+            style="display: none"
+            title="Profile"
+          >
             <i data-lucide="user" class="w-5 h-5"></i>
           </a>
           <button
             id="logoutBtn"
             class="hidden md:block text-sm text-red-600 hover:text-red-700 font-semibold"
             aria-label="Logout"
-            style="display: none;"
+            style="display: none"
           >
             Logout
           </button>
-          <button
-            id="hamburgerBtn"
-            class="md:hidden hamburger-btn"
-            aria-label="Toggle menu"
-          >
+          <button id="hamburgerBtn" class="md:hidden hamburger-btn" aria-label="Toggle menu">
             <i data-lucide="menu" class="w-6 h-6"></i>
           </button>
         </div>
@@ -149,11 +149,7 @@
     <div id="mobileMenu" class="mobile-menu">
       <div class="mobile-menu-header">
         <span class="font-semibold">Menu</span>
-        <button
-          id="closeMobileMenu"
-          class="close-menu-btn"
-          aria-label="Close menu"
-        >
+        <button id="closeMobileMenu" class="close-menu-btn" aria-label="Close menu">
           <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
@@ -169,17 +165,17 @@
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
-        <span class="points-display" id="mobilePointsDisplay" style="display: none;">
+        <span class="points-display" id="mobilePointsDisplay" style="display: none">
           Points: <b id="mobileNavPoints">0</b>
         </span>
-        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none;">
+        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none">
           <i data-lucide="user" class="w-5 h-5 inline mr-2"></i>
           Profile
         </a>
         <button
           id="mobileLogoutBtn"
           class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
-          style="display: none;"
+          style="display: none"
         >
           Logout
         </button>
@@ -196,12 +192,12 @@
     <!-- Profile Content -->
     <main class="profile-container">
       <!-- Loading State -->
-      <div id="loadingState" style="text-align: center; padding: 3rem;">
+      <div id="loadingState" style="text-align: center; padding: 3rem">
         <p class="text-slate-600">Memuat data profile...</p>
       </div>
 
       <!-- Profile Content (Hidden initially) -->
-      <div id="profileContent" style="display: none;">
+      <div id="profileContent" style="display: none">
         <!-- Profile Header -->
         <div class="profile-header">
           <div class="profile-avatar" id="profileAvatar">U</div>
@@ -237,7 +233,7 @@
         <!-- Membership Card -->
         <div class="profile-info-card">
           <h2 class="text-xl font-bold mb-4">Kartu Member Anda</h2>
-          <div class="card-preview-container" style="display: block;">
+          <div class="card-preview-container" style="display: block">
             <div class="card-flip-wrapper" id="profileCardFlipWrapper">
               <!-- Front Face -->
               <div class="card-face card-face-front">
@@ -256,8 +252,18 @@
               </div>
             </div>
             <div class="card-flip-hint">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
               </svg>
               Klik kartu untuk melihat bagian belakang
             </div>
@@ -266,11 +272,9 @@
       </div>
 
       <!-- Error State -->
-      <div id="errorState" style="display: none; text-align: center; padding: 3rem;">
+      <div id="errorState" style="display: none; text-align: center; padding: 3rem">
         <p class="text-red-600 mb-4">Gagal memuat data profile. Silakan login terlebih dahulu.</p>
-        <button onclick="window.location.href='/login'" class="btn btn-primary">
-          Login
-        </button>
+        <button onclick="window.location.href='/login'" class="btn btn-primary">Login</button>
       </div>
     </main>
 
@@ -279,7 +283,8 @@
     <script>
       lucide.createIcons();
     </script>
-    <script src="js/modal-utils.js"></script>`r`n
+    <script src="js/modal-utils.js"></script>
+    `r`n
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
     <script src="js/app-navbar.js"></script>
@@ -288,65 +293,65 @@
     <script>
       // Card type mapping (same as register page)
       const cardTypeMapping = {
-        'Active-Worker': {
-          front: '/uploads/gambar_kartu/depan/Background-Active-Worker.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Active-Worker.png',
-          label: 'Active Worker'
+        "Active-Worker": {
+          front: "/uploads/gambar_kartu/depan/Background-Active-Worker.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Active-Worker.png",
+          label: "Active Worker",
         },
-        'Family-Member': {
-          front: '/uploads/gambar_kartu/depan/Background-Family-Member.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Family-Member.png',
-          label: 'Family Member'
+        "Family-Member": {
+          front: "/uploads/gambar_kartu/depan/Background-Family-Member.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Family-Member.png",
+          label: "Family Member",
         },
-        'Healthy-Smart-Kids': {
-          front: '/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Healthy-&-Smart-Kids.png',
-          label: 'Healthy & Smart Kids'
+        "Healthy-Smart-Kids": {
+          front: "/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Healthy-&-Smart-Kids.png",
+          label: "Healthy & Smart Kids",
         },
-        'Mums-Baby': {
-          front: '/uploads/gambar_kartu/depan/Background-Mums-&-Baby.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Mums-&-Baby.png',
-          label: 'Mums & Baby'
+        "Mums-Baby": {
+          front: "/uploads/gambar_kartu/depan/Background-Mums-&-Baby.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Mums-&-Baby.png",
+          label: "Mums & Baby",
         },
-        'New-Couple': {
-          front: '/uploads/gambar_kartu/depan/Background-New-Couple.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-New-Couple.png',
-          label: 'New Couple'
+        "New-Couple": {
+          front: "/uploads/gambar_kartu/depan/Background-New-Couple.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-New-Couple.png",
+          label: "New Couple",
         },
-        'Pregnant-Preparation': {
-          front: '/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Pregnant-Preparatiom.png',
-          label: 'Pregnant Preparation'
+        "Pregnant-Preparation": {
+          front: "/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Pregnant-Preparatiom.png",
+          label: "Pregnant Preparation",
         },
-        'Senja-Ceria': {
-          front: '/uploads/gambar_kartu/depan/Background-Senja-Ceria.png',
-          back: '/uploads/gambar_kartu/belakang/Tampilan-Belakang-Senja-Ceria.png',
-          label: 'Senja Ceria'
-        }
+        "Senja-Ceria": {
+          front: "/uploads/gambar_kartu/depan/Background-Senja-Ceria.png",
+          back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Senja-Ceria.png",
+          label: "Senja Ceria",
+        },
       };
 
       // Flip card on click
-      const profileCardFlipWrapper = document.getElementById('profileCardFlipWrapper');
-      profileCardFlipWrapper.addEventListener('click', function() {
-        this.classList.toggle('flipped');
+      const profileCardFlipWrapper = document.getElementById("profileCardFlipWrapper");
+      profileCardFlipWrapper.addEventListener("click", function () {
+        this.classList.toggle("flipped");
       });
 
       // Load profile data
       async function loadProfileData() {
         try {
           // Get user data
-          const response = await fetch('/api/auth/me', {
-            credentials: 'include'
+          const response = await fetch("/api/auth/me", {
+            credentials: "include",
           });
 
           if (!response.ok) {
-            throw new Error('Not authenticated');
+            throw new Error("Not authenticated");
           }
 
           const result = await response.json();
-          
+
           if (!result.success || !result.data) {
-            throw new Error('Failed to load profile');
+            throw new Error("Failed to load profile");
           }
 
           const user = result.data;
@@ -354,8 +359,8 @@
           // Get points data
           let points = 0;
           try {
-            const progressResponse = await fetch('/api/user-data/progress', {
-              credentials: 'include'
+            const progressResponse = await fetch("/api/user-data/progress", {
+              credentials: "include",
             });
             if (progressResponse.ok) {
               const progressData = await progressResponse.json();
@@ -364,104 +369,103 @@
               }
             }
           } catch (e) {
-            console.log('Could not load points:', e);
+            console.log("Could not load points:", e);
           }
 
           // Update UI
           displayProfileData(user, points);
 
           // Hide loading, show content
-          document.getElementById('loadingState').style.display = 'none';
-          document.getElementById('profileContent').style.display = 'block';
-
+          document.getElementById("loadingState").style.display = "none";
+          document.getElementById("profileContent").style.display = "block";
         } catch (error) {
-          console.error('Error loading profile:', error);
-          document.getElementById('loadingState').style.display = 'none';
-          document.getElementById('errorState').style.display = 'block';
+          console.error("Error loading profile:", error);
+          document.getElementById("loadingState").style.display = "none";
+          document.getElementById("errorState").style.display = "block";
         }
       }
 
       function displayProfileData(user, points) {
         // Get first letter for avatar
         const firstLetter = user.name.charAt(0).toUpperCase();
-        
+
         // Update header
-        document.getElementById('profileAvatar').textContent = firstLetter;
-        document.getElementById('profileName').textContent = user.name;
-        document.getElementById('profileEmail').textContent = user.email;
+        document.getElementById("profileAvatar").textContent = firstLetter;
+        document.getElementById("profileName").textContent = user.name;
+        document.getElementById("profileEmail").textContent = user.email;
 
         // Update info rows
-        document.getElementById('infoName').textContent = user.name;
-        document.getElementById('infoEmail').textContent = user.email;
-        document.getElementById('infoPhone').textContent = user.phone;
-        
+        document.getElementById("infoName").textContent = user.name;
+        document.getElementById("infoEmail").textContent = user.email;
+        document.getElementById("infoPhone").textContent = user.phone;
+
         // Update card type
-        const cardType = user.card_type || 'Active-Worker';
+        const cardType = user.card_type || "Active-Worker";
         const cardData = cardTypeMapping[cardType];
-        
+
         if (cardData) {
-          document.getElementById('infoCardType').textContent = cardData.label;
-          
+          document.getElementById("infoCardType").textContent = cardData.label;
+
           // Update card preview
-          document.getElementById('profileCardFrontImage').src = cardData.front;
-          document.getElementById('profileCardBackImage').src = cardData.back;
-          document.getElementById('profileCardNameDisplay').textContent = user.name;
-          document.getElementById('profileCardPhoneDisplay').textContent = user.phone;
-          document.getElementById('profileCardPointsDisplay').textContent = `${points} Points`;
-          
+          document.getElementById("profileCardFrontImage").src = cardData.front;
+          document.getElementById("profileCardBackImage").src = cardData.back;
+          document.getElementById("profileCardNameDisplay").textContent = user.name;
+          document.getElementById("profileCardPhoneDisplay").textContent = user.phone;
+          document.getElementById("profileCardPointsDisplay").textContent = `${points} Points`;
+
           // Apply smaller font and lower position for specific card types
-          const smallNameTypes = ['Mums-Baby', 'New-Couple', 'Pregnant-Preparation'];
-          const nameElement = document.getElementById('profileCardNameDisplay');
-          const infoElement = document.getElementById('profileCardInfo');
+          const smallNameTypes = ["Mums-Baby", "New-Couple", "Pregnant-Preparation"];
+          const nameElement = document.getElementById("profileCardNameDisplay");
+          const infoElement = document.getElementById("profileCardInfo");
           if (smallNameTypes.includes(cardType)) {
-            nameElement.classList.add('card-name-small');
-            if (infoElement) infoElement.classList.add('card-info-lower');
+            nameElement.classList.add("card-name-small");
+            if (infoElement) infoElement.classList.add("card-info-lower");
           } else {
-            nameElement.classList.remove('card-name-small');
-            if (infoElement) infoElement.classList.remove('card-info-lower');
+            nameElement.classList.remove("card-name-small");
+            if (infoElement) infoElement.classList.remove("card-info-lower");
           }
         }
 
         // Update points
-        document.getElementById('infoPoints').textContent = `${points} Points`;
-        
+        document.getElementById("infoPoints").textContent = `${points} Points`;
+
         // Update navbar points (desktop and mobile)
-        const pointsDisplay = document.getElementById('pointsDisplay');
-        const pointsValue = document.getElementById('pointsValue');
+        const pointsDisplay = document.getElementById("pointsDisplay");
+        const pointsValue = document.getElementById("pointsValue");
         if (pointsDisplay && pointsValue) {
           pointsValue.textContent = points;
-          pointsDisplay.style.display = 'block';
+          pointsDisplay.style.display = "block";
         }
 
-        const mobilePointsDisplay = document.getElementById('mobilePointsDisplay');
-        const mobileNavPoints = document.getElementById('mobileNavPoints');
+        const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
+        const mobileNavPoints = document.getElementById("mobileNavPoints");
         if (mobilePointsDisplay && mobileNavPoints) {
           mobileNavPoints.textContent = points;
-          mobilePointsDisplay.style.display = 'block';
+          mobilePointsDisplay.style.display = "block";
         }
 
         // Show profile and logout buttons
-        const profileBtn = document.getElementById('profileBtn');
-        const mobileProfileBtn = document.getElementById('mobileProfileBtn');
-        if (profileBtn) profileBtn.style.display = 'block';
-        if (mobileProfileBtn) mobileProfileBtn.style.display = 'block';
+        const profileBtn = document.getElementById("profileBtn");
+        const mobileProfileBtn = document.getElementById("mobileProfileBtn");
+        if (profileBtn) profileBtn.style.display = "block";
+        if (mobileProfileBtn) mobileProfileBtn.style.display = "block";
       }
 
       // Logout functionality (using handleLogout from script.js)
-      const logoutBtn = document.getElementById('logoutBtn');
-      const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+      const logoutBtn = document.getElementById("logoutBtn");
+      const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
 
       if (logoutBtn) {
-        logoutBtn.style.display = 'block';
-        if (typeof handleLogout === 'function') {
-          logoutBtn.addEventListener('click', handleLogout);
+        logoutBtn.style.display = "block";
+        if (typeof handleLogout === "function") {
+          logoutBtn.addEventListener("click", handleLogout);
         }
       }
 
       if (mobileLogoutBtn) {
-        mobileLogoutBtn.style.display = 'block';
-        if (typeof handleLogout === 'function') {
-          mobileLogoutBtn.addEventListener('click', handleLogout);
+        mobileLogoutBtn.style.display = "block";
+        if (typeof handleLogout === "function") {
+          mobileLogoutBtn.addEventListener("click", handleLogout);
         }
       }
 

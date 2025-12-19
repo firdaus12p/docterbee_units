@@ -180,12 +180,21 @@ header {
    Header Styles
    ======================================== */
 
+.logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
 .logo-box {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, #ea580c, #f97316);
-  animation: pulse 3s ease-in-out infinite;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 0.5rem;
+  background-image: url("../assets/images/logo-docterbee.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -204,9 +213,8 @@ header {
 }
 
 .logo-box:hover {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1);
   animation: none;
-  box-shadow: 0 0 20px rgba(234, 88, 12, 0.6);
 }
 
 .nav-link {

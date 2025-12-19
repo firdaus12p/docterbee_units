@@ -10,20 +10,16 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
-    <header
-      class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200"
-    >
-      <div
-        class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
-      >
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
+      <div class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
         <a href="#" class="flex items-center gap-2">
-          <div class="logo-box"></div>
-          <span class="font-semibold">Docterbee</span>
+          <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="/" id="guestNavItem" class="nav-link">Beranda</a>
@@ -36,23 +32,21 @@
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
-          <span class="points-display" id="pointsDisplay" style="display: none;"> Points: <b id="navPoints">0</b> </span>
-          <a href="/profile" id="profileBtn" class="nav-link" style="display: none;" title="Profile">
+          <span class="points-display" id="pointsDisplay" style="display: none">
+            Points: <b id="navPoints">0</b>
+          </span>
+          <a href="/profile" id="profileBtn" class="nav-link" style="display: none" title="Profile">
             <i data-lucide="user" class="w-5 h-5"></i>
           </a>
           <button
             id="logoutBtn"
             class="hidden md:block text-sm text-red-600 hover:text-red-700 font-semibold"
             aria-label="Logout"
-            style="display: none;"
+            style="display: none"
           >
             Logout
           </button>
-          <button
-            id="hamburgerBtn"
-            class="md:hidden hamburger-btn"
-            aria-label="Toggle menu"
-          >
+          <button id="hamburgerBtn" class="md:hidden hamburger-btn" aria-label="Toggle menu">
             <i data-lucide="menu" class="w-6 h-6"></i>
           </button>
         </div>
@@ -66,11 +60,7 @@
     <div id="mobileMenu" class="mobile-menu">
       <div class="mobile-menu-header">
         <span class="font-semibold">Menu</span>
-        <button
-          id="closeMobileMenu"
-          class="close-menu-btn"
-          aria-label="Close menu"
-        >
+        <button id="closeMobileMenu" class="close-menu-btn" aria-label="Close menu">
           <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
@@ -86,17 +76,17 @@
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
-        <span class="points-display" id="mobilePointsDisplay" style="display: none;">
+        <span class="points-display" id="mobilePointsDisplay" style="display: none">
           Points: <b id="mobileNavPoints">0</b>
         </span>
-        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none;">
+        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none">
           <i data-lucide="user" class="w-5 h-5 inline mr-2"></i>
           Profile
         </a>
         <button
           id="mobileLogoutBtn"
           class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
-          style="display: none;"
+          style="display: none"
         >
           Logout
         </button>
@@ -114,23 +104,16 @@
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <!-- Hero Section -->
       <section class="hero-section">
-        <div
-          class="flex flex-col md:flex-row md:items-end md:justify-between gap-4"
-        >
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <h1 class="text-2xl md:text-3xl font-bold">
-              Journey Hidup Sehat – 6 Unit
-            </h1>
+            <h1 class="text-2xl md:text-3xl font-bold">Journey Hidup Sehat – 6 Unit</h1>
             <p class="text-slate-900">
-              Qur'an–Sunnah × Sains × NBSN · Jawab pertanyaan harian, dapatkan
-              feedback & skor.
+              Qur'an–Sunnah × Sains × NBSN · Jawab pertanyaan harian, dapatkan feedback & skor.
             </p>
           </div>
           <div class="text-right">
             <div class="text-sm">Skor Total Harian</div>
-            <div class="text-3xl font-bold text-amber-300" id="totalScore">
-              —
-            </div>
+            <div class="text-3xl font-bold text-amber-300" id="totalScore">—</div>
             <button id="btnCalcAll" class="btn-calc-all">Hitung Total</button>
           </div>
         </div>
@@ -144,9 +127,7 @@
     </main>
 
     <!-- Footer -->
-    <footer
-      class="mt-10 border-t border-gray-200 text-center text-xs text-slate-500 py-6"
-    >
+    <footer class="mt-10 border-t border-gray-200 text-center text-xs text-slate-500 py-6">
       © <span id="year"></span> Docterbee
     </footer>
 

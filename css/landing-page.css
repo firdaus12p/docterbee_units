@@ -72,8 +72,7 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #0f172a;
   background-color: #f9fafb;
   line-height: 1.6;
@@ -124,6 +123,17 @@ nav {
 
 .logo:hover {
   transform: scale(1.05);
+}
+
+.logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-img {
+  transform: scale(1.1);
 }
 
 .logo span {
@@ -301,8 +311,7 @@ nav {
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease,
-    background-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
   white-space: nowrap;
   position: relative;
   overflow: hidden;
@@ -790,8 +799,6 @@ section.visible {
   color: #6b7280;
   line-height: 1.6;
 }
-
-
 
 /* ====== FOOTER ====== */
 footer {

@@ -10,21 +10,17 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation (Consistent with other pages) -->
-    <header
-      class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200"
-    >
-      <div
-        class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between"
-      >
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
+      <div class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
         <a href="/" class="flex items-center gap-2">
-          <div class="logo-box"></div>
-          <span class="font-semibold">Docterbee</span>
+          <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
         </a>
         <nav class="hidden md:flex gap-6 text-sm">
           <a href="/" id="guestNavItem" class="nav-link">Beranda</a>
@@ -37,23 +33,21 @@
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
-          <span class="points-display" id="pointsDisplay" style="display: none;"> Points: <b id="navPoints">0</b> </span>
-          <a href="/profile" id="profileBtn" class="nav-link" style="display: none;" title="Profile">
+          <span class="points-display" id="pointsDisplay" style="display: none">
+            Points: <b id="navPoints">0</b>
+          </span>
+          <a href="/profile" id="profileBtn" class="nav-link" style="display: none" title="Profile">
             <i data-lucide="user" class="w-5 h-5"></i>
           </a>
           <button
             id="logoutBtn"
             class="hidden md:block text-sm text-red-600 hover:text-red-700 font-semibold"
             aria-label="Logout"
-            style="display: none;"
+            style="display: none"
           >
             Logout
           </button>
-          <button
-            id="hamburgerBtn"
-            class="md:hidden hamburger-btn"
-            aria-label="Toggle menu"
-          >
+          <button id="hamburgerBtn" class="md:hidden hamburger-btn" aria-label="Toggle menu">
             <i data-lucide="menu" class="w-6 h-6"></i>
           </button>
         </div>
@@ -67,11 +61,7 @@
     <div id="mobileMenu" class="mobile-menu">
       <div class="mobile-menu-header">
         <span class="font-semibold">Menu</span>
-        <button
-          id="closeMobileMenu"
-          class="close-menu-btn"
-          aria-label="Close menu"
-        >
+        <button id="closeMobileMenu" class="close-menu-btn" aria-label="Close menu">
           <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
@@ -86,17 +76,17 @@
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
-        <span class="points-display" id="mobilePointsDisplay" style="display: none;">
+        <span class="points-display" id="mobilePointsDisplay" style="display: none">
           Points: <b id="mobileNavPoints">0</b>
         </span>
-        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none;">
+        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none">
           <i data-lucide="user" class="w-5 h-5 inline mr-2"></i>
           Profile
         </a>
         <button
           id="mobileLogoutBtn"
           class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
-          style="display: none;"
+          style="display: none"
         >
           Logout
         </button>
@@ -123,21 +113,15 @@
       <!-- Filter & Services Grid -->
       <div class="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
         <!-- Sidebar Filter -->
-        <aside
-          class="rounded-2xl border border-gray-200 bg-white p-5 text-sm h-fit"
-        >
-          <div
-            class="font-semibold mb-3 flex items-center gap-2 text-amber-500"
-          >
+        <aside class="rounded-2xl border border-gray-200 bg-white p-5 text-sm h-fit">
+          <div class="font-semibold mb-3 flex items-center gap-2 text-amber-500">
             <i data-lucide="filter" class="w-4 h-4"></i>
             Filter Layanan
           </div>
 
           <!-- Branch Filter -->
           <label class="block mb-3">
-            <span class="text-slate-900 text-xs mb-1 block font-medium"
-              >Cabang</span
-            >
+            <span class="text-slate-900 text-xs mb-1 block font-medium">Cabang</span>
             <select
               id="branchFilter"
               class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-400 focus:outline-none"
@@ -151,9 +135,7 @@
 
           <!-- Mode Filter -->
           <label class="block mb-3">
-            <span class="text-slate-900 text-xs mb-1 block font-medium"
-              >Mode</span
-            >
+            <span class="text-slate-900 text-xs mb-1 block font-medium">Mode</span>
             <select
               id="modeFilter"
               class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-400 focus:outline-none"
@@ -166,59 +148,29 @@
 
           <!-- Category Filter -->
           <div class="mt-4">
-            <div class="font-semibold mb-2 text-xs text-slate-900">
-              Kategori
-            </div>
+            <div class="font-semibold mb-2 text-xs text-slate-900">Kategori</div>
             <ul class="space-y-2">
               <li class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="catManual"
-                  checked
-                  class="rounded text-amber-400"
-                />
-                <label
-                  for="catManual"
-                  class="text-slate-900 text-sm cursor-pointer"
+                <input type="checkbox" id="catManual" checked class="rounded text-amber-400" />
+                <label for="catManual" class="text-slate-900 text-sm cursor-pointer"
                   >Manual Therapy</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="catKlinis"
-                  checked
-                  class="rounded text-amber-400"
-                />
-                <label
-                  for="catKlinis"
-                  class="text-slate-900 text-sm cursor-pointer"
+                <input type="checkbox" id="catKlinis" checked class="rounded text-amber-400" />
+                <label for="catKlinis" class="text-slate-900 text-sm cursor-pointer"
                   >Konsultasi Klinis</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="catNutrisi"
-                  checked
-                  class="rounded text-amber-400"
-                />
-                <label
-                  for="catNutrisi"
-                  class="text-slate-900 text-sm cursor-pointer"
+                <input type="checkbox" id="catNutrisi" checked class="rounded text-amber-400" />
+                <label for="catNutrisi" class="text-slate-900 text-sm cursor-pointer"
                   >Nutrisi & Gizi</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="catKeluarga"
-                  checked
-                  class="rounded text-amber-400"
-                />
-                <label
-                  for="catKeluarga"
-                  class="text-slate-900 text-sm cursor-pointer"
+                <input type="checkbox" id="catKeluarga" checked class="rounded text-amber-400" />
+                <label for="catKeluarga" class="text-slate-900 text-sm cursor-pointer"
                   >Keluarga & Parenting</label
                 >
               </li>
@@ -227,10 +179,7 @@
         </aside>
 
         <!-- Services Grid -->
-        <section
-          id="servicesGrid"
-          class="md:col-span-2 lg:col-span-3 grid gap-4 md:grid-cols-2"
-        >
+        <section id="servicesGrid" class="md:col-span-2 lg:col-span-3 grid gap-4 md:grid-cols-2">
           <!-- Services akan dimuat secara dinamis dari API -->
           <div class="md:col-span-2 text-center py-12">
             <div
@@ -243,12 +192,8 @@
     </main>
 
     <!-- Footer -->
-    <footer
-      class="mt-16 border-t border-gray-200 text-center text-xs text-slate-500 py-6"
-    >
-      <p>
-        © <span id="year"></span> Docterbee – Kesehatan berbasis Qur'an & Sunnah
-      </p>
+    <footer class="mt-16 border-t border-gray-200 text-center text-xs text-slate-500 py-6">
+      <p>© <span id="year"></span> Docterbee – Kesehatan berbasis Qur'an & Sunnah</p>
     </footer>
 
     <!-- Scripts -->
