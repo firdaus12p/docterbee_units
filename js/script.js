@@ -3195,7 +3195,7 @@ async function refreshPoints() {
 
     // Show user-friendly message
     if (error.message.includes("login")) {
-      showWarning("Silakan login untuk melihat poin Anda");
+      showWarning("Hanya Member yang dapat melihat poin, Silahkan daftar terlebih dahulu.");
     } else {
       showError("Gagal memuat poin terbaru");
     }
@@ -3339,15 +3339,15 @@ function renderLocations() {
           </div>
         </div>
       </div>
-      <div class="flex gap-2">
-        <button class="btn-secondary-sm flex-1" onclick="checkIn('${loc.id}')">
-          <i data-lucide="map-pin-check" class="w-3 h-3"></i>
-          Check-in
-        </button>
-        <button class="btn-primary-sm flex-1" onclick="setPickup('${loc.id}')">
-          <i data-lucide="shopping-bag" class="w-3 h-3"></i>
-          Pickup
-        </button>
+      <div class="mt-3">
+        <a href="https://maps.google.com/?q=${encodeURIComponent(loc.address)}" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="w-full inline-flex items-center justify-center gap-2 rounded-lg text-white px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90" 
+           style="background-color: #F66D14;">
+          <i data-lucide="map-pin" class="w-4 h-4"></i>
+          Lihat Lokasi
+        </a>
       </div>
     </div>
   `

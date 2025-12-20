@@ -25,7 +25,7 @@
           <a href="/" id="guestNavItem" class="nav-link">Beranda</a>
           <a href="/journey" class="nav-link">Journey</a>
           <a href="/services" class="nav-link">Services</a>
-          <a href="/store" class="nav-link">Store</a>
+          <a href="/store" class="nav-link">Produk</a>
           <a href="/events" class="nav-link">Events</a>
           <a href="/insight" class="nav-link">Insight</a>
           <a href="/media" class="nav-link">Media</a>
@@ -110,7 +110,7 @@
           NBSN.
         </p>
         <div
-          class="mt-4 inline-flex items-center gap-2 bg-emerald-400/10 border border-emerald-400/30 rounded-lg px-4 py-2 text-sm text-emerald-300"
+          class="mt-4 inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2 text-sm text-emerald-600"
         >
           <i data-lucide="sparkles" class="w-4 h-4"></i>
           <span>Powered by Gemini AI dengan fallback algoritma lokal</span>
@@ -124,7 +124,7 @@
           <label class="block text-sm font-semibold mb-2 opacity-80">Pertanyaan / Perilaku</label>
           <textarea
             id="questionInput"
-            class="w-full rounded-lg bg-slate-900/60 border border-slate-700 px-4 py-3 h-32 focus:border-amber-400 focus:outline-none transition"
+            class="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 h-32 text-slate-900 placeholder-slate-500 focus:border-amber-400 focus:outline-none transition"
             placeholder="Contoh: Saya sering begadang, jarang shalat malam, dan minum kopi manis 3 gelas sehari. Bagaimana menurut syariat dan kesehatan?"
             autocomplete="off"
           ></textarea>
@@ -263,19 +263,19 @@
         // Convert **bold** to <strong>
         html = html.replace(
           /\*\*(.+?)\*\*/g,
-          "<strong class='font-semibold text-slate-100'>$1</strong>"
+          "<strong class='font-semibold text-slate-900'>$1</strong>"
         );
 
         // Convert *italic* to <em> (only if not part of **bold**)
         html = html.replace(
           /(?<!\*)\*([^*]+?)\*(?!\*)/g,
-          "<em class='italic text-slate-200'>$1</em>"
+          "<em class='italic text-slate-700'>$1</em>"
         );
 
         // Convert `code` to <code>
         html = html.replace(
           /`(.+?)`/g,
-          "<code class='px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-sm font-mono'>$1</code>"
+          "<code class='px-1.5 py-0.5 rounded bg-gray-100 text-amber-600 text-sm font-mono'>$1</code>"
         );
 
         return html;
@@ -494,7 +494,7 @@
             <i data-lucide="${item.icon}" class="w-5 h-5 ${item.color} flex-shrink-0 mt-0.5"></i>
             <div>
               <div class="font-semibold mb-1">${item.label}</div>
-              <div class="text-slate-200/90">${markdownToHtml(item.content)}</div>
+              <div class="text-slate-600">${markdownToHtml(item.content)}</div>
             </div>
           </div>
         `
@@ -506,56 +506,56 @@
             <span class="rounded-lg px-3 py-1.5 text-sm font-bold ${badgeClass}">
               ${escapeHtml(verdict.status)}
             </span>
-            <span class="text-xs opacity-70">Skor: ${verdict.score}</span>
+            <span class="text-xs text-slate-700">Skor: ${verdict.score}</span>
             <span class="text-xs text-slate-400 ml-auto">✨ Powered by AI</span>
           </div>
 
           ${
             verdict.explanation
               ? `
-          <div class="mb-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-            <p class="text-sm text-slate-200">${markdownToHtml(verdict.explanation)}</p>
+          <div class="mb-4 p-3 rounded-lg bg-white border border-gray-200">
+            <p class="text-sm text-slate-900">${markdownToHtml(verdict.explanation)}</p>
           </div>
           `
               : ""
           }
 
           <div class="grid md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
-              <div class="font-semibold mb-3 flex items-center gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
                 <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
                 Langkah yang Disarankan
               </div>
-              <ul class="list-decimal pl-5 space-y-2 text-slate-200/90 text-sm">
+              <ul class="list-decimal pl-5 space-y-2 text-slate-900 text-sm">
                 ${stepsHtml}
               </ul>
             </div>
 
-            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
-              <div class="font-semibold mb-3 flex items-center gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
                 <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
                 Dalil Syar'i
               </div>
-              <ul class="space-y-2 text-sm">
+              <ul class="space-y-2 text-sm text-slate-900">
                 ${dalilHtml}
               </ul>
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5 mt-4">
-            <div class="font-semibold mb-4 flex items-center gap-2">
+          <div class="rounded-xl border border-gray-200 bg-white p-5 mt-4">
+            <div class="font-semibold mb-4 flex items-center gap-2 text-slate-900">
               <i data-lucide="microscope" class="w-4 h-4 text-sky-400"></i>
               Analisis NBSN Framework
             </div>
-            <div class="space-y-4 text-sm">
+            <div class="space-y-4 text-sm text-slate-900">
               ${nbsnHtml}
             </div>
           </div>
 
-          <div class="mt-5 p-4 rounded-lg bg-amber-400/10 border border-amber-400/30">
+          <div class="mt-5 p-4 rounded-lg bg-white border border-amber-300">
             <div class="flex gap-3">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
-              <p class="text-sm text-amber-200">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-amber-600">
                 <b>Disclaimer:</b> Analisis ini untuk tujuan edukasi berdasarkan AI.
                 Untuk kasus serius atau keluhan medis, <b>mohon konsultasi dengan praktisi profesional</b>.
               </p>
@@ -569,20 +569,20 @@
 
       function renderFallbackResponse(rawText) {
         document.getElementById("analysisResult").innerHTML = `
-          <div class="p-5 rounded-lg bg-slate-800/50 border border-slate-700">
+          <div class="p-5 rounded-lg bg-white border border-gray-200">
             <div class="flex items-center gap-2 mb-3">
-              <i data-lucide="info" class="w-5 h-5 text-sky-400"></i>
-              <div class="font-semibold">Hasil Analisis AI</div>
+              <i data-lucide="info" class="w-5 h-5 text-sky-500"></i>
+              <div class="font-semibold text-slate-900">Hasil Analisis AI</div>
             </div>
-            <div class="prose prose-invert max-w-none text-sm text-slate-200 whitespace-pre-wrap">
+            <div class="prose max-w-none text-sm text-slate-700 whitespace-pre-wrap">
               ${markdownToHtml(rawText)}
             </div>
           </div>
           
-          <div class="mt-4 p-4 rounded-lg bg-amber-400/10 border border-amber-400/30">
+          <div class="mt-4 p-4 rounded-lg bg-white border border-amber-300">
             <div class="flex gap-3">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
-              <p class="text-sm text-amber-200">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-amber-600">
                 <b>Disclaimer:</b> Analisis ini untuk tujuan edukasi.
                 Untuk kasus serius, <b>mohon konsultasi dengan praktisi profesional</b>.
               </p>
@@ -734,46 +734,46 @@
             <span class="rounded-lg px-3 py-1.5 text-sm font-bold ${badgeClass}">
               ${escapeHtml(verdict)}
             </span>
-            <span class="text-xs opacity-70">Skor analisis: ${score}</span>
+            <span class="text-xs text-slate-700">Skor analisis: ${score}</span>
             <span class="text-xs text-slate-500 ml-auto">🔄 Algoritma Lokal</span>
           </div>
 
           <div class="grid md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
-              <div class="font-semibold mb-3 flex items-center gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
                 <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
                 Langkah yang Disarankan
               </div>
-              <ul class="list-decimal pl-5 space-y-2 text-slate-200/90 text-sm">
+              <ul class="list-decimal pl-5 space-y-2 text-slate-900 text-sm">
                 ${stepsHtml}
               </ul>
             </div>
 
-            <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5">
-              <div class="font-semibold mb-3 flex items-center gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-5">
+              <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
                 <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
                 Dalil Syar'i
               </div>
-              <ul class="space-y-2 text-slate-200/90 text-sm">
+              <ul class="space-y-2 text-slate-900 text-sm">
                 ${dalilHtml}
               </ul>
             </div>
           </div>
 
-          <div class="rounded-xl border border-gray-200 bg-slate-900/50 p-5 mt-4">
-            <div class="font-semibold mb-3 flex items-center gap-2">
+          <div class="rounded-xl border border-gray-200 bg-white p-5 mt-4">
+            <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
               <i data-lucide="microscope" class="w-4 h-4 text-sky-400"></i>
               Catatan Biomolekuler (NBSN Framework)
             </div>
-            <ul class="list-disc pl-5 space-y-2 text-slate-200/90 text-sm">
+            <ul class="list-disc pl-5 space-y-2 text-slate-900 text-sm">
               ${bioHtml}
             </ul>
           </div>
 
-          <div class="mt-5 p-4 rounded-lg bg-amber-400/10 border border-amber-400/30">
+          <div class="mt-5 p-4 rounded-lg bg-white border border-amber-300">
             <div class="flex gap-3">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
-              <p class="text-sm text-amber-200">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-amber-600">
                 <b>Disclaimer:</b> Ini adalah analisis demo berbasis algoritma sederhana untuk tujuan edukasi.
                 Untuk kasus serius atau keluhan medis, <b>mohon konsultasi dengan praktisi profesional</b>.
               </p>
