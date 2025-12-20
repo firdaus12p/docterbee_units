@@ -3275,10 +3275,21 @@ function renderRewards(rewards) {
       `;
     })
     .join("");
+
+  // Also update "Tukar Poin" sidebar list to keep them synchronized
+  renderTukarPoinList(rewards);
 }
 
 // Render default fallback rewards (if API fails)
 function renderDefaultRewards() {
+  // Define fallback rewards data
+  const defaultRewards = [
+    { id: null, name: "Diskon 10%", points_cost: 20, color_theme: "amber", description: null },
+    { id: null, name: "Konsultasi Gratis", points_cost: 50, color_theme: "emerald", description: null },
+    { id: null, name: "Free Product Kecil", points_cost: 80, color_theme: "purple", description: null },
+    { id: null, name: "Voucher Rp 50K", points_cost: 100, color_theme: "sky", description: null },
+  ];
+
   const rewardsContainer = document.querySelector(".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4");
 
   if (!rewardsContainer) {
@@ -3286,36 +3297,41 @@ function renderDefaultRewards() {
   }
 
   // Keep existing hardcoded rewards as fallback
-  rewardsContainer.innerHTML = `
-    <button
-      onclick="redeemReward(20, 'Diskon 10%')"
-      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-amber-400/50 hover:bg-amber-50 transition text-left"
-    >
-      <div class="text-xs text-amber-500 mb-1 font-semibold">20 poin</div>
-      <div class="font-semibold text-sm text-slate-900">Diskon 10%</div>
-    </button>
-    <button
-      onclick="redeemReward(50, 'Konsultasi Gratis')"
-      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-emerald-400/50 hover:bg-emerald-50 transition text-left"
-    >
-      <div class="text-xs text-emerald-500 mb-1 font-semibold">50 poin</div>
-      <div class="font-semibold text-sm text-slate-900">Konsultasi Gratis</div>
-    </button>
-    <button
-      onclick="redeemReward(80, 'Free Product Kecil')"
-      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-purple-400/50 hover:bg-purple-50 transition text-left"
-    >
-      <div class="text-xs text-purple-500 mb-1 font-semibold">80 poin</div>
-      <div class="font-semibold text-sm text-slate-900">Free Product Kecil</div>
-    </button>
-    <button
-      onclick="redeemReward(100, 'Voucher Rp 50K')"
-      class="rounded-lg border border-gray-200 bg-white p-3 hover:border-sky-400/50 hover:bg-sky-50 transition text-left"
-    >
-      <div class="text-xs text-sky-500 mb-1 font-semibold">100 poin</div>
-      <div class="font-semibold text-sm text-slate-900">Voucher Rp 50K</div>
-    </button>
-  `;
+  rewardsContainer.innerHTML = defaultRewards
+    .map((reward) => `
+      <button
+        onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name)}')"
+        class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${reward.color_theme}-400/50 hover:bg-${reward.color_theme}-50 transition text-left"
+      >
+        <div class="text-xs text-${reward.color_theme}-500 mb-1 font-semibold">${reward.points_cost} poin</div>
+        <div class="font-semibold text-sm text-slate-900">${escapeHtml(reward.name)}</div>
+      </button>
+    `)
+    .join("");
+
+  // Also update "Tukar Poin" sidebar list with same fallback data
+  renderTukarPoinList(defaultRewards);
+}
+
+/**
+ * Render "Tukar Poin" sidebar list - synchronized with rewards data
+ * @param {Array} rewards - Array of reward objects from API or fallback
+ */
+function renderTukarPoinList(rewards) {
+  const tukarPoinList = document.getElementById("tukarPoinList");
+  
+  if (!tukarPoinList) {
+    return;
+  }
+
+  if (!rewards || rewards.length === 0) {
+    tukarPoinList.innerHTML = '<li class="text-slate-400 text-sm">Tidak ada reward tersedia</li>';
+    return;
+  }
+
+  tukarPoinList.innerHTML = rewards
+    .map((reward) => `<li>🎁 ${escapeHtml(reward.name)}: ${reward.points_cost} poin</li>`)
+    .join("");
 }
 
 // Render locations
