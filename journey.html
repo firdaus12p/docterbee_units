@@ -120,7 +120,21 @@
       </section>
 
       <!-- Tab Navigation -->
-      <div class="flex flex-wrap gap-2 mb-4" id="tabs"></div>
+      <div class="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide md:flex-wrap md:overflow-visible" id="tabs"></div>
+      <style>
+        /* Hide scrollbar but keep functionality */
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        /* Ensure tabs don't shrink on mobile */
+        #tabs > button {
+          flex-shrink: 0;
+        }
+      </style>
 
       <!-- Unit Content Container -->
       <section id="unitWrap" class="unit-wrap"></section>

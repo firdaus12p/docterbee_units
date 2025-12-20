@@ -131,11 +131,18 @@
 
           <div class="mt-4 flex flex-wrap gap-3">
             <button
+              id="analyzeBtn"
               onclick="analyzeQuestion()"
-              class="rounded-lg bg-amber-400 text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-amber-500 transition flex items-center gap-2"
+              class="rounded-lg bg-amber-400 text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-amber-500 transition flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
-              Analisis Sekarang
+              <i data-lucide="sparkles" class="w-4 h-4" id="analyzeBtnIcon"></i>
+              <span class="hidden" id="analyzeBtnSpinner">
+                <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+              <span id="analyzeBtnText">Analisis Sekarang</span>
             </button>
             <button
               onclick="loadSample(0)"
@@ -358,6 +365,26 @@
         return scored.slice(0, 2).map((s) => s.dalil);
       }
 
+      // Helper function to toggle button loading state
+      function setAnalyzeButtonLoading(isLoading) {
+        const btn = document.getElementById("analyzeBtn");
+        const icon = document.getElementById("analyzeBtnIcon");
+        const spinner = document.getElementById("analyzeBtnSpinner");
+        const text = document.getElementById("analyzeBtnText");
+        
+        if (isLoading) {
+          btn.disabled = true;
+          icon.classList.add("hidden");
+          spinner.classList.remove("hidden");
+          text.textContent = "Menganalisis...";
+        } else {
+          btn.disabled = false;
+          icon.classList.remove("hidden");
+          spinner.classList.add("hidden");
+          text.textContent = "Analisis Sekarang";
+        }
+      }
+
       async function analyzeQuestion() {
         const question = document.getElementById("questionInput").value.trim();
 
@@ -366,7 +393,10 @@
           return;
         }
 
-        // Show loading state
+        // Show loading state on button
+        setAnalyzeButtonLoading(true);
+
+        // Show loading state in results
         const resultDiv = document.getElementById("analysisResult");
         resultDiv.innerHTML = `
           <div class="flex items-center justify-center py-12">
@@ -419,6 +449,9 @@
           } else {
             renderErrorWithFallback("Terjadi kesalahan. Menggunakan analisis lokal...", question);
           }
+        } finally {
+          // Reset button state
+          setAnalyzeButtonLoading(false);
         }
       }
 
