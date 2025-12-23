@@ -182,6 +182,14 @@
             <span class="hidden sm:inline">Users Manager</span>
             <span class="sm:hidden">Users</span>
           </button>
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="podcasts"
+          >
+            <i data-lucide="headphones" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Podcasts Manager</span>
+            <span class="sm:hidden">Podcasts</span>
+          </button>
         </div>
 
         <!-- Section: Booking Monitor -->
@@ -1534,6 +1542,126 @@
         </div>
       </section>
 
+      <!-- SECTION: PODCASTS MANAGER -->
+      <section id="section-podcasts" class="dashboard-section hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 class="text-xl sm:text-2xl font-bold">Podcasts Manager</h2>
+          <button
+            id="btnNewPodcast"
+            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Podcast Baru</span>
+          </button>
+        </div>
+
+        <!-- Podcasts Table -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-800">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">ID</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Judul</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Audio</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Urutan</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Status</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="podcastsTableBody">
+                <tr>
+                  <td colspan="6" class="px-4 py-8 text-center text-slate-400">
+                    Memuat data podcasts...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Podcast Form Modal -->
+      <div
+        id="podcastModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+      >
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold" id="podcastModalTitle">Podcast Baru</h3>
+            <button id="closePodcastModal" class="text-slate-400 hover:text-slate-200">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+          <form id="podcastForm" class="space-y-4" enctype="multipart/form-data">
+            <input type="hidden" id="podcastId" />
+            
+            <div>
+              <label class="block text-sm mb-2">Judul Podcast <span class="text-red-400">*</span></label>
+              <input
+                type="text"
+                id="podcastTitle"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                placeholder="Masukkan judul podcast"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm mb-2">File Audio <span class="text-red-400" id="podcastAudioRequired">*</span></label>
+              <input
+                type="file"
+                id="podcastAudio"
+                accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
+              />
+              <p class="text-xs text-slate-400 mt-1">Format: MP3, WAV, OGG. Maksimal 50MB</p>
+            </div>
+
+            <!-- Current Audio Preview (for edit mode) -->
+            <div id="currentAudioPreview" class="hidden">
+              <label class="block text-sm mb-2">Audio Saat Ini</label>
+              <audio id="currentAudioPlayer" controls class="w-full"></audio>
+              <p class="text-xs text-slate-400 mt-1">Upload file baru untuk mengganti audio ini</p>
+            </div>
+
+            <div>
+              <label class="block text-sm mb-2">Urutan (Sort Order)</label>
+              <input
+                type="number"
+                id="podcastSortOrder"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                placeholder="0"
+                value="0"
+                min="0"
+              />
+              <p class="text-xs text-slate-400 mt-1">Angka lebih kecil akan tampil lebih awal</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="podcastIsActive" class="w-4 h-4 accent-amber-400" checked />
+              <label for="podcastIsActive" class="text-sm">Aktif (tampil di halaman Media)</label>
+            </div>
+
+            <div class="flex gap-2 pt-4">
+              <button
+                type="submit"
+                class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500 transition"
+              >
+                Simpan
+              </button>
+              <button
+                type="button"
+                id="cancelPodcast"
+                class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg transition"
+              >
+                Batal
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Rewards History Modal -->
       <div
         id="rewardsModal"
@@ -1725,5 +1853,6 @@
     <script src="js/orders-manager.js"></script>
     <script src="js/users-manager.js"></script>
     <script src="js/rewards-manager.js"></script>
+    <script src="js/podcasts-manager.js"></script>
   </body>
 </html>

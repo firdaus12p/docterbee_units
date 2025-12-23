@@ -9,7 +9,7 @@ export default [
   // ============================================
   {
     files: ["js/**/*.js"],
-    ignores: ["js/utils.js", "js/users-manager.js", "js/rewards-manager.js", "js/orders-manager.js", "js/admin-dashboard.js"],
+    ignores: ["js/utils.js", "js/users-manager.js", "js/rewards-manager.js", "js/orders-manager.js", "js/admin-dashboard.js", "js/podcasts-manager.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -45,7 +45,7 @@ export default [
   // ADMIN DASHBOARD AND MANAGERS - Define and use cross-file functions
   // ============================================
   {
-    files: ["js/admin-dashboard.js", "js/users-manager.js", "js/rewards-manager.js", "js/orders-manager.js"],
+    files: ["js/admin-dashboard.js", "js/users-manager.js", "js/rewards-manager.js", "js/orders-manager.js", "js/podcasts-manager.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -73,6 +73,7 @@ export default [
         initUsersManager: "writable",
         loadOrders: "writable",
         loadUsers: "writable",
+        loadPodcasts: "writable",
       },
     },
     rules: {

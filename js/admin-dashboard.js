@@ -274,6 +274,11 @@ function switchSection(section) {
     if (typeof initUsersManager === "function") {
       initUsersManager();
     }
+  } else if (section === "podcasts") {
+    // Load podcasts from podcasts-manager.js
+    if (typeof loadPodcasts === "function") {
+      loadPodcasts();
+    }
   }
 }
 

@@ -20,6 +20,7 @@ import ordersRouter from "./routes/orders.mjs";
 import usersRouter from "./routes/users.mjs";
 import userDataRouter from "./routes/user-data.mjs";
 import rewardsRouter from "./routes/rewards.mjs";
+import podcastsRouter from "./routes/podcasts.mjs";
 import bcrypt from "bcrypt";
 
 // Get directory path for ES modules
@@ -153,6 +154,7 @@ app.use("/api/orders", ordersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/user-data", userDataRouter);
 app.use("/api/rewards", rewardsRouter);
+app.use("/api/podcasts", podcastsRouter);
 
 // ============================================
 // STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)

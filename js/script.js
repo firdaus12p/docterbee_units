@@ -2,7 +2,7 @@
    Docterbee Journey - Main JavaScript
    ======================================== */
 // Modal utilities are defined in modal-utils.js
-/* global showSuccess, showError, showWarning, showConfirm, showInfo */
+/* global showSuccess, showError, showWarning, showConfirm */
 
 // ==================== DATA MODEL ====================
 
@@ -1775,43 +1775,127 @@ function initInsight() {
 // ==================== MEDIA PAGE FUNCTIONS ====================
 
 /**
- * Podcast data
+ * Fallback podcast data (used when API is unavailable)
  */
-const PODCAST_DATA = [
+const FALLBACK_PODCAST_DATA = [
   {
     title: "Cara Hidup Rasulullah – Subuh Routine",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    audio_url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
   },
   {
     title: "Tadabbur Al-Qur'an – QS. Al-Mulk",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    audio_url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
   },
   {
     title: "Obat dalam Sunnah – Madu & Habbatussauda",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    audio_url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
   },
   {
     title: "Science by Docterbee – Autofagi & Puasa",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    audio_url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
   },
 ];
 
+// Track currently playing podcast
+let currentPodcastUrl = null;
+
 /**
- * Render podcast list
+ * Render podcast list from API or fallback data
  */
-function renderPodcastList() {
+async function renderPodcastList() {
   const podcastList = document.getElementById("podcastList");
   if (!podcastList) return;
 
-  podcastList.innerHTML = "";
+  // Show loading state
+  podcastList.innerHTML = '<p class="text-slate-400 text-sm animate-pulse">Memuat podcast...</p>';
 
-  PODCAST_DATA.forEach((podcast) => {
-    const button = document.createElement("button");
-    button.className = "podcast-item";
-    button.textContent = podcast.title;
-    button.addEventListener("click", () => playPodcast(podcast.title, podcast.url));
-    podcastList.appendChild(button);
+  try {
+    // Fetch podcasts from API
+    const response = await fetch("/api/podcasts");
+    const data = await response.json();
+
+    if (data.success && data.data && data.data.length > 0) {
+      // Use API data
+      renderPodcastItems(podcastList, data.data);
+      console.log("✅ Podcasts loaded from API:", data.data.length, "items");
+    } else {
+      // No podcasts in database, use fallback
+      console.log("⚠️ No podcasts in database, using fallback data");
+      renderPodcastItems(podcastList, FALLBACK_PODCAST_DATA);
+    }
+  } catch (error) {
+    console.error("❌ Error loading podcasts from API:", error);
+    // Use fallback data on error
+    renderPodcastItems(podcastList, FALLBACK_PODCAST_DATA);
+  }
+
+  // Setup audio player event listeners
+  setupAudioPlayerEvents();
+}
+
+/**
+ * Render podcast items with play/pause buttons
+ * @param {HTMLElement} container - The podcast list container
+ * @param {Array} podcasts - Array of podcast objects
+ */
+function renderPodcastItems(container, podcasts) {
+  container.innerHTML = "";
+  podcasts.forEach((podcast) => {
+    const item = document.createElement("div");
+    item.className = "podcast-item flex items-center gap-3";
+    item.dataset.url = podcast.audio_url;
+    
+    // Play/Pause button
+    const playBtn = document.createElement("button");
+    playBtn.className = "podcast-play-btn flex-shrink-0";
+    playBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+    playBtn.title = "Putar";
+    playBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePlayPodcast(podcast.title, podcast.audio_url);
+    });
+    
+    // Title
+    const title = document.createElement("span");
+    title.className = "podcast-title flex-1 text-left";
+    title.textContent = podcast.title;
+    title.addEventListener("click", () => {
+      togglePlayPodcast(podcast.title, podcast.audio_url);
+    });
+    
+    item.appendChild(playBtn);
+    item.appendChild(title);
+    container.appendChild(item);
   });
+
+  // Re-initialize Lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+/**
+ * Toggle play/pause for a podcast
+ * @param {string} title - Podcast title
+ * @param {string} url - Podcast URL
+ */
+function togglePlayPodcast(title, url) {
+  const audioPlayer = document.getElementById("audioPlayerPodcast");
+  if (!audioPlayer) return;
+
+  const isSamePodcast = currentPodcastUrl === url;
+  const isPlaying = !audioPlayer.paused;
+
+  if (isSamePodcast && isPlaying) {
+    // Pause current podcast
+    audioPlayer.pause();
+  } else if (isSamePodcast && !isPlaying) {
+    // Resume current podcast
+    audioPlayer.play().catch(() => console.log("Audio play prevented"));
+  } else {
+    // Play new podcast
+    playPodcast(title, url);
+  }
 }
 
 /**
@@ -1820,33 +1904,89 @@ function renderPodcastList() {
  * @param {string} url - Podcast URL
  */
 function playPodcast(title, url) {
-  // Update both nowPlaying displays (YouTube section and Podcast section)
-  const nowPlaying = document.getElementById("nowPlaying");
   const nowPlayingPodcast = document.getElementById("nowPlayingPodcast");
+  const audioPlayer = document.getElementById("audioPlayerPodcast");
 
-  if (nowPlaying) {
-    nowPlaying.textContent = title;
-  }
   if (nowPlayingPodcast) {
     nowPlayingPodcast.textContent = title;
   }
 
-  // Update both audio players (keep them in sync)
-  const audioPlayer = document.getElementById("audioPlayer");
-  const audioPlayerPodcast = document.getElementById("audioPlayerPodcast");
-
   if (audioPlayer) {
+    currentPodcastUrl = url;
     audioPlayer.src = url;
     audioPlayer.play().catch(() => {
       console.log("Audio autoplay prevented");
     });
   }
 
-  if (audioPlayerPodcast) {
-    audioPlayerPodcast.src = url;
-    audioPlayerPodcast.play().catch(() => {
-      console.log("Audio autoplay prevented");
-    });
+  // Update all play buttons state
+  updatePlayButtonStates();
+}
+
+/**
+ * Setup audio player event listeners for play/pause sync
+ */
+function setupAudioPlayerEvents() {
+  const audioPlayer = document.getElementById("audioPlayerPodcast");
+  if (!audioPlayer) return;
+
+  // Remove existing listeners to avoid duplicates
+  audioPlayer.removeEventListener("play", updatePlayButtonStates);
+  audioPlayer.removeEventListener("pause", updatePlayButtonStates);
+  audioPlayer.removeEventListener("ended", handleAudioEnded);
+
+  // Add event listeners
+  audioPlayer.addEventListener("play", updatePlayButtonStates);
+  audioPlayer.addEventListener("pause", updatePlayButtonStates);
+  audioPlayer.addEventListener("ended", handleAudioEnded);
+}
+
+/**
+ * Handle audio ended event
+ */
+function handleAudioEnded() {
+  currentPodcastUrl = null;
+  updatePlayButtonStates();
+}
+
+/**
+ * Update all play button states based on current audio state
+ */
+function updatePlayButtonStates() {
+  const audioPlayer = document.getElementById("audioPlayerPodcast");
+  const podcastItems = document.querySelectorAll(".podcast-item");
+  
+  if (!audioPlayer) return;
+
+  const isPlaying = !audioPlayer.paused;
+
+  podcastItems.forEach((item) => {
+    const btn = item.querySelector(".podcast-play-btn");
+    const itemUrl = item.dataset.url;
+    
+    if (!btn) return;
+
+    if (itemUrl === currentPodcastUrl && isPlaying) {
+      // Show pause icon
+      btn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
+      btn.title = "Pause";
+      item.classList.add("playing");
+    } else if (itemUrl === currentPodcastUrl && !isPlaying) {
+      // Show play icon but keep highlighting
+      btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+      btn.title = "Putar";
+      item.classList.add("playing");
+    } else {
+      // Show play icon
+      btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+      btn.title = "Putar";
+      item.classList.remove("playing");
+    }
+  });
+
+  // Re-initialize Lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
   }
 }
 
@@ -2755,6 +2895,11 @@ function showStoreTab(tabName) {
   if (tabName === "points") {
     loadAndRenderRewards();
   }
+
+  // Render dine-in menu when switching to dinein tab
+  if (tabName === "dinein") {
+    renderDineInMenu();
+  }
 }
 
 // Fetch products from API
@@ -2784,6 +2929,116 @@ async function loadProductsFromAPI() {
     console.error("Error loading products:", error);
     return false;
   }
+}
+
+/**
+ * Render Dine-In Menu from products API
+ * Displays products organized by category with name, prices (member + normal), and description
+ */
+async function renderDineInMenu() {
+  const container = document.getElementById("dineInMenuContainer");
+  if (!container) return;
+
+  // Show loading state
+  container.innerHTML = '<p class="text-slate-400 text-sm text-center py-8 animate-pulse">Memuat menu...</p>';
+
+  // Load products if not already loaded
+  if (PRODUCTS.length === 0) {
+    const loaded = await loadProductsFromAPI();
+    if (!loaded) {
+      container.innerHTML = '<p class="text-red-400 text-sm text-center py-8">Gagal memuat menu. Silakan refresh halaman.</p>';
+      return;
+    }
+  }
+
+  if (PRODUCTS.length === 0) {
+    container.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Belum ada menu tersedia.</p>';
+    return;
+  }
+
+  // Group products by category
+  const categorizedProducts = {};
+  PRODUCTS.forEach((product) => {
+    const category = product.cat || "Lainnya";
+    if (!categorizedProducts[category]) {
+      categorizedProducts[category] = [];
+    }
+    categorizedProducts[category].push(product);
+  });
+
+  // Category icons and colors
+  const categoryStyles = {
+    "Zona Sunnah": { icon: "🌙", color: "amber" },
+    "1001 Rempah": { icon: "🧂", color: "emerald" },
+    "Zona Honey": { icon: "🍯", color: "amber" },
+    "Cold Pressed": { icon: "🥤", color: "sky" },
+    "Lainnya": { icon: "📦", color: "slate" }
+  };
+
+  // Render categories
+  let html = "";
+  Object.keys(categorizedProducts).forEach((category) => {
+    const products = categorizedProducts[category];
+    const style = categoryStyles[category] || categoryStyles["Lainnya"];
+    
+    html += `
+      <div>
+        <h3 class="font-semibold text-${style.color}-500 mb-2">
+          ${style.icon} ${escapeHtml(category)}
+        </h3>
+        <div class="grid gap-3 sm:grid-cols-2">
+          ${products.map((p) => renderDineInMenuItem(p, style.color)).join("")}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // Reinitialize Lucide icons
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+/**
+ * Render a single dine-in menu item
+ * @param {Object} product - Product object
+ * @param {string} color - Tailwind color name for styling
+ * @returns {string} HTML string
+ */
+function renderDineInMenuItem(product, color) {
+  const hasMemberPrice = product.member_price && product.member_price < product.price;
+  
+  // Format prices
+  const normalPrice = `Rp ${product.price.toLocaleString("id-ID")}`;
+  const memberPrice = hasMemberPrice 
+    ? `Rp ${product.member_price.toLocaleString("id-ID")}`
+    : null;
+  
+  return `
+    <div class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${color}-400/50 transition-all">
+      <div class="flex justify-between items-start mb-1 gap-2">
+        <span class="font-semibold text-slate-900">${escapeHtml(product.name)}</span>
+        <div class="text-right flex-shrink-0">
+          ${hasMemberPrice ? `
+            <div class="text-${color}-500 font-bold text-sm">${memberPrice}</div>
+            <div class="text-slate-400 text-xs line-through">${normalPrice}</div>
+          ` : `
+            <span class="text-${color}-500 font-bold">${normalPrice}</span>
+          `}
+        </div>
+      </div>
+      ${hasMemberPrice ? `
+        <div class="text-xs text-emerald-600 mb-1">
+          <span class="bg-emerald-50 px-1.5 py-0.5 rounded">Harga Member</span>
+        </div>
+      ` : ""}
+      <p class="text-xs text-slate-600">
+        ${product.description ? escapeHtml(product.description) : "Produk kesehatan berkualitas"}
+      </p>
+    </div>
+  `;
 }
 
 // Check if user is logged in (member)

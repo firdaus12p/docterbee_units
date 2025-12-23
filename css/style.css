@@ -1668,6 +1668,55 @@ header {
   background-color: #f1f5f9;
 }
 
+/* Podcast play/pause button */
+.podcast-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+}
+
+.podcast-play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.5);
+}
+
+.podcast-play-btn:active {
+  transform: scale(0.95);
+}
+
+/* Podcast title */
+.podcast-title {
+  font-size: 0.875rem;
+  color: #0f172a;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.podcast-title:hover {
+  color: #ea580c;
+}
+
+/* Playing state for podcast item */
+.podcast-item.playing {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.1), rgba(234, 88, 12, 0.05));
+  border-color: #ea580c;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.2);
+}
+
+.podcast-item.playing .podcast-title {
+  color: #ea580c;
+  font-weight: 600;
+}
+
 .ai-analysis-card {
   border-radius: 0.75rem;
   border: 1px solid rgba(148, 163, 184, 0.2);
