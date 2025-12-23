@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -91,11 +92,11 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
- * POST /api/services
+ * POST /api/services (admin only)
  * Create new service
  * Body: { name, category, price, description, branch, mode, practitioner }
  */
-router.post("/", async (req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const { name, category, price, description, branch, mode, practitioner } =
       req.body;
@@ -154,11 +155,11 @@ router.post("/", async (req, res) => {
 });
 
 /**
- * PATCH /api/services/:id
+ * PATCH /api/services/:id (admin only)
  * Update existing service
  * Body: { name?, category?, price?, description?, branch?, mode?, practitioner?, is_active? }
  */
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -279,10 +280,10 @@ router.patch("/:id", async (req, res) => {
 });
 
 /**
- * DELETE /api/services/:id
+ * DELETE /api/services/:id (admin only)
  * Permanently delete service from database
  */
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

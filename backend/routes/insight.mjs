@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -32,7 +33,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /api/insight/id/:id - Get single article by ID (admin only, no published filter)
-router.get("/id/:id", async (req, res) => {
+router.get("/id/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -112,7 +113,7 @@ router.get("/:slug", async (req, res) => {
 });
 
 // POST /api/insight - Create new article (admin only)
-router.post("/", async (req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const { title, slug, content, excerpt, tags, category, header_image, article_type, product_id } =
       req.body;
@@ -177,7 +178,7 @@ router.post("/", async (req, res) => {
 });
 
 // PATCH /api/insight/:id - Update article (admin only)
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -292,7 +293,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // DELETE /api/insight/:id - Delete article permanently (admin only)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

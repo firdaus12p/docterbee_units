@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -79,7 +80,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // POST /api/events - Create new event (admin only)
-router.post("/", async (req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const {
       title,
@@ -142,7 +143,7 @@ router.post("/", async (req, res) => {
 });
 
 // PATCH /api/events/:id - Update event (admin only)
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -241,7 +242,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // DELETE /api/events/:id - Delete event (admin only)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

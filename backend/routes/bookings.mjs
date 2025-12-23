@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -16,8 +17,8 @@ async function getServicePrice(serviceName) {
   return service?.price || 0;
 }
 
-// GET /api/bookings - List all bookings with optional filters
-router.get("/", async (req, res) => {
+// GET /api/bookings - List all bookings with optional filters (admin only)
+router.get("/", requireAdmin, async (req, res) => {
   try {
     const { status, date, branch, limit = 100, offset = 0 } = req.query;
 
@@ -58,8 +59,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/bookings/:id - Get single booking detail
-router.get("/:id", async (req, res) => {
+// GET /api/bookings/:id - Get single booking detail (admin only)
+router.get("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -243,8 +244,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PATCH /api/bookings/:id - Update booking status or notes
-router.patch("/:id", async (req, res) => {
+// PATCH /api/bookings/:id - Update booking status or notes (admin only)
+router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notes } = req.body;
@@ -328,8 +329,8 @@ router.get("/prices/:serviceName", async (req, res) => {
   }
 });
 
-// DELETE /api/bookings/:id - Delete booking permanently
-router.delete("/:id", async (req, res) => {
+// DELETE /api/bookings/:id - Delete booking permanently (admin only)
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -4,6 +4,23 @@ var API_BASE = "/api";
 console.log("🚀 Admin Dashboard Loaded");
 console.log("📍 API Base URL:", API_BASE);
 
+/**
+ * Helper function for admin API requests
+ * Automatically includes credentials (session cookie) for authentication
+ * @param {string} url - API URL to fetch
+ * @param {Object} options - Fetch options (method, headers, body, etc.)
+ * @returns {Promise<Response>} Fetch response
+ */
+async function adminFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    credentials: "include", // Always include session cookie
+    headers: {
+      ...options.headers,
+    },
+  });
+}
+
 // Simple authentication (can be improved with JWT later)
 // eslint-disable-next-line no-unused-vars
 let isLoggedIn = false;
@@ -121,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Check admin session with backend
 async function checkAdminSession() {
   try {
-    const response = await fetch(`${API_BASE}/admin/check`, {
+    const response = await adminFetch(`${API_BASE}/admin/check`, {
       credentials: "include",
     });
     const data = await response.json();
@@ -153,7 +170,7 @@ async function handleLogin(e) {
   console.log("[LOGIN] Username:", username, "| Password length:", password.length);
 
   try {
-    const response = await fetch(`${API_BASE}/admin/login`, {
+    const response = await adminFetch(`${API_BASE}/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -185,7 +202,7 @@ async function handleLogin(e) {
 async function handleLogout() {
   try {
     // Call backend to clear admin session
-    await fetch(`${API_BASE}/admin/logout`, {
+    await adminFetch(`${API_BASE}/admin/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -270,7 +287,7 @@ async function loadBookings() {
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
-    const response = await fetch(url);
+    const response = await adminFetch(url);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
@@ -417,7 +434,7 @@ async function deleteBooking(id) {
     "Apakah Anda yakin ingin menghapus booking ini secara permanen? Data booking dan riwayat pelanggan akan hilang selamanya.",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/bookings/${id}`, {
+        const response = await adminFetch(`${API_BASE}/bookings/${id}`, {
           method: "DELETE",
         });
 
@@ -438,7 +455,7 @@ async function deleteBooking(id) {
 
 async function updateBookingStatus(id, status) {
   try {
-    const response = await fetch(`${API_BASE}/bookings/${id}`, {
+    const response = await adminFetch(`${API_BASE}/bookings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -456,7 +473,7 @@ async function updateBookingStatus(id, status) {
 
 async function viewBookingDetail(id) {
   try {
-    const response = await fetch(`${API_BASE}/bookings/${id}`);
+    const response = await adminFetch(`${API_BASE}/bookings/${id}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -683,7 +700,7 @@ async function loadArticles() {
   grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/insight`);
+    const response = await adminFetch(`${API_BASE}/insight`);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
@@ -785,7 +802,7 @@ async function loadProductsForArticle() {
   if (select.options.length > 1) return;
   
   try {
-    const response = await fetch(`${API_BASE}/products?is_active=1`);
+    const response = await adminFetch(`${API_BASE}/products?is_active=1`);
     const result = await response.json();
     
     if (result.success && result.data) {
@@ -838,7 +855,7 @@ async function handleArticleSubmit(e) {
     const url = id ? `${API_BASE}/insight/${id}` : `${API_BASE}/insight`;
     const method = id ? "PATCH" : "POST";
 
-    const response = await fetch(url, {
+    const response = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -866,7 +883,7 @@ async function handleArticleSubmit(e) {
 
 async function editArticle(id) {
   try {
-    const response = await fetch(`${API_BASE}/insight/id/${id}`);
+    const response = await adminFetch(`${API_BASE}/insight/id/${id}`);
     const result = await response.json();
 
     if (result.success) {
@@ -917,7 +934,7 @@ async function deleteArticle(id) {
     "Apakah Anda yakin ingin menghapus artikel ini secara permanen? Data artikel akan hilang selamanya.",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/insight/${id}`, {
+        const response = await adminFetch(`${API_BASE}/insight/${id}`, {
           method: "DELETE",
         });
 
@@ -944,7 +961,7 @@ async function loadEvents() {
 
   try {
     // Admin: includeInactive=true to see all events (active & inactive)
-    const response = await fetch(`${API_BASE}/events?limit=100&includeInactive=true`);
+    const response = await adminFetch(`${API_BASE}/events?limit=100&includeInactive=true`);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
@@ -1065,7 +1082,7 @@ async function handleEventSubmit(e) {
     const url = id ? `${API_BASE}/events/${id}` : `${API_BASE}/events`;
     const method = id ? "PATCH" : "POST";
 
-    const response = await fetch(url, {
+    const response = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -1094,7 +1111,7 @@ async function handleEventSubmit(e) {
 async function editEvent(id) {
   try {
     // Admin: includeInactive=true to edit inactive events
-    const response = await fetch(`${API_BASE}/events/${id}?includeInactive=true`);
+    const response = await adminFetch(`${API_BASE}/events/${id}?includeInactive=true`);
     const result = await response.json();
 
     if (result.success) {
@@ -1142,7 +1159,7 @@ async function deleteEvent(id) {
     "Apakah Anda yakin ingin menghapus event ini secara permanen? Data event akan hilang selamanya dan tidak dapat dipulihkan.",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/events/${id}`, {
+        const response = await adminFetch(`${API_BASE}/events/${id}`, {
           method: "DELETE",
         });
 
@@ -1168,7 +1185,7 @@ async function loadCoupons() {
   grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/coupons`);
+    const response = await adminFetch(`${API_BASE}/coupons`);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
@@ -1301,7 +1318,7 @@ async function handleCouponSubmit(e) {
     const url = id ? `${API_BASE}/coupons/${id}` : `${API_BASE}/coupons`;
     const method = id ? "PATCH" : "POST";
 
-    const response = await fetch(url, {
+    const response = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -1329,7 +1346,7 @@ async function handleCouponSubmit(e) {
 
 async function editCoupon(id) {
   try {
-    const response = await fetch(`${API_BASE}/coupons/${id}`);
+    const response = await adminFetch(`${API_BASE}/coupons/${id}`);
     const result = await response.json();
 
     if (result.success) {
@@ -1365,7 +1382,7 @@ async function deleteCoupon(id) {
     "Apakah Anda yakin ingin menghapus kode promo ini secara permanen? Kode promo akan dihapus dari database dan tidak dapat dipulihkan.",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/coupons/${id}`, {
+        const response = await adminFetch(`${API_BASE}/coupons/${id}`, {
           method: "DELETE",
         });
 
@@ -1478,7 +1495,7 @@ async function loadServices() {
   tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-white font-medium">Loading...</td></tr>`;
 
   try {
-    const response = await fetch(`${API_BASE}/services?is_active=1`);
+    const response = await adminFetch(`${API_BASE}/services?is_active=1`);
     const result = await response.json();
 
     if (!result.success) {
@@ -1671,7 +1688,7 @@ async function handleServiceSubmit(e) {
     const url = id ? `${API_BASE}/services/${id}` : `${API_BASE}/services`;
     const method = id ? "PATCH" : "POST";
 
-    const response = await fetch(url, {
+    const response = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -1700,7 +1717,7 @@ async function handleServiceSubmit(e) {
 
 async function editService(id) {
   try {
-    const response = await fetch(`${API_BASE}/services/${id}`);
+    const response = await adminFetch(`${API_BASE}/services/${id}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -1739,7 +1756,7 @@ function deleteService(id, name) {
     `Apakah Anda yakin ingin menghapus layanan "${name}"? Layanan akan dihapus dari sistem (soft delete).`,
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/services/${id}`, {
+        const response = await adminFetch(`${API_BASE}/services/${id}`, {
           method: "DELETE",
         });
 
@@ -1766,7 +1783,7 @@ async function loadProducts() {
   grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/products`);
+    const response = await adminFetch(`${API_BASE}/products`);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
@@ -1995,7 +2012,7 @@ async function handleProductSubmit(e) {
       const formData = new FormData();
       formData.append("image", imageFile);
 
-      const uploadResponse = await fetch(`${API_BASE}/upload/product-image`, {
+      const uploadResponse = await adminFetch(`${API_BASE}/upload/product-image`, {
         method: "POST",
         body: formData,
       });
@@ -2024,7 +2041,7 @@ async function handleProductSubmit(e) {
     const url = id ? `${API_BASE}/products/${id}` : `${API_BASE}/products`;
     const method = id ? "PATCH" : "POST";
 
-    const response = await fetch(url, {
+    const response = await adminFetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -2056,7 +2073,7 @@ async function handleProductSubmit(e) {
 
 async function editProduct(id) {
   try {
-    const response = await fetch(`${API_BASE}/products/${id}`);
+    const response = await adminFetch(`${API_BASE}/products/${id}`);
     const result = await response.json();
 
     if (!result.success || !result.data) {
@@ -2109,7 +2126,7 @@ function deleteProduct(id, name) {
     `Apakah Anda yakin ingin menghapus produk "${name}"? Produk akan dihapus dari sistem (soft delete).`,
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/products/${id}`, {
+        const response = await adminFetch(`${API_BASE}/products/${id}`, {
           method: "DELETE",
         });
 
@@ -2206,7 +2223,7 @@ async function uploadInsightHeaderImage(input) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await adminFetch(`${API_BASE}/upload`, {
       method: "POST",
       body: formData,
     });
@@ -2261,7 +2278,7 @@ async function uploadInsightContentImage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`${API_BASE}/upload`, {
+      const response = await adminFetch(`${API_BASE}/upload`, {
         method: "POST",
         body: formData,
       });

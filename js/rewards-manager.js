@@ -1,15 +1,16 @@
 // ============================================
 // REWARDS MANAGER
 // ============================================
+// Note: API_BASE and adminFetch are defined in admin-dashboard.js
 // Modal utilities are defined in modal-utils.js
-/* global showSuccess, showError, showWarning, showConfirm */
+/* global showSuccess, showError, showWarning, showConfirm, API_BASE, adminFetch, escapeHtml */
 
 let currentRewardId = null;
 
 // Load all rewards
 async function loadRewards() {
   try {
-    const response = await fetch(`${API_BASE}/rewards/admin/all`, {
+    const response = await adminFetch(`${API_BASE}/rewards/admin/all`, {
       credentials: "include",
     });
     const data = await response.json();
@@ -129,7 +130,7 @@ function closeRewardModal() {
 // Edit reward - fetch and populate form
 async function editReward(id) {
   try {
-    const response = await fetch(`${API_BASE}/rewards/admin/${id}`, {
+    const response = await adminFetch(`${API_BASE}/rewards/admin/${id}`, {
       credentials: "include",
     });
     const data = await response.json();
@@ -192,7 +193,7 @@ async function saveReward(event) {
     const url = id ? `${API_BASE}/rewards/admin/${id}` : `${API_BASE}/rewards/admin`;
     const method = id ? "PATCH" : "POST";
 
-    const response = await fetch(url, {
+    const response = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -227,7 +228,7 @@ async function deleteReward(id, name) {
 async function performDeleteReward(id) {
 
   try {
-    const response = await fetch(`${API_BASE}/rewards/admin/${id}`, {
+    const response = await adminFetch(`${API_BASE}/rewards/admin/${id}`, {
       method: "DELETE",
       credentials: "include",
     });

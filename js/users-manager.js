@@ -2,15 +2,16 @@
 // USERS MANAGER - Admin Dashboard
 // ============================================
 // API_BASE is defined in admin-dashboard.js
+// adminFetch is defined in admin-dashboard.js
 // Modal utilities are defined in modal-utils.js
-/* global showSuccess, showError, showWarning, showConfirm */
+/* global showSuccess, showError, showWarning, showConfirm, API_BASE, adminFetch */
 
 // ============================================
 // Load Users
 // ============================================
 async function loadUsers() {
   try {
-    const response = await fetch(`${API_BASE}/users`);
+    const response = await adminFetch(`${API_BASE}/users`);
     const data = await response.json();
 
     if (data.success) {
@@ -177,7 +178,7 @@ document.getElementById("userForm")?.addEventListener("submit", async (e) => {
 async function performPasswordReset(userId, password) {
 
   try {
-    const response = await fetch(`${API_BASE}/users/${userId}/password`, {
+    const response = await adminFetch(`${API_BASE}/users/${userId}/password`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -209,7 +210,7 @@ async function toggleUserStatus(userId) {
     "Ubah status user ini?",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/users/${userId}/toggle`, {
+        const response = await adminFetch(`${API_BASE}/users/${userId}/toggle`, {
           method: "PATCH",
         });
 
@@ -249,7 +250,7 @@ function confirmDeleteUser(userId, userName) {
 // ============================================
 async function deleteUser(userId) {
   try {
-    const response = await fetch(`${API_BASE}/users/${userId}`, {
+    const response = await adminFetch(`${API_BASE}/users/${userId}`, {
       method: "DELETE",
     });
 
@@ -312,7 +313,7 @@ if (typeof window !== "undefined") {
 // ============================================
 async function viewUserRewards(userId, userName) {
   try {
-    const response = await fetch(`${API_BASE}/users/${userId}/rewards`);
+    const response = await adminFetch(`${API_BASE}/users/${userId}/rewards`);
     const data = await response.json();
 
     if (data.success) {
@@ -418,7 +419,7 @@ async function approveRedemption(userId, redemptionId, rewardName) {
     `Approve penukaran reward "${rewardName}"?`,
     async () => {
       try {
-        const response = await fetch(
+        const response = await adminFetch(
           `${API_BASE}/users/${userId}/rewards/${redemptionId}/approve`,
           {
             method: "PATCH",
@@ -433,7 +434,7 @@ async function approveRedemption(userId, redemptionId, rewardName) {
           showSuccess("Redemption berhasil di-approve!");
           // Refresh the rewards list
           const userName = document.getElementById("rewardUserName").textContent;
-          const userRewardsResponse = await fetch(
+          const userRewardsResponse = await adminFetch(
             `${API_BASE}/users/${userId}/rewards`,
             {
               credentials: "include",

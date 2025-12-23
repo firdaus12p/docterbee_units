@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "./db.mjs";
+import { requireAdmin } from "./middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -86,8 +87,8 @@ router.get("/slug/:slug", async (req, res) => {
   }
 });
 
-// POST /api/articles - Create new article
-router.post("/", async (req, res) => {
+// POST /api/articles - Create new article (admin only)
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const { title, content, excerpt, header_image, category, author } = req.body;
 
@@ -127,8 +128,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT /api/articles/:id - Update article
-router.put("/:id", async (req, res) => {
+// PUT /api/articles/:id - Update article (admin only)
+router.put("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, excerpt, header_image, category, author, is_published } = req.body;
@@ -191,8 +192,8 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/articles/:id - Delete article permanently
-router.delete("/:id", async (req, res) => {
+// DELETE /api/articles/:id - Delete article permanently (admin only)
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

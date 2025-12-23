@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -72,8 +73,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /api/products - Create new product
-router.post("/", async (req, res) => {
+// POST /api/products - Create new product (admin only)
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const { name, category, price, member_price, promo_text, description, image_url, stock } =
       req.body;
@@ -150,8 +151,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PATCH /api/products/:id - Update product
-router.patch("/:id", async (req, res) => {
+// PATCH /api/products/:id - Update product (admin only)
+router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -278,8 +279,8 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/products/:id - Permanently delete product from database
-router.delete("/:id", async (req, res) => {
+// DELETE /api/products/:id - Permanently delete product from database (admin only)
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

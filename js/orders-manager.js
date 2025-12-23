@@ -1,9 +1,9 @@
 // ============================================
 // ORDERS MANAGER - Admin Dashboard
 // ============================================
-// Note: API_BASE is already defined in admin-dashboard.js
+// Note: API_BASE and adminFetch are defined in admin-dashboard.js
 // Modal utilities are defined in modal-utils.js
-/* global showSuccess, showError, showWarning, showConfirm */
+/* global showSuccess, showError, showWarning, showConfirm, API_BASE, adminFetch */
 
 // ============================================
 // LOAD ORDERS
@@ -24,7 +24,7 @@ async function loadOrders() {
       </tr>
     `;
 
-    const response = await fetch(`${API_BASE}/orders`);
+    const response = await adminFetch(`${API_BASE}/orders`);
     const result = await response.json();
 
     if (!result.success) {
@@ -228,7 +228,7 @@ function onScanError(_errorMessage) {
 
 async function viewOrderDetails(orderNumber) {
   try {
-    const response = await fetch(`${API_BASE}/orders/${orderNumber}`);
+    const response = await adminFetch(`${API_BASE}/orders/${orderNumber}`);
     const result = await response.json();
 
     if (!result.success) {
@@ -387,7 +387,7 @@ async function completeOrder(orderId) {
     "Complete order ini? Status akan berubah menjadi PAID dan COMPLETED.",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/orders/${orderId}/complete`, {
+        const response = await adminFetch(`${API_BASE}/orders/${orderId}/complete`, {
           method: "PATCH",
         });
 
@@ -416,7 +416,7 @@ async function deleteOrder(orderId) {
     "Hapus order ini? Data akan dihapus permanen dan tidak dapat dikembalikan.",
     async () => {
       try {
-        const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+        const response = await adminFetch(`${API_BASE}/orders/${orderId}`, {
           method: "DELETE",
         });
 
@@ -607,7 +607,7 @@ async function submitAssignPoints() {
     submitBtn.innerHTML =
       '<i data-lucide="loader" class="w-4 h-4 inline animate-spin"></i> Processing...';
 
-    const response = await fetch(
+    const response = await adminFetch(
       `${API_BASE}/orders/${orderId}/assign-points-by-phone`,
       {
         method: "POST",

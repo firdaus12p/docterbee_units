@@ -1,6 +1,7 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
 import { generateOrderNumber, calculateExpiryTime, calculatePoints } from "../utils/helpers.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -269,9 +270,9 @@ router.post("/", async (req, res) => {
 });
 
 // ============================================
-// GET /api/orders - Get all orders (admin)
+// GET /api/orders - Get all orders (admin only)
 // ============================================
-router.get("/", async (req, res) => {
+router.get("/", requireAdmin, async (req, res) => {
   try {
     const { status, payment_status, limit = 50, offset = 0 } = req.query;
 
@@ -391,9 +392,9 @@ router.get("/:orderNumber", async (req, res) => {
 });
 
 // ============================================
-// PATCH /api/orders/:id/complete - Complete order (kasir scan)
+// PATCH /api/orders/:id/complete - Complete order (admin/kasir scan)
 // ============================================
-router.patch("/:id/complete", async (req, res) => {
+router.patch("/:id/complete", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -531,9 +532,9 @@ router.patch("/:id/cancel", async (req, res) => {
 });
 
 // ============================================
-// POST /api/orders/:id/assign-points-by-phone - Assign points to user by phone
+// POST /api/orders/:id/assign-points-by-phone - Assign points to user by phone (admin only)
 // ============================================
-router.post("/:id/assign-points-by-phone", async (req, res) => {
+router.post("/:id/assign-points-by-phone", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { phone } = req.body;
@@ -636,9 +637,9 @@ router.post("/:id/assign-points-by-phone", async (req, res) => {
 });
 
 // ============================================
-// DELETE /api/orders/:id - Delete order (hard delete)
+// DELETE /api/orders/:id - Delete order (admin only)
 // ============================================
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

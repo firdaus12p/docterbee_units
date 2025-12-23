@@ -292,7 +292,17 @@ const requireAdmin = (req, res, next) => {
 app.set("requireAdmin", requireAdmin);
 
 // DEBUG ENDPOINT - Untuk troubleshooting database
+// Security: Di production, endpoint ini memerlukan login admin
+// Di development, endpoint ini terbuka untuk kemudahan debugging
 app.get("/api/debug", async (req, res) => {
+  // Security check: In production, require admin login
+  if (isProduction && !(req.session && req.session.isAdmin)) {
+    return res.status(401).json({
+      success: false,
+      error: "Debug endpoint hanya tersedia untuk admin di production. Silakan login sebagai admin terlebih dahulu.",
+    });
+  }
+
   try {
     const { pool } = await import("./db.mjs");
 
@@ -324,8 +334,9 @@ app.get("/api/debug", async (req, res) => {
         DB_PORT: process.env.DB_PORT || "not set",
         DB_USER: process.env.DB_USER || "not set",
         DB_NAME: process.env.DB_NAME || "not set",
-        DB_PASSWORD: process.env.DB_PASSWORD ? "***SET***" : "NOT SET",
-        GEMINI_API_KEY: process.env.GEMINI_API_KEY ? "***SET***" : "NOT SET",
+        // Hide sensitive info in production
+        DB_PASSWORD: isProduction ? "***HIDDEN***" : (process.env.DB_PASSWORD ? "***SET***" : "NOT SET"),
+        GEMINI_API_KEY: isProduction ? "***HIDDEN***" : (process.env.GEMINI_API_KEY ? "***SET***" : "NOT SET"),
       },
       database: {
         status: dbStatus,
@@ -338,7 +349,7 @@ app.get("/api/debug", async (req, res) => {
     res.status(500).json({
       status: "ERROR",
       error: error.message,
-      stack: error.stack,
+      stack: isProduction ? undefined : error.stack, // Hide stack trace in production
     });
   }
 });

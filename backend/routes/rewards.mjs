@@ -1,18 +1,8 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
-
-// Middleware for admin authentication
-function requireAdmin(req, res, next) {
-  if (!req.session || !req.session.isAdmin) {
-    return res.status(401).json({
-      success: false,
-      error: "Unauthorized - Admin login required",
-    });
-  }
-  next();
-}
 
 // ============================================
 // PUBLIC ROUTES (for frontend display)

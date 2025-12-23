@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -58,8 +59,8 @@ const upload = multer({
   },
 });
 
-// Generic upload endpoint (for articles, insights, etc.)
-router.post("/", (req, res) => {
+// Generic upload endpoint (for articles, insights, etc.) - admin only
+router.post("/", requireAdmin, (req, res) => {
   upload.single("file")(req, res, (err) => {
     if (err) {
       // Multer error
@@ -113,8 +114,8 @@ router.post("/", (req, res) => {
   });
 });
 
-// Upload endpoint (for products - legacy)
-router.post("/product-image", upload.single("image"), (req, res) => {
+// Upload endpoint (for products - legacy) - admin only
+router.post("/product-image", requireAdmin, upload.single("image"), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -143,8 +144,8 @@ router.post("/product-image", upload.single("image"), (req, res) => {
   }
 });
 
-// Delete image endpoint
-router.delete("/product-image/:filename", (req, res) => {
+// Delete image endpoint - admin only
+router.delete("/product-image/:filename", requireAdmin, (req, res) => {
   try {
     const { filename } = req.params;
 

@@ -1,5 +1,6 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
@@ -105,7 +106,7 @@ router.post("/validate", async (req, res) => {
 });
 
 // GET /api/coupons - List all coupons (admin only)
-router.get("/", async (req, res) => {
+router.get("/", requireAdmin, async (req, res) => {
   try {
     const { active, limit = 50 } = req.query;
 
@@ -137,7 +138,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /api/coupons/:id - Get single coupon (admin only)
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -164,7 +165,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // POST /api/coupons - Create new coupon (admin only)
-router.post("/", async (req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const {
       code,
@@ -239,7 +240,7 @@ router.post("/", async (req, res) => {
 });
 
 // PATCH /api/coupons/:id - Update coupon (admin only)
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -334,7 +335,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // DELETE /api/coupons/:id - Delete coupon (admin only)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

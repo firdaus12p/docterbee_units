@@ -1,13 +1,19 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import { query, queryOne } from "../db.mjs";
+import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
 // ============================================
+// ALL ROUTES BELOW REQUIRE ADMIN AUTHENTICATION
+// These are admin-only user management operations
+// ============================================
+
+// ============================================
 // GET /api/users - Get all users
 // ============================================
-router.get("/", async (req, res) => {
+router.get("/", requireAdmin, async (req, res) => {
   try {
     const users = await query(`
       SELECT u.id, u.name, u.email, u.phone, u.created_at, u.is_active,
@@ -34,7 +40,7 @@ router.get("/", async (req, res) => {
 // ============================================
 // GET /api/users/:id - Get single user
 // ============================================
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -68,7 +74,7 @@ router.get("/:id", async (req, res) => {
 // ============================================
 // PATCH /api/users/:id/password - Reset user password
 // ============================================
-router.patch("/:id/password", async (req, res) => {
+router.patch("/:id/password", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { password } = req.body;
@@ -125,7 +131,7 @@ router.patch("/:id/password", async (req, res) => {
 // ============================================
 // PATCH /api/users/:id/toggle - Toggle user active status
 // ============================================
-router.patch("/:id/toggle", async (req, res) => {
+router.patch("/:id/toggle", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -165,7 +171,7 @@ router.patch("/:id/toggle", async (req, res) => {
 // ============================================
 // DELETE /api/users/:id - Delete user (hard delete)
 // ============================================
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -200,7 +206,7 @@ router.delete("/:id", async (req, res) => {
 // ============================================
 // GET /api/users/:id/rewards - Get user reward redemptions history (admin)
 // ============================================
-router.get("/:id/rewards", async (req, res) => {
+router.get("/:id/rewards", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -241,7 +247,7 @@ router.get("/:id/rewards", async (req, res) => {
 // ============================================
 // PATCH /api/users/:userId/rewards/:redemptionId/approve - Approve reward redemption (admin)
 // ============================================
-router.patch("/:userId/rewards/:redemptionId/approve", async (req, res) => {
+router.patch("/:userId/rewards/:redemptionId/approve", requireAdmin, async (req, res) => {
   try {
     const { userId, redemptionId } = req.params;
 
