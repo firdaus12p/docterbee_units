@@ -1935,7 +1935,7 @@ async function checkTranscript() {
 
   if (transcriptStatus) {
     transcriptStatus.innerHTML = `
-      <div class="flex items-center gap-2 text-slate-400 text-sm">
+      <div class="flex items-center gap-2 text-slate-600 text-sm">
         <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
         <span>Memeriksa ketersediaan transcript...</span>
       </div>
@@ -1956,13 +1956,13 @@ async function checkTranscript() {
       if (data.available) {
         // ✅ Transcript available
         transcriptStatus.innerHTML = `
-          <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+          <div class="bg-emerald-100 border border-emerald-400/50 rounded-lg p-3">
             <div class="flex items-start gap-2">
-              <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+              <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5"></i>
               <div class="flex-1">
-                <div class="font-medium text-emerald-300 mb-1">✅ Transcript Tersedia!</div>
-                <div class="text-sm text-slate-300">${data.message}</div>
-                <div class="text-xs text-slate-400 mt-1">
+                <div class="font-medium text-emerald-700 mb-1">✅ Transcript Tersedia!</div>
+                <div class="text-sm text-slate-700">${data.message}</div>
+                <div class="text-xs text-slate-600 mt-1">
                   ${data.segmentCount} segmen • ${data.characterCount.toLocaleString()} karakter
                 </div>
               </div>
@@ -1972,12 +1972,12 @@ async function checkTranscript() {
       } else {
         // ❌ Transcript not available
         transcriptStatus.innerHTML = `
-          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+          <div class="bg-amber-100 border border-amber-400/50 rounded-lg p-3">
             <div class="flex items-start gap-2">
-              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
               <div class="flex-1">
-                <div class="font-medium text-amber-300 mb-1">⚠️ Transcript Tidak Tersedia</div>
-                <div class="text-sm text-slate-300 whitespace-pre-line">${data.message}</div>
+                <div class="font-medium text-amber-700 mb-1">⚠️ Transcript Tidak Tersedia</div>
+                <div class="text-sm text-slate-700 whitespace-pre-line">${data.message}</div>
               </div>
             </div>
           </div>
@@ -1989,12 +1989,12 @@ async function checkTranscript() {
     console.error("Error checking transcript:", error);
     if (transcriptStatus) {
       transcriptStatus.innerHTML = `
-        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+        <div class="bg-red-100 border border-red-400/50 rounded-lg p-3">
           <div class="flex items-start gap-2">
-            <i data-lucide="x-circle" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"></i>
+            <i data-lucide="x-circle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
             <div class="flex-1">
-              <div class="font-medium text-red-300 mb-1">❌ Error</div>
-              <div class="text-sm text-slate-300">Gagal memeriksa transcript: ${error.message}</div>
+              <div class="font-medium text-red-700 mb-1">❌ Error</div>
+              <div class="text-sm text-slate-700">Gagal memeriksa transcript: ${error.message}</div>
             </div>
           </div>
         </div>
@@ -2047,15 +2047,15 @@ async function analyzeMedia() {
 
   aiResult.innerHTML = `
     <div class="ai-analysis-card text-center">
-      <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-400"></i>
-      <p class="text-slate-300">
+      <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-500"></i>
+      <p class="text-slate-700">
         ${
           youtubeUrl && !notes
             ? "Mengambil transcript YouTube..."
             : "Menganalisis dengan Gemini AI..."
         }
       </p>
-      <p class="text-xs text-slate-500 mt-2">Mohon tunggu 5-15 detik</p>
+      <p class="text-xs text-slate-600 mt-2">Mohon tunggu 5-15 detik</p>
     </div>
   `;
   lucide.createIcons();
@@ -2148,12 +2148,12 @@ async function analyzeMedia() {
       <div class="ai-analysis-card border-${isQuotaError ? "amber" : "red"}-500/30">
         <div class="font-semibold mb-2 flex items-center gap-2 text-${
           isQuotaError ? "amber" : "red"
-        }-400">
+        }-600">
           <i data-lucide="${isQuotaError ? "clock" : "alert-triangle"}" class="w-5 h-5"></i>
           ${isQuotaError ? "Kuota API Tercapai" : "Gagal Menganalisis"}
         </div>
-        <p class="text-slate-300 mb-3">${escapeHtml(error.message)}</p>
-        <div class="text-sm text-slate-400">
+        <p class="text-slate-700 mb-3">${escapeHtml(error.message)}</p>
+        <div class="text-sm text-slate-600">
           <p class="font-semibold mb-1">${isQuotaError ? "Solusi" : "Troubleshooting"}:</p>
           <ul class="list-disc pl-5 space-y-1">
             ${
@@ -2161,12 +2161,12 @@ async function analyzeMedia() {
                 ? `
               <li><b>Tunggu 1-2 menit</b> lalu coba lagi (Free tier: 15 requests/menit)</li>
               <li>Refresh halaman ini setelah menunggu</li>
-              <li>Atau upgrade ke <a href="https://ai.google.dev/pricing" target="_blank" class="text-amber-400 underline">paid plan</a> untuk quota lebih besar</li>
+              <li>Atau upgrade ke <a href="https://ai.google.dev/pricing" target="_blank" class="text-amber-600 underline">paid plan</a> untuk quota lebih besar</li>
             `
                 : `
-              <li>Pastikan server backend berjalan: <code class="bg-slate-700 px-1 rounded">npm start</code></li>
-              <li>Cek koneksi ke <code class="bg-slate-700 px-1 rounded">http://localhost:3000</code></li>
-              <li>Periksa API key Gemini di file <code class="bg-slate-700 px-1 rounded">.env</code></li>
+              <li>Pastikan server backend berjalan: <code class="bg-slate-200 text-slate-800 px-1 rounded">npm start</code></li>
+              <li>Cek koneksi ke <code class="bg-slate-200 text-slate-800 px-1 rounded">http://localhost:3000</code></li>
+              <li>Periksa API key Gemini di file <code class="bg-slate-200 text-slate-800 px-1 rounded">.env</code></li>
               <li>Lihat console browser (F12) untuk detail error</li>
             `
             }
@@ -2206,15 +2206,15 @@ function markdownToHtml(text) {
   let html = escapeHtml(text);
 
   // Convert **bold** to <strong>
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong class='font-semibold text-slate-100'>$1</strong>");
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong class='font-semibold text-slate-900'>$1</strong>");
 
   // Convert *italic* to <em> (only if not part of **bold**)
-  html = html.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em class='italic text-slate-200'>$1</em>");
+  html = html.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em class='italic text-slate-800'>$1</em>");
 
   // Convert `code` to <code>
   html = html.replace(
     /`(.+?)`/g,
-    "<code class='px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-sm font-mono'>$1</code>"
+    "<code class='px-1.5 py-0.5 rounded bg-slate-200 text-amber-700 text-sm font-mono'>$1</code>"
   );
 
   return html;
@@ -2230,8 +2230,8 @@ function formatAISummary(text, metadata = {}) {
       metadata.source === "auto-transcript" ? "✨ Auto Transcript" : "📝 User Notes";
     const sourceColor =
       metadata.source === "auto-transcript"
-        ? "bg-emerald-400/10 border-emerald-400/30 text-emerald-300"
-        : "bg-sky-400/10 border-sky-400/30 text-sky-300";
+        ? "bg-emerald-100 border-emerald-400/50 text-emerald-700"
+        : "bg-sky-100 border-sky-400/50 text-sky-700";
 
     metadataBadge = `
       <div class="mb-4 inline-flex items-center gap-2 ${sourceColor} border rounded-lg px-3 py-1.5 text-xs">
@@ -2258,36 +2258,89 @@ function formatAISummary(text, metadata = {}) {
   lines.forEach((line) => {
     const trimmed = line.trim();
 
-    // Detect section headers (bold text with **)
-    if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
+    // Detect markdown headers (### or ####)
+    const markdownHeaderMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+    if (markdownHeaderMatch) {
       // Close previous section
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join("")}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
         currentList = [];
+      }
+      // Close previous section card if exists
+      if (currentSection) {
+        html += "</div>";
+      }
+
+      const headerText = markdownHeaderMatch[2].replace(/\*\*/g, "").trim();
+      let iconName = "info";
+      let iconColor = "text-sky-500";
+
+      if (headerText.includes("Ringkasan") || headerText.includes("ringkasan")) {
+        iconName = "info";
+        iconColor = "text-sky-500";
+      } else if (headerText.includes("Kesesuaian") || headerText.includes("kesesuaian") || headerText.includes("Qur'an") || headerText.includes("Hadis")) {
+        iconName = "book-open";
+        iconColor = "text-emerald-500";
+      } else if (headerText.includes("Selaras") || headerText.includes("selaras")) {
+        iconName = "check-circle";
+        iconColor = "text-emerald-500";
+      } else if (headerText.includes("Koreksi") || headerText.includes("koreksi") || headerText.includes("Catatan")) {
+        iconName = "alert-circle";
+        iconColor = "text-amber-500";
+      } else if (headerText.includes("Sains") || headerText.includes("sains") || headerText.includes("Ilmiah")) {
+        iconName = "flask-conical";
+        iconColor = "text-sky-500";
+      } else if (headerText.includes("NBSN") || headerText.includes("Rekomendasi")) {
+        iconName = "brain";
+        iconColor = "text-purple-500";
+      } else if (headerText.includes("Analisis") || headerText.includes("Konten")) {
+        iconName = "file-text";
+        iconColor = "text-blue-500";
+      }
+
+      html += `
+        <div class="ai-analysis-card">
+          <div class="font-semibold mb-2 flex items-center gap-2 text-slate-900">
+            <i data-lucide="${iconName}" class="w-4 h-4 ${iconColor}"></i>
+            ${escapeHtml(headerText)}
+          </div>
+      `;
+      currentSection = headerText;
+    }
+    // Detect section headers (bold text with **)
+    else if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
+      // Close previous section
+      if (currentList.length > 0) {
+        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
+        currentList = [];
+      }
+      // Close previous section card if exists
+      if (currentSection) {
+        html += "</div>";
       }
 
       // Add new section header
       const headerText = trimmed.replace(/\*\*/g, "");
       let iconName = "info";
-      let iconColor = "text-sky-400";
+      let iconColor = "text-sky-500";
 
       if (headerText.includes("Selaras") || headerText.includes("selaras")) {
         iconName = "check-circle";
-        iconColor = "text-emerald-400";
+        iconColor = "text-emerald-500";
       } else if (headerText.includes("Koreksi") || headerText.includes("koreksi")) {
         iconName = "alert-circle";
-        iconColor = "text-amber-400";
+        iconColor = "text-amber-500";
       } else if (headerText.includes("Sains") || headerText.includes("sains")) {
         iconName = "flask-conical";
-        iconColor = "text-sky-400";
+        iconColor = "text-sky-500";
       } else if (headerText.includes("NBSN")) {
         iconName = "brain";
-        iconColor = "text-purple-400";
+        iconColor = "text-purple-500";
       }
 
       html += `
         <div class="ai-analysis-card">
-          <div class="font-semibold mb-2 flex items-center gap-2">
+          <div class="font-semibold mb-2 flex items-center gap-2 text-slate-900">
             <i data-lucide="${iconName}" class="w-4 h-4 ${iconColor}"></i>
             ${escapeHtml(headerText)}
           </div>
@@ -2307,16 +2360,16 @@ function formatAISummary(text, metadata = {}) {
     // Regular paragraph
     else if (trimmed) {
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join("")}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
         currentList = [];
       }
-      html += `<p class="text-slate-200/85">${markdownToHtml(trimmed)}</p>`;
+      html += `<p class="text-slate-700">${markdownToHtml(trimmed)}</p>`;
     }
   });
 
   // Close remaining list
   if (currentList.length > 0) {
-    html += `<ul class="list-disc pl-5 text-slate-200/85">${currentList.join("")}</ul>`;
+    html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
   }
 
   // Close last section
