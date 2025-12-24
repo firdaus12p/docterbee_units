@@ -766,7 +766,7 @@ async function loadArticles() {
 
 function openArticleModal(id = null) {
   document.getElementById("articleModal").classList.remove("hidden");
-  document.getElementById("articleModalTitle").textContent = id ? "Edit Artikel" : "Artikel Baru";
+  document.getElementById("articleModalTitle").textContent = id ? "Edit Edukasi" : "Edukasi Baru";
 
   // Only reset form if creating new article (not editing)
   if (!id) {
@@ -868,7 +868,7 @@ async function handleArticleSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      showSuccessModal(id ? "Artikel berhasil diupdate" : "Artikel berhasil dibuat");
+      showSuccessModal(id ? "Edukasi berhasil diupdate" : "Edukasi berhasil dibuat");
       closeArticleModal();
       loadArticles();
     } else {
@@ -945,7 +945,7 @@ async function deleteArticle(id) {
 
         const result = await response.json();
         if (result.success) {
-          showSuccessModal("Artikel berhasil dihapus secara permanen");
+          showSuccessModal("Edukasi berhasil dihapus secara permanen");
           loadArticles();
         } else {
           alert("Gagal menghapus artikel: " + (result.error || "Unknown error"));
@@ -1044,7 +1044,7 @@ async function loadEvents() {
 
 function openEventModal(id = null) {
   document.getElementById("eventModal").classList.remove("hidden");
-  document.getElementById("eventModalTitle").textContent = id ? "Edit Event" : "Event Baru";
+  document.getElementById("eventModalTitle").textContent = id ? "Edit Program" : "Program Baru";
   document.getElementById("eventForm").reset();
   document.getElementById("eventId").value = id || "";
 
@@ -1095,7 +1095,7 @@ async function handleEventSubmit(e) {
 
     const result = await response.json();
     if (result.success) {
-      showSuccessModal(id ? "Event berhasil diupdate" : "Event berhasil dibuat");
+      showSuccessModal(id ? "Program berhasil diupdate" : "Program berhasil dibuat");
       closeEventModal();
       loadEvents();
     } else {
@@ -1170,7 +1170,7 @@ async function deleteEvent(id) {
 
         const result = await response.json();
         if (result.success) {
-          showSuccessModal("Event berhasil dihapus secara permanen");
+          showSuccessModal("Program berhasil dihapus secara permanen");
           loadEvents();
         } else {
           alert(result.error || "Gagal menghapus event");
