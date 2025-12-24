@@ -211,7 +211,7 @@ function showError(message) {
         href="/insight" 
         class="inline-block px-6 py-3 bg-amber-400 text-slate-900 font-semibold rounded-lg hover:bg-amber-500 transition"
       >
-        Kembali ke Insight
+        Kembali ke Artikel
       </a>
     </div>
   `;
