@@ -27,6 +27,11 @@ export default [
         formatNumber: "readonly",
         debounce: "readonly",
         copyToClipboard: "readonly",
+        // Shared utilities from modal-utils.js
+        showWarning: "readonly",
+        showSuccessModal: "readonly",
+        // Shared utilities from script.js
+        markdownToHtml: "readonly",
         // Cross-file dependencies
         UserDataSync: "readonly",
       },

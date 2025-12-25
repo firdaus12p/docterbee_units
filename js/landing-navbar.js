@@ -25,9 +25,10 @@
       console.log("[landing-navbar] Auth check result:", result);
 
       if (result.loggedIn && result.user) {
-        // User logged in - show member navbar
+        // User logged in - show member navbar and fetch points
         console.log("[landing-navbar] User IS logged in, showing member navbar");
         showMemberNavbar();
+        fetchAndDisplayPoints();
       } else {
         // User not logged in - show guest navbar
         console.log("[landing-navbar] User NOT logged in (no user in result)");
@@ -40,9 +41,35 @@
     }
   }
 
+  // Fetch and display user points
+  async function fetchAndDisplayPoints() {
+    try {
+      const response = await fetch("/api/user-data/progress", {
+        credentials: "include",
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          const points = data.data.points || 0;
+          
+          // Update desktop points
+          const navPoints = document.getElementById("navPoints");
+          if (navPoints) navPoints.textContent = points;
+          
+          // Update mobile points
+          const mobileNavPoints = document.getElementById("mobileNavPoints");
+          if (mobileNavPoints) mobileNavPoints.textContent = points;
+        }
+      }
+    } catch (error) {
+      console.warn("[landing-navbar] Could not fetch points:", error.message);
+    }
+  }
+
   // Show navbar for guest users (not logged in)
   function showGuestNavbar() {
-    // Show "Beranda" link
+    // Show "Beranda" link (only visible for guests)
     const guestNavItem = document.getElementById("guestNavItem");
     const mobileGuestNavItem = document.getElementById("mobileGuestNavItem");
     if (guestNavItem) guestNavItem.style.display = "";
@@ -54,16 +81,16 @@
     if (authButtons) authButtons.style.display = "";
     if (mobileAuthButtons) mobileAuthButtons.style.display = "";
 
-    // Hide logout button
-    const logoutBtn = document.getElementById("logoutBtn");
-    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
-    if (logoutBtn) logoutBtn.style.display = "none";
-    if (mobileLogoutBtn) mobileLogoutBtn.style.display = "none";
+    // Hide member info (Points, Profile, Logout)
+    const memberInfo = document.getElementById("memberInfo");
+    const mobileMemberInfo = document.getElementById("mobileMemberInfo");
+    if (memberInfo) memberInfo.style.display = "none";
+    if (mobileMemberInfo) mobileMemberInfo.style.display = "none";
   }
 
   // Show navbar for logged-in users
   function showMemberNavbar() {
-    // Hide "Beranda" link
+    // Hide "Beranda" link (only visible for guests)
     const guestNavItem = document.getElementById("guestNavItem");
     const mobileGuestNavItem = document.getElementById("mobileGuestNavItem");
     if (guestNavItem) guestNavItem.style.display = "none";
@@ -75,11 +102,11 @@
     if (authButtons) authButtons.style.display = "none";
     if (mobileAuthButtons) mobileAuthButtons.style.display = "none";
 
-    // Show logout button
-    const logoutBtn = document.getElementById("logoutBtn");
-    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
-    if (logoutBtn) logoutBtn.style.display = "inline-flex";
-    if (mobileLogoutBtn) mobileLogoutBtn.style.display = "inline-flex";
+    // Show member info (Points, Profile, Logout)
+    const memberInfo = document.getElementById("memberInfo");
+    const mobileMemberInfo = document.getElementById("mobileMemberInfo");
+    if (memberInfo) memberInfo.style.display = "flex";
+    if (mobileMemberInfo) mobileMemberInfo.style.display = "flex";
   }
 
   // Handle logout

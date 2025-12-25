@@ -102,6 +102,7 @@ const cleanUrlPages = [
   "profile",
   "youtube-ai",
   "podcast",
+  "periksa-kesehatan",
 ];
 
 // Redirect .html URLs to clean URLs (SEO friendly)
@@ -169,7 +170,9 @@ app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve 
 // CLEAN URLs - serve HTML files without extension
 cleanUrlPages.forEach((page) => {
   app.get(`/${page}`, (req, res) => {
-    res.sendFile(join(__dirname, "..", `${page}.html`));
+    // Special case: periksa-kesehatan maps to docterbee-periksa-kesehatan.html
+    const fileName = page === "periksa-kesehatan" ? "docterbee-periksa-kesehatan" : page;
+    res.sendFile(join(__dirname, "..", `${fileName}.html`));
   });
 });
 
@@ -810,6 +813,188 @@ PENTING:
 
     res.status(500).json({
       error: "Gagal memproses analisis: " + error.message,
+    });
+  }
+});
+
+// POST /api/health-check-ai - Health Check AI Analysis
+app.post("/api/health-check-ai", async (req, res) => {
+  if (!genAI) {
+    return res.status(500).json({
+      error: "Gemini API tidak dikonfigurasi",
+    });
+  }
+
+  try {
+    const { usia, gender, keluhan, makan, tidur, aktivitas, redflag } = req.body;
+
+    // Input validation
+    if (!usia || !gender) {
+      return res.status(400).json({
+        error: "Usia dan jenis kelamin harus diisi",
+      });
+    }
+
+    if (!Array.isArray(keluhan) || keluhan.length === 0) {
+      return res.status(400).json({
+        error: "Minimal satu keluhan harus dipilih",
+      });
+    }
+
+    // Sanitize arrays to prevent injection
+    const sanitizeArray = (arr) => {
+      if (!Array.isArray(arr)) return [];
+      return arr.filter((item) => typeof item === "string" && item.length < 100);
+    };
+
+    const keluhanList = sanitizeArray(keluhan);
+    const makanList = sanitizeArray(makan);
+    const tidurList = sanitizeArray(tidur);
+    const aktivitasList = sanitizeArray(aktivitas);
+    const redflagList = sanitizeArray(redflag);
+
+    console.log("🩺 Health Check AI - Analyzing user data...");
+    console.log("   Usia:", usia, "| Gender:", gender);
+    console.log("   Keluhan:", keluhanList.length, "items");
+    console.log("   Red flags:", redflagList.length, "items");
+
+    const modelName = "gemini-2.5-flash";
+    const model = genAI.getGenerativeModel({ model: modelName });
+
+    // Build context from user input
+    const userContext = `
+DATA PENGGUNA:
+- Rentang usia: ${usia}
+- Jenis kelamin: ${gender === "L" ? "Laki-laki" : "Perempuan"}
+- Keluhan utama: ${keluhanList.join(", ") || "Tidak ada"}
+- Pola makan: ${makanList.join(", ") || "Tidak disebutkan"}
+- Pola tidur: ${tidurList.join(", ") || "Tidak disebutkan"}
+- Aktivitas & stres: ${aktivitasList.join(", ") || "Tidak disebutkan"}
+- Tanda bahaya: ${redflagList.join(", ") || "Tidak ada"}`;
+
+    const prompt = `Kamu adalah AI Health Advisor untuk aplikasi kesehatan Islami "Docterbee" yang menggabungkan ajaran Qur'an & Sunnah SHAHIH dengan sains modern.
+
+${userContext}
+
+TUGAS:
+Berdasarkan data pengguna di atas, berikan analisis kesehatan dalam format JSON yang VALID dengan struktur berikut:
+
+{
+  "level": "green" atau "yellow" atau "red",
+  "statusText": "Deskripsi singkat status (contoh: RINGAN – Bisa dipantau di rumah)",
+  "ringkasan": "Ringkasan kondisi pengguna dalam 2-3 kalimat yang menjelaskan apa yang mungkin terjadi pada tubuh berdasarkan keluhan dan pola hidupnya.",
+  "akarMasalah": [
+    "Akar masalah 1 yang mungkin terjadi berdasarkan pola makan/tidur/aktivitas",
+    "Akar masalah 2",
+    "Akar masalah 3 (jika ada)"
+  ],
+  "dalilText": "Pandangan dari perspektif Qur'an dan Hadis Shahih tentang kondisi ini, dikombinasikan dengan penjelasan sains modern. Minimal 2-3 kalimat.",
+  "dalilList": [
+    {
+      "type": "Al-Qur'an" atau "Hadis",
+      "ref": "QS atau HR dengan referensi yang jelas",
+      "text": "Teks ayat atau hadis yang relevan"
+    }
+  ],
+  "solusi": [
+    "Langkah praktis 1 yang bisa dilakukan segera",
+    "Langkah praktis 2 dengan rekomendasi produk Docterbee (madu, cuka apel, dll)",
+    "Langkah praktis 3",
+    "Langkah praktis 4 (jika keluhan berat, sarankan konsultasi)"
+  ],
+  "rekomendasiText": "Rekomendasi paket yang cocok berdasarkan kondisi pengguna",
+  "rekomendasiList": [
+    "🎯 Fokus: apa yang harus diprioritaskan",
+    "🍯 Produk: rekomendasi produk Docterbee yang sesuai"
+  ],
+  "warningText": "Peringatan atau catatan penting yang perlu diperhatikan pengguna"
+}
+
+KRITERIA LEVEL:
+- "red": Ada tanda bahaya serius (nyeri dada berat, sesak berat, pingsan, muntah darah, dll) → DARURAT
+- "yellow": Banyak keluhan (4+) atau ada demam tinggi → WASPADA
+- "green": Keluhan ringan dan bisa dipantau di rumah → RINGAN
+
+PENTING:
+- Output HARUS valid JSON tanpa markdown code block atau teks tambahan
+- Dalil harus SHAHIH (Bukhari/Muslim/Tirmidzi/Abu Dawud/Ahmad atau Al-Qur'an)
+- Solusi harus praktis dan bisa dilakukan dalam 7 hari
+- Produk Docterbee yang bisa direkomendasikan: madu lebah kecil 3-5mm, cuka apel, minyak zaitun
+- Jika ada tanda bahaya, WAJIB sarankan ke fasilitas kesehatan
+- Gunakan Bahasa Indonesia yang jelas, sopan, dan profesional`;
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+
+    console.log("✅ Health Check AI analysis complete, length:", text.length, "chars");
+
+    // Clean up response (remove markdown code blocks if any)
+    text = text
+      .replace(/```json\s*/g, "")
+      .replace(/```\s*/g, "")
+      .trim();
+
+    // Parse JSON response
+    let jsonResponse;
+    try {
+      jsonResponse = JSON.parse(text);
+    } catch (parseError) {
+      console.error("❌ JSON parsing error:", parseError.message);
+      console.log("📄 Raw response:", text.substring(0, 300));
+
+      // Return error so client can use fallback
+      return res.status(500).json({
+        error: "Response AI tidak dalam format yang valid",
+        fallback: true,
+      });
+    }
+
+    // Validate required fields
+    const requiredFields = ["level", "statusText", "ringkasan", "akarMasalah", "solusi"];
+    const missingFields = requiredFields.filter((field) => !jsonResponse[field]);
+
+    if (missingFields.length > 0) {
+      console.log("⚠️ Missing fields in response:", missingFields);
+      return res.status(500).json({
+        error: "Response AI tidak lengkap",
+        fallback: true,
+      });
+    }
+
+    // Return structured response
+    res.json({
+      success: true,
+      data: jsonResponse,
+      modelUsed: modelName,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("❌ Health Check AI Error:", error.message);
+
+    // Handle specific errors
+    if (error.message.includes("API key")) {
+      return res.status(500).json({
+        error: "Konfigurasi API key tidak valid",
+      });
+    }
+
+    if (error.message.includes("quota") || error.message.includes("429")) {
+      const isPerMinute = error.message.includes("per minute") || error.message.includes("RPM");
+
+      return res.status(429).json({
+        error: isPerMinute ? "Per-minute quota tercapai" : "Daily quota tercapai",
+        details: isPerMinute ? "Tunggu 60 detik lalu coba lagi" : "Coba besok atau upgrade",
+        waitTime: isPerMinute ? "60 detik" : "24 jam",
+        retryAfter: isPerMinute ? 60 : 86400,
+        fallback: true,
+      });
+    }
+
+    res.status(500).json({
+      error: "Gagal memproses analisis: " + error.message,
+      fallback: true,
     });
   }
 });

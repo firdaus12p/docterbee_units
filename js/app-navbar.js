@@ -1,12 +1,12 @@
-// App Navbar - Authentication-based Logout Button Display
-// This script controls logout button visibility based on login status
-// Used for: index.html, services.html, store.html, events.html, insight.html, media.html, ai-advisor.html
+// App Navbar - Authentication-based Display
+// This script controls navbar visibility based on login status
+// Used for pages with style.css navbar (journey, services, store, events, insight, etc.)
 
 (function () {
   "use strict";
 
-  // Check authentication status and update logout button
-  async function checkAuthAndUpdateLogoutBtn() {
+  // Check authentication status and update navbar
+  async function checkAuthAndUpdateNavbar() {
     console.log("[app-navbar] Checking auth status...");
     try {
       const response = await fetch("/api/auth/check", {
@@ -14,9 +14,9 @@
       });
 
       if (!response.ok) {
-        // User not logged in - hide logout button
+        // User not logged in - show guest UI
         console.log("[app-navbar] User NOT logged in (response not ok)");
-        hideLogoutButton();
+        showGuestUI();
         return;
       }
 
@@ -24,23 +24,24 @@
       console.log("[app-navbar] Auth check result:", result);
 
       if (result.loggedIn && result.user) {
-        // User logged in - show logout button
-        console.log("[app-navbar] User IS logged in, showing logout button");
-        showLogoutButton();
+        // User logged in - show member UI
+        console.log("[app-navbar] User IS logged in, showing member UI");
+        showMemberUI();
       } else {
-        // User not logged in - hide logout button
+        // User not logged in - show guest UI
         console.log("[app-navbar] User NOT logged in (no user in result)");
-        hideLogoutButton();
+        showGuestUI();
       }
     } catch (error) {
-      // Network error or server down - hide logout button as fallback
+      // Network error or server down - show guest UI as fallback
       console.warn("[app-navbar] Could not check auth status:", error.message);
-      hideLogoutButton();
+      showGuestUI();
     }
   }
 
-  // Show logout button for logged-in users
-  function showLogoutButton() {
+  // Show UI for logged-in users (Points, Profile, Logout)
+  function showMemberUI() {
+    // Show logout button
     const logoutBtn = document.getElementById("logoutBtn");
     const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
 
@@ -54,7 +55,7 @@
       mobileLogoutBtn.style.display = "block";
     }
 
-    // Show Profile button if exists
+    // Show Profile button
     const profileBtn = document.getElementById("profileBtn");
     const mobileProfileBtn = document.getElementById("mobileProfileBtn");
     
@@ -68,7 +69,7 @@
       mobileProfileBtn.style.display = "block";
     }
 
-    // Show Points display if exists
+    // Show Points display
     const pointsDisplay = document.getElementById("pointsDisplay");
     const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
     
@@ -93,10 +94,22 @@
     if (mobileGuestNavItem) {
       mobileGuestNavItem.style.display = "none";
     }
+
+    // Hide login buttons for logged-in users
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+    const mobileRegisterBtn = document.getElementById("mobileRegisterBtn");
+
+    if (loginBtn) loginBtn.style.display = "none";
+    if (registerBtn) registerBtn.style.display = "none";
+    if (mobileLoginBtn) mobileLoginBtn.style.display = "none";
+    if (mobileRegisterBtn) mobileRegisterBtn.style.display = "none";
   }
 
-  // Hide logout button for guest users
-  function hideLogoutButton() {
+  // Show UI for guest users (Beranda, Login, Register)
+  function showGuestUI() {
+    // Hide logout button
     const logoutBtn = document.getElementById("logoutBtn");
     const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
 
@@ -149,6 +162,23 @@
     if (mobileGuestNavItem) {
       mobileGuestNavItem.style.display = "";
     }
+
+    // Show login buttons for guest users
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+    const mobileRegisterBtn = document.getElementById("mobileRegisterBtn");
+
+    if (loginBtn) loginBtn.style.display = "";
+    if (registerBtn) registerBtn.style.display = "";
+    if (mobileLoginBtn) {
+      mobileLoginBtn.classList.remove("hidden");
+      mobileLoginBtn.style.display = "block";
+    }
+    if (mobileRegisterBtn) {
+      mobileRegisterBtn.classList.remove("hidden");
+      mobileRegisterBtn.style.display = "block";
+    }
   }
 
   // Initialize mobile media dropdown toggle
@@ -166,8 +196,8 @@
 
   // Initialize on DOM ready
   function init() {
-    // Check auth status and update logout button
-    checkAuthAndUpdateLogoutBtn();
+    // Check auth status and update navbar
+    checkAuthAndUpdateNavbar();
     // Initialize mobile dropdown
     initMobileMediaDropdown();
   }

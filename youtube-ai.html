@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -52,8 +52,25 @@
             </div>
           </div>
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
+          <a href="/periksa-kesehatan" class="nav-link">Cek Kesehatan</a>
         </nav>
         <div class="flex items-center gap-3">
+          <!-- Guest buttons (shown when not logged in) -->
+          <a
+            id="loginBtn"
+            href="/login"
+            class="btn btn-outline"
+            style="display: none"
+          >
+            Masuk
+          </a>
+          <a
+            id="registerBtn"
+            href="/register"
+            class="btn btn-primary"
+            style="display: none"
+          >Daftar Sekarang</a>
+          <!-- Member elements (shown when logged in) -->
           <span class="points-display" id="pointsDisplay" style="display: none">
             Points: <b id="navPoints">0</b>
           </span>
@@ -62,7 +79,7 @@
           </a>
           <button
             id="logoutBtn"
-            class="hidden md:block text-sm text-red-600 hover:text-red-700 font-semibold"
+            class="btn-outline-danger"
             aria-label="Logout"
             style="display: none"
           >
@@ -116,8 +133,10 @@
           </div>
         </div>
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
+        <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
       </nav>
       <div class="mobile-menu-footer">
+        <!-- Member elements (shown when logged in) -->
         <span class="points-display" id="mobilePointsDisplay" style="display: none">
           Points: <b id="mobileNavPoints">0</b>
         </span>
@@ -127,17 +146,27 @@
         </a>
         <button
           id="mobileLogoutBtn"
-          class="hidden mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
-          style="display: none"
+          class="btn-outline-danger"
+          style="display: none; width: 100%; margin-top: 0.5rem;"
         >
           Logout
         </button>
+        <!-- Guest buttons (shown when not logged in) -->
         <a
           id="mobileLoginBtn"
           href="/login"
-          class="hidden mt-4 w-full py-2 px-4 bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold rounded-lg transition-colors text-center block"
+          class="btn btn-outline"
+          style="display: none; width: 100%; margin-top: 0.5rem;"
         >
-          Login
+          Masuk
+        </a>
+        <a
+          id="mobileRegisterBtn"
+          href="/register"
+          class="btn btn-primary"
+          style="display: none; width: 100%; margin-top: 0.5rem;"
+        >
+          Daftar Sekarang
         </a>
       </div>
     </div>
