@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docterbee – Artikel</title>
+    <title>Docterbee – YouTube & AI</title>
+    <meta name="description" content="Analisis konten YouTube dengan AI berdasarkan perspektif Qur'an, Hadis, Docterbee, dan sains." />
 
     <!-- External Stylesheets -->
     <link
@@ -144,45 +145,95 @@
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <div class="mb-6">
-        <h1 class="text-3xl md:text-4xl font-bold">Docterbee Artikel</h1>
+        <h1 class="text-3xl md:text-4xl font-bold">YouTube & AI</h1>
         <p class="text-slate-900">
-          Artikel edukasi sains × Qur'ani. Pilih artikel lalu minta AI merangkum & memberi
-          rekomendasi NBSN.
+          Tempel URL <b>video YouTube</b>, lalu minta AI menganalisis
+          kesesuaian dengan Qur'an, Hadis, Docterbee, dan sains.
         </p>
       </div>
 
-      <div class="grid gap-6 md:grid-cols-3">
-        <section class="booking-container md:col-span-2">
-          <div id="articles" class="grid gap-4"></div>
-        </section>
+      <!-- YouTube & AI Section -->
+      <div id="sectionYouTube" class="grid gap-6 md:grid-cols-3">
+        <!-- Left: YouTube -->
+        <section class="media-container md:col-span-2">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="youtube" class="w-5 h-5 text-rose-400"></i>
+            <div class="font-semibold">YouTube Player</div>
+          </div>
+          <label class="media-label">Tempel URL YouTube</label>
+          <div class="flex flex-col sm:flex-row gap-2 mt-1">
+            <input
+              id="ytUrl"
+              class="media-input flex-1"
+              placeholder="https://www.youtube.com/watch?v=..."
+              autocomplete="off"
+            />
+            <button id="btnLoadYT" class="btn-primary-sm">Load</button>
+          </div>
+          <div
+            id="ytPlayer"
+            class="media-player aspect-video mt-4 flex items-center justify-center text-slate-400"
+          >
+            <span>Video akan tampil di sini.</span>
+          </div>
 
-        <aside class="insight-sidebar">
-          <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="filter" class="w-4 h-4 text-amber-500"></i>
-            <b>Filter</b>
-          </div>
-          <ul class="space-y-1 text-slate-900">
-            <li><input type="checkbox" value="Nutrisi" checked /> Nutrisi</li>
-            <li><input type="checkbox" value="Ibadah" checked /> Ibadah</li>
-            <li><input type="checkbox" value="Kebiasaan" checked /> Kebiasaan</li>
-            <li><input type="checkbox" value="Sains" checked /> Sains</li>
-          </ul>
+          <!-- Check Transcript Button -->
           <div class="mt-4 flex items-center gap-2">
-            <i data-lucide="book-open-check" class="w-4 h-4 text-sky-500"></i>
-            <b>NBSN</b>
+            <button
+              id="btnCheckTranscript"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 text-white hover:opacity-90"
+              style="background-color: #F46A13;"
+              onclick="checkTranscript()"
+            >
+              <i data-lucide="search" class="w-3 h-3"></i>
+              Check Transcript
+            </button>
+            <span class="text-xs text-slate-500">Cek apakah video bisa auto-transcript</span>
           </div>
-          <p class="text-slate-900">
-            Setiap ringkasan mengikuti kerangka Neuron–Biomolekul–Sensorik–Nature.
-          </p>
-        </aside>
+
+          <!-- Transcript Status -->
+          <div id="transcriptStatus" class="mt-3"></div>
+
+          <div class="mt-4">
+            <label class="media-label flex items-center gap-2">
+              <span>Catatan / poin penting</span>
+              <span class="text-xs text-emerald-400 opacity-70"
+                >(Opsional - akan auto-fetch transcript jika kosong)</span
+              >
+            </label>
+            <textarea
+              id="mediaNotes"
+              class="media-textarea"
+              placeholder="Kosongkan untuk auto-fetch transcript, atau tulis catatan manual di sini..."
+              autocomplete="off"
+            ></textarea>
+          </div>
+          <div class="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <button id="btnAnalyze" class="btn-analyze">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              Analisis AI
+            </button>
+            <div class="text-xs text-slate-400 space-y-1">
+              <div class="flex items-center gap-1">
+                <i data-lucide="info" class="w-3 h-3"></i>
+                <span>Akan otomatis ambil transcript YouTube jika tersedia</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3 h-3"></i>
+                <span>Powered by Gemini AI + Dalil Shahih</span>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <section class="mt-8 booking-container">
+      <!-- AI Result -->
+      <section id="aiResultSection" class="mt-8 booking-container">
         <div class="p-5 border-b border-gray-200">
-          <div class="text-lg font-semibold">Ringkasan AI</div>
+          <div class="text-lg font-semibold">Hasil Analisis AI</div>
         </div>
-        <div id="insightResult" class="p-5 text-sm text-slate-900">
-          <p class="opacity-70">Klik <b>Ringkas & Rekomendasi</b> pada salah satu artikel.</p>
+        <div id="aiResult" class="p-5 text-sm text-slate-900">
+          <p class="opacity-70">Masukkan URL & catatan, lalu klik <b>Analisis AI</b>.</p>
         </div>
       </section>
     </main>
@@ -195,14 +246,12 @@
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="js/user-data-sync.js"></script>
-    <!-- Note: auth-check.js removed - Artikel supports guest mode -->
     <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
     <script src="js/app-navbar.js"></script>
-    <script src="js/insight-articles.js"></script>
     <script>
-      // Mobile dropdown toggle
+      // Initialize mobile dropdown toggle
       document.addEventListener('DOMContentLoaded', function() {
         const mobileDropdown = document.getElementById('mobileMediaDropdown');
         const mobileToggle = mobileDropdown?.querySelector('.mobile-nav-dropdown-toggle');

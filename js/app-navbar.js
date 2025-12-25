@@ -151,10 +151,25 @@
     }
   }
 
+  // Initialize mobile media dropdown toggle
+  function initMobileMediaDropdown() {
+    const mobileDropdown = document.getElementById("mobileMediaDropdown");
+    const mobileToggle = mobileDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+
+    if (mobileToggle) {
+      mobileToggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        mobileDropdown.classList.toggle("open");
+      });
+    }
+  }
+
   // Initialize on DOM ready
   function init() {
     // Check auth status and update logout button
     checkAuthAndUpdateLogoutBtn();
+    // Initialize mobile dropdown
+    initMobileMediaDropdown();
   }
 
   // Run on DOM ready

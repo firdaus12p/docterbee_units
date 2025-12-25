@@ -2522,45 +2522,6 @@ function formatAISummary(text, metadata = {}) {
   return html;
 }
 
-/**
- * Initialize media page
- */
-/**
- * Switch between YouTube & AI and Podcast tabs
- */
-function switchTab(tab) {
-  const sectionYouTube = document.getElementById("sectionYouTube");
-  const sectionPodcast = document.getElementById("sectionPodcast");
-  const aiResultSection = document.getElementById("aiResultSection");
-  const tabYouTube = document.getElementById("tabYouTube");
-  const tabPodcast = document.getElementById("tabPodcast");
-
-  if (tab === "youtube") {
-    // Show YouTube & AI section
-    sectionYouTube.classList.remove("hidden");
-    aiResultSection.classList.remove("hidden");
-    sectionPodcast.classList.add("hidden");
-
-    // Update tab buttons - use .active class
-    tabYouTube.classList.add("active");
-    tabPodcast.classList.remove("active");
-  } else if (tab === "podcast") {
-    // Show Podcast section
-    sectionYouTube.classList.add("hidden");
-    aiResultSection.classList.add("hidden");
-    sectionPodcast.classList.remove("hidden");
-
-    // Update tab buttons - use .active class
-    tabPodcast.classList.add("active");
-    tabYouTube.classList.remove("active");
-  }
-
-  // Re-initialize Lucide icons after DOM changes
-  if (typeof lucide !== "undefined" && lucide.createIcons) {
-    lucide.createIcons();
-  }
-}
-
 function initMedia() {
   // Set current year in footer
   const yearElement = document.getElementById("year");

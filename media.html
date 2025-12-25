@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docterbee – Media & AI</title>
+    <title>Docterbee – Media</title>
+    <meta name="description" content="Pusat media Docterbee: Edukasi artikel, YouTube & AI analisis, dan Podcast audio kesehatan Islami." />
 
     <!-- External Stylesheets -->
     <link
@@ -27,8 +28,29 @@
           <a href="/services" class="nav-link">Services</a>
           <a href="/store" class="nav-link">Produk</a>
           <a href="/events" class="nav-link">Program</a>
-          <a href="/insight" class="nav-link">Edukasi</a>
-          <a href="/media" class="nav-link active">Media</a>
+          <!-- Media Dropdown -->
+          <div class="nav-dropdown">
+            <button class="nav-dropdown-toggle active" type="button" aria-haspopup="true" aria-expanded="false">
+              Media
+              <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu">
+              <a href="/insight">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                Edukasi
+              </a>
+              <a href="/youtube-ai">
+                <i data-lucide="youtube" class="w-4 h-4"></i>
+                YouTube & AI
+              </a>
+              <a href="/podcast">
+                <i data-lucide="headphones" class="w-4 h-4"></i>
+                Podcast Audio
+              </a>
+            </div>
+          </div>
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
@@ -70,8 +92,29 @@
         <a href="/services" class="mobile-nav-link">Services</a>
         <a href="/booking" class="mobile-nav-link">Booking</a>
         <a href="/events" class="mobile-nav-link">Program</a>
-        <a href="/insight" class="mobile-nav-link">Edukasi</a>
-        <a href="/media" class="mobile-nav-link">Media</a>
+        <!-- Mobile Media Dropdown -->
+        <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
+          <button class="mobile-nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+            Media
+            <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="mobile-nav-submenu">
+            <a href="/insight">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              Edukasi
+            </a>
+            <a href="/youtube-ai">
+              <i data-lucide="youtube" class="w-4 h-4"></i>
+              YouTube & AI
+            </a>
+            <a href="/podcast">
+              <i data-lucide="headphones" class="w-4 h-4"></i>
+              Podcast Audio
+            </a>
+          </div>
+        </div>
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
@@ -101,170 +144,87 @@
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
-      <div class="mb-6">
-        <h1 class="text-3xl md:text-4xl font-bold">Media & AI</h1>
-        <p class="text-slate-900">
-          Putar <b>podcast audio</b> atau <b>video YouTube</b>, lalu minta AI menganalisis
-          kesesuaian dengan Qur'an, Hadis, Docterbee, dan sains.
+      <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold">Pusat Media Docterbee</h1>
+        <p class="text-slate-600 mt-2">
+          Jelajahi berbagai konten edukatif dan media kesehatan Islami dari Docterbee.
         </p>
-
-        <!-- Toggle Tabs -->
-        <div class="flex gap-3 mt-6">
-          <button id="tabYouTube" class="media-tab active" onclick="switchTab('youtube')">
-            <i data-lucide="youtube" class="w-4 h-4 inline-block mr-2"></i>
-            YouTube & AI
-          </button>
-          <button id="tabPodcast" class="media-tab" onclick="switchTab('podcast')">
-            <i data-lucide="headphones" class="w-4 h-4 inline-block mr-2"></i>
-            Podcast Audio
-          </button>
-        </div>
       </div>
 
-      <!-- YouTube & AI Section -->
-      <div id="sectionYouTube" class="grid gap-6 md:grid-cols-3">
-        <!-- Left: YouTube -->
-        <section class="media-container md:col-span-2">
-          <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="youtube" class="w-5 h-5 text-rose-400"></i>
-            <div class="font-semibold">YouTube Player</div>
-          </div>
-          <label class="media-label">Tempel URL YouTube</label>
-          <div class="flex flex-col sm:flex-row gap-2 mt-1">
-            <input
-              id="ytUrl"
-              class="media-input flex-1"
-              placeholder="https://www.youtube.com/watch?v=..."
-              autocomplete="off"
-            />
-            <button id="btnLoadYT" class="btn-primary-sm">Load</button>
-          </div>
-          <div
-            id="ytPlayer"
-            class="media-player aspect-video mt-4 flex items-center justify-center text-slate-400"
-          >
-            <span>Video akan tampil di sini.</span>
-          </div>
-
-          <!-- Check Transcript Button (NEW) -->
-          <div class="mt-4 flex items-center gap-2">
-            <button
-              id="btnCheckTranscript"
-              class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 text-white hover:opacity-90"
-              style="background-color: #F46A13;"
-              onclick="checkTranscript()"
-            >
-              <i data-lucide="search" class="w-3 h-3"></i>
-              Check Transcript
-            </button>
-            <span class="text-xs text-slate-500">Cek apakah video bisa auto-transcript</span>
-          </div>
-
-          <!-- Transcript Status (NEW) -->
-          <div id="transcriptStatus" class="mt-3"></div>
-
-          <div class="mt-4">
-            <label class="media-label flex items-center gap-2">
-              <span>Catatan / poin penting</span>
-              <span class="text-xs text-emerald-400 opacity-70"
-                >(Opsional - akan auto-fetch transcript jika kosong)</span
-              >
-            </label>
-            <textarea
-              id="mediaNotes"
-              class="media-textarea"
-              placeholder="Kosongkan untuk auto-fetch transcript, atau tulis catatan manual di sini..."
-              autocomplete="off"
-            ></textarea>
-          </div>
-          <div class="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <button id="btnAnalyze" class="btn-analyze">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
-              Analisis AI
-            </button>
-            <div class="text-xs text-slate-400 space-y-1">
-              <div class="flex items-center gap-1">
-                <i data-lucide="info" class="w-3 h-3"></i>
-                <span>Akan otomatis ambil transcript YouTube jika tersedia</span>
+      <!-- Media Categories Grid -->
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Edukasi Card -->
+        <a href="/insight" class="group">
+          <div class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-amber-400/50 hover:-translate-y-1">
+            <div class="p-6">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
               </div>
-              <div class="flex items-center gap-1">
-                <i data-lucide="shield-check" class="w-3 h-3"></i>
-                <span>Powered by Gemini AI + Dalil Shahih</span>
+              <h2 class="text-xl font-bold mb-2">Edukasi</h2>
+              <p class="text-slate-600 text-sm mb-4">
+                Artikel edukasi sains × Qur'ani. Baca dan minta AI merangkum & memberi rekomendasi NBSN.
+              </p>
+              <div class="flex items-center gap-2 text-amber-600 font-medium text-sm">
+                <span>Baca Artikel</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
               </div>
             </div>
           </div>
-        </section>
+        </a>
+
+        <!-- YouTube & AI Card -->
+        <a href="/youtube-ai" class="group">
+          <div class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-rose-400/50 hover:-translate-y-1">
+            <div class="p-6">
+              <div class="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="youtube" class="w-6 h-6 text-rose-600"></i>
+              </div>
+              <h2 class="text-xl font-bold mb-2">YouTube & AI</h2>
+              <p class="text-slate-600 text-sm mb-4">
+                Tempel URL video YouTube, lalu minta AI menganalisis kesesuaian dengan Qur'an, Hadis & sains.
+              </p>
+              <div class="flex items-center gap-2 text-amber-600 font-medium text-sm">
+                <span>Mulai Analisis</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Podcast Card -->
+        <a href="/podcast" class="group">
+          <div class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-amber-400/50 hover:-translate-y-1">
+            <div class="p-6">
+              <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="headphones" class="w-6 h-6 text-amber-600"></i>
+              </div>
+              <h2 class="text-xl font-bold mb-2">Podcast Audio</h2>
+              <p class="text-slate-600 text-sm mb-4">
+                Dengarkan podcast audio kesehatan Islami. Belajar konsep kesehatan yang selaras dengan Al-Qur'an.
+              </p>
+              <div class="flex items-center gap-2 text-amber-600 font-medium text-sm">
+                <span>Dengarkan Podcast</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+              </div>
+            </div>
+          </div>
+        </a>
       </div>
 
-      <!-- AI Result -->
-      <section id="aiResultSection" class="mt-8 booking-container">
-        <div class="p-5 border-b border-gray-200">
-          <div class="text-lg font-semibold">Hasil Analisis AI</div>
-        </div>
-        <div id="aiResult" class="p-5 text-sm text-slate-900">
-          <p class="opacity-70">Masukkan URL & catatan, lalu klik <b>Analisis AI</b>.</p>
-        </div>
-      </section>
-
-      <!-- Podcast Section -->
-      <div id="sectionPodcast" class="hidden">
-        <div class="grid gap-6 md:grid-cols-2">
-          <!-- Podcast List (Left) -->
-          <aside class="media-sidebar">
-            <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="podcast" class="w-4 h-4 text-amber-300"></i>
-              <b>Podcast Audio</b>
-            </div>
-            <p class="text-slate-300/85 mb-2">Pilih episode untuk diputar:</p>
-
-            <div id="podcastList" class="space-y-2"></div>
-
-            <div class="mt-4">
-              <div class="flex items-center gap-2 mb-1">
-                <i data-lucide="upload" class="w-4 h-4 text-emerald-300"></i>
-                <b>Muat audio Anda sendiri</b>
-              </div>
-              <input
-                id="customAudioUrl"
-                class="media-input-sm mb-2"
-                placeholder="Tempel URL .mp3"
-                autocomplete="off"
-              />
-              <button id="btnLoadCustomAudio" class="btn-secondary-sm">Putar</button>
-            </div>
-          </aside>
-
-          <!-- Now Playing (Right) -->
-          <div class="media-container">
-            <div class="podcast-now-playing">
-              <div class="flex items-center gap-2 mb-1">
-                <i data-lucide="mic" class="w-4 h-4 text-sky-300"></i>
-                <b>Sekarang Diputar</b>
-              </div>
-              <div id="nowPlayingPodcast" class="text-slate-200/90 text-sm mb-2">—</div>
-              <audio id="audioPlayerPodcast" controls class="w-full"></audio>
-            </div>
-
-            <div class="mt-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-              <div class="flex items-center gap-2 mb-3">
-                <i data-lucide="info" class="w-4 h-4 text-amber-400"></i>
-                <span class="font-semibold text-sm">Tips</span>
-              </div>
-              <ul class="text-xs text-slate-300 space-y-1.5">
-                <li class="flex items-start gap-2">
-                  <span class="text-amber-400">•</span>
-                  <span>Dengarkan podcast sambil belajar konsep kesehatan Islami</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-amber-400">•</span>
-                  <span>Simpan catatan penting untuk referensi nanti</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-amber-400">•</span>
-                  <span>Untuk analisis AI, gunakan tab "YouTube & AI"</span>
-                </li>
-              </ul>
-            </div>
+      <!-- Info Section -->
+      <div class="mt-10 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/50">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="info" class="w-6 h-6 text-amber-600"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-2">Tentang Media Docterbee</h3>
+            <p class="text-slate-600 text-sm">
+              Pusat Media Docterbee menyediakan berbagai konten edukatif yang menggabungkan 
+              <strong>sains modern</strong>, <strong>Al-Qur'an & Hadis</strong>, dan framework 
+              <strong>NBSN (Neuron, Biomolekul, Sensorik, Nature)</strong>. Semua konten dirancang 
+              untuk membantu Anda memahami cara menjaga kesehatan dengan pendekatan holistik Islami.
+            </p>
           </div>
         </div>
       </div>
@@ -278,10 +238,35 @@
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="js/user-data-sync.js"></script>
-    <!-- Note: auth-check.js removed - Media supports guest mode -->
     <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
     <script src="js/app-navbar.js"></script>
+    <script>
+      // Initialize page
+      document.addEventListener('DOMContentLoaded', function() {
+        // Set year
+        const yearElement = document.getElementById('year');
+        if (yearElement) {
+          yearElement.textContent = new Date().getFullYear();
+        }
+
+        // Mobile dropdown toggle
+        const mobileDropdown = document.getElementById('mobileMediaDropdown');
+        const mobileToggle = mobileDropdown?.querySelector('.mobile-nav-dropdown-toggle');
+        
+        if (mobileToggle) {
+          mobileToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            mobileDropdown.classList.toggle('open');
+          });
+        }
+
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+          lucide.createIcons();
+        }
+      });
+    </script>
   </body>
 </html>

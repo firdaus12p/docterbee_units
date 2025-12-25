@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docterbee – Artikel</title>
+    <title>Docterbee – Podcast Audio</title>
+    <meta name="description" content="Dengarkan podcast audio kesehatan Islami dari Docterbee. Belajar konsep kesehatan yang selaras dengan Al-Qur'an dan sains modern." />
 
     <!-- External Stylesheets -->
     <link
@@ -144,47 +145,73 @@
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <div class="mb-6">
-        <h1 class="text-3xl md:text-4xl font-bold">Docterbee Artikel</h1>
+        <h1 class="text-3xl md:text-4xl font-bold">Podcast Audio</h1>
         <p class="text-slate-900">
-          Artikel edukasi sains × Qur'ani. Pilih artikel lalu minta AI merangkum & memberi
-          rekomendasi NBSN.
+          Dengarkan <b>podcast audio</b> kesehatan Islami. Belajar konsep kesehatan
+          yang selaras dengan Al-Qur'an dan sains modern.
         </p>
       </div>
 
-      <div class="grid gap-6 md:grid-cols-3">
-        <section class="booking-container md:col-span-2">
-          <div id="articles" class="grid gap-4"></div>
-        </section>
-
-        <aside class="insight-sidebar">
+      <!-- Podcast Section -->
+      <div id="sectionPodcast" class="grid gap-6 md:grid-cols-2">
+        <!-- Podcast List (Left) -->
+        <aside class="media-sidebar">
           <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="filter" class="w-4 h-4 text-amber-500"></i>
-            <b>Filter</b>
+            <i data-lucide="podcast" class="w-4 h-4 text-amber-300"></i>
+            <b>Podcast Audio</b>
           </div>
-          <ul class="space-y-1 text-slate-900">
-            <li><input type="checkbox" value="Nutrisi" checked /> Nutrisi</li>
-            <li><input type="checkbox" value="Ibadah" checked /> Ibadah</li>
-            <li><input type="checkbox" value="Kebiasaan" checked /> Kebiasaan</li>
-            <li><input type="checkbox" value="Sains" checked /> Sains</li>
-          </ul>
-          <div class="mt-4 flex items-center gap-2">
-            <i data-lucide="book-open-check" class="w-4 h-4 text-sky-500"></i>
-            <b>NBSN</b>
-          </div>
-          <p class="text-slate-900">
-            Setiap ringkasan mengikuti kerangka Neuron–Biomolekul–Sensorik–Nature.
-          </p>
-        </aside>
-      </div>
+          <p class="text-slate-300/85 mb-2">Pilih episode untuk diputar:</p>
 
-      <section class="mt-8 booking-container">
-        <div class="p-5 border-b border-gray-200">
-          <div class="text-lg font-semibold">Ringkasan AI</div>
+          <div id="podcastList" class="space-y-2"></div>
+
+          <div class="mt-4">
+            <div class="flex items-center gap-2 mb-1">
+              <i data-lucide="upload" class="w-4 h-4 text-emerald-300"></i>
+              <b>Muat audio Anda sendiri</b>
+            </div>
+            <input
+              id="customAudioUrl"
+              class="media-input-sm mb-2"
+              placeholder="Tempel URL .mp3"
+              autocomplete="off"
+            />
+            <button id="btnLoadCustomAudio" class="btn-secondary-sm">Putar</button>
+          </div>
+        </aside>
+
+        <!-- Now Playing (Right) -->
+        <div class="media-container">
+          <div class="podcast-now-playing">
+            <div class="flex items-center gap-2 mb-1">
+              <i data-lucide="mic" class="w-4 h-4 text-sky-300"></i>
+              <b>Sekarang Diputar</b>
+            </div>
+            <div id="nowPlayingPodcast" class="text-slate-200/90 text-sm mb-2">—</div>
+            <audio id="audioPlayerPodcast" controls class="w-full"></audio>
+          </div>
+
+          <div class="mt-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="info" class="w-4 h-4 text-amber-400"></i>
+              <span class="font-semibold text-sm">Tips</span>
+            </div>
+            <ul class="text-xs text-slate-300 space-y-1.5">
+              <li class="flex items-start gap-2">
+                <span class="text-amber-400">•</span>
+                <span>Dengarkan podcast sambil belajar konsep kesehatan Islami</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-400">•</span>
+                <span>Simpan catatan penting untuk referensi nanti</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-400">•</span>
+                <span>Untuk analisis AI, gunakan halaman "YouTube & AI"</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div id="insightResult" class="p-5 text-sm text-slate-900">
-          <p class="opacity-70">Klik <b>Ringkas & Rekomendasi</b> pada salah satu artikel.</p>
-        </div>
-      </section>
+      </div>
     </main>
 
     <!-- Footer -->
@@ -195,15 +222,14 @@
     <!-- External Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="js/user-data-sync.js"></script>
-    <!-- Note: auth-check.js removed - Artikel supports guest mode -->
     <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
     <script src="js/app-navbar.js"></script>
-    <script src="js/insight-articles.js"></script>
     <script>
-      // Mobile dropdown toggle
+      // Initialize mobile dropdown toggle and podcast
       document.addEventListener('DOMContentLoaded', function() {
+        // Mobile dropdown toggle
         const mobileDropdown = document.getElementById('mobileMediaDropdown');
         const mobileToggle = mobileDropdown?.querySelector('.mobile-nav-dropdown-toggle');
         
@@ -212,6 +238,28 @@
             e.preventDefault();
             mobileDropdown.classList.toggle('open');
           });
+        }
+
+        // Set year
+        const yearElement = document.getElementById('year');
+        if (yearElement) {
+          yearElement.textContent = new Date().getFullYear();
+        }
+
+        // Initialize podcast list
+        if (typeof renderPodcastList === 'function') {
+          renderPodcastList();
+        }
+
+        // Initialize custom audio button
+        const btnLoadCustomAudio = document.getElementById('btnLoadCustomAudio');
+        if (btnLoadCustomAudio && typeof loadCustomAudio === 'function') {
+          btnLoadCustomAudio.addEventListener('click', loadCustomAudio);
+        }
+
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+          lucide.createIcons();
         }
       });
     </script>

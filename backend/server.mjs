@@ -99,6 +99,8 @@ const cleanUrlPages = [
   "ai-advisor",
   "admin-dashboard",
   "profile",
+  "youtube-ai",
+  "podcast",
 ];
 
 // Redirect .html URLs to clean URLs (SEO friendly)

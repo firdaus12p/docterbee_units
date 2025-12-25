@@ -2336,3 +2336,203 @@ select::after {
   content: none !important;
   display: none !important;
 }
+
+/* ========================================
+   Navigation Dropdown Submenu
+   ======================================== */
+
+/* Desktop Dropdown Container */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-bottom: 4px;
+  background: none;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+}
+
+.nav-dropdown-toggle::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ea580c, transparent);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-dropdown-toggle:hover {
+  opacity: 1;
+  color: #ea580c;
+  transform: translateY(-2px);
+}
+
+.nav-dropdown-toggle:hover::after {
+  width: 100%;
+}
+
+.nav-dropdown-toggle .chevron-icon {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s ease;
+}
+
+.nav-dropdown:hover .nav-dropdown-toggle .chevron-icon {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  min-width: 180px;
+  background: white;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  overflow: hidden;
+  padding: 0.5rem 0;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav-dropdown-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 1.25rem;
+  color: #475569;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.nav-dropdown-menu a:hover {
+  background: linear-gradient(90deg, rgba(234, 88, 12, 0.1), transparent);
+  color: #ea580c;
+  padding-left: 1.5rem;
+}
+
+.nav-dropdown-menu a svg,
+.nav-dropdown-menu a i {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.nav-dropdown-menu a:hover svg,
+.nav-dropdown-menu a:hover i {
+  opacity: 1;
+}
+
+/* Mobile Submenu Styles */
+.mobile-nav-dropdown {
+  border-left: 3px solid transparent;
+}
+
+.mobile-nav-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  color: #475569;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mobile-nav-dropdown-toggle:hover {
+  background-color: #f1f5f9;
+  color: #ea580c;
+}
+
+.mobile-nav-dropdown-toggle .chevron-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.mobile-nav-dropdown.open .mobile-nav-dropdown-toggle .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.mobile-nav-dropdown.open .mobile-nav-dropdown-toggle {
+  color: #ea580c;
+  background-color: #fff7ed;
+  border-left-color: #ea580c;
+}
+
+.mobile-nav-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: #f8fafc;
+}
+
+.mobile-nav-dropdown.open .mobile-nav-submenu {
+  max-height: 300px;
+}
+
+.mobile-nav-submenu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.875rem 1.5rem 0.875rem 2.5rem;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.mobile-nav-submenu a:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-submenu a:hover {
+  background: rgba(234, 88, 12, 0.05);
+  color: #ea580c;
+  padding-left: 3rem;
+}
+
+.mobile-nav-submenu a svg,
+.mobile-nav-submenu a i {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.mobile-nav-submenu a:hover svg,
+.mobile-nav-submenu a:hover i {
+  opacity: 1;
+}

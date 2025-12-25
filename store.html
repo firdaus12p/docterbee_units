@@ -33,8 +33,29 @@
           <a href="/services" class="nav-link">Services</a>
           <a href="/store" class="nav-link active">Produk</a>
           <a href="/events" class="nav-link">Program</a>
-          <a href="/insight" class="nav-link">Edukasi</a>
-          <a href="/media" class="nav-link">Media</a>
+          <!-- Media Dropdown -->
+          <div class="nav-dropdown">
+            <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+              Media
+              <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu">
+              <a href="/insight">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                Edukasi
+              </a>
+              <a href="/youtube-ai">
+                <i data-lucide="youtube" class="w-4 h-4"></i>
+                YouTube & AI
+              </a>
+              <a href="/podcast">
+                <i data-lucide="headphones" class="w-4 h-4"></i>
+                Podcast Audio
+              </a>
+            </div>
+          </div>
           <a href="/ai-advisor" class="nav-link">AI Advisor</a>
         </nav>
         <div class="flex items-center gap-3">
@@ -86,8 +107,29 @@
         <a href="/services" class="mobile-nav-link">Services</a>
         <a href="/store" class="mobile-nav-link">Produk</a>
         <a href="/events" class="mobile-nav-link">Program</a>
-        <a href="/insight" class="mobile-nav-link">Edukasi</a>
-        <a href="/media" class="mobile-nav-link">Media</a>
+        <!-- Mobile Media Dropdown -->
+        <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
+          <button class="mobile-nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+            Media
+            <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="mobile-nav-submenu">
+            <a href="/insight">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              Edukasi
+            </a>
+            <a href="/youtube-ai">
+              <i data-lucide="youtube" class="w-4 h-4"></i>
+              YouTube & AI
+            </a>
+            <a href="/podcast">
+              <i data-lucide="headphones" class="w-4 h-4"></i>
+              Podcast Audio
+            </a>
+          </div>
+        </div>
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
       </nav>
       <div class="mobile-menu-footer">
