@@ -2157,6 +2157,7 @@ function getProductCategoryBadgeClass(category) {
     "1001 Rempah": "bg-orange-100 text-orange-700 font-semibold",
     "Zona Honey": "bg-amber-100 text-amber-700 font-semibold",
     "Cold Pressed": "bg-green-100 text-green-700 font-semibold",
+    "Coffee": "bg-amber-100 text-amber-900 font-semibold",
   };
   return badgeClasses[category] || "bg-slate-200 text-slate-700";
 }
@@ -2167,6 +2168,7 @@ function getProductCategoryIcon(category) {
     "1001 Rempah": "🧂",
     "Zona Honey": "🍯",
     "Cold Pressed": "🥤",
+    "Coffee": "☕",
   };
   return icons[category] || "📦";
 }

@@ -107,7 +107,7 @@ router.post("/", requireAdmin, async (req, res) => {
     }
 
     // Validate category
-    const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed"];
+    const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed", "Coffee"];
     if (!validCategories.includes(category)) {
       return res.status(400).json({
         success: false,
@@ -179,7 +179,7 @@ router.patch("/:id", requireAdmin, async (req, res) => {
 
     // Validate category if provided
     if (category) {
-      const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed"];
+      const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed", "Coffee"];
       if (!validCategories.includes(category)) {
         return res.status(400).json({
           success: false,

@@ -2094,16 +2094,21 @@ async function checkTranscript() {
 
     if (transcriptStatus) {
       if (data.available) {
-        // ✅ Transcript available
+        // ✅ Video can be analyzed
+        const isGeminiDirect = data.source === "gemini-direct";
+        const sourceLabel = isGeminiDirect 
+          ? "🎬 AI Vision (Gemini dapat melihat video langsung)"
+          : `📝 Transcript (${data.segmentCount} segmen • ${data.characterCount.toLocaleString()} karakter)`;
+        
         transcriptStatus.innerHTML = `
           <div class="bg-emerald-100 border border-emerald-400/50 rounded-lg p-3">
             <div class="flex items-start gap-2">
               <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5"></i>
               <div class="flex-1">
-                <div class="font-medium text-emerald-700 mb-1">✅ Transcript Tersedia!</div>
+                <div class="font-medium text-emerald-700 mb-1">✅ Video Siap Dianalisis!</div>
                 <div class="text-sm text-slate-700">${data.message}</div>
                 <div class="text-xs text-slate-600 mt-1">
-                  ${data.segmentCount} segmen • ${data.characterCount.toLocaleString()} karakter
+                  ${sourceLabel}
                 </div>
               </div>
             </div>
@@ -2933,6 +2938,7 @@ async function renderDineInMenu() {
     "1001 Rempah": { icon: "🧂", color: "emerald" },
     "Zona Honey": { icon: "🍯", color: "amber" },
     "Cold Pressed": { icon: "🥤", color: "sky" },
+    "Coffee": { icon: "☕", color: "amber" },
     "Lainnya": { icon: "📦", color: "slate" }
   };
 
@@ -3228,11 +3234,13 @@ function getCategoryLabel(cat) {
     "1001 Rempah": "🧂 1001 Rempah",
     "Zona Honey": "🍯 Zona Honey",
     "Cold Pressed": "🥤 Cold Pressed",
+    "Coffee": "☕ Coffee",
     // Legacy support for old category names
     "zona-sunnah": "🌙 Zona Sunnah",
     rempah: "🧂 1001 Rempah",
     honey: "🍯 Zona Honey",
     "cold-pressed": "🥤 Cold Pressed",
+    coffee: "☕ Coffee",
     coffeebee: "☕ CoffeeBee",
     teabee: "🍵 TeaBee",
     "susu-kurma": "🥛 Susu Kurma",

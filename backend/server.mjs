@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Innertube } from "youtubei.js";
+import { YoutubeTranscript } from "youtube-transcript";
 import { testConnection, initializeTables, query, queryOne } from "./db.mjs";
 import authRouter from "./routes/auth.mjs";
 import bookingsRouter from "./routes/bookings.mjs";
@@ -21,7 +22,7 @@ import usersRouter from "./routes/users.mjs";
 import userDataRouter from "./routes/user-data.mjs";
 import rewardsRouter from "./routes/rewards.mjs";
 import podcastsRouter from "./routes/podcasts.mjs";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -401,10 +402,121 @@ function extractVideoId(url) {
   return null;
 }
 
-// Helper function to fetch transcript using youtubei.js (supports auto-generated captions)
+// Helper function to fetch transcript using multiple methods for better success rate
 async function fetchTranscriptWithRetry(videoId) {
   console.log(`🎯 Fetching transcript for video: ${videoId}`);
+
+  // Method 0: Raw HTML parsing to extract captions from YouTube page
+  // This bypasses library dependencies and directly parses the page
   try {
+    console.log(`🔄 Method 0: Trying raw HTML parsing...`);
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    
+    const pageResponse = await fetch(videoUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+      }
+    });
+    
+    if (!pageResponse.ok) {
+      throw new Error(`Page fetch failed: ${pageResponse.status}`);
+    }
+    
+    const html = await pageResponse.text();
+    console.log(`📄 Page fetched: ${html.length} bytes`);
+    
+    // Extract captionTracks from the page JSON
+    const captionMatch = html.match(/"captionTracks":\s*(\[.*?\])/);
+    if (captionMatch) {
+      const tracks = JSON.parse(captionMatch[1]);
+      console.log(`📋 Found ${tracks.length} caption tracks in page`);
+      
+      // Prefer Indonesian, then English, then first available
+      const preferredTrack = 
+        tracks.find(t => t.languageCode === "id") ||
+        tracks.find(t => t.languageCode === "en" && !t.kind) || // manual English
+        tracks.find(t => t.languageCode === "en") || // auto-generated English
+        tracks[0];
+      
+      if (preferredTrack && preferredTrack.baseUrl) {
+        console.log(`🎯 Using track: ${preferredTrack.languageCode} (${preferredTrack.name?.simpleText || "untitled"})`);
+        
+        // Fetch caption with proper format (srv3 returns XML with text segments)
+        const captionUrl = preferredTrack.baseUrl + "&fmt=srv3";
+        const captionResponse = await fetch(captionUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.youtube.com/",
+          }
+        });
+        
+        const captionText = await captionResponse.text();
+        console.log(`📥 Caption response: ${captionText.length} bytes`);
+        
+        if (captionText.length > 0) {
+          // Parse the XML/JSON transcript
+          const textMatches = captionText.matchAll(/<text[^>]*start="([^"]*)"[^>]*dur="([^"]*)"[^>]*>([^<]*)<\/text>/g);
+          const transcript = [];
+          
+          for (const match of textMatches) {
+            const text = match[3]
+              .replace(/&amp;/g, "&")
+              .replace(/&lt;/g, "<")
+              .replace(/&gt;/g, ">")
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")
+              .replace(/\n/g, " ")
+              .trim();
+            
+            if (text) {
+              transcript.push({
+                text,
+                offset: Math.round(parseFloat(match[1]) * 1000),
+                duration: Math.round(parseFloat(match[2]) * 1000),
+              });
+            }
+          }
+          
+          if (transcript.length > 0) {
+            console.log(`✅ SUCCESS! Raw parsing returned ${transcript.length} segments`);
+            console.log(`📊 First segment: "${transcript[0].text.substring(0, 50)}..."`);
+            return transcript;
+          }
+        }
+        console.log(`⚠️ Caption URL returned empty or unparseable content`);
+      }
+    } else {
+      console.log(`⚠️ No captionTracks found in page HTML`);
+    }
+  } catch (rawParseError) {
+    console.log(`⚠️ Method 0 (raw parsing) failed: ${rawParseError.message}`);
+  }
+
+  // Method 1: Try youtube-transcript library as fallback
+  try {
+    console.log(`🔄 Method 1: Trying youtube-transcript library...`);
+    const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+
+    if (transcriptItems && transcriptItems.length > 0) {
+      console.log(`✅ SUCCESS! youtube-transcript returned ${transcriptItems.length} segments`);
+      return transcriptItems.map((item) => ({
+        text: item.text || "",
+        offset: item.offset || 0,
+        duration: item.duration || 0,
+      }));
+    }
+    console.log(`⚠️ youtube-transcript returned no usable data`);
+  } catch (youtubeTranscriptError) {
+    console.log(`⚠️ Method 1 (youtube-transcript) failed: ${youtubeTranscriptError.message}`);
+  }
+
+  // Method 2 & 3: Try youtubei.js (existing implementation)
+  try {
+    console.log(`🔄 Method 1: Trying youtubei.js...`);
     const youtube = await Innertube.create();
     const info = await youtube.getInfo(videoId);
 
@@ -723,10 +835,52 @@ app.post("/api/check-transcript", async (req, res) => {
       });
     }
 
-    console.log("🔍 Checking transcript availability untuk:", videoId);
+    console.log("🔍 Checking video accessibility untuk:", videoId);
     console.log("🔗 Original URL:", youtubeUrl);
     console.log("🧹 Cleaned URL:", cleanYoutubeUrl(youtubeUrl));
 
+    // === NEW: Try Gemini direct video access first ===
+    // This is more reliable than transcript extraction
+    if (genAI) {
+      try {
+        console.log("🎬 Mencoba akses video langsung dengan Gemini...");
+        
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        
+        // Quick check if Gemini can access the video
+        const result = await model.generateContent([
+          "Berikan judul video ini dalam satu baris singkat (maksimal 10 kata). Jika tidak bisa mengakses video, katakan 'TIDAK DAPAT MENGAKSES'.",
+          {
+            fileData: {
+              fileUri: cleanYoutubeUrl(youtubeUrl),
+            },
+          },
+        ]);
+        
+        const response = await result.response;
+        const text = response.text();
+        
+        if (!text.includes("TIDAK DAPAT MENGAKSES")) {
+          console.log("✅ Video dapat diakses oleh Gemini:", text.substring(0, 50));
+          return res.json({
+            available: true,
+            segmentCount: 0,
+            characterCount: 0,
+            source: "gemini-direct",
+            message: `Video dapat dianalisis langsung oleh AI! Anda bisa langsung klik "Analisis AI" tanpa perlu menulis catatan manual.\n\n📌 ${text.trim()}`,
+          });
+        }
+        console.log("⚠️ Gemini tidak dapat mengakses video langsung");
+      } catch (geminiError) {
+        console.log("⚠️ Gemini direct access failed:", geminiError.message);
+        // Fall back to transcript extraction
+      }
+    }
+    // === END NEW ===
+
+    // Fallback: Try traditional transcript extraction
+    console.log("🔄 Mencoba transcript extraction sebagai fallback...");
+    
     try {
       const transcriptData = await fetchTranscriptWithRetry(videoId);
 
@@ -740,6 +894,7 @@ app.post("/api/check-transcript", async (req, res) => {
             available: true,
             segmentCount: transcriptData.length,
             characterCount: charCount,
+            source: "transcript",
             message: `Video ini memiliki transcript dengan ${transcriptData.length} segmen (${charCount} karakter). Anda bisa langsung klik "Analisis AI" tanpa perlu menulis catatan manual.`,
           });
         } else {
@@ -804,69 +959,106 @@ app.post("/api/summarize", async (req, res) => {
     let videoId = null;
     let transcriptError = null;
 
-    // Try to fetch transcript from YouTube if URL provided
+    // Extract video ID if URL provided
     if (youtubeUrl) {
       videoId = extractVideoId(youtubeUrl);
+    }
 
-      if (videoId) {
-        console.log("📹 Mencoba fetch transcript untuk video ID:", videoId);
+    // Use Gemini API
+    const modelName = "gemini-2.5-flash";
+    const model = genAI.getGenerativeModel({ model: modelName });
 
-        try {
-          // Try to fetch transcript with multiple strategies
-          console.log("🔗 Original URL:", youtubeUrl);
-          console.log("🧹 Cleaned URL:", cleanYoutubeUrl(youtubeUrl));
+    // === PRIORITY 1: Try Gemini Direct Video Analysis ===
+    // This is the primary method - Gemini can analyze YouTube videos directly!
+    if (youtubeUrl && videoId && (!notes || notes.trim() === "")) {
+      try {
+        console.log("🎬 PRIORITY 1: Mencoba analisis YouTube langsung dengan Gemini...");
+        console.log("🔗 Video URL:", cleanYoutubeUrl(youtubeUrl));
+        
+        const directAnalysisPrompt = `Kamu adalah asisten AI untuk aplikasi kesehatan Islami "Docterbee" yang menggabungkan ajaran Qur'an & Sunnah SHAHIH, sains modern, dan framework NBSN (Neuron, Biomolekul, Sensorik, Nature).
 
-          const transcriptData = await fetchTranscriptWithRetry(videoId);
+TUGAS:
+Analisis video YouTube di atas dari perspektif kesehatan Islami dan berikan penjelasan dalam Bahasa Indonesia yang mencakup:
 
-          console.log("📊 Raw transcript data items:", transcriptData?.length || 0);
+1. **Ringkasan Utama** (3-5 poin inti dari video)
+2. **Kesesuaian dengan Qur'an & Hadis Shahih:**
+   - Sebutkan ayat Al-Qur'an atau Hadis Shahih (Bukhari/Muslim/Tirmidzi/Abu Dawud) yang relevan
+   - Jelaskan kesesuaiannya dengan konten video
+   - WAJIB: Hanya gunakan dalil yang SHAHIH, bukan dhaif atau maudhu'
 
-          if (transcriptData && transcriptData.length > 0) {
-            transcript = transcriptData.map((t) => t.text).join(" ");
+3. **Koreksi & Klarifikasi:**
+   - Jika ada informasi yang SALAH atau BERTENTANGAN dengan Islam, koreksi dengan sopan
+   - Jika ada klaim kesehatan yang tidak didukung sains, berikan klarifikasi
+   - Sebutkan mana yang perlu dihindari dan mana yang boleh diamalkan
 
-            // Cek apakah transcript benar-benar ada isinya
-            if (transcript && transcript.trim().length > 0) {
-              hasTranscript = true;
-              console.log(
-                "✅ Transcript berhasil diambil:",
-                transcript.length,
-                "karakter dari",
-                transcriptData.length,
-                "segmen"
-              );
-            } else {
-              transcriptError =
-                "Transcript kosong setelah digabungkan. Video mungkin memiliki subtitle kosong atau format tidak didukung.";
-              console.log("⚠️  Transcript kosong setelah join");
-              console.log("🔄 Fallback ke catatan user");
-            }
-          } else {
-            transcriptError =
-              "Tidak ada data transcript yang dikembalikan. Video mungkin tidak memiliki subtitle yang dapat diakses oleh library.";
-            console.log("⚠️  transcriptData kosong atau null");
-            console.log("🔄 Fallback ke catatan user");
+4. **Rekomendasi Praktis (NBSN Framework):**
+   - **Neuron**: Aspek mental, spiritual, dan kesehatan otak yang bisa diamalkan
+   - **Biomolekul**: Nutrisi, suplemen, atau zat yang disebutkan (evaluasi keamanannya)
+   - **Sensorik**: Aktivitas fisik atau latihan yang direkomendasikan
+   - **Nature**: Kebiasaan alami dan pola hidup sehat yang bisa diterapkan 7 hari ke depan
+
+5. **Kesimpulan & Rekomendasi:**
+   - Apakah konten video ini direkomendasikan untuk diamalkan?
+   - Apa yang harus diambil dan apa yang harus dihindari?
+   - Saran praktis untuk implementasi
+
+PENTING:
+- Prioritaskan validasi syariat (Qur'an & Hadis Shahih) terlebih dahulu
+- Berikan koreksi dengan bahasa yang sopan dan edukatif
+- Fokus pada hal yang praktis dan bisa diamalkan
+- Jika ragu, lebih baik menyarankan konsultasi dengan ustadz/praktisi
+- Format output dalam poin-poin yang jelas, terstruktur, dan mudah dibaca`;
+
+        // Use YouTube URL directly with Gemini multimodal
+        const result = await model.generateContent([
+          directAnalysisPrompt,
+          {
+            fileData: {
+              fileUri: cleanYoutubeUrl(youtubeUrl),
+            },
+          },
+        ]);
+        
+        const response = await result.response;
+        const text = response.text();
+
+        console.log("✅ Gemini Direct berhasil! Panjang:", text.length, "karakter");
+
+        return res.json({
+          success: true,
+          summary: text,
+          youtubeUrl: youtubeUrl,
+          videoId: videoId,
+          hasTranscript: true,
+          transcriptLength: 0,
+          source: "gemini-direct-video",
+          modelUsed: modelName,
+        });
+      } catch (directError) {
+        console.log("⚠️ Gemini Direct gagal:", directError.message);
+        console.log("🔄 Fallback ke transcript extraction...");
+        // Continue to transcript extraction below
+      }
+    }
+
+    // === PRIORITY 2: Try transcript extraction (fallback) ===
+    if (youtubeUrl && videoId) {
+      console.log("📝 PRIORITY 2: Mencoba transcript extraction...");
+      try {
+        const transcriptData = await fetchTranscriptWithRetry(videoId);
+
+        if (transcriptData && transcriptData.length > 0) {
+          transcript = transcriptData.map((t) => t.text).join(" ");
+
+          if (transcript && transcript.trim().length > 0) {
+            hasTranscript = true;
+            console.log("✅ Transcript berhasil:", transcript.length, "karakter");
           }
-        } catch (error) {
-          // Parse error message untuk memberikan info lebih spesifik
-          const errorMsg = error.message || String(error);
-
-          if (errorMsg.includes("Could not find captions")) {
-            transcriptError =
-              "Video tidak memiliki subtitle/captions yang tersedia. Kemungkinan: (1) Video tidak memiliki CC sama sekali, (2) CC dinonaktifkan oleh creator, atau (3) Video memiliki batasan regional.";
-          } else if (errorMsg.includes("Transcript is disabled")) {
-            transcriptError = "Transcript dinonaktifkan untuk video ini oleh creator.";
-          } else if (errorMsg.includes("Too Many Requests")) {
-            transcriptError =
-              "Terlalu banyak request ke YouTube. Silakan tunggu beberapa saat dan coba lagi.";
-          } else {
-            transcriptError = `Error mengambil transcript: ${errorMsg}`;
-          }
-
-          console.log("⚠️  Transcript tidak tersedia:", transcriptError);
-          console.log("🔄 Fallback ke catatan user");
         }
-      } else {
-        console.log("⚠️  URL YouTube tidak valid");
-        transcriptError = "URL YouTube tidak valid atau tidak dapat di-parse.";
+      } catch (error) {
+        const errorMsg = error.message || String(error);
+        transcriptError = `Error mengambil transcript: ${errorMsg}`;
+        console.log("⚠️ Transcript extraction gagal:", errorMsg);
       }
     }
 
@@ -885,13 +1077,9 @@ app.post("/api/summarize", async (req, res) => {
       console.log("📝 Menganalisis: USER NOTES (" + notes.length + " karakter)");
     }
 
-    // Use Gemini API directly
-    const modelName = "gemini-2.5-flash";
-    console.log(`🤖 Menggunakan model: ${modelName}`);
+    // Use existing model variable from above
 
-    const model = genAI.getGenerativeModel({ model: modelName });
-
-    // Construct prompt khusus untuk analisis video/media
+    // Fallback: Use transcript or user notes for analysis
     const contentSource = hasTranscript
       ? "transcript otomatis dari YouTube"
       : "catatan/ringkasan yang ditulis user";

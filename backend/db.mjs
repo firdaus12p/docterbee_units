@@ -205,7 +205,7 @@ async function initializeTables() {
       CREATE TABLE IF NOT EXISTS products (
         id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
-        category ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed') NOT NULL,
+        category ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee') NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
         description TEXT NOT NULL,
         image_url VARCHAR(500) DEFAULT NULL,
@@ -462,6 +462,10 @@ async function runMigrations(connection) {
     `);
     console.log("✅ Migration: coupon_usage table");
     
+    // Migration: Add Coffee category to products table
+    await safeModifyEnum(connection, 'products', 'category',
+      "ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee') NOT NULL");
+    
     console.log("✅ Migrations completed");
   } catch (error) {
     console.error("❌ Migration error:", error.message);
@@ -506,6 +510,19 @@ async function safeAddIndex(connection, table, indexName, column) {
     // Ignore if index already exists
     if (!error.message.includes('Duplicate key name')) {
       console.error(`  ⚠️ Could not add index ${table}.${indexName}:`, error.message);
+    }
+  }
+}
+
+// Helper: Safely modify ENUM column to add new values
+async function safeModifyEnum(connection, table, column, newDefinition) {
+  try {
+    await connection.query(`ALTER TABLE ${table} MODIFY COLUMN ${column} ${newDefinition}`);
+    console.log(`  ✅ Modified enum: ${table}.${column}`);
+  } catch (error) {
+    // Ignore if the enum already has the values
+    if (!error.message.includes('Duplicate')) {
+      console.error(`  ⚠️ Could not modify enum ${table}.${column}:`, error.message);
     }
   }
 }
