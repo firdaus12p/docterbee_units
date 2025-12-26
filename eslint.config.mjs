@@ -155,7 +155,7 @@ export default [
   },
 
   // ============================================
-  // TEST FILES
+  // TEST FILES - Node.js built-in test runner
   // ============================================
   {
     files: ["tests/**/*.mjs", "tests/**/*.js"],
@@ -164,8 +164,25 @@ export default [
       sourceType: "module",
       globals: {
         ...globals.node,
-        ...globals.mocha, // describe, it, before, after
+        // Node.js built-in test runner globals
+        describe: "readonly",
+        it: "readonly",
+        test: "readonly",
+        before: "readonly",
+        after: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
       },
+    },
+    rules: {
+      "no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          // Allow unused imports for test utilities that may be used later
+          varsIgnorePattern: "^(before|after|beforeEach|afterEach|TEST_CONFIG|validators|loginAsAdmin|data|response|adminCookieJar|userCookieJar)$",
+        },
+      ],
     },
   },
 

@@ -1,7 +1,7 @@
 /**
  * Backend Shared Helpers
  * Extracted utilities to avoid code duplication across route files
- * 
+ *
  * @module backend/utils/helpers
  */
 
