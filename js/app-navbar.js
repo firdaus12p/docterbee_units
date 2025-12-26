@@ -194,12 +194,109 @@
     }
   }
 
+  // Initialize mobile menu (hamburger toggle)
+  function initMobileMenu() {
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+    const closeMobileMenu = document.getElementById("closeMobileMenu");
+    const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+
+    function openMobileMenu() {
+      if (hamburgerBtn) hamburgerBtn.classList.add("active");
+      if (mobileMenu) mobileMenu.classList.add("active");
+      if (mobileMenuOverlay) {
+        mobileMenuOverlay.classList.add("active");
+        mobileMenuOverlay.classList.remove("hidden");
+      }
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMobileMenuFn() {
+      if (hamburgerBtn) hamburgerBtn.classList.remove("active");
+      if (mobileMenu) mobileMenu.classList.remove("active");
+      if (mobileMenuOverlay) {
+        mobileMenuOverlay.classList.remove("active");
+        mobileMenuOverlay.classList.add("hidden");
+      }
+      document.body.style.overflow = "";
+    }
+
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener("click", () => {
+        if (mobileMenu && mobileMenu.classList.contains("active")) {
+          closeMobileMenuFn();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+
+    if (closeMobileMenu) {
+      closeMobileMenu.addEventListener("click", closeMobileMenuFn);
+    }
+
+    if (mobileMenuOverlay) {
+      mobileMenuOverlay.addEventListener("click", closeMobileMenuFn);
+    }
+
+    // Close menu when clicking nav links
+    mobileNavLinks.forEach((link) => {
+      link.addEventListener("click", closeMobileMenuFn);
+    });
+
+    // Close menu on escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mobileMenu && mobileMenu.classList.contains("active")) {
+        closeMobileMenuFn();
+      }
+    });
+  }
+
+  // Initialize logout handlers
+  function initLogoutHandlers() {
+    const logoutBtn = document.getElementById("logoutBtn");
+    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+
+    async function handleLogout() {
+      try {
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        const result = await response.json();
+        if (result.success) {
+          window.location.href = "/";
+        }
+      } catch (error) {
+        console.error("Logout error:", error);
+        window.location.href = "/";
+      }
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", handleLogout);
+    }
+
+    if (mobileLogoutBtn) {
+      mobileLogoutBtn.addEventListener("click", handleLogout);
+    }
+  }
+
   // Initialize on DOM ready
   function init() {
     // Check auth status and update navbar
     checkAuthAndUpdateNavbar();
     // Initialize mobile dropdown
     initMobileMediaDropdown();
+    // Initialize mobile menu (hamburger toggle)
+    initMobileMenu();
+    // Initialize logout handlers
+    initLogoutHandlers();
+    // Initialize Lucide icons if available
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
   }
 
   // Run on DOM ready

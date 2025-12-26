@@ -177,6 +177,46 @@ header {
 }
 
 /* ========================================
+   Navbar Override for Tailwind Navigation
+   Override landing-page.css styles when using Tailwind navbar
+   ======================================== */
+
+/* Reset landing-page.css nav styles for Tailwind header */
+header.sticky nav.hidden {
+  display: none !important;
+}
+
+header.sticky nav {
+  display: flex;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  header.sticky nav.md\:flex {
+    display: flex !important;
+    align-items: center;
+    gap: 1.5rem;
+  }
+}
+
+/* Ensure nav-link visibility inside Tailwind navigation */
+header.sticky .nav-link {
+  display: inline-block;
+}
+
+/* Override mobile menu display from landing-page.css */
+.mobile-menu.active {
+  right: 0 !important;
+  display: flex !important;
+}
+
+.mobile-menu-overlay.active {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========================================
    Header Styles
    ======================================== */
 
@@ -306,7 +346,8 @@ header {
   backdrop-filter: blur(4px);
 }
 
-.mobile-menu-overlay.show {
+.mobile-menu-overlay.show,
+.mobile-menu-overlay.active {
   opacity: 1;
 }
 
@@ -327,7 +368,8 @@ header {
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
 }
 
-.mobile-menu.open {
+.mobile-menu.open,
+.mobile-menu.active {
   right: 0;
 }
 
