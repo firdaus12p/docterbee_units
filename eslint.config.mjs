@@ -180,7 +180,8 @@ export default [
         {
           argsIgnorePattern: "^_",
           // Allow unused imports for test utilities that may be used later
-          varsIgnorePattern: "^(before|after|beforeEach|afterEach|TEST_CONFIG|validators|loginAsAdmin|data|response|adminCookieJar|userCookieJar)$",
+          varsIgnorePattern:
+            "^(before|after|beforeEach|afterEach|TEST_CONFIG|validators|loginAsAdmin|data|response|adminCookieJar|userCookieJar)$",
         },
       ],
     },
