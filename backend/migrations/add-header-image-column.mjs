@@ -2,7 +2,7 @@
 // ADD header_image column to articles table
 // ============================================
 
-import { pool } from './backend/db.mjs';
+import { pool } from '../db.mjs';
 
 async function addHeaderImageColumn() {
   const connection = await pool.getConnection();

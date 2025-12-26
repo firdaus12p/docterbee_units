@@ -2,7 +2,7 @@
 // FIX ARTICLES TABLE - Add ALL missing columns
 // ============================================
 
-import { pool } from './backend/db.mjs';
+import { pool } from '../db.mjs';
 
 async function fixArticlesTableComplete() {
   const connection = await pool.getConnection();
