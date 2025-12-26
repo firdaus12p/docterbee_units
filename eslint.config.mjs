@@ -39,10 +39,11 @@ export default [
     rules: {
       "no-unused-vars": ["warn", { 
         argsIgnorePattern: "^_",
-        varsIgnorePattern: "^(init|open|close|edit|delete|add|update|remove|toggle|handle|show|hide|save|load|check|set|get|share|copy|redeem|switch|summarize|confirm).*"
+        varsIgnorePattern: "^(init|open|close|edit|delete|add|update|remove|toggle|handle|show|hide|save|load|check|set|get|share|copy|redeem|switch|summarize|confirm|markdownToHtml|showWarning).*"
       }],
       "no-undef": "error",
       "prefer-const": "warn",
+      "no-redeclare": "off", // Allow redefining globals that are shared between files
     },
   },
 
