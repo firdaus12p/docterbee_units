@@ -2,13 +2,13 @@
 // FIX ARTICLES TABLE - Add ALL missing columns
 // ============================================
 
-import { pool } from '../db.mjs';
+import { pool } from "../db.mjs";
 
 async function fixArticlesTableComplete() {
   const connection = await pool.getConnection();
 
   try {
-    console.log('🔧 Checking articles table structure...\n');
+    console.log("🔧 Checking articles table structure...\n");
 
     // Check if table exists
     const [tables] = await connection.query(`
@@ -20,7 +20,7 @@ async function fixArticlesTableComplete() {
 
     if (tables.length === 0) {
       console.log('❌ Table "articles" does not exist!');
-      console.log('💡 Solution: Restart server to create table automatically.\n');
+      console.log("💡 Solution: Restart server to create table automatically.\n");
       return;
     }
 
@@ -32,27 +32,27 @@ async function fixArticlesTableComplete() {
         AND TABLE_NAME = 'articles'
     `);
 
-    const existingColumns = columns.map(col => col.COLUMN_NAME);
-    console.log('📊 Existing columns:', existingColumns.join(', '));
+    const existingColumns = columns.map((col) => col.COLUMN_NAME);
+    console.log("📊 Existing columns:", existingColumns.join(", "));
 
     // Define required columns
     const requiredColumns = {
-      'views': {
-        sql: 'ADD COLUMN views INT DEFAULT 0 AFTER is_published',
-        description: 'View counter'
+      views: {
+        sql: "ADD COLUMN views INT DEFAULT 0 AFTER is_published",
+        description: "View counter",
       },
-      'category': {
+      category: {
         sql: "ADD COLUMN category ENUM('Nutrisi', 'Ibadah', 'Kebiasaan', 'Sains') NOT NULL DEFAULT 'Nutrisi' AFTER header_image",
-        description: 'Article category'
+        description: "Article category",
       },
-      'author': {
+      author: {
         sql: "ADD COLUMN author VARCHAR(100) DEFAULT 'Admin' AFTER category",
-        description: 'Article author'
+        description: "Article author",
       },
-      'is_published': {
-        sql: 'ADD COLUMN is_published TINYINT(1) DEFAULT 1 AFTER author',
-        description: 'Published status'
-      }
+      is_published: {
+        sql: "ADD COLUMN is_published TINYINT(1) DEFAULT 1 AFTER author",
+        description: "Published status",
+      },
     };
 
     let hasChanges = false;
@@ -77,13 +77,12 @@ async function fixArticlesTableComplete() {
     }
 
     if (hasChanges) {
-      console.log('\n📊 Table structure updated successfully!');
+      console.log("\n📊 Table structure updated successfully!");
     } else {
-      console.log('\n✅ All required columns already exist. No changes needed.');
+      console.log("\n✅ All required columns already exist. No changes needed.");
     }
-
   } catch (error) {
-    console.error('\n❌ Error:', error.message);
+    console.error("\n❌ Error:", error.message);
   } finally {
     connection.release();
     process.exit(0);

@@ -58,12 +58,12 @@
     // Show Profile button
     const profileBtn = document.getElementById("profileBtn");
     const mobileProfileBtn = document.getElementById("mobileProfileBtn");
-    
+
     if (profileBtn) {
       profileBtn.classList.remove("hidden");
       profileBtn.style.display = "block";
     }
-    
+
     if (mobileProfileBtn) {
       mobileProfileBtn.classList.remove("hidden");
       mobileProfileBtn.style.display = "block";
@@ -72,12 +72,12 @@
     // Show Points display
     const pointsDisplay = document.getElementById("pointsDisplay");
     const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
-    
+
     if (pointsDisplay) {
       pointsDisplay.classList.remove("hidden");
       pointsDisplay.style.display = "block";
     }
-    
+
     if (mobilePointsDisplay) {
       mobilePointsDisplay.classList.remove("hidden");
       mobilePointsDisplay.style.display = "block";
@@ -126,12 +126,12 @@
     // Hide Profile button
     const profileBtn = document.getElementById("profileBtn");
     const mobileProfileBtn = document.getElementById("mobileProfileBtn");
-    
+
     if (profileBtn) {
       profileBtn.classList.add("hidden");
       profileBtn.style.display = "none";
     }
-    
+
     if (mobileProfileBtn) {
       mobileProfileBtn.classList.add("hidden");
       mobileProfileBtn.style.display = "none";
@@ -140,12 +140,12 @@
     // Hide Points display
     const pointsDisplay = document.getElementById("pointsDisplay");
     const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
-    
+
     if (pointsDisplay) {
       pointsDisplay.classList.add("hidden");
       pointsDisplay.style.display = "none";
     }
-    
+
     if (mobilePointsDisplay) {
       mobilePointsDisplay.classList.add("hidden");
       mobilePointsDisplay.style.display = "none";

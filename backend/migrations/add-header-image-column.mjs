@@ -2,13 +2,13 @@
 // ADD header_image column to articles table
 // ============================================
 
-import { pool } from '../db.mjs';
+import { pool } from "../db.mjs";
 
 async function addHeaderImageColumn() {
   const connection = await pool.getConnection();
 
   try {
-    console.log('🔧 Checking articles table...');
+    console.log("🔧 Checking articles table...");
 
     // Check if 'header_image' column exists
     const [columns] = await connection.query(`
@@ -33,14 +33,13 @@ async function addHeaderImageColumn() {
     `);
 
     console.log('✅ Column "header_image" added successfully!');
-    console.log('📊 Table structure updated.');
-
+    console.log("📊 Table structure updated.");
   } catch (error) {
-    if (error.code === 'ER_NO_SUCH_TABLE') {
+    if (error.code === "ER_NO_SUCH_TABLE") {
       console.log('⚠️  Table "articles" does not exist.');
-      console.log('💡 Solution: Restart server to create tables automatically.');
+      console.log("💡 Solution: Restart server to create tables automatically.");
     } else {
-      console.error('❌ Error:', error.message);
+      console.error("❌ Error:", error.message);
     }
   } finally {
     connection.release();

@@ -9,7 +9,14 @@ export default [
   // ============================================
   {
     files: ["js/**/*.js"],
-    ignores: ["js/utils.js", "js/users-manager.js", "js/rewards-manager.js", "js/orders-manager.js", "js/admin-dashboard.js", "js/podcasts-manager.js"],
+    ignores: [
+      "js/utils.js",
+      "js/users-manager.js",
+      "js/rewards-manager.js",
+      "js/orders-manager.js",
+      "js/admin-dashboard.js",
+      "js/podcasts-manager.js",
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -37,10 +44,14 @@ export default [
       },
     },
     rules: {
-      "no-unused-vars": ["warn", { 
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^(init|open|close|edit|delete|add|update|remove|toggle|handle|show|hide|save|load|check|set|get|share|copy|redeem|switch|summarize|confirm|markdownToHtml|showWarning).*"
-      }],
+      "no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern:
+            "^(init|open|close|edit|delete|add|update|remove|toggle|handle|show|hide|save|load|check|set|get|share|copy|redeem|switch|summarize|confirm|markdownToHtml|showWarning).*",
+        },
+      ],
       "no-undef": "error",
       "prefer-const": "warn",
       "no-redeclare": "off", // Allow redefining globals that are shared between files
@@ -51,7 +62,13 @@ export default [
   // ADMIN DASHBOARD AND MANAGERS - Define and use cross-file functions
   // ============================================
   {
-    files: ["js/admin-dashboard.js", "js/users-manager.js", "js/rewards-manager.js", "js/orders-manager.js", "js/podcasts-manager.js"],
+    files: [
+      "js/admin-dashboard.js",
+      "js/users-manager.js",
+      "js/rewards-manager.js",
+      "js/orders-manager.js",
+      "js/podcasts-manager.js",
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -83,11 +100,15 @@ export default [
       },
     },
     rules: {
-      "no-unused-vars": ["warn", { 
-        argsIgnorePattern: "^_",
-        // All functions that are called from other files or HTML
-        varsIgnorePattern: "^(init|open|close|edit|delete|add|update|remove|toggle|handle|show|hide|save|load|check|set|get|share|copy|redeem|switch|summarize|confirm|API_BASE|formatOrderDateTime|viewOrderDetails|completeOrder|current).*"
-      }],
+      "no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          // All functions that are called from other files or HTML
+          varsIgnorePattern:
+            "^(init|open|close|edit|delete|add|update|remove|toggle|handle|show|hide|save|load|check|set|get|share|copy|redeem|switch|summarize|confirm|API_BASE|formatOrderDateTime|viewOrderDetails|completeOrder|current).*",
+        },
+      ],
       "no-undef": "error",
       "prefer-const": "warn",
       "no-var": "off", // Allow var for globals like API_BASE

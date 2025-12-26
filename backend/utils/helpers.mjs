@@ -45,27 +45,3 @@ export function calculateExpiryTime(orderType) {
 export function calculatePoints(totalAmount) {
   return Math.floor(totalAmount / 10000);
 }
-
-/**
- * Send standardized success response
- * @param {object} res - Express response object
- * @param {object} data - Response data
- * @param {string} message - Optional success message
- * @param {number} status - HTTP status code (default 200)
- */
-export function sendSuccess(res, data, message = null, status = 200) {
-  const response = { success: true };
-  if (data !== undefined) response.data = data;
-  if (message) response.message = message;
-  res.status(status).json(response);
-}
-
-/**
- * Send standardized error response
- * @param {object} res - Express response object
- * @param {string} error - Error message
- * @param {number} status - HTTP status code (default 500)
- */
-export function sendError(res, error, status = 500) {
-  res.status(status).json({ success: false, error });
-}

@@ -44,11 +44,3 @@ export function requireUser(req, res, next) {
     });
   }
 }
-
-/**
- * Check if running in production mode
- * @returns {boolean} True if NODE_ENV is 'production'
- */
-export function isProduction() {
-  return process.env.NODE_ENV === "production";
-}
