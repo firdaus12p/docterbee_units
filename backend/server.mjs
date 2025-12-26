@@ -22,6 +22,7 @@ import usersRouter from "./routes/users.mjs";
 import userDataRouter from "./routes/user-data.mjs";
 import rewardsRouter from "./routes/rewards.mjs";
 import podcastsRouter from "./routes/podcasts.mjs";
+import journeysRouter from "./routes/journeys.mjs";
 import bcrypt from "bcryptjs";
 
 // Get directory path for ES modules
@@ -159,6 +160,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/user-data", userDataRouter);
 app.use("/api/rewards", rewardsRouter);
 app.use("/api/podcasts", podcastsRouter);
+app.use("/api/journeys", journeysRouter);
 
 // ============================================
 // STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)
@@ -174,6 +176,16 @@ cleanUrlPages.forEach((page) => {
     const fileName = page === "periksa-kesehatan" ? "docterbee-periksa-kesehatan" : page;
     res.sendFile(join(__dirname, "..", `${fileName}.html`));
   });
+});
+
+// Dynamic journey routes - /journey/:slug
+app.get("/journey/:slug", (req, res) => {
+  // Validate slug format (security: prevent path traversal)
+  const { slug } = req.params;
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return res.status(400).send("Invalid journey slug");
+  }
+  res.sendFile(join(__dirname, "..", "journey.html"));
 });
 
 

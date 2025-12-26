@@ -364,6 +364,64 @@ async function initializeTables() {
     `);
     console.log("✅ Table: podcasts");
 
+    // Create journeys table for dynamic journey management
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS journeys (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        slug VARCHAR(100) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        is_active TINYINT(1) DEFAULT 1,
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_slug (slug),
+        INDEX idx_active (is_active),
+        INDEX idx_sort_order (sort_order)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: journeys");
+
+    // Create journey_units table for units within a journey
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS journey_units (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        journey_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        color_class VARCHAR(100) DEFAULT 'text-amber-500',
+        sort_order INT DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (journey_id) REFERENCES journeys(id) ON DELETE CASCADE,
+        INDEX idx_journey (journey_id),
+        INDEX idx_active (is_active),
+        INDEX idx_sort_order (sort_order)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: journey_units");
+
+    // Create unit_items table for questions within a unit
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS unit_items (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        unit_id INT NOT NULL,
+        item_key VARCHAR(100) NOT NULL,
+        question TEXT NOT NULL,
+        dalil TEXT NOT NULL,
+        sains TEXT NOT NULL,
+        nbsn TEXT NOT NULL,
+        sort_order INT DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (unit_id) REFERENCES journey_units(id) ON DELETE CASCADE,
+        INDEX idx_unit (unit_id),
+        INDEX idx_active (is_active)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: unit_items");
+
     console.log("📦 All tables initialized successfully");
     
     // Run migrations for existing tables
@@ -466,6 +524,9 @@ async function runMigrations(connection) {
     await safeModifyEnum(connection, 'products', 'category',
       "ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee') NOT NULL");
     
+    // Migration: Seed default "Journey Hidup Sehat" data
+    await seedDefaultJourney(connection);
+    
     console.log("✅ Migrations completed");
   } catch (error) {
     console.error("❌ Migration error:", error.message);
@@ -524,6 +585,94 @@ async function safeModifyEnum(connection, table, column, newDefinition) {
     if (!error.message.includes('Duplicate')) {
       console.error(`  ⚠️ Could not modify enum ${table}.${column}:`, error.message);
     }
+  }
+}
+
+// Helper: Seed default "Journey Hidup Sehat" data (idempotent)
+async function seedDefaultJourney(connection) {
+  try {
+    // Check if default journey already exists
+    const [existing] = await connection.query(
+      "SELECT id FROM journeys WHERE slug = ?",
+      ["hidup-sehat"]
+    );
+    
+    if (existing.length > 0) {
+      console.log("  ✅ Default journey already exists, skipping seed");
+      return;
+    }
+    
+    console.log("  🌱 Seeding default journey 'Hidup Sehat'...");
+    
+    // Insert journey
+    const [journeyResult] = await connection.query(
+      `INSERT INTO journeys (slug, name, description, is_active, sort_order)
+       VALUES (?, ?, ?, 1, 0)`,
+      ["hidup-sehat", "Journey Hidup Sehat – 6 Unit", "Qur'an–Sunnah × Sains × NBSN · Jawab pertanyaan harian, dapatkan feedback & skor."]
+    );
+    const journeyId = journeyResult.insertId;
+    
+    // Define units data
+    const unitsData = [
+      { title: "Unit 1 · 24 Jam Sehari", color: "text-amber-500", items: [
+        { key: "subuh", q: "Sudah shalat Subuh tepat waktu & terkena cahaya fajar 5–10 menit?", dalil: "QS 7:205; adab Subuh", sains: "Cahaya fajar → sirkadian → dopamin/serotonin → semangat & fokus", nbsn: "Neuron: niat & syukur. Sensorik: cahaya pagi. Biomolekul: madu + air hangat. Nature: napas 2\"" },
+        { key: "quranPagi", q: "Apakah membaca Al-Qur'an pagi ini?", dalil: "Keutamaan membaca Qur'an", sains: "Fokus & regulasi emosi meningkat", nbsn: "Neuron: fokus 5 menit" },
+        { key: "zuhur", q: "Zuhur tepat waktu & istirahat 2–3 menit dari layar?", dalil: "QS 62:10 – seimbang kerja & ibadah", sains: "Microbreak mencegah decision fatigue", nbsn: "Sensorik: peregangan" },
+        { key: "ashar", q: "Menjaga mata/gadget di waktu Ashar (tidak berlebihan)?", dalil: "Amanah menjaga tubuh", sains: "Paparan layar berlebih → kelelahan", nbsn: "Sensorik: 20–20–20" },
+        { key: "maghrib", q: "Maghrib tepat waktu & menenangkan rumah?", dalil: "HR Bukhari – adab Maghrib", sains: "Ritme sosial & emosi stabil", nbsn: "Neuron: syukur sore" },
+        { key: "isya", q: "Isya tepat waktu & tidur lebih awal?", dalil: "HR Muslim – tidur awal", sains: "Hormon pemulihan di malam", nbsn: "Nature: gelapkan kamar" }
+      ]},
+      { title: "Unit 2 · Bersosialisasi", color: "text-emerald-500", items: [
+        { key: "senyum", q: "Hari ini memberi salam/senyum pada keluarga/teman?", dalil: "HR Tirmidzi – senyum sedekah", sains: "Oksitosin ↓ stres", nbsn: "Neuron: niat ihsan" },
+        { key: "lidah", q: "Menghindari kata menyakitkan/ghibah?", dalil: "HR Bukhari – berkata baik/diam", sains: "Menghindari konflik → emosi stabil", nbsn: "Neuron: tafakur 1 menit" },
+        { key: "doa", q: "Mendoakan orang lain diam-diam?", dalil: "Doa untuk saudara", sains: "Empati tingkatkan well-being", nbsn: "Nature: rasa syukur" }
+      ]},
+      { title: "Unit 3 · Mencari Rezeki", color: "text-sky-500", items: [
+        { key: "niatKerja", q: "Berniat kerja untuk ridha Allah & amanah?", dalil: "QS 62:10 – bertebaran cari karunia", sains: "Niat → motivasi intrinsik", nbsn: "Neuron: tujuan kerja harian" },
+        { key: "jujur", q: "Menjaga kejujuran & catatan transaksi?", dalil: "Amanah dagang", sains: "Kepercayaan sosial → produktivitas", nbsn: "Nature: disiplin waktu" },
+        { key: "recharge", q: "Istirahat singkat + dzikir saat lelah?", dalil: "Dzikir menenangkan hati", sains: "Microrest pulihkan prefrontal", nbsn: "Sensorik: napas 2–3\"" }
+      ]},
+      { title: "Unit 4 · Makan & Minum", color: "text-fuchsia-500", items: [
+        { key: "porsi", q: "Makan sebelum lapar, berhenti sebelum kenyang?", dalil: "HR Tirmidzi – sepertiga", sains: "Cegah lonjakan insulin", nbsn: "Biomolekul: porsi seimbang" },
+        { key: "halal", q: "Memilih makanan halal-thayyib?", dalil: "QS 2:168", sains: "Higienitas & kualitas nutrisi", nbsn: "Nature: bahan segar lokal" },
+        { key: "minumDuduk", q: "Minum sambil duduk & tidak terburu-buru?", dalil: "Adab minum", sains: "Hindari aspirasi/ketidaknyamanan", nbsn: "Sensorik: mindful sip" }
+      ]},
+      { title: "Unit 5 · Saat Sakit", color: "text-rose-500", items: [
+        { key: "sabar", q: "Sabar & berobat dengan cara halal?", dalil: "QS 26:80 – Allah menyembuhkan", sains: "Stres rendah → imun meningkat", nbsn: "Nature: tidur & hidrasi" },
+        { key: "doaSembuh", q: "Berdoa memohon kesembuhan?", dalil: "Doa Nabi – syifa", sains: "Relaksasi → pemulihan", nbsn: "Neuron: harapan positif" },
+        { key: "madu", q: "Mengambil ikhtiar madu/kurma sesuai anjuran?", dalil: "QS 16:69 – syifa", sains: "Enzim & flavonoid", nbsn: "Biomolekul: dosis wajar" }
+      ]},
+      { title: "Unit 6 · Menjaga Pancaindra", color: "text-amber-500", items: [
+        { key: "pandangan", q: "Menjaga pandangan dari yang haram?", dalil: "QS 24:30", sains: "Hindari dopamin instan", nbsn: "Neuron: kontrol diri" },
+        { key: "pendengaran", q: "Memilih konten bermanfaat untuk didengar?", dalil: "Adab mendengar", sains: "Konten positif → fokus", nbsn: "Sensorik: kurasi audio" },
+        { key: "ucapan", q: "Menjaga ucapan (baik/diam)?", dalil: "HR Bukhari", sains: "Hindari konflik", nbsn: "Neuron: jeda 3 detik" }
+      ]}
+    ];
+    
+    // Insert units and items
+    for (let i = 0; i < unitsData.length; i++) {
+      const unit = unitsData[i];
+      const [unitResult] = await connection.query(
+        `INSERT INTO journey_units (journey_id, title, color_class, sort_order, is_active)
+         VALUES (?, ?, ?, ?, 1)`,
+        [journeyId, unit.title, unit.color, i]
+      );
+      const unitId = unitResult.insertId;
+      
+      // Insert items for this unit
+      for (let j = 0; j < unit.items.length; j++) {
+        const item = unit.items[j];
+        await connection.query(
+          `INSERT INTO unit_items (unit_id, item_key, question, dalil, sains, nbsn, sort_order, is_active)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+          [unitId, item.key, item.q, item.dalil, item.sains, item.nbsn, j]
+        );
+      }
+    }
+    
+    console.log("  ✅ Default journey 'Hidup Sehat' seeded with 6 units");
+  } catch (error) {
+    console.error("  ⚠️ Could not seed default journey:", error.message);
   }
 }
 

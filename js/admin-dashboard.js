@@ -279,6 +279,11 @@ function switchSection(section) {
     if (typeof loadPodcasts === "function") {
       loadPodcasts();
     }
+  } else if (section === "journeys") {
+    // Load journeys
+    if (typeof loadAdminJourneys === "function") {
+      loadAdminJourneys();
+    }
   }
 }
 

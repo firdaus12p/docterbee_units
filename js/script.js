@@ -6,197 +6,131 @@
 
 // ==================== DATA MODEL ====================
 
-const UNITS = [
-  {
-    id: "u1",
-    title: "Unit 1 · 24 Jam Sehari",
-    color: "text-amber-500",
-    items: [
-      {
-        key: "subuh",
-        q: "Sudah shalat Subuh tepat waktu & terkena cahaya fajar 5–10 menit?",
-        dalil: "QS 7:205; adab Subuh",
-        sains: "Cahaya fajar → sirkadian → dopamin/serotonin → semangat & fokus",
-        nbsn: 'Neuron: niat & syukur. Sensorik: cahaya pagi. Biomolekul: madu + air hangat. Nature: napas 2"',
-      },
-      {
-        key: "quranPagi",
-        q: "Apakah membaca Al-Qur'an pagi ini?",
-        dalil: "Keutamaan membaca Qur'an",
-        sains: "Fokus & regulasi emosi meningkat",
-        nbsn: "Neuron: fokus 5 menit",
-      },
-      {
-        key: "zuhur",
-        q: "Zuhur tepat waktu & istirahat 2–3 menit dari layar?",
-        dalil: "QS 62:10 – seimbang kerja & ibadah",
-        sains: "Microbreak mencegah decision fatigue",
-        nbsn: "Sensorik: peregangan",
-      },
-      {
-        key: "ashar",
-        q: "Menjaga mata/gadget di waktu Ashar (tidak berlebihan)?",
-        dalil: "Amanah menjaga tubuh",
-        sains: "Paparan layar berlebih → kelelahan",
-        nbsn: "Sensorik: 20–20–20",
-      },
-      {
-        key: "maghrib",
-        q: "Maghrib tepat waktu & menenangkan rumah?",
-        dalil: "HR Bukhari – adab Maghrib",
-        sains: "Ritme sosial & emosi stabil",
-        nbsn: "Neuron: syukur sore",
-      },
-      {
-        key: "isya",
-        q: "Isya tepat waktu & tidur lebih awal?",
-        dalil: "HR Muslim – tidur awal",
-        sains: "Hormon pemulihan di malam",
-        nbsn: "Nature: gelapkan kamar",
-      },
-    ],
-  },
-  {
-    id: "u2",
-    title: "Unit 2 · Bersosialisasi",
-    color: "text-emerald-500",
-    items: [
-      {
-        key: "senyum",
-        q: "Hari ini memberi salam/senyum pada keluarga/teman?",
-        dalil: "HR Tirmidzi – senyum sedekah",
-        sains: "Oksitosin ↓ stres",
-        nbsn: "Neuron: niat ihsan",
-      },
-      {
-        key: "lidah",
-        q: "Menghindari kata menyakitkan/ghibah?",
-        dalil: "HR Bukhari – berkata baik/diam",
-        sains: "Menghindari konflik → emosi stabil",
-        nbsn: "Neuron: tafakur 1 menit",
-      },
-      {
-        key: "doa",
-        q: "Mendoakan orang lain diam-diam?",
-        dalil: "Doa untuk saudara",
-        sains: "Empati tingkatkan well-being",
-        nbsn: "Nature: rasa syukur",
-      },
-    ],
-  },
-  {
-    id: "u3",
-    title: "Unit 3 · Mencari Rezeki",
-    color: "text-sky-500",
-    items: [
-      {
-        key: "niatKerja",
-        q: "Berniat kerja untuk ridha Allah & amanah?",
-        dalil: "QS 62:10 – bertebaran cari karunia",
-        sains: "Niat → motivasi intrinsik",
-        nbsn: "Neuron: tujuan kerja harian",
-      },
-      {
-        key: "jujur",
-        q: "Menjaga kejujuran & catatan transaksi?",
-        dalil: "Amanah dagang",
-        sains: "Kepercayaan sosial → produktivitas",
-        nbsn: "Nature: disiplin waktu",
-      },
-      {
-        key: "recharge",
-        q: "Istirahat singkat + dzikir saat lelah?",
-        dalil: "Dzikir menenangkan hati",
-        sains: "Microrest pulihkan prefrontal",
-        nbsn: 'Sensorik: napas 2–3"',
-      },
-    ],
-  },
-  {
-    id: "u4",
-    title: "Unit 4 · Makan & Minum",
-    color: "text-fuchsia-500",
-    items: [
-      {
-        key: "porsi",
-        q: "Makan sebelum lapar, berhenti sebelum kenyang?",
-        dalil: "HR Tirmidzi – sepertiga",
-        sains: "Cegah lonjakan insulin",
-        nbsn: "Biomolekul: porsi seimbang",
-      },
-      {
-        key: "halal",
-        q: "Memilih makanan halal-thayyib?",
-        dalil: "QS 2:168",
-        sains: "Higienitas & kualitas nutrisi",
-        nbsn: "Nature: bahan segar lokal",
-      },
-      {
-        key: "minumDuduk",
-        q: "Minum sambil duduk & tidak terburu-buru?",
-        dalil: "Adab minum",
-        sains: "Hindari aspirasi/ketidaknyamanan",
-        nbsn: "Sensorik: mindful sip",
-      },
-    ],
-  },
-  {
-    id: "u5",
-    title: "Unit 5 · Saat Sakit",
-    color: "text-rose-500",
-    items: [
-      {
-        key: "sabar",
-        q: "Sabar & berobat dengan cara halal?",
-        dalil: "QS 26:80 – Allah menyembuhkan",
-        sains: "Stres rendah → imun meningkat",
-        nbsn: "Nature: tidur & hidrasi",
-      },
-      {
-        key: "doaSembuh",
-        q: "Berdoa memohon kesembuhan?",
-        dalil: "Doa Nabi – syifa",
-        sains: "Relaksasi → pemulihan",
-        nbsn: "Neuron: harapan positif",
-      },
-      {
-        key: "madu",
-        q: "Mengambil ikhtiar madu/kurma sesuai anjuran?",
-        dalil: "QS 16:69 – syifa",
-        sains: "Enzim & flavonoid",
-        nbsn: "Biomolekul: dosis wajar",
-      },
-    ],
-  },
-  {
-    id: "u6",
-    title: "Unit 6 · Menjaga Pancaindra",
-    color: "text-amber-500",
-    items: [
-      {
-        key: "pandangan",
-        q: "Menjaga pandangan dari yang haram?",
-        dalil: "QS 24:30",
-        sains: "Hindari dopamin instan",
-        nbsn: "Neuron: kontrol diri",
-      },
-      {
-        key: "pendengaran",
-        q: "Memilih konten bermanfaat untuk didengar?",
-        dalil: "Adab mendengar",
-        sains: "Konten positif → fokus",
-        nbsn: "Sensorik: kurasi audio",
-      },
-      {
-        key: "ucapan",
-        q: "Menjaga ucapan (baik/diam)?",
-        dalil: "HR Bukhari",
-        sains: "Hindari konflik",
-        nbsn: "Neuron: jeda 3 detik",
-      },
-    ],
-  },
-];
+// Dynamic units array - loaded from API
+let UNITS = [];
+
+// Current journey state
+let currentJourney = {
+  slug: null,
+  name: "",
+  description: "",
+};
+
+/**
+ * Get current journey slug from URL path
+ * @returns {string|null} Journey slug or null
+ */
+function getSlugFromURL() {
+  const path = window.location.pathname;
+  const match = path.match(/^\/journey\/([a-z0-9-]+)$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Load list of all journeys for selector
+ * @returns {Promise<Array>} Array of journey objects
+ */
+async function loadJourneyList() {
+  try {
+    const response = await fetch("/api/journeys");
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error loading journey list:", error);
+    return [];
+  }
+}
+
+/**
+ * Load journey data from API
+ * @param {string} slug - Journey slug
+ * @returns {Promise<Object|null>} Journey data or null
+ */
+async function loadJourneyFromAPI(slug) {
+  try {
+    const response = await fetch(`/api/journeys/${encodeURIComponent(slug)}`);
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      const journey = data.data;
+      
+      // Update current journey state
+      currentJourney.slug = journey.slug;
+      currentJourney.name = journey.name;
+      currentJourney.description = journey.description;
+      
+      // Convert API format to UNITS format for compatibility
+      UNITS = journey.units.map((unit) => ({
+        id: String(unit.id),
+        title: unit.title,
+        color: unit.color_class,
+        items: unit.items.map((item) => ({
+          key: item.item_key,
+          q: item.question,
+          dalil: item.dalil,
+          sains: item.sains,
+          nbsn: item.nbsn,
+        })),
+      }));
+      
+      return journey;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error loading journey:", error);
+    return null;
+  }
+}
+
+/**
+ * Initialize journey selector dropdown
+ * @param {Array} journeys - List of journeys
+ */
+function initJourneySelector(journeys) {
+  const selector = document.getElementById("journeySelector");
+  if (!selector) return;
+  
+  selector.innerHTML = "";
+  
+  journeys.forEach((journey) => {
+    const option = document.createElement("option");
+    option.value = journey.slug;
+    option.textContent = journey.name;
+    selector.appendChild(option);
+  });
+  
+  // Set current selected
+  if (currentJourney.slug) {
+    selector.value = currentJourney.slug;
+  }
+  
+  // Add change event listener
+  selector.addEventListener("change", (e) => {
+    const selectedSlug = e.target.value;
+    if (selectedSlug && selectedSlug !== currentJourney.slug) {
+      window.location.href = `/journey/${selectedSlug}`;
+    }
+  });
+}
+
+/**
+ * Update UI with journey info
+ */
+function updateJourneyUI() {
+  const titleEl = document.getElementById("journeyTitle");
+  const descEl = document.getElementById("journeyDescription");
+  
+  if (titleEl) {
+    titleEl.textContent = currentJourney.name || "Journey";
+  }
+  if (descEl) {
+    descEl.textContent = currentJourney.description || "";
+  }
+}
 
 // ==================== STORAGE HELPERS ====================
 
@@ -267,19 +201,24 @@ function refreshNav() {
 }
 
 /**
- * Get user answers state
- * @returns {Object} User answers object
+ * Get user answers state for current journey
+ * @returns {Object} User answers object for current journey
  */
 function getState() {
-  return _db("db_units");
+  const allData = _db("db_journey_progress");
+  const slug = currentJourney.slug || "hidup-sehat";
+  return allData[slug] || {};
 }
 
 /**
- * Set user answers state
+ * Set user answers state for current journey
  * @param {Object} state - State object to save
  */
 function setState(state) {
-  _db("db_units", state);
+  const allData = _db("db_journey_progress") || {};
+  const slug = currentJourney.slug || "hidup-sehat";
+  allData[slug] = state;
+  _db("db_journey_progress", allData);
 }
 
 // ==================== UI RENDERING ====================
@@ -787,9 +726,65 @@ async function init() {
     await window.UserDataSync.autoInit();
   }
 
+  // ===== JOURNEY-SPECIFIC LOGIC =====
+  // Only run journey-related code if we're on a journey page
+  // This prevents redirects from other pages (login, register, etc.)
+  const currentPath = window.location.pathname;
+  const isJourneyPage = currentPath === "/journey" || currentPath.startsWith("/journey/");
+  
+  if (!isJourneyPage) {
+    // Not on journey page, skip journey-specific initialization
+    // Other pages will call their own init functions (initBooking, renderEvents, etc.)
+    return;
+  }
+
+  // Determine journey slug from URL or use default
+  const slug = getSlugFromURL();
+  
+  // If no slug in URL (e.g., /journey without slug), redirect to default journey
+  if (!slug) {
+    // Load journey list to get the first/default journey
+    const journeys = await loadJourneyList();
+    if (journeys.length > 0) {
+      window.location.href = `/journey/${journeys[0].slug}`;
+      return; // Stop execution, page will redirect
+    } else {
+      // Fallback if no journeys exist
+      console.error("No journeys found in database");
+      const unitWrap = document.getElementById("unitWrap");
+      if (unitWrap) {
+        unitWrap.innerHTML = `<div class="text-center text-slate-500 p-8">Tidak ada journey yang tersedia.</div>`;
+      }
+      return;
+    }
+  }
+
+  // Load journey data from API
+  const journey = await loadJourneyFromAPI(slug);
+  
+  if (!journey) {
+    // Journey not found, redirect to default
+    window.location.href = "/journey";
+    return;
+  }
+
+  // Update UI with journey info
+  updateJourneyUI();
+
+  // Load and initialize journey selector
+  const journeys = await loadJourneyList();
+  initJourneySelector(journeys);
+
   // Build tabs and show first unit (after data is loaded)
-  buildTabs();
-  showUnit(UNITS[0].id);
+  if (UNITS.length > 0) {
+    buildTabs();
+    showUnit(UNITS[0].id);
+  } else {
+    const unitWrap = document.getElementById("unitWrap");
+    if (unitWrap) {
+      unitWrap.innerHTML = `<div class="text-center text-slate-500 p-8">Journey ini belum memiliki unit.</div>`;
+    }
+  }
 
   // Attach calc all button listener
   const calcAllBtn = document.getElementById("btnCalcAll");

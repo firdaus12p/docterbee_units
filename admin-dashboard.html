@@ -190,6 +190,14 @@
             <span class="hidden sm:inline">Podcasts Manager</span>
             <span class="sm:hidden">Podcasts</span>
           </button>
+          <button
+            class="dashboard-tab whitespace-nowrap"
+            data-section="journeys"
+          >
+            <i data-lucide="compass" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Journey Manager</span>
+            <span class="sm:hidden">Journey</span>
+          </button>
         </div>
 
         <!-- Section: Booking Monitor -->
@@ -1621,6 +1629,216 @@
         </div>
       </div>
 
+      <!-- SECTION: JOURNEY MANAGER -->
+      <section id="section-journeys" class="dashboard-section hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 class="text-xl sm:text-2xl font-bold">Journey Manager</h2>
+          <button
+            id="btnNewJourney"
+            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Journey Baru</span>
+          </button>
+        </div>
+
+        <!-- Journey Selector -->
+        <div class="mb-4">
+          <label class="block text-sm mb-2">Pilih Journey untuk Edit:</label>
+          <select id="adminJourneySelector" class="w-full sm:w-auto min-w-[300px] bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none">
+            <option value="">Loading...</option>
+          </select>
+        </div>
+
+        <!-- Journey Details Panel -->
+        <div id="journeyDetailsPanel" class="hidden mb-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-semibold">Detail Journey</h3>
+              <div class="flex gap-2">
+                <button id="btnEditJourney" class="text-xs bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">Edit</button>
+                <button id="btnDeleteJourney" class="text-xs bg-red-500 hover:bg-red-600 px-3 py-1 rounded">Hapus</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div><span class="text-slate-400">Nama:</span> <span id="journeyDetailName" class="font-medium">-</span></div>
+              <div><span class="text-slate-400">Slug:</span> <span id="journeyDetailSlug" class="font-mono text-amber-400">-</span></div>
+              <div><span class="text-slate-400">Status:</span> <span id="journeyDetailStatus">-</span></div>
+            </div>
+          </div>
+
+          <!-- Units Table -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-4">
+            <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+              <h3 class="font-semibold">Units dalam Journey</h3>
+              <button id="btnNewUnit" class="text-xs bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="plus" class="w-3 h-3"></i> Unit Baru
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-slate-800">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">ID</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">Judul Unit</th>
+                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Warna</th>
+                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Items</th>
+                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="unitsTableBody">
+                  <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Pilih journey untuk melihat units</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Items Table (shown when unit selected) -->
+          <div id="itemsPanel" class="hidden bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+              <h3 class="font-semibold">Items dalam Unit: <span id="selectedUnitTitle" class="text-amber-400">-</span></h3>
+              <button id="btnNewItem" class="text-xs bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="plus" class="w-3 h-3"></i> Item Baru
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-slate-800">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">Key</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">Pertanyaan</th>
+                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                  <tr><td colspan="3" class="px-4 py-6 text-center text-slate-400">Pilih unit untuk melihat items</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Journey Form Modal -->
+      <div id="journeyModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold" id="journeyModalTitle">Journey Baru</h3>
+            <button id="closeJourneyModal" class="text-slate-400 hover:text-slate-200">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+          <form id="journeyForm" class="space-y-4">
+            <input type="hidden" id="journeyFormId" />
+            <div>
+              <label class="block text-sm mb-2">Nama Journey</label>
+              <input type="text" id="journeyFormName" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+            </div>
+            <div>
+              <label class="block text-sm mb-2">Slug (URL)</label>
+              <input type="text" id="journeyFormSlug" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none font-mono" placeholder="contoh-journey" required />
+              <p class="text-xs text-slate-400 mt-1">Huruf kecil, angka, dan tanda hubung (-) saja</p>
+            </div>
+            <div>
+              <label class="block text-sm mb-2">Deskripsi</label>
+              <textarea id="journeyFormDesc" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"></textarea>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="journeyFormActive" class="w-4 h-4 accent-amber-400" checked />
+              <label for="journeyFormActive" class="text-sm">Aktif</label>
+            </div>
+            <div class="flex gap-2 pt-4">
+              <button type="submit" class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500">Simpan</button>
+              <button type="button" id="cancelJourneyModal" class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg">Batal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Unit Form Modal -->
+      <div id="unitModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold" id="unitModalTitle">Unit Baru</h3>
+            <button id="closeUnitModal" class="text-slate-400 hover:text-slate-200">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+          <form id="unitForm" class="space-y-4">
+            <input type="hidden" id="unitFormId" />
+            <input type="hidden" id="unitFormJourneyId" />
+            <div>
+              <label class="block text-sm mb-2">Judul Unit</label>
+              <input type="text" id="unitFormTitle" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+            </div>
+            <div>
+              <label class="block text-sm mb-2">Warna (CSS Class)</label>
+              <select id="unitFormColor" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none">
+                <option value="text-amber-500">Amber</option>
+                <option value="text-emerald-500">Emerald</option>
+                <option value="text-sky-500">Sky</option>
+                <option value="text-fuchsia-500">Fuchsia</option>
+                <option value="text-rose-500">Rose</option>
+                <option value="text-purple-500">Purple</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="unitFormActive" class="w-4 h-4 accent-amber-400" checked />
+              <label for="unitFormActive" class="text-sm">Aktif</label>
+            </div>
+            <div class="flex gap-2 pt-4">
+              <button type="submit" class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500">Simpan</button>
+              <button type="button" id="cancelUnitModal" class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg">Batal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Item Form Modal -->
+      <div id="itemModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold" id="itemModalTitle">Item Baru</h3>
+            <button id="closeItemModal" class="text-slate-400 hover:text-slate-200">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+          <form id="itemForm" class="space-y-4">
+            <input type="hidden" id="itemFormId" />
+            <input type="hidden" id="itemFormUnitId" />
+            <div>
+              <label class="block text-sm mb-2">Item Key</label>
+              <input type="text" id="itemFormKey" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none font-mono" placeholder="contohKey" required />
+              <p class="text-xs text-slate-400 mt-1">camelCase, tanpa spasi</p>
+            </div>
+            <div>
+              <label class="block text-sm mb-2">Pertanyaan</label>
+              <textarea id="itemFormQuestion" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required></textarea>
+            </div>
+            <div>
+              <label class="block text-sm mb-2">Dalil</label>
+              <input type="text" id="itemFormDalil" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+            </div>
+            <div>
+              <label class="block text-sm mb-2">Sains</label>
+              <input type="text" id="itemFormSains" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+            </div>
+            <div>
+              <label class="block text-sm mb-2">NBSN</label>
+              <input type="text" id="itemFormNbsn" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="itemFormActive" class="w-4 h-4 accent-amber-400" checked />
+              <label for="itemFormActive" class="text-sm">Aktif</label>
+            </div>
+            <div class="flex gap-2 pt-4">
+              <button type="submit" class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500">Simpan</button>
+              <button type="button" id="cancelItemModal" class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg">Batal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Rewards History Modal -->
       <div
         id="rewardsModal"
@@ -1813,5 +2031,6 @@
     <script src="js/users-manager.js"></script>
     <script src="js/rewards-manager.js"></script>
     <script src="js/podcasts-manager.js"></script>
+    <script src="js/journey-manager.js"></script>
   </body>
 </html>
