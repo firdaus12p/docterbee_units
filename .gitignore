@@ -85,3 +85,4 @@ debug-*.bat
 # OPTIONAL (NO CI/CD YET)
 # ===============================
 .github/
+.antigravity/
