@@ -888,11 +888,26 @@ async function reopenLastOrderQR() {
   }
 
   try {
-    // Fetch latest order status from server
-    const response = await fetch(`/api/orders/id/${lastOrder.id}`);
+    // Fetch latest order status from server (requires auth)
+    const response = await fetch(`/api/orders/id/${lastOrder.id}`, {
+      credentials: "include",
+    });
     const result = await response.json();
 
     if (!result.success) {
+      // If auth failed (401/403), try order number endpoint instead
+      if (response.status === 401 || response.status === 403) {
+        console.log("Auth required for /api/orders/id, trying order number...");
+        const altResponse = await fetch(`/api/orders/status/${encodeURIComponent(lastOrder.order_number)}`, {
+          credentials: "include",
+        });
+        const altResult = await altResponse.json();
+        
+        if (altResult.success && altResult.order) {
+          showQRCodeModal(altResult.order);
+          return;
+        }
+      }
       throw new Error("Gagal mengambil status order");
     }
 

@@ -24,6 +24,7 @@ import rewardsRouter from "./routes/rewards.mjs";
 import podcastsRouter from "./routes/podcasts.mjs";
 import journeysRouter from "./routes/journeys.mjs";
 import bcrypt from "bcryptjs";
+import { loginRateLimiter } from "./utils/rate-limiter.mjs";
 
 // Get directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -38,17 +39,34 @@ const PORT = process.env.PORT || 3000;
 // Check if running in production
 const isProduction = process.env.NODE_ENV === "production";
 
+// ============================================
+// SESSION SECRET VALIDATION (Security Best Practice)
+// ============================================
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (isProduction && !sessionSecret) {
+  console.error("❌ FATAL: SESSION_SECRET environment variable is REQUIRED in production!");
+  console.error("   Please set a strong, random SESSION_SECRET (at least 64 characters).");
+  console.error("   You can generate one with: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\"");
+  process.exit(1);
+}
+
+if (!sessionSecret) {
+  console.warn("⚠️  WARNING: SESSION_SECRET not set. Using insecure fallback for development only.");
+  console.warn("   Set SESSION_SECRET in .env before deploying to production!");
+}
+
 // Session middleware (MUST be before routes)
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "docterbee-secret-key-change-in-production",
+    secret: sessionSecret || "dev-only-insecure-secret-do-not-use-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Set to false for compatibility (even in production if not using HTTPS)
+      secure: isProduction, // true in production (HTTPS), false in development (HTTP)
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      sameSite: "lax", // More permissive for cross-origin requests
+      sameSite: isProduction ? "strict" : "lax", // Stricter in production
     },
   })
 );
@@ -83,6 +101,48 @@ app.use(
   })
 );
 app.use(express.json());
+
+// ============================================
+// SECURITY HEADERS (Production only to avoid dev friction)
+// ============================================
+if (isProduction) {
+  app.use((req, res, next) => {
+    // Prevent MIME type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // Prevent clickjacking - allow same origin framing only
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    
+    // Legacy XSS protection for older browsers
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    
+    // Control referrer information
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Prevent DNS prefetching
+    res.setHeader('X-DNS-Prefetch-Control', 'off');
+    
+    // HSTS - enforce HTTPS (only if truly using HTTPS)
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    
+    // Basic Content Security Policy
+    // Allows: same-origin scripts/styles, inline scripts (needed for some features), 
+    // Google Fonts, external images, and specific CDNs
+    res.setHeader('Content-Security-Policy', 
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
+      "font-src 'self' https://fonts.gstatic.com data:; " +
+      "img-src 'self' data: https: blob:; " +
+      "connect-src 'self' https://generativelanguage.googleapis.com https://www.youtube.com https://youtube.com; " +
+      "frame-src 'self' https://www.youtube.com https://youtube.com; " +
+      "object-src 'none'; " +
+      "base-uri 'self';"
+    );
+    
+    next();
+  });
+}
 
 // ============================================
 // REDIRECT .html to clean URLs (MUST be before static middleware)
@@ -193,8 +253,8 @@ app.get("/journey/:slug", (req, res) => {
 // ADMIN AUTHENTICATION (Database-based with bcrypt)
 // ============================================
 
-// POST /api/admin/login - Admin login with database authentication
-app.post("/api/admin/login", async (req, res) => {
+// POST /api/admin/login - Admin login with database authentication (rate limited)
+app.post("/api/admin/login", loginRateLimiter.middleware(), async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -212,6 +272,12 @@ app.post("/api/admin/login", async (req, res) => {
     );
 
     if (!admin) {
+      // Record rate limit failure
+      const rateLimitResult = req.rateLimiter.recordFailure();
+      const attemptsMsg = rateLimitResult.attemptsLeft > 0 
+        ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)` 
+        : '';
+
       // Log failed attempt (admin not found) - use NULL for admin_id
       await query(
         `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
@@ -221,7 +287,7 @@ app.post("/api/admin/login", async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        error: "Username atau password salah",
+        error: `Username atau password salah${attemptsMsg}`,
       });
     }
 
@@ -229,6 +295,12 @@ app.post("/api/admin/login", async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, admin.password);
 
     if (!passwordMatch) {
+      // Record rate limit failure
+      const rateLimitResult = req.rateLimiter.recordFailure();
+      const attemptsMsg = rateLimitResult.attemptsLeft > 0 
+        ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)` 
+        : '';
+
       // Log failed attempt (wrong password)
       await query(
         `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
@@ -238,9 +310,12 @@ app.post("/api/admin/login", async (req, res) => {
 
       return res.status(401).json({
         success: false,
-        error: "Username atau password salah",
+        error: `Username atau password salah${attemptsMsg}`,
       });
     }
+
+    // Successful login - reset rate limiter
+    req.rateLimiter.reset();
 
     // Update last_login timestamp
     await query("UPDATE admins SET last_login = NOW() WHERE id = ?", [admin.id]);
@@ -311,15 +386,16 @@ const requireAdmin = (req, res, next) => {
 // Export middleware for use in route files (if needed later)
 app.set("requireAdmin", requireAdmin);
 
-// DEBUG ENDPOINT - Untuk troubleshooting database
-// Security: Di production, endpoint ini memerlukan login admin
-// Di development, endpoint ini terbuka untuk kemudahan debugging
+// DEBUG ENDPOINT - Untuk troubleshooting database  
+// Security: 
+// - Production: Requires admin login, shows minimal info
+// - Development: Open but shows warning
 app.get("/api/debug", async (req, res) => {
   // Security check: In production, require admin login
   if (isProduction && !(req.session && req.session.isAdmin)) {
     return res.status(401).json({
       success: false,
-      error: "Debug endpoint hanya tersedia untuk admin di production. Silakan login sebagai admin terlebih dahulu.",
+      error: "Debug endpoint hanya tersedia untuk admin di production.",
     });
   }
 
@@ -329,47 +405,55 @@ app.get("/api/debug", async (req, res) => {
     // Test database connection
     let dbStatus = "disconnected";
     let dbError = null;
-    let tables = [];
+    let tableCount = 0;
 
     try {
       const connection = await pool.getConnection();
       dbStatus = "connected";
 
-      // Get list of tables
+      // Only get table count, not names (less info exposure)
       const [rows] = await connection.query("SHOW TABLES");
-      tables = rows.map((row) => Object.values(row)[0]);
+      tableCount = rows.length;
 
       connection.release();
     } catch (error) {
-      dbError = error.message;
+      dbError = isProduction ? "Connection failed" : error.message;
     }
 
-    res.json({
+    // Build response - NEVER expose actual env values
+    const response = {
       status: "OK",
       timestamp: new Date().toISOString(),
-      environment: {
-        NODE_ENV: process.env.NODE_ENV || "development",
-        PORT: process.env.PORT || "3000",
-        DB_HOST: process.env.DB_HOST || "not set",
-        DB_PORT: process.env.DB_PORT || "not set",
-        DB_USER: process.env.DB_USER || "not set",
-        DB_NAME: process.env.DB_NAME || "not set",
-        // Hide sensitive info in production
-        DB_PASSWORD: isProduction ? "***HIDDEN***" : (process.env.DB_PASSWORD ? "***SET***" : "NOT SET"),
-        GEMINI_API_KEY: isProduction ? "***HIDDEN***" : (process.env.GEMINI_API_KEY ? "***SET***" : "NOT SET"),
+      mode: isProduction ? "production" : "development",
+      // Show only status, never actual values
+      config: {
+        NODE_ENV: process.env.NODE_ENV || "not set",
+        PORT: process.env.PORT ? "SET" : "default (3000)",
+        DB_HOST: process.env.DB_HOST ? "SET" : "NOT SET",
+        DB_PORT: process.env.DB_PORT ? "SET" : "NOT SET", 
+        DB_USER: process.env.DB_USER ? "SET" : "NOT SET",
+        DB_NAME: process.env.DB_NAME ? "SET" : "NOT SET",
+        DB_PASSWORD: process.env.DB_PASSWORD ? "SET" : "NOT SET",
+        SESSION_SECRET: process.env.SESSION_SECRET ? "SET" : "NOT SET",
+        GEMINI_API_KEY: process.env.GEMINI_API_KEY ? "SET" : "NOT SET",
       },
       database: {
         status: dbStatus,
         error: dbError,
-        tables: tables,
-        tableCount: tables.length,
+        tableCount: tableCount,
       },
-    });
+    };
+
+    // Add warning in development
+    if (!isProduction) {
+      response.warning = "⚠️ Debug endpoint aktif. Nonaktifkan atau lindungi di production!";
+    }
+
+    res.json(response);
   } catch (error) {
     res.status(500).json({
       status: "ERROR",
-      error: error.message,
-      stack: isProduction ? undefined : error.stack, // Hide stack trace in production
+      error: isProduction ? "Internal server error" : error.message,
     });
   }
 });

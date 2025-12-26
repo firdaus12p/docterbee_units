@@ -314,11 +314,21 @@ router.get("/", requireAdmin, async (req, res) => {
 });
 
 // ============================================
-// GET /api/orders/id/:id - Get order by ID
+// GET /api/orders/id/:id - Get order by ID (requires auth)
 // ============================================
 router.get("/id/:id", async (req, res) => {
   try {
     const orderId = parseInt(req.params.id);
+    const userId = req.session?.userId;
+    const isAdmin = req.session?.isAdmin === true;
+
+    // Must be logged in (either as user or admin)
+    if (!userId && !isAdmin) {
+      return res.status(401).json({
+        success: false,
+        error: "Silakan login untuk melihat order",
+      });
+    }
 
     const order = await queryOne("SELECT * FROM orders WHERE id = ?", [orderId]);
 
@@ -326,6 +336,16 @@ router.get("/id/:id", async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Order tidak ditemukan",
+      });
+    }
+
+    // Authorization: Admin can see all, user can only see their own orders
+    const isOwner = userId && order.user_id && order.user_id === userId;
+    
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        error: "Anda tidak memiliki akses ke order ini",
       });
     }
 
@@ -353,11 +373,14 @@ router.get("/id/:id", async (req, res) => {
 });
 
 // ============================================
-// GET /api/orders/:orderNumber - Get order by number
+// GET /api/orders/:orderNumber - Get order by number (for QR scanning)
+// Full data for admin/owner, limited data for others
 // ============================================
 router.get("/:orderNumber", async (req, res) => {
   try {
     const { orderNumber } = req.params;
+    const userId = req.session?.userId;
+    const isAdmin = req.session?.isAdmin === true;
 
     const order = await queryOne("SELECT * FROM orders WHERE order_number = ?", [orderNumber]);
 
@@ -378,10 +401,47 @@ router.get("/:orderNumber", async (req, res) => {
       order.status = "expired";
     }
 
-    res.json({
-      success: true,
-      data: order,
-    });
+    // Check if requester is admin or owner
+    const isOwner = userId && order.user_id && order.user_id === userId;
+    const hasFullAccess = isAdmin || isOwner;
+
+    if (hasFullAccess) {
+      // Admin or owner gets full data
+      res.json({
+        success: true,
+        data: order,
+      });
+    } else {
+      // Others get limited data (for cashier scanning, etc.)
+      // Hide sensitive customer information
+      const limitedOrder = {
+        id: order.id,
+        order_number: order.order_number,
+        order_type: order.order_type,
+        store_location: order.store_location,
+        items: order.items,
+        total_amount: order.total_amount,
+        status: order.status,
+        qr_code_data: order.qr_code_data,
+        expires_at: order.expires_at,
+        created_at: order.created_at,
+        points_earned: order.points_earned,
+        // Mask sensitive data
+        customer_name: order.customer_name ? order.customer_name.charAt(0) + "***" : null,
+        customer_phone: order.customer_phone ? order.customer_phone.slice(0, 4) + "****" + order.customer_phone.slice(-2) : null,
+        // Hide address completely
+        customer_address: null,
+        // Include coupon info for display but not sensitive
+        coupon_code: order.coupon_code,
+        coupon_discount: order.coupon_discount,
+      };
+
+      res.json({
+        success: true,
+        data: limitedOrder,
+        limited: true, // Flag indicating limited data
+      });
+    }
   } catch (error) {
     console.error("Error fetching order:", error);
     res.status(500).json({
@@ -483,12 +543,13 @@ router.patch("/:id/complete", requireAdmin, async (req, res) => {
 });
 
 // ============================================
-// PATCH /api/orders/:id/cancel - Cancel order
+// PATCH /api/orders/:id/cancel - Cancel order (auth required)
 // ============================================
 router.patch("/:id/cancel", async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.session?.userId;
+    const isAdmin = req.session?.isAdmin === true;
 
     // Get order to verify ownership
     const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);
@@ -500,11 +561,16 @@ router.patch("/:id/cancel", async (req, res) => {
       });
     }
 
-    // Verify ownership (allow admin or order owner)
-    if (userId && order.user_id && order.user_id !== userId) {
+    // Authorization check:
+    // - Admin can cancel any order
+    // - Logged-in user can cancel their own orders (user_id matches)
+    // - Guest orders (user_id is null) can only be cancelled by admin
+    const isOwner = userId && order.user_id && order.user_id === userId;
+
+    if (!isAdmin && !isOwner) {
       return res.status(403).json({
         success: false,
-        error: "Anda tidak memiliki akses untuk membatalkan order ini",
+        error: "Anda tidak memiliki akses untuk membatalkan order ini. Silakan login atau hubungi admin.",
       });
     }
 
@@ -514,6 +580,23 @@ router.patch("/:id/cancel", async (req, res) => {
         success: false,
         error: `Order dengan status ${order.status} tidak dapat dibatalkan`,
       });
+    }
+
+    // Restore stock when order is cancelled
+    try {
+      const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+      
+      for (const item of items) {
+        if (item.product_id) {
+          await query("UPDATE products SET stock = stock + ? WHERE id = ?", [
+            item.quantity,
+            item.product_id,
+          ]);
+        }
+      }
+    } catch (stockError) {
+      console.error("Error restoring stock on cancel:", stockError);
+      // Continue with cancellation even if stock restore fails
     }
 
     await query("UPDATE orders SET status = 'cancelled' WHERE id = ?", [id]);

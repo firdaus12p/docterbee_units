@@ -103,10 +103,8 @@ router.post("/", async (req, res) => {
       customerAddress,
       promoCode,
       notes,
-      // Accept prices from frontend (already calculated with promo)
-      price: frontendPrice,
-      discountAmount: frontendDiscountAmount,
-      finalPrice: frontendFinalPrice,
+      // NOTE: Frontend prices are intentionally IGNORED for security
+      // Price is ALWAYS determined server-side from database
     } = req.body;
 
     // Validation
@@ -127,23 +125,42 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // Use frontend prices if provided, otherwise get from database
-    const price = frontendPrice || (await getServicePrice(serviceName));
-    let discountAmount = frontendDiscountAmount || 0;
-    let finalPrice = frontendFinalPrice || price;
+    // SECURITY: Always get price from database - never trust frontend
+    const price = await getServicePrice(serviceName);
+    
+    // Validate that service exists and has a price
+    if (price === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Service tidak ditemukan atau harga belum tersedia",
+      });
+    }
 
-    // Only recalculate if frontend didn't provide prices AND promo code exists
-    if (!frontendPrice && promoCode) {
+    let discountAmount = 0;
+    let finalPrice = price;
+    let appliedCouponId = null;
+
+    // Calculate discount server-side if promo code is provided
+    if (promoCode) {
       const coupon = await queryOne(
         `SELECT * FROM coupons 
          WHERE code = ? 
          AND is_active = 1 
          AND (expires_at IS NULL OR expires_at > NOW())
-         AND (max_uses IS NULL OR used_count < max_uses)`,
-        [promoCode]
+         AND (max_uses IS NULL OR used_count < max_uses)
+         AND (coupon_type = 'services' OR coupon_type = 'both')`,
+        [promoCode.toUpperCase()]
       );
 
       if (coupon) {
+        // Check minimum booking value
+        if (coupon.min_booking_value && price < coupon.min_booking_value) {
+          return res.status(400).json({
+            success: false,
+            error: `Minimum pembelanjaan untuk kupon ini adalah Rp ${coupon.min_booking_value.toLocaleString("id-ID")}`,
+          });
+        }
+
         // Calculate discount in Rupiah
         if (coupon.discount_type === "percentage") {
           discountAmount = Math.round((price * coupon.discount_value) / 100);
@@ -151,23 +168,18 @@ router.post("/", async (req, res) => {
           discountAmount = coupon.discount_value;
         }
 
-        // Calculate final price
+        // Calculate final price (minimum 0)
         finalPrice = Math.max(0, price - discountAmount);
+        appliedCouponId = coupon.id;
 
         // Increment usage count
         await query("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?", [coupon.id]);
-      }
-    } else if (frontendPrice && promoCode) {
-      // If frontend provided prices with promo code, still increment coupon usage
-      const coupon = await queryOne(
-        `SELECT * FROM coupons 
-         WHERE code = ? 
-         AND is_active = 1`,
-        [promoCode]
-      );
-
-      if (coupon) {
-        await query("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?", [coupon.id]);
+      } else {
+        // Coupon not found or not valid for services
+        return res.status(400).json({
+          success: false,
+          error: "Kode promo tidak valid, sudah kadaluarsa, atau tidak berlaku untuk layanan ini",
+        });
       }
     }
 
@@ -197,19 +209,19 @@ router.post("/", async (req, res) => {
     );
 
     // Record coupon usage for logged-in users (one-time per user)
-    if (promoCode && req.session?.userId) {
+    if (appliedCouponId && req.session?.userId) {
       const userId = req.session.userId;
-      const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
-        promoCode.toUpperCase(),
-      ]);
-
-      if (coupon) {
-        // Insert into coupon_usage to track one-time usage per user
+      // Use appliedCouponId from earlier validation - no need to re-query
+      try {
         await query(
           `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
            VALUES (?, ?, 'services', ?)`,
-          [userId, coupon.id, result.insertId]
+          [userId, appliedCouponId, result.insertId]
         );
+      } catch (usageError) {
+        // Ignore duplicate key error (user already used this coupon)
+        // This is expected behavior for one-time-per-user coupons
+        console.log("Coupon usage tracking skipped (possibly duplicate):", usageError.message);
       }
     }
 

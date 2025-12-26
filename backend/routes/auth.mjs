@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import { query, queryOne } from "../db.mjs";
+import { loginRateLimiter } from "../utils/rate-limiter.mjs";
 
 const router = express.Router();
 
@@ -110,9 +111,9 @@ router.post("/register", async (req, res) => {
 });
 
 // ============================================
-// POST /api/auth/login - Login user
+// POST /api/auth/login - Login user (with rate limiting)
 // ============================================
-router.post("/login", async (req, res) => {
+router.post("/login", loginRateLimiter.middleware(), async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -131,9 +132,15 @@ router.post("/login", async (req, res) => {
     );
 
     if (!user) {
+      // Record failed attempt
+      const result = req.rateLimiter.recordFailure();
+      const attemptsMsg = result.attemptsLeft > 0 
+        ? ` (${result.attemptsLeft} percobaan tersisa)` 
+        : '';
+      
       return res.status(401).json({
         success: false,
-        error: "Email atau password salah",
+        error: `Email atau password salah${attemptsMsg}`,
       });
     }
 
@@ -141,11 +148,20 @@ router.post("/login", async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
+      // Record failed attempt
+      const result = req.rateLimiter.recordFailure();
+      const attemptsMsg = result.attemptsLeft > 0 
+        ? ` (${result.attemptsLeft} percobaan tersisa)` 
+        : '';
+      
       return res.status(401).json({
         success: false,
-        error: "Email atau password salah",
+        error: `Email atau password salah${attemptsMsg}`,
       });
     }
+
+    // Successful login - reset rate limiter
+    req.rateLimiter.reset();
 
     // Create session
     req.session.userId = user.id;
