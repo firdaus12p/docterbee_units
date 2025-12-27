@@ -89,6 +89,22 @@ a {
   padding: 0 1.5rem;
 }
 
+/* Ensure header container always has consistent width (override TailwindCSS container) */
+header .container {
+  max-width: 1120px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 1.5rem !important;
+  box-sizing: border-box !important;
+  overflow: visible;
+}
+
+header nav {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
 header {
   position: sticky;
   top: 0;
@@ -109,6 +125,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 0;
+  gap: 1rem;
 }
 
 .logo {
@@ -119,6 +136,7 @@ nav {
   font-size: 1.1rem;
   transition: transform 0.3s ease;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .logo:hover {
@@ -185,6 +203,7 @@ nav {
   padding: 8px;
   z-index: 1003;
   position: relative;
+  flex-shrink: 0;
 }
 
 .hamburger-btn span {
@@ -831,12 +850,17 @@ footer a {
     transform: none !important;
   }
 
-  .nav-links {
-    display: none;
+  .nav-links,
+  .nav-links #authButtons,
+  .nav-links #memberInfo,
+  .nav-links a,
+  .nav-links .nav-dropdown {
+    display: none !important;
   }
 
   .hamburger-btn {
-    display: flex;
+    display: flex !important;
+    margin-left: auto;
   }
 
   .mobile-menu {
@@ -845,6 +869,13 @@ footer a {
 
   .mobile-menu-overlay {
     display: block;
+  }
+
+  /* Ensure nav only shows logo and hamburger on mobile */
+  header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 

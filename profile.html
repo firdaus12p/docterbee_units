@@ -6,13 +6,11 @@
     <title>Profile – Docterbee Member</title>
 
     <!-- External Stylesheets -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/landing-page.css" />
     <link rel="stylesheet" href="css/card-preview.css" />
     <style>
       .profile-container {
@@ -95,169 +93,65 @@
           min-width: auto;
         }
       }
+      main, main section, main div { opacity: 1 !important; transform: none !important; }
     </style>
   </head>
   <body class="bg-gray-50 text-slate-900">
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
-      <div class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2">
-          <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
-        </a>
-        <nav class="hidden md:flex gap-6 text-sm">
-          <a href="/" id="guestNavItem" class="nav-link">Beranda</a>
-          <a href="/journey" class="nav-link">Journey</a>
-          <a href="/services" class="nav-link">Services</a>
-          <a href="/store" class="nav-link">Produk</a>
-          <a href="/events" class="nav-link">Program</a>
-          <!-- Media Dropdown -->
-          <div class="nav-dropdown">
-            <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
-              Media
-              <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-            <div class="nav-dropdown-menu">
-              <a href="/insight">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
-                Edukasi
-              </a>
-              <a href="/youtube-ai">
-                <i data-lucide="youtube" class="w-4 h-4"></i>
-                YouTube & AI
-              </a>
-              <a href="/podcast">
-                <i data-lucide="headphones" class="w-4 h-4"></i>
-                Podcast Audio
-              </a>
+    <header>
+      <div class="container">
+        <nav>
+          <a href="/" class="logo"><img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" /></a>
+          <div class="nav-links">
+            <a href="/" id="guestNavItem">Beranda</a>
+            <a href="/journey">Journey</a>
+            <a href="/services">Services</a>
+            <a href="/store">Produk</a>
+            <a href="/events">Program</a>
+            <div class="nav-dropdown">
+              <button class="nav-dropdown-toggle" type="button">Media <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+              <div class="nav-dropdown-menu">
+                <a href="/insight"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Edukasi</a>
+                <a href="/youtube-ai"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> YouTube &amp; AI</a>
+                <a href="/podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Podcast Audio</a>
+              </div>
             </div>
+            <a href="/ai-advisor">AI Advisor</a>
+            <a href="/periksa-kesehatan">Cek Kesehatan</a>
+            <div id="authButtons"><button class="btn btn-outline" onclick="location.href='/login'" style="margin-right: 8px">Masuk</button><button class="btn btn-primary" onclick="location.href='/register'">Daftar Sekarang</button></div>
+            <div id="memberInfo" style="display: none; align-items: center; gap: 12px;"><span class="points-display" id="pointsDisplay">Points: <b id="pointsValue">0</b></span><a href="/profile" id="profileBtn" class="nav-link active" title="Profile"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a><button id="logoutBtn" class="btn btn-outline-danger">Logout</button></div>
           </div>
-          <a href="/ai-advisor" class="nav-link">AI Advisor</a>
-          <a href="/periksa-kesehatan" class="nav-link">Cek Kesehatan</a>
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
         </nav>
-        <div class="flex items-center gap-3">
-          <!-- Guest buttons (shown when not logged in) -->
-          <a
-            id="loginBtn"
-            href="/login"
-            class="btn btn-outline"
-            style="display: none"
-          >
-            Masuk
-          </a>
-          <a
-            id="registerBtn"
-            href="/register"
-            class="btn btn-primary"
-            style="display: none"
-          >Daftar Sekarang</a>
-          <!-- Member elements (shown when logged in) -->
-          <span class="points-display" id="pointsDisplay" style="display: none">
-            Points: <b id="pointsValue">0</b>
-          </span>
-          <a
-            href="/profile"
-            id="profileBtn"
-            class="nav-link active"
-            style="display: none"
-            title="Profile"
-          >
-            <i data-lucide="user" class="w-5 h-5"></i>
-          </a>
-          <button
-            id="logoutBtn"
-            class="btn-outline-danger"
-            aria-label="Logout"
-            style="display: none"
-          >
-            Logout
-          </button>
-          <button id="hamburgerBtn" class="md:hidden hamburger-btn" aria-label="Toggle menu">
-            <i data-lucide="menu" class="w-6 h-6"></i>
-          </button>
-        </div>
       </div>
     </header>
 
-    <!-- Mobile Menu Overlay -->
-    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
-
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu">
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
       <div class="mobile-menu-header">
-        <span class="font-semibold">Menu</span>
-        <button id="closeMobileMenu" class="close-menu-btn" aria-label="Close menu">
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
+        <div class="logo-box" style="margin: 0"><img src="assets/images/logo-docterbee.png" alt="DocterBee" style="height: 48px; width: auto" /></div>
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
       </div>
-      <nav class="mobile-menu-nav">
+      <nav class="mobile-nav">
         <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
         <a href="/journey" class="mobile-nav-link">Journey</a>
         <a href="/services" class="mobile-nav-link">Services</a>
         <a href="/store" class="mobile-nav-link">Produk</a>
-        <a href="/booking" class="mobile-nav-link">Booking</a>
         <a href="/events" class="mobile-nav-link">Program</a>
-        <!-- Mobile Media Dropdown -->
         <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
-          <button class="mobile-nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
-            Media
-            <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
+          <button class="mobile-nav-dropdown-toggle" type="button">Media <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
           <div class="mobile-nav-submenu">
-            <a href="/insight">
-              <i data-lucide="book-open" class="w-4 h-4"></i>
-              Edukasi
-            </a>
-            <a href="/youtube-ai">
-              <i data-lucide="youtube" class="w-4 h-4"></i>
-              YouTube & AI
-            </a>
-            <a href="/podcast">
-              <i data-lucide="headphones" class="w-4 h-4"></i>
-              Podcast Audio
-            </a>
+            <a href="/insight"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Edukasi</a>
+            <a href="/youtube-ai"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> YouTube &amp; AI</a>
+            <a href="/podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Podcast Audio</a>
           </div>
         </div>
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
         <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
+        <div class="mobile-menu-actions">
+          <div id="mobileAuthButtons"><button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">Masuk</button><button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">Daftar Sekarang</button></div>
+          <div id="mobileMemberInfo" style="display: none;"><div class="mobile-points-display" id="mobilePointsDisplay">Points: <b id="mobileNavPoints">0</b></div><a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: flex; align-items: center; gap: 8px;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile</a><button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">Logout</button></div>
+        </div>
       </nav>
-      <div class="mobile-menu-footer">
-        <!-- Member elements (shown when logged in) -->
-        <span class="points-display" id="mobilePointsDisplay" style="display: none">
-          Points: <b id="mobileNavPoints">0</b>
-        </span>
-        <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: none">
-          <i data-lucide="user" class="w-5 h-5 inline mr-2"></i>
-          Profile
-        </a>
-        <button
-          id="mobileLogoutBtn"
-          class="btn-outline-danger"
-          style="display: none; width: 100%; margin-top: 0.5rem;"
-        >
-          Logout
-        </button>
-        <!-- Guest buttons (shown when not logged in) -->
-        <a
-          id="mobileLoginBtn"
-          href="/login"
-          class="btn btn-outline"
-          style="display: none; width: 100%; margin-top: 0.5rem;"
-        >
-          Masuk
-        </a>
-        <a
-          id="mobileRegisterBtn"
-          href="/register"
-          class="btn btn-primary"
-          style="display: none; width: 100%; margin-top: 0.5rem;"
-        >
-          Daftar Sekarang
-        </a>
-      </div>
     </div>
 
     <!-- Profile Content -->
@@ -357,7 +251,7 @@
     <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
-    <script src="js/app-navbar.js"></script>
+    <script src="js/landing-navbar.js"></script>
 
     <!-- Profile Logic -->
     <script>

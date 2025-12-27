@@ -62,9 +62,18 @@
                 Daftar Sekarang
               </button>
             </div>
-            <button id="logoutBtn" class="btn btn-outline" style="display: none; margin-left: 8px">
-              Logout
-            </button>
+            <!-- Member info (shown when logged in) -->
+            <div id="memberInfo" style="display: none; align-items: center; gap: 12px;">
+              <span class="points-display" id="pointsDisplay">
+                Points: <b id="navPoints">0</b>
+              </span>
+              <a href="/profile" id="profileBtn" class="nav-link" title="Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </a>
+              <button id="logoutBtn" class="btn btn-outline-danger">
+                Logout
+              </button>
+            </div>
           </div>
 
           <!-- Hamburger Menu Button (Mobile) -->

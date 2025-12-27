@@ -373,6 +373,76 @@ router.get("/id/:id", async (req, res) => {
 });
 
 // ============================================
+// GET /api/orders/status/:orderNumber - Get order status by order number
+// IMPORTANT: This route MUST be defined BEFORE /:orderNumber
+// ============================================
+router.get("/status/:orderNumber", async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+
+    if (!orderNumber) {
+      return res.status(400).json({
+        success: false,
+        error: "Order number is required",
+      });
+    }
+
+    // Fetch order by order_number
+    const order = await queryOne(
+      `SELECT id, order_number, user_id, customer_name, customer_phone, 
+              total_amount, items, status, qr_code_data, expires_at, 
+              store_location, order_type, created_at
+       FROM orders 
+       WHERE order_number = ?`,
+      [orderNumber]
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order not found",
+      });
+    }
+
+    // Calculate points earned
+    const pointsEarned = calculatePoints(order.total_amount);
+
+    // Check if order expired
+    const now = new Date();
+    const expiresAt = new Date(order.expires_at);
+
+    // Auto-expire if needed
+    if (order.status === "pending" && now > expiresAt) {
+      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [order.id]);
+      order.status = "expired";
+    }
+
+    return res.json({
+      success: true,
+      order: {
+        id: order.id,
+        order_number: order.order_number,
+        status: order.status,
+        total_amount: order.total_amount,
+        items: order.items,
+        qr_code_data: order.qr_code_data,
+        expires_at: order.expires_at,
+        store_location: order.store_location,
+        order_type: order.order_type,
+        points_earned: pointsEarned,
+        created_at: order.created_at,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Gagal mengecek status order",
+    });
+  }
+});
+
+// ============================================
 // GET /api/orders/:orderNumber - Get order by number (for QR scanning)
 // Full data for admin/owner, limited data for others
 // ============================================
@@ -748,75 +818,6 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal menghapus order",
-    });
-  }
-});
-
-// ============================================
-// GET /api/orders/status/:orderNumber - Get order status by order number
-// ============================================
-router.get("/status/:orderNumber", async (req, res) => {
-  try {
-    const { orderNumber } = req.params;
-
-    if (!orderNumber) {
-      return res.status(400).json({
-        success: false,
-        error: "Order number is required",
-      });
-    }
-
-    // Fetch order by order_number
-    const order = await queryOne(
-      `SELECT id, order_number, user_id, customer_name, customer_phone, 
-              total_amount, items, status, qr_code_data, expires_at, 
-              store_location, order_type, created_at
-       FROM orders 
-       WHERE order_number = ?`,
-      [orderNumber]
-    );
-
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        error: "Order not found",
-      });
-    }
-
-    // Calculate points earned
-    const pointsEarned = calculatePoints(order.total_amount);
-
-    // Check if order expired
-    const now = new Date();
-    const expiresAt = new Date(order.expires_at);
-
-    // Auto-expire if needed
-    if (order.status === "pending" && now > expiresAt) {
-      await query("UPDATE orders SET status = 'expired' WHERE id = ?", [order.id]);
-      order.status = "expired";
-    }
-
-    return res.json({
-      success: true,
-      order: {
-        id: order.id,
-        order_number: order.order_number,
-        status: order.status,
-        total_amount: order.total_amount,
-        items: order.items,
-        qr_code_data: order.qr_code_data,
-        expires_at: order.expires_at,
-        store_location: order.store_location,
-        order_type: order.order_type,
-        points_earned: pointsEarned,
-        created_at: order.created_at,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching order status:", error);
-    return res.status(500).json({
-      success: false,
-      error: "Gagal mengecek status order",
     });
   }
 });

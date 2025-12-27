@@ -157,8 +157,15 @@ function updateCartUI() {
 // Update cart count in navigation
 function updateCartCount() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  document.getElementById("navCartCount").textContent = totalItems;
-  document.getElementById("mobileCartCount").textContent = totalItems;
+  const navCartCount = document.getElementById("navCartCount");
+  const mobileCartCount = document.getElementById("mobileCartCount");
+  
+  if (navCartCount) {
+    navCartCount.textContent = totalItems;
+  }
+  if (mobileCartCount) {
+    mobileCartCount.textContent = totalItems;
+  }
 }
 
 // ============================================
@@ -735,6 +742,19 @@ async function checkOrderStatus() {
 
     const data = await response.json();
 
+    // Handle order not found (deleted/rejected by admin)
+    if (response.status === 404 || data.error === "Order not found") {
+      // Close the QR modal
+      closeQRModal();
+      
+      // Clear the last order from localStorage since it no longer exists
+      clearLastOrder();
+      
+      // Show user-friendly message
+      showToast("🚫 Pesanan telah dihapus oleh admin. Silakan order kembali.", "error");
+      return;
+    }
+
     if (data.success && data.order) {
       // Close current modal
       closeQRModal();
@@ -748,6 +768,10 @@ async function checkOrderStatus() {
           showToast("✅ Pesanan sudah di-accept! Poin Anda telah ditambahkan.", "success");
         } else if (data.order.status === "pending") {
           showToast("⏳ Pesanan masih pending, belum di-accept admin", "info");
+        } else if (data.order.status === "cancelled") {
+          showToast("❌ Pesanan telah dibatalkan", "error");
+        } else if (data.order.status === "expired") {
+          showToast("⌛ Pesanan telah kadaluarsa", "error");
         } else {
           showToast(`ℹ️ Status: ${data.order.status}`, "info");
         }
@@ -757,7 +781,15 @@ async function checkOrderStatus() {
     }
   } catch (error) {
     console.error("Error checking order status:", error);
-    showToast("❌ Gagal mengecek status pesanan. Coba lagi.", "error");
+    
+    // Check if the error is specifically "Order not found"
+    if (error.message && error.message.includes("not found")) {
+      closeQRModal();
+      clearLastOrder();
+      showToast("🚫 Pesanan tidak ditemukan. Mungkin telah dihapus oleh admin. Silakan order kembali.", "error");
+    } else {
+      showToast("❌ Gagal mengecek status pesanan. Coba lagi.", "error");
+    }
   } finally {
     // Restore button state
     if (checkBtn) {
@@ -877,6 +909,12 @@ function saveLastOrder(orderData) {
 function getLastOrder() {
   const savedOrder = localStorage.getItem("docterbee_last_order");
   return savedOrder ? JSON.parse(savedOrder) : null;
+}
+
+// Clear last order (when order is deleted/rejected by admin)
+function clearLastOrder() {
+  localStorage.removeItem("docterbee_last_order");
+  updateLastOrderButton();
 }
 
 // Reopen last order QR with latest status from server
