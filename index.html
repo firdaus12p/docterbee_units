@@ -8,8 +8,36 @@
       name="description"
       content="DocterBee membantu kamu kembali sehat dengan obat alami, edukasi, dan gaya hidup sehat berbasis sains, AI, dan teknologi alami."
     />
+    <meta name="keywords" content="madu, kesehatan alami, obat herbal, DocterBee, gaya hidup sehat, edukasi kesehatan" />
+    <meta name="author" content="DocterBee" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DocterBee – Kembali Sehat dengan Teknologi Alam" />
+    <meta property="og:description" content="Ekosistem kesehatan alami berbasis sains, AI, dan teknologi alam untuk memandumu keluar dari lingkaran sakit-obat-sakit lagi." />
+    <meta property="og:image" content="assets/images/logo-docterbee.png" />
+    <meta property="og:url" content="https://docterbee.com/" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DocterBee – Kembali Sehat dengan Teknologi Alam" />
+    <meta name="twitter:description" content="Ekosistem kesehatan alami berbasis sains, AI, dan teknologi alam." />
+    
+    <link rel="canonical" href="https://docterbee.com/" />
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <link rel="stylesheet" href="css/landing-page.css" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DocterBee",
+      "description": "Ekosistem kesehatan alami berbasis sains, AI, dan teknologi alam",
+      "url": "https://docterbee.com/",
+      "logo": "https://docterbee.com/assets/images/logo-docterbee.png"
+    }
+    </script>
   </head>
   <body>
     <!-- ================= HEADER ================= -->
@@ -17,7 +45,7 @@
       <div class="container">
         <nav>
           <a href="/" class="logo">
-            <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
+            <img src="assets/images/logo-docterbee.png" alt="DocterBee Logo" class="logo-img" />
           </a>
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
@@ -51,11 +79,7 @@
             <a href="/ai-advisor">AI Advisor</a>
             <a href="/periksa-kesehatan">Cek Kesehatan</a>
             <div id="authButtons">
-              <button
-                class="btn btn-outline"
-                onclick="location.href='/login'"
-                style="margin-right: 8px"
-              >
+              <button class="btn btn-outline" onclick="location.href='/login'">
                 Masuk
               </button>
               <button class="btn btn-primary" onclick="location.href='/register'">
@@ -63,7 +87,7 @@
               </button>
             </div>
             <!-- Member info (shown when logged in) -->
-            <div id="memberInfo" style="display: none; align-items: center; gap: 12px;">
+            <div id="memberInfo">
               <span class="points-display" id="pointsDisplay">
                 Points: <b id="navPoints">0</b>
               </span>
@@ -92,22 +116,11 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
       <div class="mobile-menu-header">
-        <div class="logo-box" style="margin: 0">
-          <img
-            src="assets/images/logo-docterbee.png"
-            alt="DocterBee"
-            style="height: 48px; width: auto"
-          />
+        <div class="logo-box">
+          <img src="assets/images/logo-docterbee.png" alt="DocterBee" />
         </div>
         <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -146,14 +159,14 @@
         <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
         <div class="mobile-menu-actions">
           <div id="mobileAuthButtons">
-            <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
+            <button class="btn btn-outline" onclick="location.href='/login'">
               Masuk
             </button>
-            <button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">
+            <button class="btn btn-primary" onclick="location.href='/register'">
               Daftar Sekarang
             </button>
           </div>
-          <button id="mobileLogoutBtn" class="btn btn-outline" style="display: none; width: 100%">
+          <button id="mobileLogoutBtn" class="btn btn-outline">
             Logout
           </button>
         </div>
@@ -167,17 +180,13 @@
           <div>
             <div class="badge">
               <span class="badge-dot"></span>
-              Kembali ke Sehat yang Diciptakan Allah
+              Kembali Sehat Alami
             </div>
             <h1 class="hero-title">
-              Saat <span class="hero-highlight">obat</span> berhenti, <br />teknologi alami di
-              tubuhmu mulai bekerja.
+              Saat <span class="hero-highlight">obat</span> berhenti, <br />teknologi alami di tubuhmu mulai bekerja.
             </h1>
             <p class="hero-subtitle">
-              Di layanan kesehatan konvensional, pengobatan seringkali hanya berfokus meredam gejala sementara, tanpa menyentuh akar masalahnya. Meski gejala hilang, tubuh justru menjadi ketergantungan, dan penyakit kerap kambuh saat obat dihentikan. Sayangnya, jarang ada pendekatan yang benar-benar membimbing pasien memperbaiki gaya hidup untuk kesembuhan jangka panjang.
-            </p>
-            <p class="hero-subtitle" style="margin-top: 0.75rem;">
-              <strong>DocterBee</strong> hadir dengan pendekatan berbeda. Kami memadukan <strong>pengobatan alami</strong>, <strong>pola hidup sehat</strong>, dan <strong>edukasi mendalam</strong> agar tubuh mampu memulihkan dirinya sendiri secara berkelanjutan. Metode ini kami susun secara kokoh berdasarkan <strong>Sains modern</strong> serta validasi dari <strong>Al-Qur'an dan Hadis</strong>.
+              <strong>DocterBee</strong> memadukan pengobatan alami, pola hidup sehat, dan edukasi berbasis sains & Al-Qur'an untuk membantu tubuhmu memulihkan diri secara berkelanjutan.
             </p>
             <div class="hero-actions">
               <a
@@ -189,92 +198,35 @@
               >
                 Mulai Konsultasi Gratis
               </a>
-              <button class="btn btn-outline">Lihat Cara Kerjanya ↓</button>
+              <a href="#solution" class="btn btn-outline">Lihat Cara Kerjanya ↓</a>
             </div>
             <div class="hero-meta">
-              <span>✓ Praktisi: dokter, ahli gizi, & praktisi kesehatan alami</span>
-              <span>✓ Obat utama: madu & bahan alami berkualitas</span>
-              <span>✓ Didukung sains & AI, bukan mitos</span>
+              <span>✓ Dokter, ahli gizi, & praktisi kesehatan alami</span>
+              <span>✓ Madu & bahan alami berkualitas</span>
             </div>
           </div>
 
           <aside class="hero-card">
-            <div class="hero-card-tag">Lingkaran Sakit yang Terjadi Hari Ini</div>
+            <div class="hero-card-tag">Masalah Kesehatan Hari Ini</div>
             <div class="hero-card-title">Sakit → Obat → Sembuh sebentar → Sakit lagi</div>
             <ul class="hero-card-list">
-              <li>• Sakit → konsultasi → pulang bawa resep.</li>
-              <li>• Gejala hilang, akar masalah tetap tinggal.</li>
-              <li>• Tubuh makin tergantung obat, bukan makin kuat.</li>
-              <li>• Tidak ada edukasi gaya hidup sehat jangka panjang.</li>
+              <li>• Gejala hilang, akar masalah tetap.</li>
+              <li>• Tubuh makin tergantung obat.</li>
+              <li>• Tidak ada edukasi gaya hidup sehat.</li>
             </ul>
             <div class="hero-card-pill"></div>
           </aside>
         </div>
       </section>
 
-      <!-- ================= PROBLEM ================= -->
+      <!-- ================= COMPARISON ================= -->
       <section id="problem">
         <div class="container">
           <div class="section-header">
-            <div class="section-eyebrow">Masalah di Industri Kesehatan Hari Ini</div>
-            <h2 class="section-title">Kenapa kita makin sering sakit?</h2>
+            <div class="section-eyebrow">Beda Pendekatan</div>
+            <h2 class="section-title">Layanan kesehatan biasa vs DocterBee</h2>
             <p class="section-desc">
-              Kebanyakan layanan kesehatan hanya fokus pada
-              <strong>"bagaimana menghilangkan rasa sakitnya sekarang"</strong>, bukan
-              <strong>"bagaimana tubuhmu bisa kembali kuat dan jarang sakit"</strong>. Akhirnya,
-              banyak orang terjebak dalam pola minum obat berulang.
-            </p>
-          </div>
-
-          <div class="problem-grid">
-            <div class="problem-card">
-              <h3>Lingkaran yang melelahkan</h3>
-              <p>Polanya hampir selalu sama. Kamu mungkin juga pernah mengalaminya:</p>
-              <ul class="problem-list">
-                <li>1. Sakit → cari dokter / layanan kesehatan.</li>
-                <li>2. Diperiksa sebentar → pulang dengan obat farmasi.</li>
-                <li>3. Gejala reda → kembali ke aktivitas lama.</li>
-                <li>4. Beberapa waktu kemudian, sakit lagi dengan pola serupa.</li>
-              </ul>
-              <p>
-                Tubuh tidak pernah diajak "ngobrol", tidak diajari cara memperbaiki dirinya sendiri.
-                Semua diserahkan ke obat.
-              </p>
-            </div>
-
-            <div class="problem-card">
-              <h3>Apa yang jarang dijelaskan?</h3>
-              <p>
-                Di balik setiap keluhan, ada sistem tubuh yang sebenarnya sudah Allah desain
-                <strong>super canggih</strong>:
-              </p>
-              <ul class="problem-list">
-                <li>• Tubuh bisa membuang racun,</li>
-                <li>• memperbaiki jaringan rusak,</li>
-                <li>• menyeimbangkan sistem saat kita tidur,</li>
-                <li>• dan butuh bahan baku yang benar dari makanan & minuman.</li>
-              </ul>
-              <p>
-                Tanpa edukasi, kita hanya mengejar "cepat hilang sakitnya" dan lupa membangun "modal
-                sehat jangka panjang".
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= COMPARISON ================= -->
-      <section>
-        <div class="container">
-          <div class="section-header">
-            <div class="section-eyebrow">Bandingkan Cara Kerjanya</div>
-            <h2 class="section-title">Layanan kesehatan biasa vs ekosistem DocterBee</h2>
-            <p class="section-desc">
-              Bukan berarti dokter itu salah. Obat farmasi punya tempat dan fungsi. Namun, DocterBee
-              hadir sebagai
-              <strong>jalan pulang ke sehat</strong>: mengembalikan peran
-              <strong>obat alami, gaya hidup, dan teknologi tubuh</strong>
-              yang selama ini dilupakan.
+              DocterBee hadir sebagai <strong>jalan pulang ke sehat</strong>: mengembalikan peran obat alami, gaya hidup, dan teknologi tubuh.
             </p>
           </div>
 
@@ -287,37 +239,17 @@
             <div class="comparison-row">
               <div class="comparison-label">Fokus utama</div>
               <div class="comparison-text">Menghilangkan gejala dengan obat.</div>
-              <div class="comparison-text-strong">
-                Bantu tubuh menyembuhkan diri dengan madu & bahan alami.
-              </div>
+              <div class="comparison-text-strong">Bantu tubuh menyembuhkan diri dengan madu & bahan alami.</div>
             </div>
             <div class="comparison-row">
               <div class="comparison-label">Setelah konsultasi</div>
-              <div class="comparison-text">Selesai setelah obat ditebus, pasien pulang.</div>
-              <div class="comparison-text-strong">
-                Lanjut dengan edukasi, panduan gaya hidup, & komunitas di cafe sehat.
-              </div>
-            </div>
-            <div class="comparison-row">
-              <div class="comparison-label">Peran edukasi</div>
-              <div class="comparison-text">Minimal, fokus pada resep & aturan minum obat.</div>
-              <div class="comparison-text-strong">
-                Artikel, konsultasi, event, dan media AI untuk memahami tubuh sendiri.
-              </div>
-            </div>
-            <div class="comparison-row">
-              <div class="comparison-label">Sumber "teknologi"</div>
-              <div class="comparison-text">Teknologi buatan manusia & mesin.</div>
-              <div class="comparison-text-strong">
-                Teknologi alami: tanaman, lebah, dan sistem penyembuhan tubuh.
-              </div>
+              <div class="comparison-text">Selesai setelah obat ditebus.</div>
+              <div class="comparison-text-strong">Lanjut dengan edukasi, panduan gaya hidup, & komunitas.</div>
             </div>
             <div class="comparison-row">
               <div class="comparison-label">Pola jangka panjang</div>
-              <div class="comparison-text-warn">Risiko ketergantungan obat & sakit berulang.</div>
-              <div class="comparison-text-strong">
-                Tujuan: jarang sakit, tubuh lebih kuat, paham cara menjaga diri.
-              </div>
+              <div class="comparison-text-warn">Risiko ketergantungan obat.</div>
+              <div class="comparison-text-strong">Tubuh lebih kuat, jarang sakit.</div>
             </div>
           </div>
         </div>
@@ -330,41 +262,25 @@
             <div class="section-eyebrow">Solusi DocterBee</div>
             <h2 class="section-title">Bukan sekadar madu. Ini sistem hidup sehat.</h2>
             <p class="section-desc">
-              DocterBee menggabungkan <strong>sains modern</strong>, <strong>AI</strong>, dan
-              <strong>teknologi alami</strong> dari tanaman & lebah untuk memandumu keluar dari
-              lingkaran sakit—obat—sakit lagi.
+              Menggabungkan <strong>sains modern</strong>, <strong>AI</strong>, dan <strong>teknologi alami</strong> untuk memandumu keluar dari lingkaran sakit—obat—sakit lagi.
             </p>
           </div>
 
           <div class="grid-3">
             <div class="card">
               <div class="card-tag">Langkah 1</div>
-              <h3>Konsultasi dengan Praktisi</h3>
-              <p>
-                Kamu akan dibimbing oleh dokter, ahli gizi, dan praktisi kesehatan alami/keluarga
-                yang mengerti cara kerja tubuh, bukan hanya nama penyakit. Tujuannya: memahami
-                kondisi, pola hidup, dan akar masalah.
-              </p>
+              <h3>Konsultasi Praktisi</h3>
+              <p>Dibimbing dokter & praktisi yang mengerti cara kerja tubuh, bukan hanya nama penyakit.</p>
             </div>
             <div class="card">
               <div class="card-tag">Langkah 2</div>
-              <h3>Obat Alami dari Pabrik Alam</h3>
-              <p>
-                Rekomendasi utama bukan pil, tapi produk alami seperti madu, herbal, dan nutrisi
-                yang bersumber dari
-                <strong>pabrik terbaik: tanaman dan lebah</strong>. Mereka mengelola mineral tanah,
-                menghasilkan nektar, dan memprosesnya menjadi madu.
-              </p>
+              <h3>Obat dari Pabrik Alam</h3>
+              <p>Madu, herbal, dan nutrisi dari tanaman & lebah—pabrik terbaik ciptaan Allah.</p>
             </div>
             <div class="card">
               <div class="card-tag">Langkah 3</div>
-              <h3>Gaya Hidup & Cafe Sehat</h3>
-              <p>
-                Setelah obat alami, kamu diajak membangun
-                <strong>gaya hidup sehat yang nyata</strong>. Salah satunya dengan nongkrong di cafe
-                sehat DocterBee: tempat minum yang baik, ngobrol, belajar, dan kembali merencanakan
-                hidup yang lebih sehat.
-              </p>
+              <h3>Gaya Hidup & Komunitas</h3>
+              <p>Bangun kebiasaan sehat di cafe DocterBee: tempat minum baik, belajar, dan berkomunitas.</p>
             </div>
           </div>
         </div>
@@ -375,147 +291,95 @@
         <div class="container">
           <div class="section-header">
             <div class="section-eyebrow">Teknologi Alami</div>
-            <h2 class="section-title">
-              Di dunia ada "teknologi madu", di alam sudah ada madu itu sendiri.
-            </h2>
+            <h2 class="section-title">Di dunia ada teknologi madu, di alam sudah ada madu itu sendiri.</h2>
             <p class="section-desc">
-              Manusia bangga dengan pabrik, drone, dan rekayasa teknologi. Padahal, di alam sudah
-              ada sistem yang jauh lebih halus dan sempurna.
+              Allah sudah mendesain sistem yang sempurna: dari tanaman, lebah, hingga tubuhmu sendiri.
             </p>
           </div>
 
           <div class="grid-3">
             <div class="card">
-              <h3>Tanaman: Pabrik yang Sempurna</h3>
-              <p>
-                Tanaman mengelola mineral dalam tanah, cahaya matahari, dan air untuk menghasilkan
-                buah. Sebelum jadi buah, ada
-                <strong>nektar</strong> – nano nutrisi yang disiapkan alam.
-              </p>
+              <h3>🌱 Tanaman: Pabrik Sempurna</h3>
+              <p>Mengelola mineral, cahaya, dan air menjadi nektar—nano nutrisi yang disiapkan alam.</p>
             </div>
             <div class="card">
-              <h3>Lebah: "Drone" Alami</h3>
-              <p>
-                Jika di dunia ada drone, di alam ada lebah. Lebah mengumpulkan nektar, menyatukan
-                ribuan titik energi kecil menjadi
-                <strong>madu</strong> yang padat manfaat bagi manusia.
-              </p>
+              <h3>🐝 Lebah: Drone Alami</h3>
+              <p>Mengumpulkan nektar dari ribuan sumber, menyatukannya menjadi madu yang padat manfaat.</p>
             </div>
             <div class="card">
-              <h3>Teknologi Tubuh: Sistem Penyembuhan Otomatis</h3>
-              <p>
-                Tubuhmu sendiri adalah "mesin penyembuh" yang sudah Allah desain. Ia bekerja kuat
-                saat kamu istirahat: membuang racun, memperbaiki jaringan, menormalkan sistem. Madu
-                dan bahan alami menjadi "bensin" dan "suku cadang" untuk proses ini.
-              </p>
+              <h3>💪 Tubuh: Mesin Penyembuh</h3>
+              <p>Saat tidur, tubuhmu membuang racun & memperbaiki jaringan. Madu jadi bahan bakunya.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= SISTEM PENYEMBUHAN TUBUH ================= -->
-      <section>
+      <!-- ================= PRODUK UNGGULAN ================= -->
+      <section id="products">
         <div class="container">
           <div class="section-header">
-            <div class="section-eyebrow">Self-Healing yang Benar</div>
-            <h2 class="section-title">Malam hari: saat tubuhmu melakukan bersih-bersih besar.</h2>
+            <div class="section-eyebrow">Produk Unggulan</div>
+            <h2 class="section-title">Dari alam, untuk kesehatanmu.</h2>
             <p class="section-desc">
-              Banyak orang ingin cepat sehat, tapi lupa bahwa tubuh punya jadwal kerjanya sendiri.
-              DocterBee membantumu menyesuaikan konsumsi dan gaya hidup dengan
-              <strong>ritme alami tubuh</strong>.
+              Pilihan produk alami berkualitas yang diseleksi ketat untuk mendukung proses pemulihan tubuhmu.
             </p>
           </div>
 
-          <div class="steps">
-            <div class="step">
-              <div class="step-number">1</div>
-              <h3>Siang: Tubuh sibuk melayani aktivitasmu</h3>
-              <p>
-                Di siang hari, tubuhmu fokus merespons aktivitas, stres, dan makanan yang masuk. Di
-                fase ini, kita bantu dengan pilihan minuman & makanan yang lebih ramah tubuh.
-              </p>
+          <div class="grid-3">
+            <div class="card">
+              <img src="assets/assets/Sulawesi-Nectar-Pangkep-Docterbee.jpeg" alt="Sulawesi Nectar Pangkep" class="card-image" />
+              <h3>Sulawesi Nectar</h3>
+              <p>Madu murni dari lebah liar Sulawesi dengan khasiat istimewa.</p>
             </div>
-            <div class="step">
-              <div class="step-number">2</div>
-              <h3>Malam: Switch ke mode perbaikan</h3>
-              <p>
-                Saat kamu tidur, tubuh berpindah mode: membuang racun, memperbaiki jaringan rusak,
-                dan menormalkan sistem. Madu dan nutrisi alami yang tepat akan sangat mendukung fase
-                ini.
-              </p>
+            <div class="card">
+              <img src="assets/assets/Akar-Bajakah-docterbee.jpeg" alt="Akar Bajakah" class="card-image" />
+              <h3>Akar Bajakah</h3>
+              <p>Herbal legendaris Kalimantan untuk kesehatan sel dan imunitas.</p>
             </div>
-            <div class="step">
-              <div class="step-number">3</div>
-              <h3>Ritme sehat yang konsisten</h3>
-              <p>
-                Dengan konsultasi, edukasi, dan kebiasaan baru, tubuh tidak hanya "dipaksa sehat"
-                dengan obat, tapi diajak kembali ke ritme alami yang membuatmu lebih jarang sakit.
-              </p>
+            <div class="card">
+              <img src="assets/assets/Bunga-Telang-Docterbee.jpeg" alt="Bunga Telang" class="card-image" />
+              <h3>Bunga Telang</h3>
+              <p>Kaya antioksidan, baik untuk kesehatan mata dan otak.</p>
             </div>
+          </div>
+
+          <div class="section-cta">
+            <a href="/store" class="btn btn-primary">Lihat Semua Produk →</a>
           </div>
         </div>
       </section>
 
-      <!-- ================= JOURNEY / CUSTOMER FLOW ================= -->
+      <!-- ================= JOURNEY ================= -->
       <section id="journey">
         <div class="container">
           <div class="section-header">
-            <div class="section-eyebrow">Perjalananmu Bersama DocterBee</div>
+            <div class="section-eyebrow">Perjalananmu</div>
             <h2 class="section-title">Dari sakit → paham → sehat → jarang sakit.</h2>
             <p class="section-desc">
-              Landing page ini bukan sekadar tempat beli produk. Ini pintu masuk ke ekosistem yang
-              ingin melihatmu kembali sehat, kuat, dan paham cara menjaga diri dan keluarga.
+              Pintu masuk ke ekosistem yang ingin melihatmu kembali sehat, kuat, dan paham cara menjaga diri.
             </p>
           </div>
 
           <div class="steps">
             <div class="step">
               <div class="step-number">1</div>
-              <h3>Isi form & ceritakan keluhanmu</h3>
-              <p>
-                Ceritakan secara singkat apa yang kamu rasakan, riwayat sakit, dan kebiasaan harian.
-                Di sini kamu mulai jujur pada tubuhmu.
-              </p>
+              <h3>Ceritakan keluhanmu</h3>
+              <p>Isi form singkat tentang kondisi dan kebiasaan harianmu.</p>
             </div>
             <div class="step">
               <div class="step-number">2</div>
-              <h3>Konsultasi dengan praktisi DocterBee</h3>
-              <p>
-                Kamu dipandu oleh dokter, ahli gizi, atau praktisi kesehatan alami untuk memahami
-                kondisi dan rencana perbaikan.
-              </p>
+              <h3>Konsultasi praktisi</h3>
+              <p>Dipandu memahami kondisi dan rencana perbaikan.</p>
             </div>
             <div class="step">
               <div class="step-number">3</div>
-              <h3>Rencana sehat + obat alami</h3>
-              <p>
-                Kamu mendapatkan rekomendasi konsumsi madu & bahan alami yang sesuai, plus kebiasaan
-                kecil yang perlu diubah.
-              </p>
+              <h3>Rencana sehat</h3>
+              <p>Rekomendasi madu, herbal, dan kebiasaan baru.</p>
             </div>
             <div class="step">
               <div class="step-number">4</div>
-              <h3>Cafe sehat & komunitas</h3>
-              <p>
-                Kamu bisa lanjutkan perjalanan di cafe sehat DocterBee: minum yang baik, belajar,
-                dan tidak merasa sendirian.
-              </p>
-            </div>
-            <div class="step">
-              <div class="step-number">5</div>
-              <h3>Edukasi artikel, event, & media AI</h3>
-              <p>
-                Baca artikel, ikut event, dan gunakan media AI untuk bertanya kapan pun. Tujuannya:
-                kamu makin paham caranya menjaga diri.
-              </p>
-            </div>
-            <div class="step">
-              <div class="step-number">6</div>
-              <h3>Review & penyesuaian berkala</h3>
-              <p>
-                Tubuhmu akan berubah. Rencana sehat pun menyesuaikan. Ini bukan sekali minum lalu
-                selesai. Ini perjalanan hidup sehat.
-              </p>
+              <h3>Komunitas & edukasi</h3>
+              <p>Cafe sehat, artikel, event, dan AI untuk belajar terus.</p>
             </div>
           </div>
         </div>
@@ -528,104 +392,60 @@
             <div class="section-eyebrow">Layanan DocterBee</div>
             <h2 class="section-title">Satu ekosistem, banyak pintu masuk.</h2>
             <p class="section-desc">
-              Kamu bisa mulai dari mana saja: konsultasi, produk, cafe, atau konten edukasi.
-              Semuanya saling terhubung ke satu tujuan:
-              <strong>kamu dan keluarga lebih sehat</strong>.
+              Mulai dari mana saja—konsultasi, produk, cafe, atau edukasi. Semuanya menuju satu tujuan: <strong>kamu dan keluarga lebih sehat</strong>.
             </p>
           </div>
 
           <div class="grid-3">
             <div class="card">
-              <h3>Konsultasi Kesehatan Alami</h3>
-              <p>
-                Konsultasi 1:1 dengan dokter, ahli gizi, atau praktisi kesehatan alami/keluarga.
-                Fokus pada akar masalah, bukan hanya gejala.
-                <br /><br />
-                <strong>Format:</strong> online / offline (di cabang yang tersedia).
-              </p>
+              <h3>🩺 Konsultasi Kesehatan</h3>
+              <p>1:1 dengan dokter, ahli gizi, atau praktisi. Fokus pada akar masalah.</p>
             </div>
             <div class="card">
-              <h3>Produk Madu & Alami</h3>
-              <p>
-                Pilihan madu lebah kecil, kombinasi herbal, dan produk alami lain yang diseleksi
-                ketat. Bukan sekadar "manis", tapi sarat nutrisi.
-                <br /><br />
-                <strong>Catatan:</strong> bukan pengganti diagnosis medis, tapi pendamping proses
-                pemulihan tubuh.
-              </p>
+              <h3>🍯 Produk Madu & Alami</h3>
+              <p>Madu lebah kecil, herbal, dan nutrisi alami yang diseleksi ketat.</p>
             </div>
             <div class="card">
-              <h3>Cafe Sehat DocterBee</h3>
-              <p>
-                Tempat nongkrong yang menyehatkan: menu minuman dan makanan yang mendukung tubuh,
-                bukan membebani. Cocok untuk keluarga, pekerja, dan pelajar yang ingin "healing"
-                tanpa merusak badan.
-              </p>
+              <h3>☕ Cafe Sehat</h3>
+              <p>Nongkrong yang menyehatkan. Menu yang mendukung, bukan membebani tubuh.</p>
             </div>
           </div>
 
-          <div style="margin-top: 1.5rem" class="grid-3">
+          <div class="grid-3">
             <div class="card">
-              <h3>Artikel & Modul Edukasi</h3>
-              <p>
-                Artikel singkat, infografik, dan modul yang menjelaskan cara kerja tubuh, peran
-                madu, pola tidur, dan gaya hidup sehat dengan bahasa sederhana. Cocok untuk dibaca
-                bareng keluarga.
-              </p>
+              <h3>📚 Edukasi & Artikel</h3>
+              <p>Pahami cara kerja tubuh dengan bahasa sederhana.</p>
             </div>
             <div class="card">
-              <h3>Event & Kelas Kesehatan</h3>
-              <p>
-                Event offline/online tentang gaya hidup sehat, keluarga sehat, dan cara menjadi
-                "dokter pertama" bagi diri sendiri dan anak-anak.
-              </p>
+              <h3>🎓 Event & Kelas</h3>
+              <p>Belajar jadi "dokter pertama" bagi diri sendiri dan keluarga.</p>
             </div>
             <div class="card">
-              <h3>Media AI DocterBee</h3>
-              <p>
-                Media AI yang membantumu bertanya seputar pola hidup dan edukasi. Bukan menggantikan
-                dokter, tapi menemanimu memahami ilmu kesehatan dengan cara yang mudah dan praktis.
-              </p>
+              <h3>🤖 Media AI</h3>
+              <p>Tanya kapan pun tentang pola hidup sehat. Praktis dan mudah.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= CTA KHUSUS ================= -->
-      <section>
+      <!-- ================= CTA ================= -->
+      <section id="cta">
         <div class="container">
-          <div
-            style="
-              background: linear-gradient(135deg, #0f172a, #020617);
-              border-radius: 1.5rem;
-              padding: 1.8rem 1.6rem;
-              color: #e5e7eb;
-              display: flex;
-              flex-wrap: wrap;
-              gap: 1.5rem;
-              align-items: center;
-              justify-content: space-between;
-            "
-          >
-            <div style="max-width: 520px">
-              <h2 style="margin: 0 0 0.4rem; font-size: 1.3rem; letter-spacing: -0.02em">
-                Jangan tunggu sakitmu makin rumit.
-              </h2>
-              <p style="margin: 0; font-size: 0.95rem; opacity: 0.9">
-                Mulai dulu dari konsultasi singkat. Dengarkan bagaimana tubuhmu sebenarnya bekerja,
-                dan apa yang bisa kamu lakukan hari ini untuk membantunya.
-              </p>
+          <div class="cta-box">
+            <div class="cta-content">
+              <h2>Jangan tunggu sakitmu makin rumit.</h2>
+              <p>Mulai dari konsultasi singkat. Dengarkan bagaimana tubuhmu bekerja.</p>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem">
+            <div class="cta-actions">
               <a
                 href="https://wa.me/6282188080688?text=Halo%20DocterBee%2C%20saya%20ingin%20menjadwalkan%20konsultasi%20pertama%20saya.%20Kapan%20waktu%20yang%20tersedia%3F"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="btn btn-primary"
               >
-                Jadwalkan Konsultasi Pertama
+                Jadwalkan Konsultasi
               </a>
-              <button class="btn btn-outline">Lihat Panduan Produk Madu →</button>
+              <a href="/store" class="btn btn-outline">Lihat Produk Madu →</a>
             </div>
           </div>
         </div>
@@ -638,116 +458,57 @@
             <div class="section-header">
               <div class="section-eyebrow">FAQ</div>
               <h2 class="section-title">Pertanyaan yang sering muncul</h2>
-              <p class="section-desc">
-                Berikut beberapa hal penting yang sering ditanyakan sebelum orang mulai perjalanan
-                sehatnya bersama DocterBee.
-              </p>
             </div>
 
             <div class="faq-item">
               <button class="faq-question" aria-expanded="false">
-                <span>Apakah DocterBee menggantikan dokter sepenuhnya?</span>
-                <svg
-                  class="faq-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+                <span>Apakah DocterBee menggantikan dokter?</span>
+                <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </button>
               <div class="faq-answer">
                 <p>
-                  Tidak. DocterBee bukan pengganti layanan medis darurat atau perawatan intensif.
-                  Kami adalah ekosistem yang fokus pada pemulihan alami, edukasi, dan gaya hidup
-                  sehat yang
-                  <strong>melengkapi</strong> peran tenaga medis.
+                  Tidak. DocterBee <strong>melengkapi</strong> peran tenaga medis dengan fokus pada pemulihan alami dan gaya hidup sehat.
                 </p>
               </div>
             </div>
             <div class="faq-item">
               <button class="faq-question" aria-expanded="false">
                 <span>Apakah madu bisa menyembuhkan semua penyakit?</span>
-                <svg
-                  class="faq-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+                <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </button>
               <div class="faq-answer">
                 <p>
-                  Madu bukan "obat sakti" untuk semua penyakit. Namun, dengan sains dan pemakaian
-                  yang tepat, madu dan bahan alami dapat
-                  <strong>mendukung proses pemulihan tubuh</strong>, terutama jika disertai pola
-                  hidup sehat dan istirahat yang cukup.
+                  Madu bukan obat sakti, tapi dengan pemakaian tepat dapat <strong>mendukung pemulihan tubuh</strong>—terutama jika disertai pola hidup sehat.
                 </p>
               </div>
             </div>
             <div class="faq-item">
               <button class="faq-question" aria-expanded="false">
-                <span>Kenapa harus ada cafe sehat segala?</span>
-                <svg
-                  class="faq-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+                <span>Kenapa ada cafe segala?</span>
+                <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </button>
               <div class="faq-answer">
                 <p>
-                  Karena sehat bukan hanya soal obat dan vitamin. Sehat juga tentang
-                  <strong>lingkungan</strong>, obrolan, dan tempat kita menghabiskan waktu. Cafe
-                  sehat DocterBee dirancang agar kamu bisa "nongkrong" sambil benar-benar menjaga
-                  tubuh.
+                  Sehat juga tentang <strong>lingkungan</strong> dan tempat kita berkumpul. Cafe sehat dirancang agar kamu bisa nongkrong sambil tetap menjaga tubuh.
                 </p>
               </div>
             </div>
             <div class="faq-item">
               <button class="faq-question" aria-expanded="false">
-                <span>Apakah ada pendampingan untuk keluarga?</span>
-                <svg
-                  class="faq-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+                <span>Ada pendampingan untuk keluarga?</span>
+                <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </button>
               <div class="faq-answer">
                 <p>
-                  Ya. Visi DocterBee bukan hanya menyehatkan individu, tapi membantu keluarga
-                  membangun kebiasaan sehat bersama. Kamu bisa mulai dari konsultasi individu, lalu
-                  dilanjutkan sesi edukasi keluarga dan event khusus.
+                  Ya. DocterBee membantu <strong>keluarga</strong> membangun kebiasaan sehat bersama melalui konsultasi dan event khusus.
                 </p>
               </div>
             </div>
@@ -757,23 +518,18 @@
             <div class="problem-card">
               <h3>Butuh bantuan memilih langkah pertama?</h3>
               <p>
-                Kirimkan saja keluhanmu secara singkat. Tim DocterBee akan bantu menyarankan apakah
-                kamu sebaiknya mulai dari konsultasi, produk, atau langsung datang ke cafe sehat
-                terdekat.
+                Kirimkan keluhanmu singkat. Tim akan bantu menyarankan apakah mulai dari konsultasi, produk, atau cafe terdekat.
               </p>
               <a
                 href="https://wa.me/6282188080688?text=Halo%20Tim%20DocterBee%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20kesehatan%20alami.%20Bisa%20dibantu%3F"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="btn btn-primary"
-                style="margin-top: 0.75rem"
               >
                 Chat dengan Tim DocterBee
               </a>
-              <p style="margin-top: 0.75rem; font-size: 0.8rem; color: #9ca3af">
-                <strong>Disclaimer:</strong> informasi di website ini tidak menggantikan diagnosis
-                dokter. Jika kamu mengalami kondisi darurat atau gejala berat, segera hubungi
-                layanan medis terdekat.
+              <p class="disclaimer">
+                <strong>Disclaimer:</strong> Informasi di website ini tidak menggantikan diagnosis dokter. Untuk kondisi darurat, hubungi layanan medis.
               </p>
             </div>
           </aside>
@@ -784,28 +540,20 @@
     <!-- ================= FOOTER ================= -->
     <footer>
       <div class="container">
-        <div
-          style="
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 0.75rem;
-            align-items: center;
-          "
-        >
+        <div class="footer-content">
           <div>© DocterBee. Semua hak dilindungi.</div>
           <div>
-            Berbasis <strong>sains, AI, dan teknologi alami</strong> untuk membantu keluarga kembali
-            sehat. | <a href="#">Kebijakan Privasi</a> ·
+            Berbasis <strong>sains, AI, dan teknologi alami</strong> untuk membantu keluarga kembali sehat. |
+            <a href="#">Kebijakan Privasi</a> ·
             <a href="#">Syarat & Ketentuan</a>
           </div>
         </div>
       </div>
     </footer>
 
-    <!-- ================= JAVASCRIPT FOR ANIMATIONS ================= -->
+    <!-- ================= JAVASCRIPT ================= -->
     <script>
-      // ========== SMOOTH SCROLL ANIMATIONS ==========
+      // ========== INTERSECTION OBSERVER ==========
       const observerOptions = {
         threshold: 0.1,
         rootMargin: "0px 0px -50px 0px",
@@ -819,9 +567,8 @@
         });
       }, observerOptions);
 
-      // Observe all sections
       document.addEventListener("DOMContentLoaded", () => {
-        // ========== MOBILE MENU TOGGLE ==========
+        // ========== MOBILE MENU ==========
         const hamburgerBtn = document.getElementById("hamburgerBtn");
         const mobileMenu = document.getElementById("mobileMenu");
         const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
@@ -850,7 +597,6 @@
               openMobileMenu();
             }
           });
-          // Mark as initialized to prevent double-binding by landing-navbar.js
           hamburgerBtn.dataset.mobileMenuInitialized = "true";
         }
 
@@ -862,14 +608,10 @@
           mobileMenuOverlay.addEventListener("click", closeMobileMenu);
         }
 
-        // Close menu when clicking nav links
         mobileNavLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            closeMobileMenu();
-          });
+          link.addEventListener("click", closeMobileMenu);
         });
 
-        // Close menu on escape key
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape" && mobileMenu && mobileMenu.classList.contains("active")) {
             closeMobileMenu();
@@ -894,18 +636,12 @@
 
         // Header scroll effect
         const header = document.querySelector("header");
-        let lastScroll = 0;
-
         window.addEventListener("scroll", () => {
-          const currentScroll = window.pageYOffset;
-
-          if (currentScroll > 50) {
+          if (window.pageYOffset > 50) {
             header.classList.add("scrolled");
           } else {
             header.classList.remove("scrolled");
           }
-
-          lastScroll = currentScroll;
         });
 
         // Smooth scroll for anchor links
@@ -925,23 +661,12 @@
           });
         });
 
-        // Add stagger animation to cards and steps
-        const addStaggerAnimation = (selector, delay = 100) => {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach((el, index) => {
-            el.style.animationDelay = `${index * delay}ms`;
-            el.style.opacity = "0";
-            el.style.animation = "fadeInUp 0.6s ease forwards";
-          });
-        };
-
-        // Apply stagger animations when sections become visible
+        // Stagger animation observer
         const staggerObserver = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting && !entry.target.dataset.animated) {
                 entry.target.dataset.animated = "true";
-
                 const cards = entry.target.querySelectorAll(".card, .step, .problem-card");
                 cards.forEach((card, index) => {
                   setTimeout(() => {
@@ -960,19 +685,18 @@
           staggerObserver.observe(section);
         });
 
-        // Parallax effect for hero card (disabled on mobile)
+        // Parallax for hero card (desktop only)
         const heroCard = document.querySelector(".hero-card");
         if (heroCard && window.innerWidth > 900) {
           window.addEventListener("scroll", () => {
             const scrolled = window.pageYOffset;
-            const rate = scrolled * 0.3;
             if (scrolled < 600) {
-              heroCard.style.transform = `translateY(${rate}px)`;
+              heroCard.style.transform = `translateY(${scrolled * 0.3}px)`;
             }
           });
         }
 
-        // Add hover effect sound feedback (visual only, no audio)
+        // Button hover effects
         const buttons = document.querySelectorAll(".btn");
         buttons.forEach((btn) => {
           btn.addEventListener("mouseenter", function () {
@@ -983,7 +707,7 @@
           });
         });
 
-        // Animate comparison rows on hover
+        // Comparison row hover
         const comparisonRows = document.querySelectorAll(".comparison-row");
         comparisonRows.forEach((row) => {
           row.addEventListener("mouseenter", function () {
@@ -1000,7 +724,6 @@
           const question = item.querySelector(".faq-question");
           if (question) {
             question.addEventListener("click", () => {
-              // Close other open items (accordion behavior)
               faqItems.forEach((otherItem) => {
                 if (otherItem !== item && otherItem.classList.contains("active")) {
                   otherItem.classList.remove("active");
@@ -1008,25 +731,12 @@
                   if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
                 }
               });
-
-              // Toggle current item
               item.classList.toggle("active");
               const isActive = item.classList.contains("active");
               question.setAttribute("aria-expanded", isActive ? "true" : "false");
             });
           }
         });
-
-        // ========== MOBILE MEDIA DROPDOWN TOGGLE ==========
-        const mobileDropdown = document.getElementById('mobileMediaDropdown');
-        const mobileToggle = mobileDropdown?.querySelector('.mobile-nav-dropdown-toggle');
-        
-        if (mobileToggle) {
-          mobileToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            mobileDropdown.classList.toggle('open');
-          });
-        }
       });
     </script>
     <script src="js/modal-utils.js"></script>
