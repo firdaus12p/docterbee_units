@@ -841,6 +841,8 @@
               openMobileMenu();
             }
           });
+          // Mark as initialized to prevent double-binding by landing-navbar.js
+          hamburgerBtn.dataset.mobileMenuInitialized = "true";
         }
 
         if (mobileMenuClose) {

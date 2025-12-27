@@ -155,6 +155,63 @@
     }
   }
 
+  // Initialize mobile menu (hamburger button) toggle
+  function initMobileMenu() {
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+    const mobileMenuClose = document.getElementById("mobileMenuClose");
+    const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+
+    if (!hamburgerBtn || !mobileMenu || !mobileMenuOverlay) return;
+
+    // Prevent double initialization (may happen if inline script already initialized)
+    if (hamburgerBtn.dataset.mobileMenuInitialized) return;
+    hamburgerBtn.dataset.mobileMenuInitialized = "true";
+
+    function openMobileMenu() {
+      hamburgerBtn.classList.add("active");
+      mobileMenu.classList.add("active");
+      mobileMenuOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMobileMenu() {
+      hamburgerBtn.classList.remove("active");
+      mobileMenu.classList.remove("active");
+      mobileMenuOverlay.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    hamburgerBtn.addEventListener("click", () => {
+      if (mobileMenu.classList.contains("active")) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+
+    if (mobileMenuClose) {
+      mobileMenuClose.addEventListener("click", closeMobileMenu);
+    }
+
+    mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+    // Close menu when clicking nav links
+    mobileNavLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        closeMobileMenu();
+      });
+    });
+
+    // Close menu on escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mobileMenu.classList.contains("active")) {
+        closeMobileMenu();
+      }
+    });
+  }
+
   // Initialize mobile media dropdown toggle
   function initMobileMediaDropdown() {
     const mobileDropdown = document.getElementById("mobileMediaDropdown");
@@ -172,6 +229,9 @@
   function init() {
     // Check auth status and update navbar
     checkAuthAndUpdateNavbar();
+
+    // Initialize mobile menu (hamburger button)
+    initMobileMenu();
 
     // Initialize mobile dropdown
     initMobileMediaDropdown();
