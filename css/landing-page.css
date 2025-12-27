@@ -320,11 +320,12 @@ nav {
   flex: 1; /* Take remaining space */
   overflow-y: auto; /* Enable scrolling */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  justify-content: flex-start; /* Keep menu items at the top */
 }
 
 .mobile-nav-link {
   display: block;
-  padding: 0.875rem 0;
+  padding: 0.65rem 0; /* Reduced from 0.875rem for tighter spacing */
   color: #0f172a;
   font-size: 0.95rem;
   font-weight: 500;
