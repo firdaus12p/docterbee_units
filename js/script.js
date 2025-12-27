@@ -661,50 +661,16 @@ async function updateAuthButtons() {
 // Flag to prevent multiple initializations
 let mobileMenuInitialized = false;
 
+/**
+ * Initialize mobile menu functionality
+ * NOTE: This function is intentionally empty/no-op.
+ * Mobile menu is now exclusively handled by landing-navbar.js which is loaded on all pages.
+ * This prevents duplicate event listener conflicts.
+ */
 function initMobileMenu() {
-  // Prevent multiple initializations
-  if (mobileMenuInitialized) return;
-
-  const hamburgerBtn = document.getElementById("hamburgerBtn");
-  const mobileMenu = document.getElementById("mobileMenu");
-  const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
-  const closeMobileMenu = document.getElementById("closeMobileMenu");
-
-  if (!hamburgerBtn || !mobileMenu || !mobileMenuOverlay) return;
-
-  // Open mobile menu
-  hamburgerBtn.addEventListener("click", () => {
-    mobileMenu.classList.add("open");
-    mobileMenuOverlay.classList.remove("hidden");
-    mobileMenuOverlay.classList.add("show");
-    document.body.style.overflow = "hidden"; // Prevent scrolling
-  });
-
-  // Close mobile menu
-  const closeMobileMenuHandler = () => {
-    mobileMenu.classList.remove("open");
-    mobileMenuOverlay.classList.remove("show");
-    setTimeout(() => {
-      mobileMenuOverlay.classList.add("hidden");
-    }, 300);
-    document.body.style.overflow = ""; // Restore scrolling
-  };
-
-  if (closeMobileMenu) {
-    closeMobileMenu.addEventListener("click", closeMobileMenuHandler);
-  }
-
-  mobileMenuOverlay.addEventListener("click", closeMobileMenuHandler);
-
-  // Close menu when clicking on a nav link
-  const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
-  mobileNavLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      setTimeout(closeMobileMenuHandler, 200);
-    });
-  });
-
-  // Mark as initialized
+  // Mobile menu initialization is now handled by landing-navbar.js
+  // This function is kept for backward compatibility but does nothing.
+  // See js/landing-navbar.js initMobileMenu() for the actual implementation.
   mobileMenuInitialized = true;
 }
 

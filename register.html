@@ -13,7 +13,9 @@
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/landing-page.css" />
     <link rel="stylesheet" href="css/card-preview.css" />
+    <style>main, main section, main aside, main div { opacity: 1 !important; transform: none !important; }</style>
   </head>
   <body class="bg-gray-50 text-slate-900">
     <!-- Header Navigation -->
@@ -27,8 +29,10 @@
           <a href="/register" class="nav-link active">Daftar</a>
           <a href="/login" class="nav-link">Login</a>
         </nav>
-        <button id="hamburgerBtn" class="md:hidden hamburger-btn" aria-label="Toggle menu">
-          <i data-lucide="menu" class="w-6 h-6"></i>
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
     </header>
@@ -39,13 +43,16 @@
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="mobile-menu">
       <div class="mobile-menu-header">
-        <span class="font-semibold">Menu</span>
-        <button id="closeMobileMenu" class="close-menu-btn" aria-label="Close menu">
-          <i data-lucide="x" class="w-6 h-6"></i>
+        <div class="logo-box" style="margin: 0"><img src="assets/images/logo-docterbee.png" alt="DocterBee" style="height: 48px; width: auto" /></div>
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
-      <nav class="mobile-menu-nav">
-        <a href="/" class="mobile-nav-link">Home</a>
+      <nav class="mobile-nav">
+        <a href="/" class="mobile-nav-link">Beranda</a>
         <a href="/register" class="mobile-nav-link">Daftar</a>
         <a href="/login" class="mobile-nav-link">Login</a>
       </nav>
@@ -249,6 +256,7 @@
     <script src="js/modal-utils.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/landing-navbar.js"></script>
 
     <!-- Card Preview Logic -->
     <script>

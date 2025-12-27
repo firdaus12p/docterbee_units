@@ -876,6 +876,16 @@
           }
         });
 
+        // ========== MOBILE MEDIA DROPDOWN ==========
+        const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
+        const mobileMediaToggle = mobileMediaDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+        if (mobileMediaToggle) {
+          mobileMediaToggle.addEventListener("click", function(e) {
+            e.preventDefault();
+            mobileMediaDropdown.classList.toggle("open");
+          });
+        }
+
         // ========== SECTION OBSERVERS ==========
         const sections = document.querySelectorAll("section");
         sections.forEach((section) => {
