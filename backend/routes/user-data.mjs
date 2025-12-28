@@ -1,17 +1,8 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
+import { requireUser as requireAuth } from "../middleware/auth.mjs";
 
 const router = express.Router();
-
-// Middleware to check authentication
-const requireAuth = (req, res, next) => {
-  if (!req.session || !req.session.userId) {
-    return res
-      .status(401)
-      .json({ success: false, error: "Unauthorized. Please login." });
-  }
-  next();
-};
 
 // === USER PROGRESS (Journey + Points) ===
 
