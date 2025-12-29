@@ -333,15 +333,26 @@ app.post("/api/admin/login", loginRateLimiter.middleware(), async (req, res) => 
     req.session.adminUsername = admin.username;
     req.session.adminRole = admin.role;
 
-    res.json({
-      success: true,
-      message: "Admin login berhasil",
-      admin: {
-        id: admin.id,
-        username: admin.username,
-        email: admin.email,
-        role: admin.role,
-      },
+    // Save session before sending response
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({
+          success: false,
+          error: "Gagal menyimpan session",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Admin login berhasil",
+        admin: {
+          id: admin.id,
+          username: admin.username,
+          email: admin.email,
+          role: admin.role,
+        },
+      });
     });
   } catch (error) {
     console.error("Admin login error:", error);
