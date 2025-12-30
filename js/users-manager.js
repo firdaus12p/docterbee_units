@@ -116,6 +116,19 @@ function displayUsers(users) {
               >
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
+              ${
+                user.phone
+                  ? `<button
+                onclick="sendWhatsAppToUser('${escapeHtml(user.phone)}', '${escapeHtml(
+                      user.name
+                    )}')"
+                class="text-green-400 hover:text-green-300 p-1"
+                title="Kirim WhatsApp"
+              >
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+              </button>`
+                  : ""
+              }
             </div>
           </td>
         </tr>
@@ -455,6 +468,34 @@ async function approveRedemption(userId, redemptionId, rewardName) {
   );
 }
 
+// ============================================
+// Send WhatsApp to User
+// ============================================
+function sendWhatsAppToUser(phone, userName) {
+  // Clean phone number - remove all non-numeric characters
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+  
+  // Format phone number for WhatsApp (add 62 prefix if starts with 0)
+  let formattedPhone = cleanPhone;
+  if (formattedPhone.startsWith("0")) {
+    formattedPhone = "62" + formattedPhone.substring(1);
+  } else if (!formattedPhone.startsWith("62")) {
+    formattedPhone = "62" + formattedPhone;
+  }
+  
+  // Default message template
+  const defaultMessage = `Halo ${userName}, saya dari Tim DocterBee. `;
+  
+  // Encode message for URL
+  const encodedMessage = encodeURIComponent(defaultMessage);
+  
+  // Create WhatsApp URL
+  const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+  
+  // Open WhatsApp in new tab
+  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+}
+
 // Export functions for use in HTML
 if (typeof window !== "undefined") {
   window.loadUsers = loadUsers;
@@ -466,4 +507,5 @@ if (typeof window !== "undefined") {
   window.confirmDeleteUser = confirmDeleteUser;
   window.deleteUser = deleteUser;
   window.approveRedemption = approveRedemption;
+  window.sendWhatsAppToUser = sendWhatsAppToUser;
 }

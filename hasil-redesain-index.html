@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DocterBee – Solusi Sehat Alami & Berbasis Sains</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="DocterBee: Ekosistem kesehatan alami. Madu murni, herbal berkualitas, dan edukasi gaya hidup sehat berbasis sains untuk pemulihan tubuh maksimal."
+    />
+    <meta name="keywords" content="madu sulawesi, akar bajakah, kesehatan alami, obat herbal, DocterBee, gaya hidup sehat, teh kulit pala" />
+    <meta name="author" content="DocterBee" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DocterBee – Kembali Sehat dengan Teknologi Alam" />
+    <meta property="og:description" content="Paduan sains, AI, dan teknologi alam (madu & herbal) untuk memandumu keluar dari lingkaran sakit-obat-sakit lagi." />
+    <meta property="og:image" content="https://z-cdn-media.chatglm.cn/files/ba6d8681-8ccf-4486-ad15-9404a5bdd608.jpeg?auth_key=1867065899-6e036aa5c9594d89895e3b2503eeda5e-0-a09c3537890e3917bce2f0101a21e57f" />
+    <meta property="og:url" content="https://docterbee.com/" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DocterBee – Kembali Sehat dengan Teknologi Alam" />
+    <meta name="twitter:description" content="Ekosistem kesehatan alami berbasis sains, AI, dan teknologi alam." />
+    
+    <link rel="canonical" href="https://docterbee.com/" />
+    <!-- Placeholder icon menggunakan data URI agar tidak ada file hilang -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐝</text></svg>" />
+    
+    <!-- Structured Data untuk SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DocterBee",
+      "description": "Ekosistem kesehatan alami berbasis sains, AI, dan teknologi alam",
+      "url": "https://docterbee.com/",
+      "logo": "https://z-cdn-media.chatglm.cn/files/ba6d8681-8ccf-4486-ad15-9404a5bdd608.jpeg?auth_key=1867065899-6e036aa5c9594d89895e3b2503eeda5e-0-a09c3537890e3917bce2f0101a21e57f"
+    }
+    </script>
+
+    <style>
+      /* ================= CSS VARIABLES & RESET ================= */
+      :root {
+        /* Mengganti Orange ke Merah sesuai permintaan */
+        --primary: #D32F2F; 
+        --primary-dark: #B71C1C;
+        --primary-light: #FFCDD2;
+        --accent: #FFEBEE;
+        
+        --text-main: #1F2937;
+        --text-muted: #6B7280;
+        --bg-body: #FFFFFF;
+        --bg-section: #F9FAFB;
+        
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        
+        --radius: 12px;
+        --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --max-width: 1200px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--font-main);
+        color: var(--text-main);
+        background-color: var(--bg-body);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+        transition: 0.3s;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* ================= UTILITIES ================= */
+      .container {
+        width: 90%;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        font-size: 1rem;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 14px rgba(211, 47, 47, 0.4);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      .btn-outline {
+        background-color: transparent;
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .btn-outline:hover {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .section-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.875rem;
+        color: var(--primary);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      .section-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: var(--text-main);
+        line-height: 1.2;
+      }
+
+      .section-desc {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+      }
+
+      /* Grid Layouts */
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      /* ================= HEADER ================= */
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        box-shadow: var(--shadow-sm);
+        transition: 0.3s;
+        padding: 1rem 0;
+      }
+
+      header.scrolled {
+        padding: 0.5rem 0;
+        box-shadow: var(--shadow-md);
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo-img {
+        height: 40px; /* Placeholder height */
+        width: auto;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        font-weight: 500;
+        color: var(--text-main);
+        font-size: 0.95rem;
+      }
+
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      /* Dropdown */
+      .nav-dropdown {
+        position: relative;
+      }
+
+      .nav-dropdown-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        padding: 0.5rem 0;
+      }
+      
+      .nav-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: white;
+        min-width: 200px;
+        box-shadow: var(--shadow-lg);
+        border-radius: var(--radius);
+        padding: 0.5rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+      }
+
+      .nav-dropdown:hover .nav-dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .nav-dropdown-menu a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+
+      .nav-dropdown-menu a:hover {
+        background-color: var(--bg-section);
+        color: var(--primary);
+      }
+
+      .hamburger-btn {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .hamburger-btn span {
+        width: 25px;
+        height: 3px;
+        background-color: var(--text-main);
+        border-radius: 2px;
+        transition: 0.3s;
+      }
+
+      /* ================= HERO ================= */
+      .hero {
+        padding-top: 140px;
+        padding-bottom: 80px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--primary-light);
+        color: var(--primary-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--primary);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        color: var(--text-main);
+      }
+
+      .hero-highlight {
+        color: var(--primary);
+        position: relative;
+        display: inline-block;
+      }
+      
+      .hero-highlight::after {
+        content: '';
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+        width: 100%;
+        height: 15px;
+        background: rgba(211, 47, 47, 0.2);
+        z-index: -1;
+        border-radius: 4px;
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        max-width: 500px;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .hero-meta {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .hero-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 10;
+      }
+
+      .hero-card-tag {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--primary);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: 1px;
+      }
+
+      .hero-card-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero-card-list li {
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+        position: relative;
+        color: var(--text-muted);
+      }
+
+      .hero-card-list li::before {
+        content: '✖';
+        position: absolute;
+        left: 0;
+        color: var(--primary);
+        font-weight: bold;
+      }
+
+      /* ================= COMPARISON ================= */
+      #problem {
+        padding: 5rem 0;
+        background-color: var(--bg-section);
+      }
+
+      .comparison {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-top: 2rem;
+      }
+
+      .comparison-header {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        background: var(--text-main);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      .comparison-header div:first-child {
+        text-align: left;
+        color: rgba(255,255,255,0.6);
+      }
+
+      .comparison-row {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        align-items: center;
+        transition: 0.2s;
+      }
+
+      .comparison-row:last-child {
+        border-bottom: none;
+      }
+
+      .comparison-label {
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .comparison-text {
+        text-align: center;
+        color: var(--text-muted);
+      }
+
+      .comparison-text-strong {
+        text-align: center;
+        font-weight: 700;
+        color: var(--primary);
+        background: var(--accent);
+        padding: 0.5rem;
+        border-radius: 8px;
+      }
+
+      /* ================= SOLUTION & NATURE ================= */
+      #solution, #nature-tech {
+        padding: 5rem 0;
+      }
+
+      .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #f0f0f0;
+        transition: 0.3s;
+        height: 100%;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-light);
+      }
+
+      .card-tag {
+        background: var(--accent);
+        color: var(--primary);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 1rem;
+      }
+
+      .card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-main);
+      }
+
+      .card p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      /* ================= PRODUCTS ================= */
+      #products {
+        padding: 5rem 0;
+        background-color: var(--bg-section);
+      }
+
+      .card-image {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        transition: 0.5s;
+      }
+
+      .card:hover .card-image {
+        transform: scale(1.03);
+      }
+
+      .section-cta {
+        text-align: center;
+        margin-top: 3rem;
+      }
+
+      /* ================= STEPS / JOURNEY ================= */
+      #journey {
+        padding: 5rem 0;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 2rem;
+        counter-reset: step-counter;
+      }
+
+      .step {
+        text-align: center;
+        position: relative;
+      }
+
+      .step-number {
+        width: 60px;
+        height: 60px;
+        background: var(--primary);
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 800;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
+      }
+
+      .step h3 {
+        margin-bottom: 0.5rem;
+      }
+
+      /* ================= FAQ ================= */
+      #faq {
+        padding: 5rem 0;
+        background-color: var(--bg-section);
+      }
+
+      .faq {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 4rem;
+      }
+
+      .faq-item {
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+      }
+
+      .faq-question {
+        width: 100%;
+        text-align: left;
+        padding: 1.5rem;
+        background: none;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: var(--text-main);
+        cursor: pointer;
+        font-size: 1.05rem;
+      }
+
+      .faq-question:hover {
+        color: var(--primary);
+      }
+
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        padding: 0 1.5rem;
+      }
+
+      .faq-answer p {
+        padding-bottom: 1.5rem;
+        color: var(--text-muted);
+      }
+
+      .faq-item.active .faq-answer {
+        max-height: 200px;
+      }
+
+      .faq-item.active .faq-icon {
+        transform: rotate(180deg);
+      }
+
+      .problem-card {
+        background: var(--primary);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        height: fit-content;
+      }
+
+      .problem-card h3 {
+        margin-bottom: 1rem;
+      }
+
+      .problem-card p {
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 2rem;
+      }
+
+      .problem-card .btn {
+        background: white;
+        color: var(--primary);
+        width: 100%;
+        margin-bottom: 1.5rem;
+      }
+      
+      .problem-card .btn:hover {
+        background: var(--primary-light);
+      }
+
+      .disclaimer {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.6);
+        line-height: 1.4;
+      }
+
+      /* ================= CTA ================= */
+      #cta {
+        padding: 5rem 0;
+        text-align: center;
+      }
+
+      .cta-box {
+        background: linear-gradient(135deg, var(--text-main) 0%, #374151 100%);
+        border-radius: 24px;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cta-box h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .cta-box p {
+        color: rgba(255,255,255,0.8);
+        margin-bottom: 2rem;
+        font-size: 1.2rem;
+      }
+
+      .cta-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .cta-actions .btn-primary {
+        background: var(--primary);
+      }
+      
+      .cta-actions .btn-outline {
+        border-color: white;
+        color: white;
+      }
+      
+      .cta-actions .btn-outline:hover {
+        background: white;
+        color: var(--text-main);
+      }
+
+      /* ================= FOOTER ================= */
+      footer {
+        background: white;
+        padding: 2rem 0;
+        border-top: 1px solid #eee;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .footer-content a {
+        color: var(--primary);
+      }
+
+      /* ================= MOBILE MENU ================= */
+      .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1001;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+      }
+
+      .mobile-menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .mobile-menu {
+        position: fixed;
+        top: 0;
+        right: -320px;
+        width: 300px;
+        height: 100%;
+        background: white;
+        z-index: 1002;
+        transition: 0.3s;
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mobile-menu.active {
+        right: 0;
+      }
+
+      .mobile-menu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .mobile-menu-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .mobile-nav-link {
+        display: block;
+        padding: 1rem 0;
+        font-weight: 600;
+        color: var(--text-main);
+        border-bottom: 1px solid #f9f9f9;
+      }
+      
+      .mobile-nav-submenu a {
+        display: block;
+        padding: 0.75rem 0 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      .mobile-menu-actions {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      /* Animations */
+      @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ================= RESPONSIVE ================= */
+      @media (max-width: 992px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+
+        .hero-actions {
+          justify-content: center;
+        }
+
+        .hero-meta {
+          justify-content: center;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .hero-card {
+          display: none; /* Hide card on tablet to focus on CTA */
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .hamburger-btn {
+          display: flex;
+        }
+
+        .comparison-header, .comparison-row {
+          grid-template-columns: 1fr;
+          text-align: left;
+          gap: 0.5rem;
+        }
+
+        .comparison-header div:first-child {
+          text-align: left;
+          font-weight: bold;
+          color: white;
+          margin-bottom: 0.5rem;
+        }
+
+        .comparison-text {
+          text-align: left;
+        }
+
+        .comparison-text-strong {
+          text-align: left;
+        }
+
+        .faq {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .hero-title {
+          font-size: 2.5rem;
+        }
+
+        .section-title {
+          font-size: 1.75rem;
+        }
+
+        .cta-box h2 {
+          font-size: 1.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ================= HEADER ================= -->
+    <header>
+      <div class="container">
+        <nav>
+          <a href="/" class="logo">
+            <!-- Menggunakan SVG Logo sederhana karena file asli tidak tersedia -->
+            <svg width="150" height="40" viewBox="0 0 150 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-img">
+              <rect width="40" height="40" rx="8" fill="#D32F2F"/>
+              <path d="M20 10C14.477 10 10 14.477 10 20C10 25.523 14.477 30 20 30C25.523 30 30 25.523 30 20C30 14.477 25.523 10 20 10ZM22 25H18V23H22V25ZM22.5 21H17.5C17.2239 21 17 20.7761 17 20.5V19.5C17 19.2239 17.2239 19 17.5 19H18.5V16C18.5 15.1716 19.1716 14.5 20 14.5C20.8284 14.5 21.5 15.1716 21.5 16V19H22.5C22.7761 19 23 19.2239 23 19.5V20.5C23 20.7761 22.7761 21 22.5 21Z" fill="white"/>
+              <text x="45" y="26" font-family="Arial" font-weight="bold" font-size="20" fill="#1F2937">DocterBee</text>
+            </svg>
+          </a>
+          <div class="nav-links">
+            <a href="/" id="guestNavItem">Beranda</a>
+            <a href="/journey">Journey</a>
+            <a href="/services">Services</a>
+            <a href="/store">Produk</a>
+            <!-- Media Dropdown -->
+            <div class="nav-dropdown">
+              <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+                Media
+                <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="nav-dropdown-menu">
+                <a href="/insight">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                  Edukasi
+                </a>
+                <a href="/youtube-ai">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                  YouTube & AI
+                </a>
+                <a href="/podcast">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+                  Podcast
+                </a>
+              </div>
+            </div>
+            <a href="/ai-advisor">AI Advisor</a>
+            <a href="/periksa-kesehatan">Cek Kesehatan</a>
+            <div id="authButtons">
+              <button class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="location.href='/login'">Masuk</button>
+              <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="location.href='/register'">Daftar</button>
+            </div>
+          </div>
+
+          <!-- Hamburger Menu Button (Mobile) -->
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-header">
+        <div class="logo-box">
+          <strong style="color: var(--primary); font-size: 1.25rem;">DocterBee</strong>
+        </div>
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
+        <a href="/journey" class="mobile-nav-link">Journey</a>
+        <a href="/services" class="mobile-nav-link">Services</a>
+        <a href="/store" class="mobile-nav-link">Produk</a>
+        <a href="/events" class="mobile-nav-link">Program</a>
+        <!-- Mobile Media Dropdown -->
+        <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
+          <button class="mobile-nav-link" style="background:none; border:none; width:100%; text-align:left; display:flex; justify-content:space-between;">
+            Media
+            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="mobile-nav-submenu">
+            <a href="/insight">Edukasi</a>
+            <a href="/youtube-ai">YouTube & AI</a>
+            <a href="/podcast">Podcast</a>
+          </div>
+        </div>
+        <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
+        <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
+        <div class="mobile-menu-actions">
+          <div id="mobileAuthButtons">
+            <button class="btn btn-outline" onclick="location.href='/login'">Masuk</button>
+            <button class="btn btn-primary" onclick="location.href='/register'">Daftar Sekarang</button>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- ================= HERO ================= -->
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <div class="badge">
+              <span class="badge-dot"></span>
+              Kembali Sehat Alami
+            </div>
+            <h1 class="hero-title">
+              Saat <span class="hero-highlight">obat</span> berhenti, <br />teknologi alami mulai bekerja.
+            </h1>
+            <p class="hero-subtitle">
+              DocterBee memadukan pengobatan alami, pola hidup sehat, dan edukasi berbasis sains untuk memulihkan tubuhmu secara berkelanjutan.
+            </p>
+            <div class="hero-actions">
+              <a
+                href="https://wa.me/6282188080688?text=Halo%20DocterBee%2C%20saya%20ingin%20konsultasi%20kesehatan%20alami.%20Bisa%20dibantu%3F"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary"
+                id="consult"
+              >
+                Mulai Konsultasi Gratis
+              </a>
+              <a href="#products" class="btn btn-outline">Lihat Produk ↓</a>
+            </div>
+            <div class="hero-meta">
+              <span>✓ Praktisi kesehatan profesional</span>
+              <span>✓ Madu & herbal premium</span>
+            </div>
+          </div>
+
+          <!-- Gambar Hero menggunakan landscape image yang disediakan -->
+          <aside class="hero-image-container">
+             <img src="https://z-cdn-media.chatglm.cn/files/ba6d8681-8ccf-4486-ad15-9404a5bdd608.jpeg?auth_key=1867065899-6e036aa5c9594d89895e3b2503eeda5e-0-a09c3537890e3917bce2f0101a21e57f" alt="Produk DocterBee Collection" style="border-radius: 20px; box-shadow: var(--shadow-lg); width: 100%; object-fit: cover;">
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= COMPARISON ================= -->
+      <section id="problem">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Kenapa DocterBee?</div>
+            <h2 class="section-title">Layanan biasa vs Teknologi Alam</h2>
+          </div>
+
+          <div class="comparison">
+            <div class="comparison-header">
+              <div>Parameter</div>
+              <div>Layanan Biasa</div>
+              <div>DocterBee</div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Fokus Utama</div>
+              <div class="comparison-text">Menghilangkan gejala sesaat.</div>
+              <div class="comparison-text-strong">Memperbaiki sistem tubuh & daya tahan.</div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Solusi Jangka Panjang</div>
+              <div class="comparison-text">Ketergantungan obat kimia.</div>
+              <div class="comparison-text-strong">Gaya hidup sehat & nutrisi alami.</div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Metode</div>
+              <div class="comparison-text">Medis konvensional.</div>
+              <div class="comparison-text-strong">Integrasi Madu, Herbal, & Sains.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SOLUSI DOCTERBEE ================= -->
+      <section id="solution">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Cara Kerja</div>
+            <h2 class="section-title">Sistem Hidup Sehat Terpadu</h2>
+            <p class="section-desc">
+              Kami menggabungkan sains modern, AI, dan kearifan alam untuk memandumu keluar dari lingkaran penyakit.
+            </p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-tag">Langkah 1</div>
+              <h3>Konsultasi Ahli</h3>
+              <p>Dibimbing dokter & praktisi yang mengakar masalah kesehatanmu, bukan sekadar nama penyakit.</p>
+            </div>
+            <div class="card">
+              <div class="card-tag">Langkah 2</div>
+              <h3>Nutrisi Alam</h3>
+              <p>Resep madu murni dan herbal terbaik yang berfungsi sebagai "obat" dari pabrik alam.</p>
+            </div>
+            <div class="card">
+              <div class="card-tag">Langkah 3</div>
+              <h3>Edukasi & Komunitas</h3>
+              <p>Bimbingan gaya hidup sehat berkelanjutan agar tubuh semakin kuat dan jarang sakit.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PRODUK UNGGULAN ================= -->
+      <section id="products">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Produk Premium</div>
+            <h2 class="section-title">Pilihan Terbaik dari Alam</h2>
+            <p class="section-desc">Produk alami berkualitas tinggi untuk mendukung pemulihan tubuhmu.</p>
+          </div>
+
+          <div class="grid-3">
+            <!-- Menggunakan Gambar yang disediakan -->
+            <div class="card">
+              <img src="https://z-cdn-media.chatglm.cn/files/ced19052-0c5a-4d99-b30a-157851a41ece.jpeg?auth_key=1867065899-e13a5d816dc847c3aae34ef5cb41cf86-0-8ae54d9ce6330ec37d4605cd481ec4a2" alt="DoctorBee Sulawesi Nectar" class="card-image" />
+              <h3>Sulawesi Nectar Pangkep</h3>
+              <p>Madu murni dari lebah liar Sulawesi dengan khasiat istimewa untuk pemulihan.</p>
+            </div>
+            <div class="card">
+              <img src="https://z-cdn-media.chatglm.cn/files/923e370a-76a8-4734-8f84-87afe6273c2c.jpeg?auth_key=1867065899-7e6f10120d714e81b256f0df9e6d8125-0-13d7d81e2c99c4f8026aed6ac3dca5d5" alt="Akar Bajakah" class="card-image" />
+              <h3>Akar Bajakah</h3>
+              <p>Herbal legendaris Kalimantan untuk menjaga kesehatan sel dan boosting imunitas.</p>
+            </div>
+            <div class="card">
+              <img src="https://z-cdn-media.chatglm.cn/files/da6afb4a-3909-41f4-a585-5a22643f02c8.jpeg?auth_key=1867065899-aa8a119028ca4f8ab2f3b787ff132bdf-0-1d3802bf7371e67fcbe5df4040f45647" alt="Bunga Telang" class="card-image" />
+              <h3>Bunga Telang</h3>
+              <p>Kaya antioksidan alami, sangat baik untuk kesehatan mata dan fungsi otak.</p>
+            </div>
+            <div class="card">
+              <img src="https://z-cdn-media.chatglm.cn/files/a924c7cf-fe58-42b4-82f1-db2a7155d726.jpeg?auth_key=1867065899-6550675277414a2cab46465c78fbacb1-0-284ac20ef6b042efc6580bfbb8ab05a1" alt="DocterBee Coffee" class="card-image" />
+              <h3>Healthy Coffee</h3>
+              <p>Kopi sehat dengan campuran madu dan herbal, memberikan energi tanpa efek samping buruk.</p>
+            </div>
+            <div class="card">
+              <img src="https://z-cdn-media.chatglm.cn/files/756f37a0-4af6-47d6-9078-d41ae1cfee32.jpeg?auth_key=1867065899-9af1a16af27d40dba6c527d1bc3bc0fa-0-bd5a219873ff95e02cff21ca3725cc29" alt="Teh Kulit Pala" class="card-image" />
+              <h3>Teh Kulit Pala</h3>
+              <p>Infusan herbal yang menenangkan, baik untuk pencernaan dan relaksasi.</p>
+            </div>
+            <div class="card">
+              <img src="https://z-cdn-media.chatglm.cn/files/fcb21071-2ffa-4858-984b-bb70f4d78a92.jpeg?auth_key=1867065899-bc019afc7b524b61ae750d37f52d86c1-0-30d5760da9f8fc0b5abfbe7c7b25d8d1" alt="Chia Seeds" class="card-image" />
+              <h3>Chia Seeds</h3>
+              <p>Superfood kaya serat dan Omega-3 untuk mendukung diet dan kesehatan jantung.</p>
+            </div>
+          </div>
+
+          <div class="section-cta">
+            <a href="/store" class="btn btn-primary">Lihat Semua Produk →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TEKNOLOGI ALAMI (Singkat) ================= -->
+      <section id="nature-tech">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Filosofi Kami</div>
+            <h2 class="section-title">Teknologi Allah Adalah yang Terbaik</h2>
+          </div>
+          <div class="grid-3">
+            <div class="card" style="text-align: center;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🌱</div>
+              <h3>Tanaman</h3>
+              <p>Menyimpan mineral dan cahaya matahari menjadi nektar nano-nutrisi.</p>
+            </div>
+            <div class="card" style="text-align: center;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🐝</div>
+              <h3>Lebah</h3>
+              <p>Drone biologis yang mengolah nektar menjadi madu penyembuh.</p>
+            </div>
+            <div class="card" style="text-align: center;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🧬</div>
+              <h3>Tubuh Manusia</h3>
+              <p>Mesin self-healing yang luar biasa jika diberi "bahan bakar" yang tepat.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= JOURNEY ================= -->
+      <section id="journey">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Proses</div>
+            <h2 class="section-title">Langkah Menuju Sehat</h2>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <h3>Konsultasi</h3>
+              <p>Ceritakan keluhan kesehatanmu.</p>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <h3>Analisa</h3>
+              <p>Tim kami menganalisa akar masalah.</p>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <h3>Detoks</h3>
+              <p>Program madu & herbal alami.</p>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <h3>Pemulihan</h3>
+              <p>Tubuh kembali sehat & bugar.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CTA ================= -->
+      <section id="cta">
+        <div class="container">
+          <div class="cta-box">
+            <h2>Jangan tunggu sakitmu makin parah.</h2>
+            <p>Mulai perubahan dari konsultasi singkat dengan ahli kami hari ini.</p>
+            <div class="cta-actions">
+              <a
+                href="https://wa.me/6282188080688?text=Halo%20DocterBee%2C%20saya%20ingin%20menjadwalkan%20konsultasi.%20Bisa%20dibantu%3F"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary"
+              >
+                Chat WhatsApp Sekarang
+              </a>
+              <a href="/store" class="btn btn-outline">Lihat Produk</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FAQ ================= -->
+      <section id="faq">
+        <div class="container faq">
+          <div>
+            <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
+              <div class="section-eyebrow">FAQ</div>
+              <h2 class="section-title">Pertanyaan Umum</h2>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Apakah DocterBee menggantikan dokter?</span>
+                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Tidak. DocterBee melengkapi medis dengan fokus pada pemulihan alami dan gaya hidup sehat.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Apakah madu bisa menyembuhkan semua penyakit?</span>
+                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Madu adalah suplemen alami terbaik yang mendukung pemulihan tubuh, bukan obat sakti instan.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Apakah produknya aman dikonsumsi?</span>
+                <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer">
+                <p>Ya, semua produk DocterBee terbuat dari bahan alami murni tanpa bahan pengawet kimia berbahaya.</p>
+              </div>
+            </div>
+          </div>
+
+          <aside>
+            <div class="problem-card">
+              <h3>Bingung Mulai Dari Mana?</h3>
+              <p>Konsultasikan keluhanmu singkat. Tim kami akan merekomendasikan langkah terbaik untukmu.</p>
+              <a
+                href="https://wa.me/6282188080688?text=Halo%20Tim%20DocterBee%2C%20saya%20butuh%20rekomendasi."
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn"
+              >
+                Konsultasi via WA
+              </a>
+              <p class="disclaimer">
+                <strong>Disclaimer:</strong> Informasi ini bukan pengganti diagnosis dokter profesional.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>© 2023 DocterBee. All rights reserved.</div>
+          <div>
+            Berbasis <strong>Sains & Alam</strong>. | 
+            <a href="#">Privacy</a> · 
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // ========== MOBILE MENU ==========
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+        const mobileMenuClose = document.getElementById("mobileMenuClose");
+        const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+
+        function openMobileMenu() {
+          hamburgerBtn.classList.add("active");
+          mobileMenu.classList.add("active");
+          mobileMenuOverlay.classList.add("active");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeMobileMenu() {
+          hamburgerBtn.classList.remove("active");
+          mobileMenu.classList.remove("active");
+          mobileMenuOverlay.classList.remove("active");
+          document.body.style.overflow = "";
+        }
+
+        if (hamburgerBtn) {
+          hamburgerBtn.addEventListener("click", () => {
+            if (mobileMenu.classList.contains("active")) {
+              closeMobileMenu();
+            } else {
+              openMobileMenu();
+            }
+          });
+        }
+
+        if (mobileMenuClose) {
+          mobileMenuClose.addEventListener("click", closeMobileMenu);
+        }
+
+        if (mobileMenuOverlay) {
+          mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+        }
+
+        mobileNavLinks.forEach((link) => {
+          link.addEventListener("click", closeMobileMenu);
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && mobileMenu && mobileMenu.classList.contains("active")) {
+            closeMobileMenu();
+          }
+        });
+
+        // ========== MOBILE MEDIA DROPDOWN (Simple Toggle) ==========
+        const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
+        const mobileMediaToggle = mobileMediaDropdown?.querySelector("button");
+        const mobileMediaSubmenu = mobileMediaDropdown?.querySelector(".mobile-nav-submenu");
+        
+        if (mobileMediaToggle) {
+          mobileMediaSubmenu.style.display = "none";
+          mobileMediaToggle.addEventListener("click", function(e) {
+            e.preventDefault();
+            const isVisible = mobileMediaSubmenu.style.display === "block";
+            mobileMediaSubmenu.style.display = isVisible ? "none" : "block";
+          });
+        }
+
+        // ========== SCROLL HEADER ==========
+        const header = document.querySelector("header");
+        window.addEventListener("scroll", () => {
+          if (window.pageYOffset > 50) {
+            header.classList.add("scrolled");
+          } else {
+            header.classList.remove("scrolled");
+          }
+        });
+
+        // ========== FAQ ACCORDION ==========
+        const faqItems = document.querySelectorAll(".faq-item");
+        faqItems.forEach((item) => {
+          const question = item.querySelector(".faq-question");
+          if (question) {
+            question.addEventListener("click", () => {
+              // Close others
+              faqItems.forEach((otherItem) => {
+                if (otherItem !== item && otherItem.classList.contains("active")) {
+                  otherItem.classList.remove("active");
+                  const otherBtn = otherItem.querySelector(".faq-question");
+                  if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
+                }
+              });
+              
+              // Toggle current
+              item.classList.toggle("active");
+              const isActive = item.classList.contains("active");
+              question.setAttribute("aria-expanded", isActive ? "true" : "false");
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
