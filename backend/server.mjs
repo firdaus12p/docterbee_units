@@ -61,6 +61,12 @@ if (!sessionSecret) {
   console.warn("   Set SESSION_SECRET in .env before deploying to production!");
 }
 
+// Trust proxy in production (required when behind nginx/reverse proxy)
+// This allows Express to trust X-Forwarded-* headers and correctly detect HTTPS
+if (isProduction) {
+  app.set("trust proxy", 1);
+}
+
 // Session middleware (MUST be before routes)
 app.use(
   session({
