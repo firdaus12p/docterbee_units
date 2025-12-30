@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cek Member – Docterbee</title>
+
+    <!-- External Stylesheets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/landing-page.css" />
+    <link rel="stylesheet" href="css/member-check.css" />
+  </head>
+  <body class="bg-gray-50 text-slate-900">
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
+      <div class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2">
+          <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
+        </a>
+        <nav
+          class="hidden md:flex gap-6 text-sm"
+          style="justify-content: flex-end; padding: 0; width: auto"
+        >
+          <a href="/" class="nav-link">Home</a>
+          <a href="/member-check" class="nav-link active">Cek Member</a>
+          <a href="/register" class="nav-link">Daftar</a>
+          <a href="/login" class="nav-link">Login</a>
+        </nav>
+        <button class="hamburger-btn md:hidden" id="hamburgerBtn" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <div class="logo-box" style="margin: 0">
+          <img
+            src="assets/images/logo-docterbee.png"
+            alt="DocterBee"
+            style="height: 48px; width: auto"
+          />
+        </div>
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="/" class="mobile-nav-link">Beranda</a>
+        <a href="/member-check" class="mobile-nav-link">Cek Member</a>
+        <a href="/register" class="mobile-nav-link">Daftar</a>
+        <a href="/login" class="mobile-nav-link">Login</a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="mx-auto max-w-6xl px-4 py-12" style="min-height: calc(100vh - 200px)">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <!-- Left Column: Check Form -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <h1 class="text-3xl font-bold text-center mb-2">Cek Status Member</h1>
+          <p class="text-center text-slate-600 mb-8">
+            Masukkan nomor HP untuk melihat kartu member Anda
+          </p>
+
+          <!-- Check Form -->
+          <form id="memberCheckForm">
+            <div class="mb-6">
+              <label for="phone" class="block text-sm font-semibold mb-2">
+                <svg
+                  class="inline-block w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  ></path>
+                </svg>
+                Nomor HP Terdaftar
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                required
+                pattern="^(08|\+?62)[0-9]{8,13}$"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-lg"
+                placeholder="08xxxxxxxxxx"
+                autocomplete="tel"
+              />
+              <p class="text-xs text-slate-500 mt-1">Format: 08xxxxxxxxxx atau +628xxxxxxxxxx</p>
+            </div>
+
+            <button
+              type="submit"
+              id="checkBtn"
+              class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+              <span id="checkBtnText">Cek Status Member</span>
+            </button>
+          </form>
+
+          <!-- Rate Limit Warning (hidden by default) -->
+          <div
+            id="rateLimitWarning"
+            class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+          >
+            <svg
+              class="inline-block w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              ></path>
+            </svg>
+            <span id="rateLimitMessage"
+              >Terlalu banyak percobaan. Silakan tunggu beberapa saat.</span
+            >
+          </div>
+
+          <p class="text-center text-sm text-slate-600 mt-6">
+            Belum punya akun member?
+            <a href="/register" class="text-amber-600 hover:text-amber-700 font-semibold"
+              >Daftar di sini</a
+            >
+          </p>
+        </div>
+
+        <!-- Right Column: Member Card Display (hidden initially) -->
+        <div id="memberCardSection" class="hidden">
+          <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-24">
+            <h2 class="text-xl font-bold text-center mb-4">
+              <svg
+                class="inline-block w-5 h-5 mr-1 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              Kartu Member Anda
+            </h2>
+
+            <!-- Member Info Box -->
+            <div class="member-info-box mb-6">
+              <div class="member-info-row">
+                <span class="member-info-label">Nama</span>
+                <span class="member-info-value" id="memberName">-</span>
+              </div>
+              <div class="member-info-row">
+                <span class="member-info-label">Member ID</span>
+                <span class="member-info-value" id="memberId">-</span>
+              </div>
+              <div class="member-info-row">
+                <span class="member-info-label">Jenis Kartu</span>
+                <span class="member-info-value" id="memberCardType">-</span>
+              </div>
+              <div class="member-info-row">
+                <span class="member-info-label">Member Sejak</span>
+                <span class="member-info-value" id="memberSince">-</span>
+              </div>
+            </div>
+
+            <!-- Card Preview Container -->
+            <div class="member-card-preview-container" id="memberCardPreview">
+              <div class="member-card-flip-wrapper" id="memberCardFlipWrapper">
+                <!-- Front Face -->
+                <div class="member-card-face member-card-face-front">
+                  <img
+                    id="memberCardFrontImage"
+                    src=""
+                    alt="Card Front"
+                    class="member-card-image"
+                  />
+                  <div class="member-card-overlay">
+                    <div class="member-card-info" id="memberCardInfo">
+                      <div class="member-card-name" id="memberCardName">-</div>
+                      <div class="member-card-phone" id="memberCardPhone">-</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Back Face -->
+                <div class="member-card-face member-card-face-back">
+                  <img id="memberCardBackImage" src="" alt="Card Back" class="member-card-image" />
+                </div>
+              </div>
+              <div class="member-card-flip-hint">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Klik kartu untuk melihat bagian belakang
+              </div>
+            </div>
+
+            <!-- Login Suggestion -->
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+              <p class="text-blue-700 text-sm mb-2">
+                Ingin akses fitur lengkap seperti riwayat pesanan, poin reward, dan lainnya?
+              </p>
+              <a
+                href="/login"
+                class="inline-block text-blue-600 hover:text-blue-700 font-semibold text-sm"
+              >
+                Login ke Akun Anda →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Not Found Message (hidden initially) -->
+        <div id="notFoundSection" class="hidden">
+          <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div
+              class="w-20 h-20 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-10 h-10 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold mb-2">Nomor HP Tidak Terdaftar</h2>
+            <p class="text-slate-600 mb-6">
+              Nomor HP yang Anda masukkan belum terdaftar sebagai member Docterbee.
+            </p>
+            <a
+              href="/register"
+              class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            >
+              Daftar Sebagai Member Baru
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>© 2025 DocterBee. All rights reserved.</div>
+          <div>
+            Berbasis <strong>Sains & Alam</strong>. | <a href="#">Privacy</a> ·
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
+    </script>
+    <script src="js/modal-utils.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/landing-navbar.js"></script>
+    <script src="js/member-check.js"></script>
+  </body>
+</html>

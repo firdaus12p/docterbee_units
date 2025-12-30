@@ -37,6 +37,10 @@ export default [
         // Shared utilities from modal-utils.js
         showWarning: "readonly",
         showSuccessModal: "readonly",
+        showSuccess: "readonly",
+        showError: "readonly",
+        showInfo: "readonly",
+        showConfirm: "readonly",
         // Shared utilities from script.js
         markdownToHtml: "readonly",
         // Cross-file dependencies

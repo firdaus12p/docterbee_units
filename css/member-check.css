@@ -1,0 +1,265 @@
+/* ========================================
+   MEMBER CHECK - CARD PREVIEW STYLES
+   Independent styling for member check feature
+   ======================================== */
+
+/* Member Info Box */
+.member-info-box {
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.member-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.member-info-row:last-child {
+  border-bottom: none;
+}
+
+.member-info-label {
+  color: #92400e;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.member-info-value {
+  color: #1f2937;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ========================================
+   CARD PREVIEW WITH FLIP ANIMATION
+   (Self-contained, prefixed with member-)
+   ======================================== */
+
+.member-card-preview-container {
+  margin: 1.5rem 0;
+  perspective: 1000px;
+}
+
+.member-card-flip-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  height: 250px;
+  margin: 0 auto;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.member-card-flip-wrapper.flipped {
+  transform: rotateY(180deg);
+}
+
+.member-card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.member-card-face-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.member-card-face-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.member-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.member-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+.member-card-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+/* Smaller name for specific card types */
+.member-card-name-small {
+  font-size: 1rem;
+}
+
+.member-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Lower position for specific card types */
+.member-card-info-lower {
+  padding-top: 8.8rem;
+}
+
+.member-card-phone {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.member-card-flip-hint {
+  text-align: center;
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.member-card-flip-hint svg {
+  width: 20px;
+  height: 20px;
+  animation: member-flip-hint 2s ease-in-out infinite;
+}
+
+@keyframes member-flip-hint {
+  0%,
+  100% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Loading state for button */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Status badge for card type */
+.card-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1024px) {
+  /* On mobile/tablet, show placeholder section */
+  #placeholderSection {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .member-card-flip-wrapper {
+    max-width: 100%;
+    height: 200px;
+  }
+
+  .member-card-name {
+    font-size: 1.125rem;
+  }
+
+  .member-card-name-small {
+    font-size: 0.9rem;
+  }
+
+  .member-card-phone {
+    font-size: 0.75rem;
+  }
+
+  .member-info-box {
+    padding: 0.75rem;
+  }
+
+  .member-info-label,
+  .member-info-value {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .member-card-flip-wrapper {
+    height: 180px;
+  }
+
+  .member-card-overlay {
+    padding: 1rem;
+  }
+
+  .member-card-name {
+    font-size: 1rem;
+  }
+
+  .member-card-name-small {
+    font-size: 0.85rem;
+  }
+
+  .member-card-phone {
+    font-size: 0.7rem;
+  }
+
+  .member-card-info {
+    padding-top: 0.5rem;
+  }
+
+  .member-card-info-lower {
+    padding-top: 2rem;
+  }
+}

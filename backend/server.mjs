@@ -23,6 +23,7 @@ import userDataRouter from "./routes/user-data.mjs";
 import rewardsRouter from "./routes/rewards.mjs";
 import podcastsRouter from "./routes/podcasts.mjs";
 import journeysRouter from "./routes/journeys.mjs";
+import memberCheckRouter from "./routes/member-check.mjs";
 import bcrypt from "bcryptjs";
 import { loginRateLimiter } from "./utils/rate-limiter.mjs";
 
@@ -47,12 +48,16 @@ const sessionSecret = process.env.SESSION_SECRET;
 if (isProduction && !sessionSecret) {
   console.error("❌ FATAL: SESSION_SECRET environment variable is REQUIRED in production!");
   console.error("   Please set a strong, random SESSION_SECRET (at least 64 characters).");
-  console.error("   You can generate one with: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\"");
+  console.error(
+    "   You can generate one with: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\""
+  );
   process.exit(1);
 }
 
 if (!sessionSecret) {
-  console.warn("⚠️  WARNING: SESSION_SECRET not set. Using insecure fallback for development only.");
+  console.warn(
+    "⚠️  WARNING: SESSION_SECRET not set. Using insecure fallback for development only."
+  );
   console.warn("   Set SESSION_SECRET in .env before deploying to production!");
 }
 
@@ -108,38 +113,39 @@ app.use(express.json());
 if (isProduction) {
   app.use((req, res, next) => {
     // Prevent MIME type sniffing
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    
+    res.setHeader("X-Content-Type-Options", "nosniff");
+
     // Prevent clickjacking - allow same origin framing only
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+
     // Legacy XSS protection for older browsers
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+
     // Control referrer information
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+
     // Prevent DNS prefetching
-    res.setHeader('X-DNS-Prefetch-Control', 'off');
-    
+    res.setHeader("X-DNS-Prefetch-Control", "off");
+
     // HSTS - enforce HTTPS (only if truly using HTTPS)
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
     // Basic Content Security Policy
-    // Allows: same-origin scripts/styles, inline scripts (needed for some features), 
+    // Allows: same-origin scripts/styles, inline scripts (needed for some features),
     // Google Fonts, external images, and specific CDNs used by the website
-    res.setHeader('Content-Security-Policy', 
+    res.setHeader(
+      "Content-Security-Policy",
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; " +
-      "font-src 'self' https://fonts.gstatic.com data:; " +
-      "img-src 'self' data: https: blob:; " +
-      "connect-src 'self' https://generativelanguage.googleapis.com https://www.youtube.com https://youtube.com; " +
-      "frame-src 'self' https://www.youtube.com https://youtube.com; " +
-      "object-src 'none'; " +
-      "base-uri 'self';"
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; " +
+        "font-src 'self' https://fonts.gstatic.com data:; " +
+        "img-src 'self' data: https: blob:; " +
+        "connect-src 'self' https://generativelanguage.googleapis.com https://www.youtube.com https://youtube.com; " +
+        "frame-src 'self' https://www.youtube.com https://youtube.com; " +
+        "object-src 'none'; " +
+        "base-uri 'self';"
     );
-    
+
     next();
   });
 }
@@ -164,6 +170,7 @@ const cleanUrlPages = [
   "youtube-ai",
   "podcast",
   "periksa-kesehatan",
+  "member-check",
 ];
 
 // Redirect .html URLs to clean URLs (SEO friendly)
@@ -221,6 +228,7 @@ app.use("/api/user-data", userDataRouter);
 app.use("/api/rewards", rewardsRouter);
 app.use("/api/podcasts", podcastsRouter);
 app.use("/api/journeys", journeysRouter);
+app.use("/api/member-check", memberCheckRouter);
 
 // ============================================
 // STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)
@@ -248,7 +256,6 @@ app.get("/journey/:slug", (req, res) => {
   res.sendFile(join(__dirname, "..", "journey.html"));
 });
 
-
 // ============================================
 // ADMIN AUTHENTICATION (Database-based with bcrypt)
 // ============================================
@@ -266,17 +273,17 @@ app.post("/api/admin/login", loginRateLimiter.middleware(), async (req, res) => 
     }
 
     // Query admin from database
-    const admin = await queryOne(
-      "SELECT * FROM admins WHERE username = ? AND is_active = 1",
-      [username]
-    );
+    const admin = await queryOne("SELECT * FROM admins WHERE username = ? AND is_active = 1", [
+      username,
+    ]);
 
     if (!admin) {
       // Record rate limit failure
       const rateLimitResult = req.rateLimiter.recordFailure();
-      const attemptsMsg = rateLimitResult.attemptsLeft > 0 
-        ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)` 
-        : '';
+      const attemptsMsg =
+        rateLimitResult.attemptsLeft > 0
+          ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)`
+          : "";
 
       // Log failed attempt (admin not found) - use NULL for admin_id
       await query(
@@ -297,9 +304,10 @@ app.post("/api/admin/login", loginRateLimiter.middleware(), async (req, res) => 
     if (!passwordMatch) {
       // Record rate limit failure
       const rateLimitResult = req.rateLimiter.recordFailure();
-      const attemptsMsg = rateLimitResult.attemptsLeft > 0 
-        ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)` 
-        : '';
+      const attemptsMsg =
+        rateLimitResult.attemptsLeft > 0
+          ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)`
+          : "";
 
       // Log failed attempt (wrong password)
       await query(
@@ -397,8 +405,8 @@ const requireAdmin = (req, res, next) => {
 // Export middleware for use in route files (if needed later)
 app.set("requireAdmin", requireAdmin);
 
-// DEBUG ENDPOINT - Untuk troubleshooting database  
-// Security: 
+// DEBUG ENDPOINT - Untuk troubleshooting database
+// Security:
 // - Production: Requires admin login, shows minimal info
 // - Development: Open but shows warning
 app.get("/api/debug", async (req, res) => {
@@ -441,7 +449,7 @@ app.get("/api/debug", async (req, res) => {
         NODE_ENV: process.env.NODE_ENV || "not set",
         PORT: process.env.PORT ? "SET" : "default (3000)",
         DB_HOST: process.env.DB_HOST ? "SET" : "NOT SET",
-        DB_PORT: process.env.DB_PORT ? "SET" : "NOT SET", 
+        DB_PORT: process.env.DB_PORT ? "SET" : "NOT SET",
         DB_USER: process.env.DB_USER ? "SET" : "NOT SET",
         DB_NAME: process.env.DB_NAME ? "SET" : "NOT SET",
         DB_PASSWORD: process.env.DB_PASSWORD ? "SET" : "NOT SET",
@@ -521,57 +529,64 @@ async function fetchTranscriptWithRetry(videoId) {
   try {
     console.log(`🔄 Method 0: Trying raw HTML parsing...`);
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    
+
     const pageResponse = await fetch(videoUrl, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-      }
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
     });
-    
+
     if (!pageResponse.ok) {
       throw new Error(`Page fetch failed: ${pageResponse.status}`);
     }
-    
+
     const html = await pageResponse.text();
     console.log(`📄 Page fetched: ${html.length} bytes`);
-    
+
     // Extract captionTracks from the page JSON
     const captionMatch = html.match(/"captionTracks":\s*(\[.*?\])/);
     if (captionMatch) {
       const tracks = JSON.parse(captionMatch[1]);
       console.log(`📋 Found ${tracks.length} caption tracks in page`);
-      
+
       // Prefer Indonesian, then English, then first available
-      const preferredTrack = 
-        tracks.find(t => t.languageCode === "id") ||
-        tracks.find(t => t.languageCode === "en" && !t.kind) || // manual English
-        tracks.find(t => t.languageCode === "en") || // auto-generated English
+      const preferredTrack =
+        tracks.find((t) => t.languageCode === "id") ||
+        tracks.find((t) => t.languageCode === "en" && !t.kind) || // manual English
+        tracks.find((t) => t.languageCode === "en") || // auto-generated English
         tracks[0];
-      
+
       if (preferredTrack && preferredTrack.baseUrl) {
-        console.log(`🎯 Using track: ${preferredTrack.languageCode} (${preferredTrack.name?.simpleText || "untitled"})`);
-        
+        console.log(
+          `🎯 Using track: ${preferredTrack.languageCode} (${
+            preferredTrack.name?.simpleText || "untitled"
+          })`
+        );
+
         // Fetch caption with proper format (srv3 returns XML with text segments)
         const captionUrl = preferredTrack.baseUrl + "&fmt=srv3";
         const captionResponse = await fetch(captionUrl, {
           headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Accept": "*/*",
+            Accept: "*/*",
             "Accept-Language": "en-US,en;q=0.9",
-            "Referer": "https://www.youtube.com/",
-          }
+            Referer: "https://www.youtube.com/",
+          },
         });
-        
+
         const captionText = await captionResponse.text();
         console.log(`📥 Caption response: ${captionText.length} bytes`);
-        
+
         if (captionText.length > 0) {
           // Parse the XML/JSON transcript
-          const textMatches = captionText.matchAll(/<text[^>]*start="([^"]*)"[^>]*dur="([^"]*)"[^>]*>([^<]*)<\/text>/g);
+          const textMatches = captionText.matchAll(
+            /<text[^>]*start="([^"]*)"[^>]*dur="([^"]*)"[^>]*>([^<]*)<\/text>/g
+          );
           const transcript = [];
-          
+
           for (const match of textMatches) {
             const text = match[3]
               .replace(/&amp;/g, "&")
@@ -581,7 +596,7 @@ async function fetchTranscriptWithRetry(videoId) {
               .replace(/&#39;/g, "'")
               .replace(/\n/g, " ")
               .trim();
-            
+
             if (text) {
               transcript.push({
                 text,
@@ -590,7 +605,7 @@ async function fetchTranscriptWithRetry(videoId) {
               });
             }
           }
-          
+
           if (transcript.length > 0) {
             console.log(`✅ SUCCESS! Raw parsing returned ${transcript.length} segments`);
             console.log(`📊 First segment: "${transcript[0].text.substring(0, 50)}..."`);
@@ -1136,9 +1151,9 @@ app.post("/api/check-transcript", async (req, res) => {
     if (genAI) {
       try {
         console.log("🎬 Mencoba akses video langsung dengan Gemini...");
-        
+
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        
+
         // Quick check if Gemini can access the video
         const result = await model.generateContent([
           "Berikan judul video ini dalam satu baris singkat (maksimal 10 kata). Jika tidak bisa mengakses video, katakan 'TIDAK DAPAT MENGAKSES'.",
@@ -1148,10 +1163,10 @@ app.post("/api/check-transcript", async (req, res) => {
             },
           },
         ]);
-        
+
         const response = await result.response;
         const text = response.text();
-        
+
         if (!text.includes("TIDAK DAPAT MENGAKSES")) {
           console.log("✅ Video dapat diakses oleh Gemini:", text.substring(0, 50));
           return res.json({
@@ -1172,7 +1187,7 @@ app.post("/api/check-transcript", async (req, res) => {
 
     // Fallback: Try traditional transcript extraction
     console.log("🔄 Mencoba transcript extraction sebagai fallback...");
-    
+
     try {
       const transcriptData = await fetchTranscriptWithRetry(videoId);
 
@@ -1266,7 +1281,7 @@ app.post("/api/summarize", async (req, res) => {
       try {
         console.log("🎬 PRIORITY 1: Mencoba analisis YouTube langsung dengan Gemini...");
         console.log("🔗 Video URL:", cleanYoutubeUrl(youtubeUrl));
-        
+
         const directAnalysisPrompt = `Kamu adalah asisten AI untuk aplikasi kesehatan Islami "Docterbee" yang menggabungkan ajaran Qur'an & Sunnah SHAHIH, sains modern, dan framework NBSN (Neuron, Biomolekul, Sensorik, Nature).
 
 TUGAS:
@@ -1310,7 +1325,7 @@ PENTING:
             },
           },
         ]);
-        
+
         const response = await result.response;
         const text = response.text();
 

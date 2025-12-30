@@ -29,8 +29,11 @@ let isLoggedIn = false;
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ DOM Content Loaded - Initializing...");
 
-  // Set year
-  document.getElementById("year").textContent = new Date().getFullYear();
+  // Set year (if element exists)
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined") {
@@ -807,17 +810,18 @@ function toggleProductSelect() {
 async function loadProductsForArticle() {
   const select = document.getElementById("articleProductId");
   if (!select) return;
-  
+
   // Check if already loaded
   if (select.options.length > 1) return;
-  
+
   try {
     const response = await adminFetch(`${API_BASE}/products?is_active=1`);
     const result = await response.json();
-    
+
     if (result.success && result.data) {
-      select.innerHTML = '<option value="">-- Pilih Produk --</option>' + 
-        result.data.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+      select.innerHTML =
+        '<option value="">-- Pilih Produk --</option>' +
+        result.data.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
     }
   } catch (error) {
     console.error("Error loading products for article:", error);
@@ -839,7 +843,7 @@ async function handleArticleSubmit(e) {
   const id = document.getElementById("articleId").value;
   const isProductType = document.getElementById("articleTypeProduct").checked;
   const productId = isProductType ? document.getElementById("articleProductId").value : null;
-  
+
   // Validate product selection if type is product
   if (isProductType && !productId) {
     alert("Silakan pilih produk untuk artikel tipe produk");
@@ -848,7 +852,7 @@ async function handleArticleSubmit(e) {
     submitBtn.textContent = originalText;
     return;
   }
-  
+
   const data = {
     title: document.getElementById("articleTitle").value,
     slug: document.getElementById("articleSlug").value,
@@ -917,7 +921,7 @@ async function editArticle(id) {
         // Hide preview if no image
         document.getElementById("insightHeaderImagePreview").classList.add("hidden");
       }
-      
+
       // Set article type and product
       if (article.article_type === "product") {
         document.getElementById("articleTypeProduct").checked = true;
@@ -2162,7 +2166,7 @@ function getProductCategoryBadgeClass(category) {
     "1001 Rempah": "bg-orange-100 text-orange-700 font-semibold",
     "Zona Honey": "bg-amber-100 text-amber-700 font-semibold",
     "Cold Pressed": "bg-green-100 text-green-700 font-semibold",
-    "Coffee": "bg-amber-100 text-amber-900 font-semibold",
+    Coffee: "bg-amber-100 text-amber-900 font-semibold",
   };
   return badgeClasses[category] || "bg-slate-200 text-slate-700";
 }
@@ -2173,7 +2177,7 @@ function getProductCategoryIcon(category) {
     "1001 Rempah": "🧂",
     "Zona Honey": "🍯",
     "Cold Pressed": "🥤",
-    "Coffee": "☕",
+    Coffee: "☕",
   };
   return icons[category] || "📦";
 }
