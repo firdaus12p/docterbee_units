@@ -195,7 +195,7 @@
       <div class="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
         <!-- Sidebar Filter -->
         <aside class="rounded-2xl border border-gray-200 bg-white p-5 text-sm h-fit">
-          <div class="font-semibold mb-3 flex items-center gap-2 text-amber-500">
+          <div class="font-semibold mb-3 flex items-center gap-2 text-red-600">
             <i data-lucide="filter" class="w-4 h-4"></i>
             Filter Layanan
           </div>
@@ -205,7 +205,7 @@
             <span class="text-slate-900 text-xs mb-1 block font-medium">Cabang</span>
             <select
               id="branchFilter"
-              class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-400 focus:outline-none"
+              class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-red-600 focus:outline-none"
             >
               <option value="all">Semua Cabang</option>
               <option value="kolaka">Kolaka</option>
@@ -219,7 +219,7 @@
             <span class="text-slate-900 text-xs mb-1 block font-medium">Mode</span>
             <select
               id="modeFilter"
-              class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-400 focus:outline-none"
+              class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-red-600 focus:outline-none"
             >
               <option value="all">Semua Mode</option>
               <option value="online">Online</option>
@@ -232,25 +232,25 @@
             <div class="font-semibold mb-2 text-xs text-slate-900">Kategori</div>
             <ul class="space-y-2">
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catManual" checked class="rounded text-amber-400" />
+                <input type="checkbox" id="catManual" checked class="rounded text-red-600" />
                 <label for="catManual" class="text-slate-900 text-sm cursor-pointer"
                   >Manual Therapy</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catKlinis" checked class="rounded text-amber-400" />
+                <input type="checkbox" id="catKlinis" checked class="rounded text-red-600" />
                 <label for="catKlinis" class="text-slate-900 text-sm cursor-pointer"
                   >Konsultasi Klinis</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catNutrisi" checked class="rounded text-amber-400" />
+                <input type="checkbox" id="catNutrisi" checked class="rounded text-red-600" />
                 <label for="catNutrisi" class="text-slate-900 text-sm cursor-pointer"
                   >Nutrisi & Gizi</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catKeluarga" checked class="rounded text-amber-400" />
+                <input type="checkbox" id="catKeluarga" checked class="rounded text-red-600" />
                 <label for="catKeluarga" class="text-slate-900 text-sm cursor-pointer"
                   >Keluarga & Parenting</label
                 >
@@ -264,7 +264,7 @@
           <!-- Services akan dimuat secara dinamis dari API -->
           <div class="md:col-span-2 text-center py-12">
             <div
-              class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"
+              class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"
             ></div>
             <p class="mt-4 text-slate-400">Memuat layanan...</p>
           </div>

@@ -180,12 +180,12 @@ nav {
   left: 0;
   width: 0;
   height: 2px;
-  background: #ea580c;
+  background: #DC2626;
   transition: width 0.3s ease;
 }
 
 .nav-links a:hover {
-  color: #ea580c;
+  color: #DC2626;
 }
 
 .nav-links a:hover::after {
@@ -309,7 +309,7 @@ nav {
 }
 
 .mobile-menu-close:hover {
-  color: #ea580c;
+  color: #DC2626;
 }
 
 .mobile-nav {
@@ -338,7 +338,7 @@ nav {
 }
 
 .mobile-nav-link:hover {
-  color: #ea580c;
+  color: #DC2626;
   padding-left: 8px;
 }
 
@@ -391,19 +391,30 @@ nav {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #f97316, #ea580c);
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
   color: white;
-  box-shadow: 0 12px 25px rgba(234, 88, 12, 0.4);
+  box-shadow: 0 12px 25px rgba(220, 38, 38, 0.4);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 35px rgba(234, 88, 12, 0.55);
+  box-shadow: 0 16px 35px rgba(220, 38, 38, 0.55);
 }
 
 .btn-outline {
   background: white;
-  color: #ea580c;
+  color: #DC2626;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 35px rgba(220, 38, 38, 0.55);
+}
+
+.btn-outline {
+  background: white;
+  color: #DC2626;
   border: 1px solid rgba(248, 113, 22, 0.4);
 }
 
@@ -462,7 +473,7 @@ nav {
 }
 
 .hero-highlight {
-  color: #ea580c;
+  color: #DC2626;
   font-weight: 700;
 }
 
@@ -485,8 +496,31 @@ nav {
   animation: fadeInUp 1.6s ease;
 }
 
+.hero-image {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  object-fit: cover;
+  animation: slideInRight 0.8s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-image:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 900px) {
+  .hero-image {
+    max-width: 100%;
+    margin-top: 2rem;
+  }
+}
+
 .hero-card {
-  background: radial-gradient(circle at top left, #f97316 0, #0f172a 55%);
+  background: radial-gradient(circle at top left, #DC2626 0, #0f172a 55%);
   border-radius: 1.5rem;
   padding: 1.5rem;
   color: #e5e7eb;
@@ -527,6 +561,27 @@ nav {
   margin-bottom: 0.25rem;
 }
 
+.hero-card-image {
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin-top: 1rem;
+  object-fit: cover;
+  max-height: 300px;
+}
+
+@media (max-width: 768px) {
+  .hero-card-image {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-card-image {
+    max-height: 200px;
+  }
+}
+
 .hero-card-pill {
   position: absolute;
   inset: auto -20px -40px auto;
@@ -560,7 +615,7 @@ section.visible {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: #ea580c;
+  color: #DC2626;
   font-weight: 700;
   margin-bottom: 0.35rem;
 }
@@ -596,7 +651,7 @@ section.visible {
 .problem-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  border-color: rgba(234, 88, 12, 0.3);
+  border-color: rgba(220, 38, 38, 0.3);
 }
 
 .problem-card h3 {
@@ -696,7 +751,7 @@ section.visible {
 .card:hover {
   transform: translateY(-8px);
   box-shadow: 0 16px 35px rgba(0, 0, 0, 0.1);
-  border-color: rgba(234, 88, 12, 0.4);
+  border-color: rgba(220, 38, 38, 0.4);
 }
 
 .card h3 {
@@ -757,7 +812,7 @@ section.visible {
 
 .step:hover .step-number {
   transform: scale(1.15);
-  background: #ea580c;
+  background: #DC2626;
 }
 
 .step h3 {
@@ -788,7 +843,7 @@ section.visible {
 .faq-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  border-color: rgba(234, 88, 12, 0.3);
+  border-color: rgba(220, 38, 38, 0.3);
 }
 
 .faq-item + .faq-item {
@@ -814,8 +869,8 @@ section.visible {
 }
 
 .faq-question:hover {
-  color: #ea580c;
-  background: rgba(249, 115, 22, 0.03);
+  color: #DC2626;
+  background: rgba(185, 28, 28, 0.03);
 }
 
 .faq-question span {
@@ -830,11 +885,11 @@ section.visible {
 
 .faq-item.active .faq-icon {
   transform: rotate(180deg);
-  color: #ea580c;
+  color: #DC2626;
 }
 
 .faq-item.active .faq-question {
-  color: #ea580c;
+  color: #DC2626;
 }
 
 .faq-answer {
@@ -949,7 +1004,7 @@ footer {
 }
 
 footer a {
-  color: #e76f14;
+  color: #DC2626;
 }
 
 /* ====== RESPONSIVE ====== */
@@ -1041,12 +1096,12 @@ footer a {
   left: 0;
   width: 0;
   height: 2px;
-  background: #ea580c;
+  background: #DC2626;
   transition: width 0.3s ease;
 }
 
 .nav-dropdown-toggle:hover {
-  color: #ea580c;
+  color: #DC2626;
 }
 
 .nav-dropdown-toggle:hover::after {
@@ -1104,8 +1159,8 @@ footer a {
 }
 
 .nav-dropdown-menu a:hover {
-  background: linear-gradient(90deg, rgba(234, 88, 12, 0.1), transparent);
-  color: #ea580c;
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent);
+  color: #DC2626;
   padding-left: 1.5rem;
 }
 
@@ -1148,7 +1203,7 @@ footer a {
 }
 
 .mobile-nav-dropdown-toggle:hover {
-  color: #ea580c;
+  color: #DC2626;
   padding-left: 8px;
 }
 
@@ -1163,7 +1218,7 @@ footer a {
 }
 
 .mobile-nav-dropdown.open .mobile-nav-dropdown-toggle {
-  color: #ea580c;
+  color: #DC2626;
 }
 
 .mobile-nav-submenu {
@@ -1196,8 +1251,8 @@ footer a {
 }
 
 .mobile-nav-submenu a:hover {
-  background: rgba(234, 88, 12, 0.05);
-  color: #ea580c;
+  background: rgba(220, 38, 38, 0.05);
+  color: #DC2626;
   padding-left: 2rem;
 }
 
@@ -1217,18 +1272,18 @@ footer a {
 .points-display {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #ea580c;
+  color: #DC2626;
   padding: 0.375rem 0.75rem;
-  background: rgba(234, 88, 12, 0.1);
+  background: rgba(220, 38, 38, 0.1);
   border-radius: 999px;
 }
 
 .mobile-points-display {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #ea580c;
+  color: #DC2626;
   padding: 0.75rem;
-  background: rgba(234, 88, 12, 0.1);
+  background: rgba(220, 38, 38, 0.1);
   border-radius: 0.5rem;
   text-align: center;
   margin-bottom: 0.5rem;

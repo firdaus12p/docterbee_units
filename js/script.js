@@ -301,7 +301,7 @@ function showUnit(unitId) {
       <div class="text-lg font-semibold">${escapeHtml(unit.title)}</div>
       <div class="unit-actions flex flex-wrap items-center gap-2 sm:flex-nowrap">
         <button class="btn-calc-unit" data-unit="${unitId}">Hitung Skor Unit</button>
-        <span class="text-2xl font-bold text-amber-300" id="score_${unitId}">—</span>
+        <span class="text-2xl font-bold text-red-500" id="score_${unitId}">—</span>
       </div>
     </div>
     <div class="card-grid">
@@ -1060,7 +1060,7 @@ async function validatePromoCode() {
     } else {
       // Handle already used error with special styling
       if (result.alreadyUsed) {
-        promoResult.className = "text-sm text-amber-400 bg-amber-900/20 p-3 rounded-lg";
+        promoResult.className = "text-sm text-red-600 bg-red-900/20 p-3 rounded-lg";
         promoResult.innerHTML = `
           <div class="flex items-center gap-2 mb-1">
             <i data-lucide="alert-circle" class="w-4 h-4"></i>
@@ -1430,7 +1430,7 @@ async function renderEvents() {
       if (event.mode === "offline" && event.location) {
         locationText = `
           <div class="text-xs text-slate-900 mt-1 flex items-center gap-1">
-            <i data-lucide="map-pin" class="w-3 h-3 text-amber-400"></i>
+            <i data-lucide="map-pin" class="w-3 h-3 text-red-600"></i>
             ${escapeHtml(event.location)}
           </div>
         `;
@@ -1438,7 +1438,7 @@ async function renderEvents() {
 
       card.innerHTML = `
         <div class="text-lg font-semibold">${escapeHtml(event.title)}</div>
-        <div class="text-xs text-amber-300 mt-1">${escapeHtml(
+        <div class="text-xs text-red-500 mt-1">${escapeHtml(
           event.mode.toUpperCase()
         )} · ${escapeHtml(event.topic)}</div>
         <div class="text-sm text-slate-900 mt-1 flex items-center gap-1">
@@ -1457,7 +1457,7 @@ async function renderEvents() {
         }
         ${locationText}
         ${deadlineText}
-        <div class="text-sm font-semibold text-amber-400 mt-2">${feeText}</div>
+        <div class="text-sm font-semibold text-red-600 mt-2">${feeText}</div>
         <p class="text-sm text-slate-900 mt-2">${escapeHtml(
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
@@ -1598,7 +1598,7 @@ async function renderInsightArticles() {
       card.className = "article-card";
       card.innerHTML = `
         <div class="text-lg font-semibold">${escapeHtml(article.title)}</div>
-        <div class="text-xs text-amber-500 mt-1 font-medium">${escapeHtml(
+        <div class="text-xs text-red-600 mt-1 font-medium">${escapeHtml(
           article.tags || "Article"
         )}</div>
         <p class="text-sm text-slate-900 mt-2">${escapeHtml(
@@ -2078,11 +2078,11 @@ async function checkTranscript() {
       } else {
         // ❌ Transcript not available
         transcriptStatus.innerHTML = `
-          <div class="bg-amber-100 border border-amber-400/50 rounded-lg p-3">
+          <div class="bg-red-100 border border-red-600/50 rounded-lg p-3">
             <div class="flex items-start gap-2">
-              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-700 flex-shrink-0 mt-0.5"></i>
               <div class="flex-1">
-                <div class="font-medium text-amber-700 mb-1">⚠️ Transcript Tidak Tersedia</div>
+                <div class="font-medium text-red-800 mb-1">⚠️ Transcript Tidak Tersedia</div>
                 <div class="text-sm text-slate-700 whitespace-pre-line">${data.message}</div>
               </div>
             </div>
@@ -2153,7 +2153,7 @@ async function analyzeMedia() {
 
   aiResult.innerHTML = `
     <div class="ai-analysis-card text-center">
-      <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-500"></i>
+      <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-red-600"></i>
       <p class="text-slate-700">
         ${
           youtubeUrl && !notes
@@ -2267,7 +2267,7 @@ async function analyzeMedia() {
                 ? `
               <li><b>Tunggu 1-2 menit</b> lalu coba lagi (Free tier: 15 requests/menit)</li>
               <li>Refresh halaman ini setelah menunggu</li>
-              <li>Atau upgrade ke <a href="https://ai.google.dev/pricing" target="_blank" class="text-amber-600 underline">paid plan</a> untuk quota lebih besar</li>
+              <li>Atau upgrade ke <a href="https://ai.google.dev/pricing" target="_blank" class="text-red-700 underline">paid plan</a> untuk quota lebih besar</li>
             `
                 : `
               <li>Pastikan server backend berjalan: <code class="bg-slate-200 text-slate-800 px-1 rounded">npm start</code></li>
@@ -2320,7 +2320,7 @@ function markdownToHtml(text) {
   // Convert `code` to <code>
   html = html.replace(
     /`(.+?)`/g,
-    "<code class='px-1.5 py-0.5 rounded bg-slate-200 text-amber-700 text-sm font-mono'>$1</code>"
+    "<code class='px-1.5 py-0.5 rounded bg-slate-200 text-red-800 text-sm font-mono'>$1</code>"
   );
 
   return html;
@@ -2392,7 +2392,7 @@ function formatAISummary(text, metadata = {}) {
         iconColor = "text-emerald-500";
       } else if (headerText.includes("Koreksi") || headerText.includes("koreksi") || headerText.includes("Catatan")) {
         iconName = "alert-circle";
-        iconColor = "text-amber-500";
+        iconColor = "text-red-600";
       } else if (headerText.includes("Sains") || headerText.includes("sains") || headerText.includes("Ilmiah")) {
         iconName = "flask-conical";
         iconColor = "text-sky-500";
@@ -2435,7 +2435,7 @@ function formatAISummary(text, metadata = {}) {
         iconColor = "text-emerald-500";
       } else if (headerText.includes("Koreksi") || headerText.includes("koreksi")) {
         iconName = "alert-circle";
-        iconColor = "text-amber-500";
+        iconColor = "text-red-600";
       } else if (headerText.includes("Sains") || headerText.includes("sains")) {
         iconName = "flask-conical";
         iconColor = "text-sky-500";
@@ -2602,8 +2602,8 @@ async function renderServices() {
                 : ""
             }
             <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="tag" class="w-4 h-4 text-amber-400"></i>
-              <span class="text-lg font-bold text-amber-500">${price}</span>
+              <i data-lucide="tag" class="w-4 h-4 text-red-600"></i>
+              <span class="text-lg font-bold text-red-600">${price}</span>
             </div>
             <div class="flex items-center gap-2 mb-2 text-xs text-slate-900">
               <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
@@ -2612,7 +2612,7 @@ async function renderServices() {
             ${modeInfo}
             <a
               href="/booking?service=${encodeURIComponent(service.name)}"
-              class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-4 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md mt-3"
+              class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-red-600 text-white px-4 py-2 text-sm font-semibold hover:from-red-600 hover:to-red-700 transition-all shadow-sm hover:shadow-md mt-3"
             >
               <i data-lucide="calendar" class="w-4 h-4"></i>
               Booking Sekarang
@@ -2642,7 +2642,7 @@ async function renderServices() {
 function getCategoryBadgeHTML(category) {
   const badges = {
     manual:
-      '<span class="text-xs rounded-full bg-amber-400/10 border border-amber-400/40 px-2 py-1 text-amber-300">Manual</span>',
+      '<span class="text-xs rounded-full bg-red-600/10 border border-red-600/40 px-2 py-1 text-red-500">Manual</span>',
     klinis:
       '<span class="text-xs rounded-full bg-sky-400/10 border border-sky-400/40 px-2 py-1 text-sky-300">Klinis</span>',
     konsultasi:
@@ -2789,7 +2789,7 @@ function showStoreTab(tabName) {
   tabs.forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
-      el.classList.remove("bg-amber-400", "text-slate-900");
+      el.classList.remove("bg-red-600", "text-slate-900");
       el.classList.add("bg-slate-800", "text-slate-300");
     }
   });
@@ -2815,7 +2815,7 @@ function showStoreTab(tabName) {
   if (targetSection) targetSection.classList.remove("hidden");
   if (targetTab) {
     targetTab.classList.remove("bg-slate-800", "text-slate-300");
-    targetTab.classList.add("bg-amber-400", "text-slate-900");
+    targetTab.classList.add("bg-red-600", "text-slate-900");
   }
 
   // Reload rewards when switching to points tab
@@ -3010,7 +3010,7 @@ function renderProductPricing(product) {
         </div>
         ${
           product.promo_text
-            ? `<div class="text-xs text-amber-600 font-medium">${escapeHtml(
+            ? `<div class="text-xs text-red-700 font-medium">${escapeHtml(
                 product.promo_text
               )}</div>`
             : ""
@@ -3023,7 +3023,7 @@ function renderProductPricing(product) {
   if (!isUserLoggedIn && hasMemberPrice) {
     return `
       <div class="space-y-1">
-        <div class="text-amber-500 font-bold text-lg">
+        <div class="text-red-600 font-bold text-lg">
           Rp ${product.price.toLocaleString("id-ID")}
         </div>
         <a href="/login.html" class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold hover:text-emerald-700">
@@ -3031,7 +3031,7 @@ function renderProductPricing(product) {
         </a>
         ${
           product.promo_text
-            ? `<div class="text-xs text-amber-600 font-medium">${escapeHtml(
+            ? `<div class="text-xs text-red-700 font-medium">${escapeHtml(
                 product.promo_text
               )}</div>`
             : ""
@@ -3042,12 +3042,12 @@ function renderProductPricing(product) {
 
   // No member price: just show normal price
   return `
-    <div class="text-amber-500 font-bold text-lg">
+    <div class="text-red-600 font-bold text-lg">
       Rp ${product.price.toLocaleString("id-ID")}
     </div>
     ${
       product.promo_text
-        ? `<div class="text-xs text-amber-600 font-medium">${escapeHtml(product.promo_text)}</div>`
+        ? `<div class="text-xs text-red-700 font-medium">${escapeHtml(product.promo_text)}</div>`
         : ""
     }
   `;
@@ -3128,7 +3128,7 @@ async function filterStoreCategory(category) {
       }
       <div class="p-4 space-y-3">
         <div>
-          <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-semibold">${getCategoryLabel(
+          <div class="text-xs uppercase tracking-wider text-red-600 mb-1 font-semibold">${getCategoryLabel(
             p.cat
           )}</div>
           <div class="font-semibold text-slate-900 text-lg">${escapeHtml(p.name)}</div>
@@ -3149,7 +3149,7 @@ async function filterStoreCategory(category) {
               p.stock === 0
                 ? '<span class="text-xs bg-red-500/20 text-red-600 px-2 py-1 rounded font-semibold">Stok Habis</span>'
                 : p.stock <= 5
-                ? `<span class="text-xs bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-semibold">Stok Tersisa: ${p.stock}</span>`
+                ? `<span class="text-xs bg-red-600/20 text-red-700 px-2 py-1 rounded font-semibold">Stok Tersisa: ${p.stock}</span>`
                 : `<span class="text-xs bg-emerald-500/20 text-emerald-600 px-2 py-1 rounded font-semibold">Stok: ${p.stock}</span>`
             }
           </div>
@@ -3158,7 +3158,7 @@ async function filterStoreCategory(category) {
           <div class="flex items-center justify-between gap-2">
             ${
               p.stock > 0
-                ? `<button class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-2 text-sm font-semibold hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${p.id}')">
+                ? `<button class="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-600 to-red-600 text-white px-3 py-2 text-sm font-semibold hover:from-red-600 hover:to-red-700 transition-all shadow-sm hover:shadow-md" onclick="addToCart('${p.id}')">
                     <i data-lucide="plus" class="w-3 h-3"></i>
                     Tambah
                   </button>`
@@ -3246,7 +3246,7 @@ function updateCartDisplay() {
         "id-ID"
       )}</div>
         </div>
-        <div class="font-semibold text-amber-300">Rp ${subtotal.toLocaleString("id-ID")}</div>
+        <div class="font-semibold text-red-500">Rp ${subtotal.toLocaleString("id-ID")}</div>
       </div>
     `;
     })
@@ -3257,7 +3257,7 @@ function updateCartDisplay() {
       ${rows}
       <div class="flex items-center justify-between pt-2 font-bold">
         <span class="text-slate-300">Total</span>
-        <span class="text-amber-300">Rp ${total.toLocaleString("id-ID")}</span>
+        <span class="text-red-500">Rp ${total.toLocaleString("id-ID")}</span>
       </div>
     </div>
   `;
@@ -3579,10 +3579,10 @@ function renderLocations() {
 
   grid.innerHTML = LOCATIONS.map(
     (loc) => `
-    <div class="rounded-2xl border border-gray-200 bg-white p-4 space-y-3 hover:border-amber-400/50 transition-all">
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 space-y-3 hover:border-red-600/50 transition-all">
       <div class="flex items-start gap-3">
         <div class="mt-1">
-          <i data-lucide="map-pin" class="w-5 h-5 text-amber-500"></i>
+          <i data-lucide="map-pin" class="w-5 h-5 text-red-600"></i>
         </div>
         <div class="flex-1">
           <div class="font-semibold text-slate-900 mb-1">${escapeHtml(loc.name)}</div>

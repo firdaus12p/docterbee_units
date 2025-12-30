@@ -10,8 +10,8 @@
   --hc-primary: #dc2626;
   --hc-primary-gradient: linear-gradient(135deg, #dc2626, #ef4444);
   --hc-primary-soft: #fee2e2;
-  --hc-accent: #F66E14;
-  --hc-accent-gradient: linear-gradient(135deg, #F66E14, #ea580c);
+  --hc-accent: #DC2626;
+  --hc-accent-gradient: linear-gradient(135deg, #DC2626, #DC2626);
   --hc-danger: #e05353;
   --hc-warning: #f4b000;
   --hc-text: #0f172a;

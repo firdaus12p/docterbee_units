@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -96,7 +96,7 @@
           <label class="block text-sm font-semibold mb-2 opacity-80">Pertanyaan / Perilaku</label>
           <textarea
             id="questionInput"
-            class="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 h-32 text-slate-900 placeholder-slate-500 focus:border-amber-400 focus:outline-none transition"
+            class="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 h-32 text-slate-900 placeholder-slate-500 focus:border-red-600 focus:outline-none transition"
             placeholder="Contoh: Saya sering begadang, jarang shalat malam, dan minum kopi manis 3 gelas sehari. Bagaimana menurut syariat dan kesehatan?"
             autocomplete="off"
           ></textarea>
@@ -105,7 +105,7 @@
             <button
               id="analyzeBtn"
               onclick="analyzeQuestion()"
-              class="rounded-lg bg-amber-400 text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-amber-500 transition flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              class="rounded-lg bg-red-600 text-white px-5 py-2.5 text-sm font-semibold hover:bg-red-700 transition flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               <i data-lucide="sparkles" class="w-4 h-4" id="analyzeBtnIcon"></i>
               <span class="hidden" id="analyzeBtnSpinner">
@@ -118,19 +118,19 @@
             </button>
             <button
               onclick="loadSample(0)"
-              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-amber-400/50 transition"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-red-600/50 transition"
             >
               Contoh 1
             </button>
             <button
               onclick="loadSample(1)"
-              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-amber-400/50 transition"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-red-600/50 transition"
             >
               Contoh 2
             </button>
             <button
               onclick="loadSample(2)"
-              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-amber-400/50 transition"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-red-600/50 transition"
             >
               Contoh 3
             </button>
@@ -140,7 +140,7 @@
         <!-- Sidebar Info -->
         <aside class="booking-container">
           <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
+            <i data-lucide="shield-check" class="w-5 h-5 text-red-600"></i>
             <h3 class="font-semibold text-lg">Guardrails</h3>
           </div>
           <ul class="list-disc pl-5 text-slate-900 space-y-2 text-sm mb-5">
@@ -166,7 +166,7 @@
         <div class="lg:col-span-2 booking-container">
           <div class="border-b border-gray-200 pb-4 mb-4">
             <h2 class="text-xl font-semibold flex items-center gap-2">
-              <i data-lucide="file-text" class="w-5 h-5 text-amber-400"></i>
+              <i data-lucide="file-text" class="w-5 h-5 text-red-600"></i>
               Hasil Analisis
             </h2>
           </div>
@@ -185,7 +185,7 @@
         <!-- Tips Sidebar -->
         <div class="booking-container">
           <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="lightbulb" class="w-5 h-5 text-amber-400"></i>
+            <i data-lucide="lightbulb" class="w-5 h-5 text-red-600"></i>
             <h3 class="font-semibold text-lg">Tips Penggunaan</h3>
           </div>
           <ul class="list-disc pl-5 text-slate-900 space-y-2 text-sm">
@@ -198,7 +198,7 @@
           <div class="mt-5 pt-5 border-t border-gray-200">
             <a
               href="/booking"
-              class="block text-center rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white px-4 py-2.5 text-sm font-semibold transition"
+              class="block text-center rounded-lg bg-gradient-to-r from-red-600 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 text-sm font-semibold transition"
             >
               Booking Konsultasi Praktisi →
             </a>
@@ -334,7 +334,7 @@
         resultDiv.innerHTML = `
           <div class="flex items-center justify-center py-12">
             <div class="text-center">
-              <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-400 border-t-transparent mb-4"></div>
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-red-600 border-t-transparent mb-4"></div>
               <p class="text-slate-300">AI sedang menganalisis pertanyaan Anda...</p>
               <p class="text-xs text-slate-500 mt-2">Mohon tunggu 5-10 detik</p>
             </div>
@@ -409,7 +409,7 @@
           .map(
             (d) => `
           <li class="mb-3">
-            <div class="font-semibold text-amber-300">${escapeHtml(d.type)} — ${escapeHtml(
+            <div class="font-semibold text-red-500">${escapeHtml(d.type)} — ${escapeHtml(
               d.ref
             )}</div>
             <div class="opacity-90 mt-1">"${markdownToHtml(d.text)}"</div>
@@ -489,7 +489,7 @@
           <div class="grid md:grid-cols-2 gap-4">
             <div class="rounded-xl border border-gray-200 bg-white p-5">
               <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
-                <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
+                <i data-lucide="list-checks" class="w-4 h-4 text-red-600"></i>
                 Langkah yang Disarankan
               </div>
               <ul class="list-decimal pl-5 space-y-2 text-slate-900 text-sm">
@@ -518,10 +518,10 @@
             </div>
           </div>
 
-          <div class="mt-5 p-4 rounded-lg bg-white border border-amber-300">
+          <div class="mt-5 p-4 rounded-lg bg-white border border-red-300">
             <div class="flex gap-3">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"></i>
-              <p class="text-sm text-amber-600">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-red-700">
                 <b>Disclaimer:</b> Analisis ini untuk tujuan edukasi berdasarkan AI.
                 Untuk kasus serius atau keluhan medis, <b>mohon konsultasi dengan praktisi profesional</b>.
               </p>
@@ -545,10 +545,10 @@
             </div>
           </div>
           
-          <div class="mt-4 p-4 rounded-lg bg-white border border-amber-300">
+          <div class="mt-4 p-4 rounded-lg bg-white border border-red-300">
             <div class="flex gap-3">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"></i>
-              <p class="text-sm text-amber-600">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-red-700">
                 <b>Disclaimer:</b> Analisis ini untuk tujuan edukasi.
                 Untuk kasus serius, <b>mohon konsultasi dengan praktisi profesional</b>.
               </p>
@@ -566,10 +566,10 @@
         // Show error message briefly
         const resultDiv = document.getElementById("analysisResult");
         resultDiv.innerHTML = `
-          <div class="p-4 rounded-lg bg-amber-400/10 border border-amber-400/30 mb-4">
+          <div class="p-4 rounded-lg bg-red-400/10 border border-red-600/30 mb-4">
             <div class="flex gap-3">
-              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
-              <div class="text-sm text-amber-200">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <div class="text-sm text-red-400">
                 <b>${escapeHtml(errorMessage)}</b>
               </div>
             </div>
@@ -707,7 +707,7 @@
           <div class="grid md:grid-cols-2 gap-4">
             <div class="rounded-xl border border-gray-200 bg-white p-5">
               <div class="font-semibold mb-3 flex items-center gap-2 text-slate-900">
-                <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
+                <i data-lucide="list-checks" class="w-4 h-4 text-red-600"></i>
                 Langkah yang Disarankan
               </div>
               <ul class="list-decimal pl-5 space-y-2 text-slate-900 text-sm">
@@ -736,10 +736,10 @@
             </ul>
           </div>
 
-          <div class="mt-5 p-4 rounded-lg bg-white border border-amber-300">
+          <div class="mt-5 p-4 rounded-lg bg-white border border-red-300">
             <div class="flex gap-3">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"></i>
-              <p class="text-sm text-amber-600">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <p class="text-sm text-red-700">
                 <b>Disclaimer:</b> Ini adalah analisis demo berbasis algoritma sederhana untuk tujuan edukasi.
                 Untuk kasus serius atau keluhan medis, <b>mohon konsultasi dengan praktisi profesional</b>.
               </p>

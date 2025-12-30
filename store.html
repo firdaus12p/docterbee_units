@@ -128,7 +128,7 @@
         <button
           id="tabStore"
           onclick="showStoreTab('store')"
-          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-amber-400 text-slate-900"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-red-600 text-slate-900"
         >
           <i data-lucide="shopping-bag" class="w-4 h-4 inline mr-1"></i>
           Store & Products
@@ -179,7 +179,7 @@
         <div class="flex gap-2 overflow-x-auto pb-2 store-category-scroll">
           <button
             onclick="filterStoreCategory('all')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 whitespace-nowrap"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-slate-900 whitespace-nowrap"
           >
             Semua Produk
           </button>
@@ -225,8 +225,8 @@
 
         <!-- ========== SHOPPING CART ========== -->
         <div class="border-t border-gray-200 pt-6 space-y-4">
-          <div class="rounded-2xl border-2 border-amber-400/40 bg-white p-6">
-            <h2 class="text-xl font-bold text-amber-500 mb-4 flex items-center gap-2">
+          <div class="rounded-2xl border-2 border-red-600/40 bg-white p-6">
+            <h2 class="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
               <i data-lucide="shopping-cart" class="w-5 h-5"></i>
               Keranjang Belanja
             </h2>
@@ -254,8 +254,8 @@
                       checked
                       class="peer hidden"
                     >
-                    <div class="border-2 border-gray-200 peer-checked:border-amber-400 peer-checked:bg-amber-50 rounded-lg p-3 text-center transition">
-                      <i data-lucide="utensils" class="w-5 h-5 mx-auto mb-1 text-amber-500"></i>
+                    <div class="border-2 border-gray-200 peer-checked:border-red-600 peer-checked:bg-red-50 rounded-lg p-3 text-center transition">
+                      <i data-lucide="utensils" class="w-5 h-5 mx-auto mb-1 text-red-600"></i>
                       <div class="text-sm font-semibold text-slate-900">Dine In</div>
                       <div class="text-xs text-slate-500">Makan di tempat</div>
                     </div>
@@ -283,7 +283,7 @@
                 </label>
                 <select 
                   id="storeLocation"
-                  class="w-full bg-slate-50 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-amber-400 focus:outline-none transition"
+                  class="w-full bg-slate-50 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-red-600 focus:outline-none transition"
                 >
                   <option value="">-- Pilih Lokasi --</option>
                   <option value="kolaka">🏪 Docterbee Kolaka ZE Center</option>
@@ -294,9 +294,9 @@
 
               <!-- Customer Info (for guest users) -->
               <div id="guestCustomerInfo" class="hidden space-y-3">
-                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
                   <div class="flex items-start gap-2">
-                    <i data-lucide="info" class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0"></i>
+                    <i data-lucide="info" class="w-4 h-4 text-red-700 mt-0.5 flex-shrink-0"></i>
                     <p class="text-slate-700">
                       <strong>Info:</strong> Silahkan isi nama dan nomor HP Anda untuk memproses pesanan.
                     </p>
@@ -311,7 +311,7 @@
                     type="text" 
                     id="guestName"
                     placeholder="Nama Anda"
-                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-amber-400 focus:outline-none transition"
+                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition"
                   />
                 </div>
 
@@ -323,7 +323,7 @@
                     type="tel" 
                     id="guestPhone"
                     placeholder="08123456789"
-                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-amber-400 focus:outline-none transition"
+                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition"
                   />
                   <p class="text-xs text-slate-500 mt-1">
                     💡 Punya akun? Gunakan nomor HP yang terdaftar untuk claim points!
@@ -338,7 +338,7 @@
                     id="guestAddress"
                     placeholder="Alamat lengkap (jika diperlukan untuk delivery)"
                     rows="2"
-                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-amber-400 focus:outline-none transition resize-none"
+                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition resize-none"
                   ></textarea>
                 </div>
               </div>
@@ -353,7 +353,7 @@
                     type="text" 
                     id="storeCouponCode"
                     placeholder="Masukkan kode promo"
-                    class="flex-1 bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-amber-400 focus:outline-none transition uppercase"
+                    class="flex-1 bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition uppercase"
                   />
                   <button 
                     id="validateStoreCouponBtn"
@@ -383,7 +383,7 @@
                 </div>
                 <div class="flex items-center justify-between mb-4">
                   <span class="text-lg font-semibold text-slate-900">Total Pembayaran</span>
-                  <span class="text-2xl font-bold text-amber-500">
+                  <span class="text-2xl font-bold text-red-600">
                     Rp <span id="cartTotal">0</span>
                   </span>
                 </div>
@@ -391,7 +391,7 @@
                 <button 
                   id="submitOrderBtn"
                   onclick="submitOrder()"
-                  class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg"
+                  class="w-full bg-gradient-to-r from-red-600 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg"
                 >
                   <i data-lucide="send" class="w-5 h-5"></i>
                   Kirim Pesanan
@@ -416,8 +416,8 @@
 
           <!-- Info Cards -->
           <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-amber-400/50 transition-all">
-              <div class="flex items-center gap-2 text-amber-500 font-semibold">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-red-600/50 transition-all">
+              <div class="flex items-center gap-2 text-red-600 font-semibold">
                 <i data-lucide="package" class="w-5 h-5"></i>
                 <span>Grab & Go</span>
               </div>
@@ -443,7 +443,7 @@
       <!-- =============== DINE-IN MENU TAB =============== -->
       <section id="page-dinein" class="space-y-6 hidden">
         <div class="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
-          <h2 class="text-xl font-bold text-amber-500">
+          <h2 class="text-xl font-bold text-red-600">
             <i data-lucide="coffee" class="w-5 h-5 inline mr-2"></i>
             Menu Café Sehat Docterbee
           </h2>
@@ -459,12 +459,12 @@
 
           <!-- Dine-In Info -->
           <div
-            class="mt-6 rounded-xl border border-amber-400/30 bg-amber-900/10 p-4"
+            class="mt-6 rounded-xl border border-red-600/30 bg-red-900/10 p-4"
           >
             <div class="flex items-start gap-3">
-              <i data-lucide="info" class="w-5 h-5 text-amber-500 mt-0.5"></i>
+              <i data-lucide="info" class="w-5 h-5 text-red-600 mt-0.5"></i>
               <div class="text-sm text-slate-900">
-                <p class="font-semibold text-amber-600 mb-1">Info Dine-In:</p>
+                <p class="font-semibold text-red-700 mb-1">Info Dine-In:</p>
                 <ul class="space-y-1 text-xs">
                   <li>• Tersedia di Docterbee Café (Kolaka & Makassar)</li>
                   <li>• Buka: Senin–Sabtu, 09.00–20.00 WITA</li>
@@ -482,7 +482,7 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-6">
           <div class="text-center">
             <div class="text-sm text-slate-900 mb-2">Total Poin Anda</div>
-            <div id="pointsBig" class="text-5xl font-bold text-amber-500 mb-4">
+            <div id="pointsBig" class="text-5xl font-bold text-red-600 mb-4">
               0
             </div>
             <p class="text-xs text-slate-500 italic mb-3">
@@ -490,7 +490,7 @@
             </p>
             <button 
               onclick="refreshPoints()"
-              class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg transition-all transform hover:scale-105"
+              class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-all transform hover:scale-105"
             >
               <i data-lucide="refresh-cw" class="w-4 h-4"></i>
               Refresh Poin
@@ -501,7 +501,7 @@
         <div class="grid gap-4 md:grid-cols-2">
           <!-- Cara Dapat Poin -->
           <div class="rounded-2xl border border-gray-200 bg-white p-4">
-            <h3 class="font-semibold text-amber-500 mb-3">
+            <h3 class="font-semibold text-red-600 mb-3">
               Cara Mendapat Poin
             </h3>
             <ul class="text-sm text-slate-900 space-y-2">
@@ -529,7 +529,7 @@
 
         <!-- Redeem Rewards -->
         <div class="rounded-2xl border border-gray-200 bg-white p-4">
-          <h3 class="font-semibold text-amber-500 mb-4">
+          <h3 class="font-semibold text-red-600 mb-4">
             Tukar Reward Sekarang
           </h3>
           <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
@@ -548,7 +548,7 @@
       <!-- =============== LOCATOR TAB =============== -->
       <section id="page-locator" class="space-y-6 hidden">
         <div class="rounded-2xl border border-gray-200 bg-white p-5">
-          <h2 class="text-xl font-bold text-amber-500 mb-2">
+          <h2 class="text-xl font-bold text-red-600 mb-2">
             <i data-lucide="map-pin" class="w-5 h-5 inline mr-2"></i>
             Lokasi & Pickup Point
           </h2>
@@ -569,8 +569,8 @@
     >
       <div class="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div class="text-center">
-          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <i data-lucide="alert-circle" class="w-6 h-6 text-amber-500"></i>
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="alert-circle" class="w-6 h-6 text-red-600"></i>
           </div>
           
           <h2 class="text-xl font-bold text-slate-900 mb-2">
@@ -582,13 +582,13 @@
           </p>
 
           <!-- Pending Order Info -->
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 text-left">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-left">
             <div class="grid grid-cols-2 gap-2 text-xs mb-3">
               <div class="text-slate-600">Order Number:</div>
               <div class="font-bold text-slate-900" id="pendingOrderNumber">-</div>
               
               <div class="text-slate-600">Total Bayar:</div>
-              <div class="font-bold text-amber-500" id="pendingOrderTotal">-</div>
+              <div class="font-bold text-red-600" id="pendingOrderTotal">-</div>
               
               <div class="text-slate-600">Tipe Order:</div>
               <div class="font-semibold text-slate-700" id="pendingOrderType">-</div>
@@ -598,7 +598,7 @@
             </div>
 
             <!-- Items Preview -->
-            <div class="border-t border-amber-300 pt-2 mt-2">
+            <div class="border-t border-red-300 pt-2 mt-2">
               <div class="text-xs text-slate-600 mb-2">Items:</div>
               <div id="pendingOrderItems" class="space-y-1 max-h-32 overflow-y-auto">
                 <!-- Items will be populated via JS -->
@@ -673,13 +673,13 @@
           </div>
 
           <!-- Order Info -->
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 text-left">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-left">
             <div class="grid grid-cols-2 gap-2 text-xs">
               <div class="text-slate-600">Order Number:</div>
               <div class="font-bold text-slate-900" id="qrOrderNumber">-</div>
               
               <div class="text-slate-600">Poin Didapat:</div>
-              <div class="font-bold text-amber-500">
+              <div class="font-bold text-red-600">
                 +<span id="qrPoints">0</span> poin
               </div>
               
