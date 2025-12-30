@@ -38,10 +38,82 @@
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
             <a href="/store">Produk</a>
-            <a href="/periksa-kesehatan">Cek Kesehatan</a>
+            <!-- Kesehatan Dropdown -->
+            <div class="nav-dropdown">
+              <button
+                class="nav-dropdown-toggle"
+                type="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Kesehatan
+                <svg
+                  class="chevron-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div class="nav-dropdown-menu">
+                <a href="/periksa-kesehatan"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                  </svg>
+                  Cek Kesehatan</a
+                >
+                <a href="/journey"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Journey</a
+                >
+                <a href="/services"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  Services</a
+                >
+              </div>
+            </div>
             <a href="/ai-advisor">AI Advisor</a>
-            <a href="/journey">Journey</a>
-            <a href="/services">Services</a>
             <a href="/events">Program</a>
             <div class="nav-dropdown">
               <button class="nav-dropdown-toggle active" type="button">
@@ -170,13 +242,85 @@
       </div>
       <nav class="mobile-nav">
         <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
-        <a href="/journey" class="mobile-nav-link">Journey</a>
-        <a href="/services" class="mobile-nav-link">Services</a>
         <a href="/store" class="mobile-nav-link">Produk</a>
-        <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
+        <!-- Mobile Kesehatan Dropdown -->
+        <div class="mobile-nav-dropdown" id="mobileKesehatanDropdown">
+          <button
+            class="mobile-nav-dropdown-toggle"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Kesehatan
+            <svg
+              class="chevron-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="mobile-nav-submenu">
+            <a href="/periksa-kesehatan"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+              Cek Kesehatan</a
+            >
+            <a href="/journey"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              Journey</a
+            >
+            <a href="/services"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Services</a
+            >
+          </div>
+        </div>
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
-        <a href="/journey" class="mobile-nav-link">Journey</a>
-        <a href="/services" class="mobile-nav-link">ServicesaDropdown">
+        <a href="/events" class="mobile-nav-link">Program</a>
+        <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
           <button class="mobile-nav-dropdown-toggle" type="button">
             Media
             <svg
@@ -240,8 +384,8 @@
               </svg>
               Podcast Audio</a
             >
-         a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
-        <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
+          </div>
+        </div>
         <div class="mobile-menu-actions">
           <div id="mobileAuthButtons">
             <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
