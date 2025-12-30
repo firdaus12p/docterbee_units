@@ -1,356 +1,591 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <title>Cek Kesehatan Cepat – Docterbee</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Cek kesehatan cepat Docterbee berbasis Qur'an, Hadis, dan Sains. Kenali kondisi tubuhmu dalam 3 menit." />
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
-  <link rel="stylesheet" href="css/landing-page.css" />
-  <link rel="stylesheet" href="css/health-check.css" />
-</head>
-<body>
-  <!-- ================= HEADER NAVIGATION ================= -->
-  <header>
-    <div class="container">
-      <nav>
-        <a href="/" class="logo">
-          <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
-        </a>
-        <div class="nav-links">
-          <a href="/" id="guestNavItem">Beranda</a>
-          <a href="/journey">Journey</a>
-          <a href="/services">Services</a>
-          <a href="/store">Produk</a>
-          <a href="/events">Program</a>
-          <!-- Media Dropdown -->
-          <div class="nav-dropdown">
-            <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
-              Media
-              <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-            <div class="nav-dropdown-menu">
-              <a href="/insight">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                Edukasi
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cek Kesehatan Cepat – Docterbee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Cek kesehatan cepat Docterbee berbasis Qur'an, Hadis, dan Sains. Kenali kondisi tubuhmu dalam 3 menit."
+    />
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <link rel="stylesheet" href="css/landing-page.css" />
+    <link rel="stylesheet" href="css/health-check.css" />
+  </head>
+  <body>
+    <!-- ================= HEADER NAVIGATION ================= -->
+    <header>
+      <div class="container">
+        <nav>
+          <a href="/" class="logo">
+            <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
+          </a>
+          <div class="nav-links">
+            <a href="/" id="guestNavItem">Beranda</a>
+            <a href="/store">Produk</a>
+            <a href="/periksa-kesehatan" class="active">Cek Kesehatan</a>
+            <a href="/ai-advisor">AI Advisor</a>
+            <a href="/journey">Journey</a>
+            <a href="/services">Services</a>
+            <a href="/events">Program</a>
+            <!-- Media Dropdown -->
+            <div class="nav-dropdown">
+              <button
+                class="nav-dropdown-toggle"
+                type="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Media
+                <svg
+                  class="chevron-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div class="nav-dropdown-menu">
+                <a href="/insight">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  Edukasi
+                </a>
+                <a href="/youtube-ai">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+                    ></path>
+                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                  </svg>
+                  YouTube & AI
+                </a>
+                <a href="/podcast">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                    <path
+                      d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"
+                    ></path>
+                  </svg>
+                  Podcast Audio
+                </a>
+              </div>
+            </div>
+            <!-- Auth buttons for guests -->
+            <div id="authButtons">
+              <button
+                class="btn btn-outline"
+                onclick="location.href='/login'"
+                style="margin-right: 8px"
+              >
+                Masuk
+              </button>
+              <button class="btn btn-primary" onclick="location.href='/register'">
+                Daftar Sekarang
+              </button>
+            </div>
+            <!-- Member info (shown when logged in) -->
+            <div id="memberInfo" style="display: none; align-items: center; gap: 12px">
+              <span class="points-display" id="pointsDisplay">
+                Points: <b id="navPoints">0</b>
+              </span>
+              <a href="/profile" id="profileBtn" class="nav-link" title="Profile">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
               </a>
-              <a href="/youtube-ai">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
-                YouTube & AI
-              </a>
-              <a href="/podcast">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
-                Podcast Audio
-              </a>
+              <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
             </div>
           </div>
-          <a href="/ai-advisor">AI Advisor</a>
-          <a href="/periksa-kesehatan" class="active">Cek Kesehatan</a>
-          <!-- Auth buttons for guests -->
-          <div id="authButtons">
-            <button
-              class="btn btn-outline"
-              onclick="location.href='/login'"
-              style="margin-right: 8px"
+
+          <!-- Hamburger Menu Button (Mobile) -->
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-header">
+        <div class="logo-box" style="margin: 0">
+          <img
+            src="assets/images/logo-docterbee.png"
+            alt="DocterBee"
+            style="height: 48px; width: auto"
+          />
+        </div>
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
+        <a href="/store" class="mobile-nav-link">Produk</a>
+        <a href="/periksa-kesehatan" class="mobile-nav-link active">Cek Kesehatan</a>
+        <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
+        <a href="/journey" class="mobile-nav-link">Journey</a>
+        <a href="/services" class="mobile-nav-link">Services</a>
+        <a href="/events" class="mobile-nav-link">Program</a>
+        <!-- Mobile Media Dropdown -->
+        <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
+          <button
+            class="mobile-nav-dropdown-toggle"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Media
+            <svg
+              class="chevron-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="mobile-nav-submenu">
+            <a href="/insight">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              Edukasi
+            </a>
+            <a href="/youtube-ai">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+                ></path>
+                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+              </svg>
+              YouTube & AI
+            </a>
+            <a href="/podcast">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                <path
+                  d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"
+                ></path>
+              </svg>
+              Podcast Audio
+            </a>
+         a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
+        <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
+        <div class="mobile-menu-actions">
+          <!-- Auth buttons for guests -->
+          <div id="mobileAuthButtons">
+            <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
               Masuk
             </button>
-            <button class="btn btn-primary" onclick="location.href='/register'">
+            <button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">
               Daftar Sekarang
             </button>
           </div>
           <!-- Member info (shown when logged in) -->
-          <div id="memberInfo" style="display: none; align-items: center; gap: 12px;">
-            <span class="points-display" id="pointsDisplay">
-              Points: <b id="navPoints">0</b>
-            </span>
-            <a href="/profile" id="profileBtn" class="nav-link" title="Profile">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <div id="mobileMemberInfo" style="display: none">
+            <div class="mobile-points-display" id="mobilePointsDisplay">
+              Points: <b id="mobileNavPoints">0</b>
+            </div>
+            <a
+              href="/profile"
+              id="mobileProfileBtn"
+              class="mobile-nav-link"
+              style="display: flex; align-items: center; gap: 8px"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile
             </a>
-            <button id="logoutBtn" class="btn btn-outline-danger">
+            <button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">
               Logout
             </button>
           </div>
         </div>
-
-        <!-- Hamburger Menu Button (Mobile) -->
-        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </nav>
     </div>
-  </header>
 
-  <!-- Mobile Menu Overlay -->
-  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <div class="mobile-menu-header">
-      <div class="logo-box" style="margin: 0">
-        <img
-          src="assets/images/logo-docterbee.png"
-          alt="DocterBee"
-          style="height: 48px; width: auto"
-        />
-      </div>
-      <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    <nav class="mobile-nav">
-      <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
-      <a href="/journey" class="mobile-nav-link">Journey</a>
-      <a href="/services" class="mobile-nav-link">Services</a>
-      <a href="/store" class="mobile-nav-link">Produk</a>
-      <a href="/events" class="mobile-nav-link">Program</a>
-      <!-- Mobile Media Dropdown -->
-      <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
-        <button class="mobile-nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
-          Media
-          <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
-        <div class="mobile-nav-submenu">
-          <a href="/insight">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            Edukasi
-          </a>
-          <a href="/youtube-ai">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
-            YouTube & AI
-          </a>
-          <a href="/podcast">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
-            Podcast Audio
-          </a>
-        </div>
-      </div>
-      <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
-      <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
-      <div class="mobile-menu-actions">
-        <!-- Auth buttons for guests -->
-        <div id="mobileAuthButtons">
-          <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
-            Masuk
-          </button>
-          <button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">
-            Daftar Sekarang
-          </button>
-        </div>
-        <!-- Member info (shown when logged in) -->
-        <div id="mobileMemberInfo" style="display: none;">
-          <div class="mobile-points-display" id="mobilePointsDisplay">
-            Points: <b id="mobileNavPoints">0</b>
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="hc-page">
+      <!-- HEADER HERO -->
+      <div class="hc-header">
+        <div>
+          <div class="hc-badge">
+            <span class="hc-badge-dot"></span>
+            Sistem awal bantu pahami kondisi tubuhmu
           </div>
-          <a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: flex; align-items: center; gap: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            Profile
-          </a>
-          <button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">
-            Logout
-          </button>
+          <h1 class="hc-header-title">🩺 Cek Kesehatan Cepat Docterbee</h1>
+          <p class="hc-header-subtitle">
+            Kenali kondisi tubuhmu dalam 3 menit. Berbasis <strong>Qur'an, Hadis, dan Sains</strong>
+            untuk membantumu memahami gejala, mencari akar masalah, dan menemukan solusi yang lebih
+            sehat. Hasil ini bukan pengganti dokter, tetapi panduan awal agar kamu tidak bingung.
+          </p>
+          <div class="hc-header-steps">
+            <span>1. Isi gejala & pola hidup</span>
+            <span>2. Baca analisa awal</span>
+            <span>3. Lihat solusi & langkah Sunnah</span>
+          </div>
+        </div>
+        <div class="hc-header-side">
+          <div class="hc-header-side-title">Docterbee menggabungkan:</div>
+          <ul>
+            <li>
+              <span>🕋</span> <span>Ayat & hadis tentang makan, tidur, puasa, dan madu.</span>
+            </li>
+            <li><span>🧬</span> <span>Ilmu biologi, imunologi, dan inflamasi kronis.</span></li>
+            <li>
+              <span>🍯</span>
+              <span>Pengalaman nyata pemakaian madu lebah kecil 3–5 mm & nutrisi alami.</span>
+            </li>
+          </ul>
         </div>
       </div>
-    </nav>
-  </div>
 
-  <!-- ================= MAIN CONTENT ================= -->
-  <main class="hc-page">
-    <!-- HEADER HERO -->
-    <div class="hc-header">
-      <div>
-        <div class="hc-badge">
-          <span class="hc-badge-dot"></span>
-          Sistem awal bantu pahami kondisi tubuhmu
+      <!-- FORM SECTION -->
+      <section class="hc-section">
+        <div class="hc-section-title">
+          Form Cek Kesehatan Cepat
+          <small>Jawablah sejujur mungkin untuk hasil analisa yang lebih tepat.</small>
         </div>
-        <h1 class="hc-header-title">🩺 Cek Kesehatan Cepat Docterbee</h1>
-        <p class="hc-header-subtitle">
-          Kenali kondisi tubuhmu dalam 3 menit. Berbasis <strong>Qur'an, Hadis, dan Sains</strong>
-          untuk membantumu memahami gejala, mencari akar masalah, dan menemukan solusi yang lebih sehat.
-          Hasil ini bukan pengganti dokter, tetapi panduan awal agar kamu tidak bingung.
+        <p class="hc-section-description">
+          Data ini tidak untuk diagnosis medis resmi, tetapi untuk membantu kamu mengenali pola yang
+          merusak tubuh dan bagaimana Sunnah & madu bisa membantu memulihkan.
         </p>
-        <div class="hc-header-steps">
-          <span>1. Isi gejala & pola hidup</span>
-          <span>2. Baca analisa awal</span>
-          <span>3. Lihat solusi & langkah Sunnah</span>
-        </div>
-      </div>
-      <div class="hc-header-side">
-        <div class="hc-header-side-title">Docterbee menggabungkan:</div>
-        <ul>
-          <li><span>🕋</span> <span>Ayat & hadis tentang makan, tidur, puasa, dan madu.</span></li>
-          <li><span>🧬</span> <span>Ilmu biologi, imunologi, dan inflamasi kronis.</span></li>
-          <li><span>🍯</span> <span>Pengalaman nyata pemakaian madu lebah kecil 3–5 mm & nutrisi alami.</span></li>
-        </ul>
-      </div>
-    </div>
 
-    <!-- FORM SECTION -->
-    <section class="hc-section">
-      <div class="hc-section-title">
-        Form Cek Kesehatan Cepat
-        <small>Jawablah sejujur mungkin untuk hasil analisa yang lebih tepat.</small>
-      </div>
-      <p class="hc-section-description">
-        Data ini tidak untuk diagnosis medis resmi, tetapi untuk membantu kamu mengenali
-        pola yang merusak tubuh dan bagaimana Sunnah & madu bisa membantu memulihkan.
-      </p>
+        <div class="hc-card">
+          <form id="hcForm">
+            <div class="hc-form-grid">
+              <!-- Data Singkat -->
+              <div class="hc-form-group">
+                <h3>
+                  Data singkat
+                  <small>Umur & jenis kelamin mempengaruhi risiko.</small>
+                </h3>
+                <div class="hc-inline-inputs">
+                  <select name="usia" id="hcUsiaSelect" required aria-label="Rentang usia">
+                    <option value="">Pilih rentang usia</option>
+                    <option value="<12">&lt; 12 tahun</option>
+                    <option value="12-18">12–18 tahun</option>
+                    <option value="19-35">19–35 tahun</option>
+                    <option value="36-55">36–55 tahun</option>
+                    <option value=">55">&gt; 55 tahun</option>
+                  </select>
+                  <select name="gender" id="hcGenderSelect" required aria-label="Jenis kelamin">
+                    <option value="">Jenis kelamin</option>
+                    <option value="L">Laki-laki</option>
+                    <option value="P">Perempuan</option>
+                  </select>
+                </div>
+              </div>
 
-      <div class="hc-card">
-        <form id="hcForm">
-          <div class="hc-form-grid">
-            <!-- Data Singkat -->
-            <div class="hc-form-group">
-              <h3>
-                Data singkat
-                <small>Umur & jenis kelamin mempengaruhi risiko.</small>
-              </h3>
-              <div class="hc-inline-inputs">
-                <select name="usia" id="hcUsiaSelect" required aria-label="Rentang usia">
-                  <option value="">Pilih rentang usia</option>
-                  <option value="<12">&lt; 12 tahun</option>
-                  <option value="12-18">12–18 tahun</option>
-                  <option value="19-35">19–35 tahun</option>
-                  <option value="36-55">36–55 tahun</option>
-                  <option value=">55">&gt; 55 tahun</option>
-                </select>
-                <select name="gender" id="hcGenderSelect" required aria-label="Jenis kelamin">
-                  <option value="">Jenis kelamin</option>
-                  <option value="L">Laki-laki</option>
-                  <option value="P">Perempuan</option>
-                </select>
+              <!-- Keluhan Utama (Multi-select) -->
+              <div class="hc-form-group">
+                <h3>
+                  Keluhan utama
+                  <small>Boleh pilih lebih dari satu.</small>
+                </h3>
+                <label
+                  ><input type="checkbox" name="keluhan" value="demam" /> Demam / meriang</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="batuk" /> Batuk / pilek /
+                  tenggorokan tidak enak</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="sesak" /> Sesak / napas terasa
+                  berat</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="pusing" /> Pusing / sakit kepala /
+                  migrain</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="lambung" /> Lambung perih / kembung
+                  / mual</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="mualMuntah" /> Mual + muntah</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="lemas" /> Badan lemas / cepat
+                  capek</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="nyeriOtot" /> Nyeri otot / pegal
+                  berlebihan</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="diare" /> Diare / BAB cair</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="sembelit" /> Sembelit / susah
+                  BAB</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="kulit" /> Luka / infeksi kulit /
+                  bisul / ruam</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="tidur" /> Sulit tidur / sering
+                  begadang</label
+                >
+                <label
+                  ><input type="checkbox" name="keluhan" value="tidakAda" /> Tidak ada keluhan
+                  khusus, hanya ingin cek pola hidup</label
+                >
+              </div>
+
+              <!-- Pola Makan & Tidur (Multi-select) -->
+              <div class="hc-form-group">
+                <h3>
+                  Pola makan & tidur
+                  <small>Boleh pilih lebih dari satu yang sesuai.</small>
+                </h3>
+                <p class="hc-form-group-subtitle">Pola makan dominan:</p>
+                <label
+                  ><input type="checkbox" name="makan" value="manis" /> Sering manis (teh manis,
+                  kue, minuman kemasan)</label
+                >
+                <label
+                  ><input type="checkbox" name="makan" value="gorengan" /> Sering gorengan /
+                  berlemak</label
+                >
+                <label
+                  ><input type="checkbox" name="makan" value="malam" /> Sering makan malam larut /
+                  menjelang tidur</label
+                >
+                <label
+                  ><input type="checkbox" name="makan" value="berlebih" /> Porsi makan sering
+                  berlebih (sangat kenyang)</label
+                >
+                <label
+                  ><input type="checkbox" name="makan" value="terjaga" /> Cukup terjaga, tidak
+                  berlebihan setiap hari</label
+                >
+
+                <p class="hc-form-group-subtitle">Pola tidur:</p>
+                <label
+                  ><input type="checkbox" name="tidur" value="begadang" /> Sering begadang (tidur
+                  setelah jam 23.00)</label
+                >
+                <label
+                  ><input type="checkbox" name="tidur" value="kurang" /> Tidur 4–5 jam per
+                  hari</label
+                >
+                <label
+                  ><input type="checkbox" name="tidur" value="cukup" /> Tidur 6–8 jam cukup</label
+                >
+                <label
+                  ><input type="checkbox" name="tidur" value="sulit" /> Sulit tidur / sering
+                  terbangun malam</label
+                >
+              </div>
+
+              <!-- Aktivitas & Stres + Tanda Bahaya (Multi-select) -->
+              <div class="hc-form-group">
+                <h3>
+                  Aktivitas, stres & tanda bahaya
+                  <small>Bagian ini penting untuk tingkat risiko.</small>
+                </h3>
+                <p class="hc-form-group-subtitle">Aktivitas & stres:</p>
+                <label
+                  ><input type="checkbox" name="aktivitas" value="duduk" /> Banyak duduk / jarang
+                  gerak</label
+                >
+                <label
+                  ><input type="checkbox" name="aktivitas" value="fisikBerat" /> Kerja fisik berat /
+                  sering kelelahan</label
+                >
+                <label
+                  ><input type="checkbox" name="aktivitas" value="stres" /> Pikiran sering stres /
+                  cemas</label
+                >
+                <label
+                  ><input type="checkbox" name="aktivitas" value="seimbang" /> Cukup seimbang</label
+                >
+
+                <p class="hc-form-group-subtitle">Tanda bahaya (jika ada):</p>
+                <label
+                  ><input type="checkbox" name="redflag" value="nyeriDada" /> Nyeri dada berat /
+                  dada terasa sangat ditekan</label
+                >
+                <label
+                  ><input type="checkbox" name="redflag" value="sesakBerat" /> Napas sangat sesak /
+                  sulit bicara</label
+                >
+                <label
+                  ><input type="checkbox" name="redflag" value="pingsan" /> Pingsan / kejang /
+                  bingung berat</label
+                >
+                <label
+                  ><input type="checkbox" name="redflag" value="darah" /> Muntah darah / BAB hitam /
+                  BAB berdarah</label
+                >
+                <label
+                  ><input type="checkbox" name="redflag" value="demamTinggi" /> Demam tinggi &gt;
+                  39°C &gt; 3 hari</label
+                >
+                <label
+                  ><input type="checkbox" name="redflag" value="tidakAda" /> Tidak ada tanda bahaya
+                  di atas</label
+                >
               </div>
             </div>
 
-            <!-- Keluhan Utama (Multi-select) -->
-            <div class="hc-form-group">
-              <h3>
-                Keluhan utama
-                <small>Boleh pilih lebih dari satu.</small>
-              </h3>
-              <label><input type="checkbox" name="keluhan" value="demam" /> Demam / meriang</label>
-              <label><input type="checkbox" name="keluhan" value="batuk" /> Batuk / pilek / tenggorokan tidak enak</label>
-              <label><input type="checkbox" name="keluhan" value="sesak" /> Sesak / napas terasa berat</label>
-              <label><input type="checkbox" name="keluhan" value="pusing" /> Pusing / sakit kepala / migrain</label>
-              <label><input type="checkbox" name="keluhan" value="lambung" /> Lambung perih / kembung / mual</label>
-              <label><input type="checkbox" name="keluhan" value="mualMuntah" /> Mual + muntah</label>
-              <label><input type="checkbox" name="keluhan" value="lemas" /> Badan lemas / cepat capek</label>
-              <label><input type="checkbox" name="keluhan" value="nyeriOtot" /> Nyeri otot / pegal berlebihan</label>
-              <label><input type="checkbox" name="keluhan" value="diare" /> Diare / BAB cair</label>
-              <label><input type="checkbox" name="keluhan" value="sembelit" /> Sembelit / susah BAB</label>
-              <label><input type="checkbox" name="keluhan" value="kulit" /> Luka / infeksi kulit / bisul / ruam</label>
-              <label><input type="checkbox" name="keluhan" value="tidur" /> Sulit tidur / sering begadang</label>
-              <label><input type="checkbox" name="keluhan" value="tidakAda" /> Tidak ada keluhan khusus, hanya ingin cek pola hidup</label>
+            <div class="hc-cta-row">
+              <p class="hc-note">
+                ⚠ <strong>Catatan:</strong> Hasil ini bukan diagnosis dokter. Untuk kondisi berat,
+                tetap utamakan pemeriksaan di fasilitas kesehatan.
+              </p>
+              <div>
+                <button type="button" class="hc-btn-secondary" id="hcResetBtn">
+                  Reset formulir
+                </button>
+                <button type="submit" class="hc-btn-primary" id="hcSubmitBtn">
+                  <span id="hcSubmitBtnText">Lihat Hasil Analisa</span>
+                  <span id="hcSubmitBtnSpinner" class="hc-spinner hidden"></span>
+                  <span>➜</span>
+                </button>
+              </div>
             </div>
+          </form>
+        </div>
+      </section>
 
-            <!-- Pola Makan & Tidur (Multi-select) -->
-            <div class="hc-form-group">
-              <h3>
-                Pola makan & tidur
-                <small>Boleh pilih lebih dari satu yang sesuai.</small>
-              </h3>
-              <p class="hc-form-group-subtitle">Pola makan dominan:</p>
-              <label><input type="checkbox" name="makan" value="manis" /> Sering manis (teh manis, kue, minuman kemasan)</label>
-              <label><input type="checkbox" name="makan" value="gorengan" /> Sering gorengan / berlemak</label>
-              <label><input type="checkbox" name="makan" value="malam" /> Sering makan malam larut / menjelang tidur</label>
-              <label><input type="checkbox" name="makan" value="berlebih" /> Porsi makan sering berlebih (sangat kenyang)</label>
-              <label><input type="checkbox" name="makan" value="terjaga" /> Cukup terjaga, tidak berlebihan setiap hari</label>
+      <!-- HASIL ANALISA (will be populated by JavaScript) -->
+      <section class="hc-section hc-results" id="hcResultsSection">
+        <!-- Results will be rendered here by JavaScript -->
+      </section>
+    </main>
 
-              <p class="hc-form-group-subtitle">Pola tidur:</p>
-              <label><input type="checkbox" name="tidur" value="begadang" /> Sering begadang (tidur setelah jam 23.00)</label>
-              <label><input type="checkbox" name="tidur" value="kurang" /> Tidur 4–5 jam per hari</label>
-              <label><input type="checkbox" name="tidur" value="cukup" /> Tidur 6–8 jam cukup</label>
-              <label><input type="checkbox" name="tidur" value="sulit" /> Sulit tidur / sering terbangun malam</label>
-            </div>
-
-            <!-- Aktivitas & Stres + Tanda Bahaya (Multi-select) -->
-            <div class="hc-form-group">
-              <h3>
-                Aktivitas, stres & tanda bahaya
-                <small>Bagian ini penting untuk tingkat risiko.</small>
-              </h3>
-              <p class="hc-form-group-subtitle">Aktivitas & stres:</p>
-              <label><input type="checkbox" name="aktivitas" value="duduk" /> Banyak duduk / jarang gerak</label>
-              <label><input type="checkbox" name="aktivitas" value="fisikBerat" /> Kerja fisik berat / sering kelelahan</label>
-              <label><input type="checkbox" name="aktivitas" value="stres" /> Pikiran sering stres / cemas</label>
-              <label><input type="checkbox" name="aktivitas" value="seimbang" /> Cukup seimbang</label>
-
-              <p class="hc-form-group-subtitle">Tanda bahaya (jika ada):</p>
-              <label><input type="checkbox" name="redflag" value="nyeriDada" /> Nyeri dada berat / dada terasa sangat ditekan</label>
-              <label><input type="checkbox" name="redflag" value="sesakBerat" /> Napas sangat sesak / sulit bicara</label>
-              <label><input type="checkbox" name="redflag" value="pingsan" /> Pingsan / kejang / bingung berat</label>
-              <label><input type="checkbox" name="redflag" value="darah" /> Muntah darah / BAB hitam / BAB berdarah</label>
-              <label><input type="checkbox" name="redflag" value="demamTinggi" /> Demam tinggi &gt; 39°C &gt; 3 hari</label>
-              <label><input type="checkbox" name="redflag" value="tidakAda" /> Tidak ada tanda bahaya di atas</label>
-            </div>
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>© 2025 DocterBee. All rights reserved.</div>
+          <div>
+            Berbasis <strong>Sains & Alam</strong>. | <a href="#">Privacy</a> ·
+            <a href="#">Terms</a>
           </div>
-
-          <div class="hc-cta-row">
-            <p class="hc-note">
-              ⚠ <strong>Catatan:</strong> Hasil ini bukan diagnosis dokter.
-              Untuk kondisi berat, tetap utamakan pemeriksaan di fasilitas kesehatan.
-            </p>
-            <div>
-              <button type="button" class="hc-btn-secondary" id="hcResetBtn">Reset formulir</button>
-              <button type="submit" class="hc-btn-primary" id="hcSubmitBtn">
-                <span id="hcSubmitBtnText">Lihat Hasil Analisa</span>
-                <span id="hcSubmitBtnSpinner" class="hc-spinner hidden"></span>
-                <span>➜</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- HASIL ANALISA (will be populated by JavaScript) -->
-    <section class="hc-section hc-results" id="hcResultsSection">
-      <!-- Results will be rendered here by JavaScript -->
-    </section>
-  </main>
-
-  <!-- ================= FOOTER ================= -->
-  <footer>
-    <div class="container">
-      <div
-        style="
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          gap: 0.75rem;
-          align-items: center;
-        "
-      >
-        <div>© DocterBee. Semua hak dilindungi.</div>
-        <div>
-          Berbasis <strong>sains, AI, dan teknologi alami</strong> untuk membantu keluarga kembali
-          sehat. | <a href="#">Kebijakan Privasi</a> ·
-          <a href="#">Syarat & Ketentuan</a>
         </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <!-- ================= SCRIPTS ================= -->
-  <script src="js/utils.js"></script>
-  <script src="js/modal-utils.js"></script>
-  <script src="js/landing-navbar.js"></script>
-  <script src="js/health-check.js"></script>
-</body>
+    <!-- ================= SCRIPTS ================= -->
+    <script src="js/utils.js"></script>
+    <script src="js/modal-utils.js"></script>
+    <script src="js/landing-navbar.js"></script>
+    <script src="js/health-check.js"></script>
+  </body>
 </html>

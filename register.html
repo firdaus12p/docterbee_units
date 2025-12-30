@@ -17,9 +17,9 @@
     <link rel="stylesheet" href="css/card-preview.css" />
     <style>
       /* Prevent animation glitches on page load, but exclude ALL card-related elements */
-      main *:not([class*="card-"]) { 
-        opacity: 1 !important; 
-        transform: none !important; 
+      main *:not([class*="card-"]) {
+        opacity: 1 !important;
+        transform: none !important;
       }
     </style>
   </head>
@@ -30,7 +30,10 @@
         <a href="/" class="flex items-center gap-2">
           <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
         </a>
-        <nav class="hidden md:flex gap-6 text-sm" style="justify-content: flex-end; padding: 0; width: auto;">
+        <nav
+          class="hidden md:flex gap-6 text-sm"
+          style="justify-content: flex-end; padding: 0; width: auto"
+        >
           <a href="/" class="nav-link">Home</a>
           <a href="/register" class="nav-link active">Daftar</a>
           <a href="/login" class="nav-link">Login</a>
@@ -49,9 +52,22 @@
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="mobile-menu">
       <div class="mobile-menu-header">
-        <div class="logo-box" style="margin: 0"><img src="assets/images/logo-docterbee.png" alt="DocterBee" style="height: 48px; width: auto" /></div>
+        <div class="logo-box" style="margin: 0">
+          <img
+            src="assets/images/logo-docterbee.png"
+            alt="DocterBee"
+            style="height: 48px; width: auto"
+          />
+        </div>
         <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -316,5 +332,18 @@
         }
       });
     </script>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>© 2025 DocterBee. All rights reserved.</div>
+          <div>
+            Berbasis <strong>Sains & Alam</strong>. | <a href="#">Privacy</a> ·
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

@@ -4,43 +4,141 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Docterbee – Media</title>
-    <meta name="description" content="Pusat media Docterbee: Edukasi artikel, YouTube & AI analisis, dan Podcast audio kesehatan Islami." />
+    <meta
+      name="description"
+      content="Pusat media Docterbee: Edukasi artikel, YouTube & AI analisis, dan Podcast audio kesehatan Islami."
+    />
 
     <!-- External Stylesheets -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/landing-page.css" />
     <style>
-      main, main section, main div { opacity: 1 !important; transform: none !important; }
+      main,
+      main section,
+      main div {
+        opacity: 1 !important;
+        transform: none !important;
+      }
     </style>
   </head>
   <body class="bg-gray-50 text-slate-900">
     <header>
       <div class="container">
         <nav>
-          <a href="/" class="logo"><img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" /></a>
+          <a href="/" class="logo"
+            ><img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img"
+          /></a>
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
+            <a href="/store">Produk</a>
+            <a href="/periksa-kesehatan">Cek Kesehatan</a>
+            <a href="/ai-advisor">AI Advisor</a>
             <a href="/journey">Journey</a>
             <a href="/services">Services</a>
-            <a href="/store">Produk</a>
             <a href="/events">Program</a>
             <div class="nav-dropdown">
-              <button class="nav-dropdown-toggle active" type="button">Media <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+              <button class="nav-dropdown-toggle active" type="button">
+                Media
+                <svg
+                  class="chevron-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
               <div class="nav-dropdown-menu">
-                <a href="/insight"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Edukasi</a>
-                <a href="/youtube-ai"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> YouTube &amp; AI</a>
-                <a href="/podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Podcast Audio</a>
+                <a href="/insight"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  Edukasi</a
+                >
+                <a href="/youtube-ai"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+                    ></path>
+                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                  </svg>
+                  YouTube &amp; AI</a
+                >
+                <a href="/podcast"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                    <path
+                      d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"
+                    ></path>
+                  </svg>
+                  Podcast Audio</a
+                >
               </div>
             </div>
-            <a href="/ai-advisor">AI Advisor</a>
-            <a href="/periksa-kesehatan">Cek Kesehatan</a>
-            <div id="authButtons"><button class="btn btn-outline" onclick="location.href='/login'" style="margin-right: 8px">Masuk</button><button class="btn btn-primary" onclick="location.href='/register'">Daftar Sekarang</button></div>
-            <div id="memberInfo" style="display: none; align-items: center; gap: 12px;"><span class="points-display" id="pointsDisplay">Points: <b id="navPoints">0</b></span><a href="/profile" id="profileBtn" class="nav-link" title="Profile"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a><button id="logoutBtn" class="btn btn-outline-danger">Logout</button></div>
+            <div id="authButtons">
+              <button
+                class="btn btn-outline"
+                onclick="location.href='/login'"
+                style="margin-right: 8px"
+              >
+                Masuk</button
+              ><button class="btn btn-primary" onclick="location.href='/register'">
+                Daftar Sekarang
+              </button>
+            </div>
+            <div id="memberInfo" style="display: none; align-items: center; gap: 12px">
+              <span class="points-display" id="pointsDisplay">Points: <b id="navPoints">0</b></span
+              ><a href="/profile" id="profileBtn" class="nav-link" title="Profile"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle></svg></a
+              ><button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+            </div>
           </div>
-          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
         </nav>
       </div>
     </header>
@@ -48,28 +146,139 @@
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
     <div class="mobile-menu" id="mobileMenu">
       <div class="mobile-menu-header">
-        <div class="logo-box" style="margin: 0"><img src="assets/images/logo-docterbee.png" alt="DocterBee" style="height: 48px; width: auto" /></div>
-        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <div class="logo-box" style="margin: 0">
+          <img
+            src="assets/images/logo-docterbee.png"
+            alt="DocterBee"
+            style="height: 48px; width: auto"
+          />
+        </div>
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <nav class="mobile-nav">
         <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
         <a href="/journey" class="mobile-nav-link">Journey</a>
         <a href="/services" class="mobile-nav-link">Services</a>
         <a href="/store" class="mobile-nav-link">Produk</a>
-        <a href="/events" class="mobile-nav-link">Program</a>
-        <div class="mobile-nav-dropdown" id="mobileMediaDropdown">
-          <button class="mobile-nav-dropdown-toggle" type="button">Media <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-          <div class="mobile-nav-submenu">
-            <a href="/insight"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Edukasi</a>
-            <a href="/youtube-ai"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> YouTube &amp; AI</a>
-            <a href="/podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Podcast Audio</a>
-          </div>
-        </div>
+        <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
         <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
+        <a href="/journey" class="mobile-nav-link">Journey</a>
+        <a href="/services" class="mobile-nav-link">ServicesaDropdown">
+          <button class="mobile-nav-dropdown-toggle" type="button">
+            Media
+            <svg
+              class="chevron-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="mobile-nav-submenu">
+            <a href="/insight"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              Edukasi</a
+            >
+            <a href="/youtube-ai"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+                ></path>
+                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+              </svg>
+              YouTube &amp; AI</a
+            >
+            <a href="/podcast"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                <path
+                  d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"
+                ></path>
+              </svg>
+              Podcast Audio</a
+            >
+         a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
         <a href="/periksa-kesehatan" class="mobile-nav-link">Cek Kesehatan</a>
         <div class="mobile-menu-actions">
-          <div id="mobileAuthButtons"><button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">Masuk</button><button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">Daftar Sekarang</button></div>
-          <div id="mobileMemberInfo" style="display: none;"><div class="mobile-points-display" id="mobilePointsDisplay">Points: <b id="mobileNavPoints">0</b></div><a href="/profile" id="mobileProfileBtn" class="mobile-nav-link" style="display: flex; align-items: center; gap: 8px;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile</a><button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">Logout</button></div>
+          <div id="mobileAuthButtons">
+            <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
+              Masuk</button
+            ><button
+              class="btn btn-primary"
+              onclick="location.href='/register'"
+              style="width: 100%"
+            >
+              Daftar Sekarang
+            </button>
+          </div>
+          <div id="mobileMemberInfo" style="display: none">
+            <div class="mobile-points-display" id="mobilePointsDisplay">
+              Points: <b id="mobileNavPoints">0</b>
+            </div>
+            <a
+              href="/profile"
+              id="mobileProfileBtn"
+              class="mobile-nav-link"
+              style="display: flex; align-items: center; gap: 8px"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile</a
+            ><button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
     </div>
@@ -87,18 +296,26 @@
       <div class="grid gap-6 md:grid-cols-3">
         <!-- Edukasi Card -->
         <a href="/insight" class="group">
-          <div class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-amber-400/50 hover:-translate-y-1">
+          <div
+            class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-amber-400/50 hover:-translate-y-1"
+          >
             <div class="p-6">
-              <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div
+                class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+              >
                 <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
               </div>
               <h2 class="text-xl font-bold mb-2">Edukasi</h2>
               <p class="text-slate-600 text-sm mb-4">
-                Artikel edukasi sains × Qur'ani. Baca dan minta AI merangkum & memberi rekomendasi NBSN.
+                Artikel edukasi sains × Qur'ani. Baca dan minta AI merangkum & memberi rekomendasi
+                NBSN.
               </p>
               <div class="flex items-center gap-2 text-amber-600 font-medium text-sm">
                 <span>Baca Artikel</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                <i
+                  data-lucide="arrow-right"
+                  class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                ></i>
               </div>
             </div>
           </div>
@@ -106,18 +323,26 @@
 
         <!-- YouTube & AI Card -->
         <a href="/youtube-ai" class="group">
-          <div class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-rose-400/50 hover:-translate-y-1">
+          <div
+            class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-rose-400/50 hover:-translate-y-1"
+          >
             <div class="p-6">
-              <div class="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div
+                class="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+              >
                 <i data-lucide="youtube" class="w-6 h-6 text-rose-600"></i>
               </div>
               <h2 class="text-xl font-bold mb-2">YouTube & AI</h2>
               <p class="text-slate-600 text-sm mb-4">
-                Tempel URL video YouTube, lalu minta AI menganalisis kesesuaian dengan Qur'an, Hadis & sains.
+                Tempel URL video YouTube, lalu minta AI menganalisis kesesuaian dengan Qur'an, Hadis
+                & sains.
               </p>
               <div class="flex items-center gap-2 text-amber-600 font-medium text-sm">
                 <span>Mulai Analisis</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                <i
+                  data-lucide="arrow-right"
+                  class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                ></i>
               </div>
             </div>
           </div>
@@ -125,18 +350,26 @@
 
         <!-- Podcast Card -->
         <a href="/podcast" class="group">
-          <div class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-amber-400/50 hover:-translate-y-1">
+          <div
+            class="booking-container h-full transition-all duration-300 hover:shadow-lg hover:border-amber-400/50 hover:-translate-y-1"
+          >
             <div class="p-6">
-              <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div
+                class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+              >
                 <i data-lucide="headphones" class="w-6 h-6 text-amber-600"></i>
               </div>
               <h2 class="text-xl font-bold mb-2">Podcast Audio</h2>
               <p class="text-slate-600 text-sm mb-4">
-                Dengarkan podcast audio kesehatan Islami. Belajar konsep kesehatan yang selaras dengan Al-Qur'an.
+                Dengarkan podcast audio kesehatan Islami. Belajar konsep kesehatan yang selaras
+                dengan Al-Qur'an.
               </p>
               <div class="flex items-center gap-2 text-amber-600 font-medium text-sm">
                 <span>Dengarkan Podcast</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                <i
+                  data-lucide="arrow-right"
+                  class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                ></i>
               </div>
             </div>
           </div>
@@ -144,17 +377,21 @@
       </div>
 
       <!-- Info Section -->
-      <div class="mt-10 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/50">
+      <div
+        class="mt-10 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/50"
+      >
         <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+          <div
+            class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0"
+          >
             <i data-lucide="info" class="w-6 h-6 text-amber-600"></i>
           </div>
           <div>
             <h3 class="font-bold text-lg mb-2">Tentang Media Docterbee</h3>
             <p class="text-slate-600 text-sm">
-              Pusat Media Docterbee menyediakan berbagai konten edukatif yang menggabungkan 
-              <strong>sains modern</strong>, <strong>Al-Qur'an & Hadis</strong>, dan framework 
-              <strong>NBSN (Neuron, Biomolekul, Sensorik, Nature)</strong>. Semua konten dirancang 
+              Pusat Media Docterbee menyediakan berbagai konten edukatif yang menggabungkan
+              <strong>sains modern</strong>, <strong>Al-Qur'an & Hadis</strong>, dan framework
+              <strong>NBSN (Neuron, Biomolekul, Sensorik, Nature)</strong>. Semua konten dirancang
               untuk membantu Anda memahami cara menjaga kesehatan dengan pendekatan holistik Islami.
             </p>
           </div>
@@ -162,9 +399,17 @@
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-10 border-t border-gray-200 text-center text-xs text-slate-500 py-6">
-      © <span id="year"></span> Docterbee
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>© 2025 DocterBee. All rights reserved.</div>
+          <div>
+            Berbasis <strong>Sains & Alam</strong>. | <a href="#">Privacy</a> ·
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
     </footer>
 
     <!-- External Scripts -->
@@ -175,9 +420,10 @@
     <script src="js/script.js"></script>
     <script src="js/landing-navbar.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('year').textContent = new Date().getFullYear();
-        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+      document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== "undefined") {
+          lucide.createIcons();
+        }
       });
     </script>
   </body>
