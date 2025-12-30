@@ -633,12 +633,21 @@ nav {
 }
 
 @media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
   .hero-card-image {
     max-height: 250px;
   }
 }
 
 @media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
   .hero-card-image {
     max-height: 200px;
   }
