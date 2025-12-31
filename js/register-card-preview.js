@@ -6,44 +6,9 @@
 (function () {
   "use strict";
 
-  // Card type mapping for file names
-  const cardTypeMapping = {
-    "Active-Worker": {
-      front: "/uploads/gambar_kartu/depan/Background-Active-Worker.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Active-Worker.png",
-      label: "Active Worker",
-    },
-    "Family-Member": {
-      front: "/uploads/gambar_kartu/depan/Background-Family-Member.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Family-Member.png",
-      label: "Family Member",
-    },
-    "Healthy-Smart-Kids": {
-      front: "/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Healthy-&-Smart-Kids.png",
-      label: "Healthy & Smart Kids",
-    },
-    "Mums-Baby": {
-      front: "/uploads/gambar_kartu/depan/Background-Mums-&-Baby.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Mums-&-Baby.png",
-      label: "Mums & Baby",
-    },
-    "New-Couple": {
-      front: "/uploads/gambar_kartu/depan/Background-New-Couple.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-New-Couple.png",
-      label: "New Couple",
-    },
-    "Pregnant-Preparation": {
-      front: "/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Pregnant-Preparatiom.png",
-      label: "Pregnant Preparation",
-    },
-    "Senja-Ceria": {
-      front: "/uploads/gambar_kartu/depan/Background-Senja-Ceria.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Senja-Ceria.png",
-      label: "Senja Ceria",
-    },
-  };
+  // Card configuration is now in card-config.js
+  // Use window.CARD_TYPE_CONFIG and getSmallNameCardTypes()
+  const cardTypeMapping = window.CARD_TYPE_CONFIG;
 
   // Initialize card preview functionality
   function initCardPreview() {
@@ -115,7 +80,9 @@
         if (cardBackImageMobile) cardBackImageMobile.src = cardData.back;
 
         // Apply smaller font and lower position for specific card types
-        const smallNameTypes = ["Mums-Baby", "New-Couple", "Pregnant-Preparation"];
+        const smallNameTypes = window.getSmallNameCardTypes
+          ? window.getSmallNameCardTypes()
+          : ["Mums-Baby", "New-Couple", "Pregnant-Preparation"];
         if (smallNameTypes.includes(selectedType)) {
           if (cardNameDisplay) cardNameDisplay.classList.add("card-name-small");
           if (cardNameDisplayMobile) cardNameDisplayMobile.classList.add("card-name-small");

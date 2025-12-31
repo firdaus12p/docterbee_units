@@ -314,6 +314,62 @@ function showInfo(message, title = "Informasi") {
 }
 
 // ============================================
+// DELETE MODAL (Admin Dashboard Specific)
+// Uses the DOM-based deleteModal element in admin-dashboard.html
+// ============================================
+
+// Callback for delete confirmation
+let deleteCallback = null;
+
+/**
+ * Show delete confirmation modal (Admin Dashboard)
+ * This uses the DOM-based modal in admin-dashboard.html
+ * 
+ * @param {string} message - Confirmation message
+ * @param {function} onConfirm - Callback when user confirms deletion
+ */
+function showDeleteModal(message, onConfirm) {
+  const modal = document.getElementById("deleteModal");
+  const messageEl = document.getElementById("deleteModalMessage");
+
+  if (modal && messageEl) {
+    messageEl.textContent = message;
+    modal.classList.remove("hidden");
+    deleteCallback = onConfirm;
+
+    // Refresh icons
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  } else {
+    // Fallback to showConfirm if deleteModal element not found
+    showConfirm(message, onConfirm, null, "Konfirmasi Hapus");
+  }
+}
+
+/**
+ * Close delete modal
+ */
+function closeDeleteModal() {
+  const modal = document.getElementById("deleteModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    deleteCallback = null;
+  }
+}
+
+/**
+ * Execute delete callback
+ * Called by the confirm button in deleteModal
+ */
+function executeDeleteCallback() {
+  if (deleteCallback) {
+    deleteCallback();
+    closeDeleteModal();
+  }
+}
+
+// ============================================
 // EXPORT TO WINDOW
 // ============================================
 
@@ -325,3 +381,6 @@ window.showSuccess = showSuccess;
 window.showError = showError;
 window.showWarning = showWarning;
 window.showInfo = showInfo;
+window.showDeleteModal = showDeleteModal;
+window.closeDeleteModal = closeDeleteModal;
+window.executeDeleteCallback = executeDeleteCallback;

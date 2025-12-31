@@ -1,25 +1,7 @@
 // Admin Dashboard JavaScript
-var API_BASE = "/api";
+// API_BASE and adminFetch are defined in admin-api.js
 
 console.log("🚀 Admin Dashboard Loaded");
-console.log("📍 API Base URL:", API_BASE);
-
-/**
- * Helper function for admin API requests
- * Automatically includes credentials (session cookie) for authentication
- * @param {string} url - API URL to fetch
- * @param {Object} options - Fetch options (method, headers, body, etc.)
- * @returns {Promise<Response>} Fetch response
- */
-async function adminFetch(url, options = {}) {
-  return fetch(url, {
-    ...options,
-    credentials: "include", // Always include session cookie
-    headers: {
-      ...options.headers,
-    },
-  });
-}
 
 // Simple authentication (can be improved with JWT later)
 // eslint-disable-next-line no-unused-vars
@@ -121,12 +103,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Delete modal
+  // Delete modal - functions are now in modal-utils.js
   document.getElementById("confirmDelete").addEventListener("click", () => {
-    if (deleteCallback) {
-      deleteCallback();
-      closeDeleteModal();
-    }
+    executeDeleteCallback();
   });
   document.getElementById("cancelDelete").addEventListener("click", closeDeleteModal);
 
@@ -1416,32 +1395,7 @@ async function deleteCoupon(id) {
 }
 
 // ========== DELETE MODAL ==========
-
-let deleteCallback = null;
-
-function showDeleteModal(message, onConfirm) {
-  const modal = document.getElementById("deleteModal");
-  const messageEl = document.getElementById("deleteModalMessage");
-
-  if (modal && messageEl) {
-    messageEl.textContent = message;
-    modal.classList.remove("hidden");
-    deleteCallback = onConfirm;
-
-    // Refresh icons
-    if (typeof lucide !== "undefined") {
-      lucide.createIcons();
-    }
-  }
-}
-
-function closeDeleteModal() {
-  const modal = document.getElementById("deleteModal");
-  if (modal) {
-    modal.classList.add("hidden");
-    deleteCallback = null;
-  }
-}
+// showDeleteModal, closeDeleteModal, and deleteCallback are now defined in modal-utils.js
 
 // ========== SUCCESS MODAL ==========
 

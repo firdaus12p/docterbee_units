@@ -4,17 +4,8 @@
 
 // ============================================
 // HELPER FUNCTIONS
-// Note: escapeHtml and formatDate are defined in utils.js (global)
+// Note: escapeHtml, formatDate, and getCategoryColor are defined in utils.js (global)
 // ============================================
-function getCategoryColor(category) {
-  const colors = {
-    Nutrisi: "bg-green-100 text-green-700",
-    Ibadah: "bg-blue-100 text-blue-700",
-    Kebiasaan: "bg-purple-100 text-purple-700",
-    Sains: "bg-orange-100 text-orange-700",
-  };
-  return colors[category] || "bg-gray-100 text-gray-700";
-}
 
 // ============================================
 // LOAD ARTICLES

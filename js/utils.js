@@ -105,6 +105,20 @@ async function copyToClipboard(text) {
     return false;
   }
 }
+/**
+ * Get Tailwind CSS classes for article category badge
+ * @param {string} category - Category name
+ * @returns {string} Tailwind CSS classes for badge styling
+ */
+function getCategoryColor(category) {
+  const colors = {
+    Nutrisi: "bg-green-100 text-green-700",
+    Ibadah: "bg-blue-100 text-blue-700",
+    Kebiasaan: "bg-purple-100 text-purple-700",
+    Sains: "bg-orange-100 text-orange-700",
+  };
+  return colors[category] || "bg-gray-100 text-gray-700";
+}
 
 // Make functions globally available
 window.escapeHtml = escapeHtml;
@@ -114,3 +128,4 @@ window.formatCurrency = formatCurrency;
 window.formatNumber = formatNumber;
 window.debounce = debounce;
 window.copyToClipboard = copyToClipboard;
+window.getCategoryColor = getCategoryColor;

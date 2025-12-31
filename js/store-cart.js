@@ -845,22 +845,23 @@ async function claimOrderPoints(orderData) {
     // Guest mode - add points to localStorage only
     console.log("👤 Guest mode - adding points to localStorage");
 
-    if (typeof window.addPoints === "function") {
-      window.addPoints(orderData.points_earned);
+    // Dispatch event for decoupled point handling (script.js listens for this)
+    document.dispatchEvent(
+      new CustomEvent("docterbee:pointsEarned", {
+        detail: { points: orderData.points_earned },
+      })
+    );
 
-      // Mark order as claimed
-      claimedOrders.push(orderData.id);
-      localStorage.setItem("docterbee_claimed_orders", JSON.stringify(claimedOrders));
+    // Mark order as claimed
+    claimedOrders.push(orderData.id);
+    localStorage.setItem("docterbee_claimed_orders", JSON.stringify(claimedOrders));
 
-      // Show toast notification
-      showToast(`+${orderData.points_earned} poin telah ditambahkan! 🎉`, "success");
+    // Show toast notification
+    showToast(`+${orderData.points_earned} poin telah ditambahkan! 🎉`, "success");
 
-      console.log(
-        `✅ Added ${orderData.points_earned} points to localStorage for order ${orderData.id}`
-      );
-    } else {
-      console.error("addPoints function not available");
-    }
+    console.log(
+      `✅ Dispatched pointsEarned event with ${orderData.points_earned} points for order ${orderData.id}`
+    );
   }
 }
 

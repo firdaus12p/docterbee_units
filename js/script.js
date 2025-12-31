@@ -3722,4 +3722,16 @@ if (document.readyState === "loading") {
 }
 
 // Expose addPoints to window for cross-file usage (e.g., store-cart.js)
+// Keeping this for backward compatibility
 window.addPoints = addPoints;
+
+// ==================== EVENT LISTENERS FOR DECOUPLED MODULES ====================
+// Listen for points earned events from other modules (e.g., store-cart.js)
+// This decouples store-cart.js from directly calling addPoints
+document.addEventListener("docterbee:pointsEarned", (e) => {
+  const points = e.detail?.points;
+  if (typeof points === "number" && points > 0) {
+    addPoints(points);
+    console.log(`✅ [script.js] Received pointsEarned event, added ${points} points`);
+  }
+});

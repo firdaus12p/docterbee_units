@@ -2,8 +2,7 @@
  * Member Check - Phone Number Lookup
  * Allows users to check their membership status using phone number
  *
- * This module is self-contained and does not depend on other features.
- * It has its own card type mapping and display logic.
+ * Card configuration is now shared via card-config.js
  */
 
 (function () {
@@ -11,52 +10,9 @@
 
   // ========================================
   // CARD TYPE CONFIGURATION
-  // Self-contained mapping (independent from register-card-preview.js)
+  // Now defined in card-config.js (shared with register-card-preview.js)
   // ========================================
-  const CARD_TYPE_CONFIG = {
-    "Active-Worker": {
-      front: "/uploads/gambar_kartu/depan/Background-Active-Worker.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Active-Worker.png",
-      label: "Active Worker",
-      smallName: false,
-    },
-    "Family-Member": {
-      front: "/uploads/gambar_kartu/depan/Background-Family-Member.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Family-Member.png",
-      label: "Family Member",
-      smallName: false,
-    },
-    "Healthy-Smart-Kids": {
-      front: "/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Healthy-&-Smart-Kids.png",
-      label: "Healthy & Smart Kids",
-      smallName: false,
-    },
-    "Mums-Baby": {
-      front: "/uploads/gambar_kartu/depan/Background-Mums-&-Baby.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Mums-&-Baby.png",
-      label: "Mums & Baby",
-      smallName: true,
-    },
-    "New-Couple": {
-      front: "/uploads/gambar_kartu/depan/Background-New-Couple.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-New-Couple.png",
-      label: "New Couple",
-      smallName: true,
-    },
-    "Pregnant-Preparation": {
-      front: "/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Pregnant-Preparatiom.png",
-      label: "Pregnant Preparation",
-      smallName: true,
-    },
-    "Senja-Ceria": {
-      front: "/uploads/gambar_kartu/depan/Background-Senja-Ceria.png",
-      back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Senja-Ceria.png",
-      label: "Senja Ceria",
-      smallName: false,
-    },
-  };
+  const CARD_TYPE_CONFIG = window.CARD_TYPE_CONFIG;
 
   // ========================================
   // DOM ELEMENTS

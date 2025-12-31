@@ -1,6 +1,7 @@
 // Journey Manager for Admin Dashboard
 // CRUD operations for Journeys, Units, and Items
-/* global adminFetch, escapeHtml, showDeleteModal, showSuccessModal, lucide */
+// Note: adminFetch is defined in admin-api.js, showDeleteModal is defined in modal-utils.js
+/* global adminFetch, escapeHtml, showDeleteModal, showSuccessModal, lucide, API_BASE */
 
 let currentSelectedJourneyId = null;
 let currentSelectedUnitId = null;

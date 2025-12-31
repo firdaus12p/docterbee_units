@@ -297,12 +297,19 @@ describe("Feature Tests", () => {
 
 ## File-Specific Notes
 
+### Backend Files
 - `backend/server.mjs` - Main entry point, route mounting, middleware setup
 - `backend/db.mjs` - Database pool, `query()`, `queryOne()`, table initialization
 - `backend/utils/helpers.mjs` - Shared utilities (order numbers, points, expiry)
-- `js/utils.js` - Frontend utilities (formatting, escaping, debounce)
-- `js/modal-utils.js` - User alerts (`showSuccess`, `showError`, `showConfirm`)
+
+### Frontend Utility Modules (Shared)
+- `js/utils.js` - Frontend utilities (formatting, escaping, debounce, getCategoryColor)
+- `js/modal-utils.js` - User alerts (`showSuccess`, `showError`, `showConfirm`, `showDeleteModal`)
+- `js/admin-api.js` - Admin API configuration (`API_BASE`, `adminFetch`) - **load before admin-dashboard.js**
+- `js/card-config.js` - Card type configuration (`CARD_TYPE_CONFIG`, `getSmallNameCardTypes`) - **load before register-card-preview.js and member-check.js**
 - `js/user-data-sync.js` - Guest/logged-in data synchronization
+
+### Test Files
 - `tests/setup.mjs` - Test utilities, mocks, `apiRequest`, `CookieJar`
 
 ## References
