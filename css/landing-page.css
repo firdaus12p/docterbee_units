@@ -239,6 +239,23 @@ nav {
   width: 100%;
 }
 
+/* Active navigation link styling */
+.nav-links a.active {
+  color: #ffffff;
+  background-color: #d32f2f;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.nav-links a.active::after {
+  display: none; /* Remove underline for active link */
+}
+
+.nav-links a.active:hover {
+  color: #ffffff;
+  background-color: #b71c1c; /* Slightly darker red on hover */
+}
+
 /* ====== HAMBURGER MENU (MOBILE) ====== */
 .hamburger-btn {
   display: none;
@@ -387,6 +404,21 @@ nav {
 .mobile-nav-link:hover {
   color: #d32f2f;
   padding-left: 8px;
+}
+
+/* Active mobile navigation link styling */
+.mobile-nav-link.active {
+  color: #ffffff;
+  background-color: #d32f2f;
+  padding-left: 1rem;
+  border-radius: 0.5rem;
+  border-bottom: none;
+}
+
+.mobile-nav-link.active:hover {
+  color: #ffffff;
+  background-color: #b71c1c; /* Slightly darker red on hover */
+  padding-left: 1rem; /* Keep consistent padding on hover */
 }
 
 .mobile-menu-actions {
@@ -1317,6 +1349,23 @@ footer a {
 
 .nav-dropdown-toggle:hover::after {
   width: 100%;
+}
+
+/* Active dropdown toggle styling */
+.nav-dropdown-toggle.active {
+  color: #ffffff;
+  background-color: #d32f2f;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.nav-dropdown-toggle.active::after {
+  display: none; /* Remove underline for active dropdown */
+}
+
+.nav-dropdown-toggle.active:hover {
+  color: #ffffff;
+  background-color: #b71c1c;
 }
 
 .nav-dropdown-toggle .chevron-icon {

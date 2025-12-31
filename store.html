@@ -30,7 +30,7 @@
           </a>
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
-            <a href="/store" class="active">Produk</a>
+            <a href="/store">Produk</a>
             <!-- Kesehatan Dropdown -->
             <div class="nav-dropdown">
               <button class="nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
@@ -86,7 +86,7 @@
       </div>
       <nav class="mobile-nav">
         <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
-        <a href="/store" class="mobile-nav-link active">Produk</a>
+        <a href="/store" class="mobile-nav-link">Produk</a>
         <!-- Mobile Kesehatan Dropdown -->
         <div class="mobile-nav-dropdown" id="mobileKesehatanDropdown">
           <button class="mobile-nav-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
@@ -146,7 +146,7 @@
         <button
           id="tabStore"
           onclick="showStoreTab('store')"
-          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-red-600 text-slate-900"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors bg-red-600 text-white"
         >
           <i data-lucide="shopping-bag" class="w-4 h-4 inline mr-1"></i>
           Store & Products
@@ -196,36 +196,42 @@
         <!-- Category Filters -->
         <div class="flex gap-2 overflow-x-auto pb-2 store-category-scroll">
           <button
+            id="filterAll"
             onclick="filterStoreCategory('all')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-slate-900 whitespace-nowrap"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white whitespace-nowrap transition-colors"
           >
             Semua Produk
           </button>
           <button
+            id="filterZonaSunnah"
             onclick="filterStoreCategory('Zona Sunnah')"
             class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🌙 Zona Sunnah
           </button>
           <button
+            id="filter1001Rempah"
             onclick="filterStoreCategory('1001 Rempah')"
             class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🧂 1001 Rempah
           </button>
           <button
+            id="filterZonaHoney"
             onclick="filterStoreCategory('Zona Honey')"
             class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🍯 Zona Honey
           </button>
           <button
+            id="filterColdPressed"
             onclick="filterStoreCategory('Cold Pressed')"
             class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >
             🥤 Cold Pressed
           </button>
           <button
+            id="filterCoffee"
             onclick="filterStoreCategory('Coffee')"
             class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
           >

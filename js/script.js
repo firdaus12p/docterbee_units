@@ -34,7 +34,7 @@ async function loadJourneyList() {
   try {
     const response = await fetch("/api/journeys");
     const data = await response.json();
-    
+
     if (data.success && data.data) {
       return data.data;
     }
@@ -54,15 +54,15 @@ async function loadJourneyFromAPI(slug) {
   try {
     const response = await fetch(`/api/journeys/${encodeURIComponent(slug)}`);
     const data = await response.json();
-    
+
     if (data.success && data.data) {
       const journey = data.data;
-      
+
       // Update current journey state
       currentJourney.slug = journey.slug;
       currentJourney.name = journey.name;
       currentJourney.description = journey.description;
-      
+
       // Convert API format to UNITS format for compatibility
       UNITS = journey.units.map((unit) => ({
         id: String(unit.id),
@@ -76,7 +76,7 @@ async function loadJourneyFromAPI(slug) {
           nbsn: item.nbsn,
         })),
       }));
-      
+
       return journey;
     }
     return null;
@@ -93,21 +93,21 @@ async function loadJourneyFromAPI(slug) {
 function initJourneySelector(journeys) {
   const selector = document.getElementById("journeySelector");
   if (!selector) return;
-  
+
   selector.innerHTML = "";
-  
+
   journeys.forEach((journey) => {
     const option = document.createElement("option");
     option.value = journey.slug;
     option.textContent = journey.name;
     selector.appendChild(option);
   });
-  
+
   // Set current selected
   if (currentJourney.slug) {
     selector.value = currentJourney.slug;
   }
-  
+
   // Add change event listener
   selector.addEventListener("change", (e) => {
     const selectedSlug = e.target.value;
@@ -123,7 +123,7 @@ function initJourneySelector(journeys) {
 function updateJourneyUI() {
   const titleEl = document.getElementById("journeyTitle");
   const descEl = document.getElementById("journeyDescription");
-  
+
   if (titleEl) {
     titleEl.textContent = currentJourney.name || "Journey";
   }
@@ -697,7 +697,7 @@ async function init() {
   // This prevents redirects from other pages (login, register, etc.)
   const currentPath = window.location.pathname;
   const isJourneyPage = currentPath === "/journey" || currentPath.startsWith("/journey/");
-  
+
   if (!isJourneyPage) {
     // Not on journey page, skip journey-specific initialization
     // Other pages will call their own init functions (initBooking, renderEvents, etc.)
@@ -706,7 +706,7 @@ async function init() {
 
   // Determine journey slug from URL or use default
   const slug = getSlugFromURL();
-  
+
   // If no slug in URL (e.g., /journey without slug), redirect to default journey
   if (!slug) {
     // Load journey list to get the first/default journey
@@ -727,7 +727,7 @@ async function init() {
 
   // Load journey data from API
   const journey = await loadJourneyFromAPI(slug);
-  
+
   if (!journey) {
     // Journey not found, redirect to default
     window.location.href = "/journey";
@@ -942,7 +942,9 @@ async function confirmBooking() {
   // Validasi nomor HP format Indonesia
   const phoneRegex = /^(08|\+?628)[0-9]{8,13}$/;
   if (!phoneRegex.test(customerPhone.replace(/[\s-]/g, ""))) {
-    showWarning("Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx atau +628xx-xxxx-xxxx");
+    showWarning(
+      "Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx atau +628xx-xxxx-xxxx"
+    );
     return;
   }
 
@@ -1805,7 +1807,7 @@ function renderPodcastItems(container, podcasts) {
     const item = document.createElement("div");
     item.className = "podcast-item flex items-center gap-3";
     item.dataset.url = podcast.audio_url;
-    
+
     // Play/Pause button
     const playBtn = document.createElement("button");
     playBtn.className = "podcast-play-btn flex-shrink-0";
@@ -1815,7 +1817,7 @@ function renderPodcastItems(container, podcasts) {
       e.stopPropagation();
       togglePlayPodcast(podcast.title, podcast.audio_url);
     });
-    
+
     // Title
     const title = document.createElement("span");
     title.className = "podcast-title flex-1 text-left";
@@ -1823,7 +1825,7 @@ function renderPodcastItems(container, podcasts) {
     title.addEventListener("click", () => {
       togglePlayPodcast(podcast.title, podcast.audio_url);
     });
-    
+
     item.appendChild(playBtn);
     item.appendChild(title);
     container.appendChild(item);
@@ -1916,7 +1918,7 @@ function handleAudioEnded() {
 function updatePlayButtonStates() {
   const audioPlayer = document.getElementById("audioPlayerPodcast");
   const podcastItems = document.querySelectorAll(".podcast-item");
-  
+
   if (!audioPlayer) return;
 
   const isPlaying = !audioPlayer.paused;
@@ -1924,7 +1926,7 @@ function updatePlayButtonStates() {
   podcastItems.forEach((item) => {
     const btn = item.querySelector(".podcast-play-btn");
     const itemUrl = item.dataset.url;
-    
+
     if (!btn) return;
 
     if (itemUrl === currentPodcastUrl && isPlaying) {
@@ -2057,10 +2059,12 @@ async function checkTranscript() {
       if (data.available) {
         // ✅ Video can be analyzed
         const isGeminiDirect = data.source === "gemini-direct";
-        const sourceLabel = isGeminiDirect 
+        const sourceLabel = isGeminiDirect
           ? "🎬 AI Vision (Gemini dapat melihat video langsung)"
-          : `📝 Transcript (${data.segmentCount} segmen • ${data.characterCount.toLocaleString()} karakter)`;
-        
+          : `📝 Transcript (${
+              data.segmentCount
+            } segmen • ${data.characterCount.toLocaleString()} karakter)`;
+
         transcriptStatus.innerHTML = `
           <div class="bg-emerald-100 border border-emerald-400/50 rounded-lg p-3">
             <div class="flex items-start gap-2">
@@ -2384,16 +2388,29 @@ function formatAISummary(text, metadata = {}) {
       if (headerText.includes("Ringkasan") || headerText.includes("ringkasan")) {
         iconName = "info";
         iconColor = "text-sky-500";
-      } else if (headerText.includes("Kesesuaian") || headerText.includes("kesesuaian") || headerText.includes("Qur'an") || headerText.includes("Hadis")) {
+      } else if (
+        headerText.includes("Kesesuaian") ||
+        headerText.includes("kesesuaian") ||
+        headerText.includes("Qur'an") ||
+        headerText.includes("Hadis")
+      ) {
         iconName = "book-open";
         iconColor = "text-emerald-500";
       } else if (headerText.includes("Selaras") || headerText.includes("selaras")) {
         iconName = "check-circle";
         iconColor = "text-emerald-500";
-      } else if (headerText.includes("Koreksi") || headerText.includes("koreksi") || headerText.includes("Catatan")) {
+      } else if (
+        headerText.includes("Koreksi") ||
+        headerText.includes("koreksi") ||
+        headerText.includes("Catatan")
+      ) {
         iconName = "alert-circle";
         iconColor = "text-red-600";
-      } else if (headerText.includes("Sains") || headerText.includes("sains") || headerText.includes("Ilmiah")) {
+      } else if (
+        headerText.includes("Sains") ||
+        headerText.includes("sains") ||
+        headerText.includes("Ilmiah")
+      ) {
         iconName = "flask-conical";
         iconColor = "text-sky-500";
       } else if (headerText.includes("NBSN") || headerText.includes("Rekomendasi")) {
@@ -2784,13 +2801,13 @@ function showStoreTab(tabName) {
     if (el) el.classList.add("hidden");
   });
 
-  // Remove active styles dari semua tabs
+  // Remove active styles dari semua tabs and restore hover
   const tabs = ["tabStore", "tabDineIn", "tabPoints", "tabLocator"];
   tabs.forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
-      el.classList.remove("bg-red-600", "text-slate-900");
-      el.classList.add("bg-slate-800", "text-slate-300");
+      el.classList.remove("bg-red-600", "text-white");
+      el.classList.add("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
     }
   });
 
@@ -2814,8 +2831,8 @@ function showStoreTab(tabName) {
 
   if (targetSection) targetSection.classList.remove("hidden");
   if (targetTab) {
-    targetTab.classList.remove("bg-slate-800", "text-slate-300");
-    targetTab.classList.add("bg-red-600", "text-slate-900");
+    targetTab.classList.remove("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
+    targetTab.classList.add("bg-red-600", "text-white");
   }
 
   // Reload rewards when switching to points tab
@@ -2867,19 +2884,22 @@ async function renderDineInMenu() {
   if (!container) return;
 
   // Show loading state
-  container.innerHTML = '<p class="text-slate-400 text-sm text-center py-8 animate-pulse">Memuat menu...</p>';
+  container.innerHTML =
+    '<p class="text-slate-400 text-sm text-center py-8 animate-pulse">Memuat menu...</p>';
 
   // Load products if not already loaded
   if (PRODUCTS.length === 0) {
     const loaded = await loadProductsFromAPI();
     if (!loaded) {
-      container.innerHTML = '<p class="text-red-400 text-sm text-center py-8">Gagal memuat menu. Silakan refresh halaman.</p>';
+      container.innerHTML =
+        '<p class="text-red-400 text-sm text-center py-8">Gagal memuat menu. Silakan refresh halaman.</p>';
       return;
     }
   }
 
   if (PRODUCTS.length === 0) {
-    container.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Belum ada menu tersedia.</p>';
+    container.innerHTML =
+      '<p class="text-slate-400 text-sm text-center py-8">Belum ada menu tersedia.</p>';
     return;
   }
 
@@ -2899,8 +2919,8 @@ async function renderDineInMenu() {
     "1001 Rempah": { icon: "🧂", color: "emerald" },
     "Zona Honey": { icon: "🍯", color: "amber" },
     "Cold Pressed": { icon: "🥤", color: "sky" },
-    "Coffee": { icon: "☕", color: "amber" },
-    "Lainnya": { icon: "📦", color: "slate" }
+    Coffee: { icon: "☕", color: "amber" },
+    Lainnya: { icon: "📦", color: "slate" },
   };
 
   // Render categories
@@ -2908,7 +2928,7 @@ async function renderDineInMenu() {
   Object.keys(categorizedProducts).forEach((category) => {
     const products = categorizedProducts[category];
     const style = categoryStyles[category] || categoryStyles["Lainnya"];
-    
+
     html += `
       <div>
         <h3 class="font-semibold text-${style.color}-500 mb-2">
@@ -2937,31 +2957,37 @@ async function renderDineInMenu() {
  */
 function renderDineInMenuItem(product, color) {
   const hasMemberPrice = product.member_price && product.member_price < product.price;
-  
+
   // Format prices
   const normalPrice = `Rp ${product.price.toLocaleString("id-ID")}`;
-  const memberPrice = hasMemberPrice 
-    ? `Rp ${product.member_price.toLocaleString("id-ID")}`
-    : null;
-  
+  const memberPrice = hasMemberPrice ? `Rp ${product.member_price.toLocaleString("id-ID")}` : null;
+
   return `
     <div class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${color}-400/50 transition-all">
       <div class="flex justify-between items-start mb-1 gap-2">
         <span class="font-semibold text-slate-900">${escapeHtml(product.name)}</span>
         <div class="text-right flex-shrink-0">
-          ${hasMemberPrice ? `
+          ${
+            hasMemberPrice
+              ? `
             <div class="text-${color}-500 font-bold text-sm">${memberPrice}</div>
             <div class="text-slate-400 text-xs line-through">${normalPrice}</div>
-          ` : `
+          `
+              : `
             <span class="text-${color}-500 font-bold">${normalPrice}</span>
-          `}
+          `
+          }
         </div>
       </div>
-      ${hasMemberPrice ? `
+      ${
+        hasMemberPrice
+          ? `
         <div class="text-xs text-emerald-600 mb-1">
           <span class="bg-emerald-50 px-1.5 py-0.5 rounded">Harga Member</span>
         </div>
-      ` : ""}
+      `
+          : ""
+      }
       <p class="text-xs text-slate-600">
         ${product.description ? escapeHtml(product.description) : "Produk kesehatan berkualitas"}
       </p>
@@ -3058,18 +3084,18 @@ function renderProductPricing(product) {
 /* global showToast */
 function addToCart(productId) {
   const product = PRODUCTS.find((p) => p.id === parseInt(productId));
-  
+
   if (!product) {
     showToast("Produk tidak ditemukan", "error");
     return;
   }
-  
+
   // Check stock availability
   if (product.stock === 0) {
     showToast("Maaf, produk ini sedang habis stok", "error");
     return;
   }
-  
+
   // Call store cart function
   if (typeof window.addToStoreCart === "function") {
     window.addToStoreCart(product.id, product.name, product.price, product.image);
@@ -3083,6 +3109,31 @@ function addToCart(productId) {
 async function filterStoreCategory(category) {
   const grid = document.getElementById("productGrid");
   if (!grid) return;
+
+  // Update active state for filter buttons IMMEDIATELY (synchronous)
+  const filterButtons = [
+    { id: "filterAll", category: "all" },
+    { id: "filterZonaSunnah", category: "Zona Sunnah" },
+    { id: "filter1001Rempah", category: "1001 Rempah" },
+    { id: "filterZonaHoney", category: "Zona Honey" },
+    { id: "filterColdPressed", category: "Cold Pressed" },
+    { id: "filterCoffee", category: "Coffee" },
+  ];
+
+  filterButtons.forEach((btn) => {
+    const buttonEl = document.getElementById(btn.id);
+    if (buttonEl) {
+      if (btn.category === category) {
+        // Active state: red background with white text, remove hover effects
+        buttonEl.classList.remove("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
+        buttonEl.classList.add("bg-red-600", "text-white");
+      } else {
+        // Inactive state: dark background with light text, restore hover
+        buttonEl.classList.remove("bg-red-600", "text-white");
+        buttonEl.classList.add("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
+      }
+    }
+  });
 
   // Show loading state
   grid.innerHTML =
@@ -3195,7 +3246,7 @@ function getCategoryLabel(cat) {
     "1001 Rempah": "🧂 1001 Rempah",
     "Zona Honey": "🍯 Zona Honey",
     "Cold Pressed": "🥤 Cold Pressed",
-    "Coffee": "☕ Coffee",
+    Coffee: "☕ Coffee",
     // Legacy support for old category names
     "zona-sunnah": "🌙 Zona Sunnah",
     rempah: "🧂 1001 Rempah",
@@ -3211,8 +3262,6 @@ function getCategoryLabel(cat) {
 }
 
 // Duplicate addToCart function removed - using the one defined at line 2810
-
-
 
 // Update cart display in locator section
 function updateCartDisplay() {
@@ -3316,14 +3365,20 @@ async function redeemReward(cost, rewardName, rewardId = null) {
           _db("db_points", { value: newValue });
           addPoints(0); // Trigger nav refresh
           updatePointsView();
-          showSuccess(`Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`, "Redeem Berhasil");
+          showSuccess(
+            `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
+            "Redeem Berhasil"
+          );
         } else {
           // Fallback to local storage only
           const newValue = current - cost;
           _db("db_points", { value: newValue });
           addPoints(0);
           updatePointsView();
-          showSuccess(`Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`, "Redeem Berhasil");
+          showSuccess(
+            `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
+            "Redeem Berhasil"
+          );
         }
       } catch (error) {
         console.error("Error redeeming reward:", error);
@@ -3332,7 +3387,10 @@ async function redeemReward(cost, rewardName, rewardId = null) {
         _db("db_points", { value: newValue });
         addPoints(0);
         updatePointsView();
-        showSuccess(`Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`, "Redeem Berhasil");
+        showSuccess(
+          `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
+          "Redeem Berhasil"
+        );
       }
     },
     null,
@@ -3523,8 +3581,20 @@ function renderDefaultRewards() {
   // Define fallback rewards data
   const defaultRewards = [
     { id: null, name: "Diskon 10%", points_cost: 20, color_theme: "amber", description: null },
-    { id: null, name: "Konsultasi Gratis", points_cost: 50, color_theme: "emerald", description: null },
-    { id: null, name: "Free Product Kecil", points_cost: 80, color_theme: "purple", description: null },
+    {
+      id: null,
+      name: "Konsultasi Gratis",
+      points_cost: 50,
+      color_theme: "emerald",
+      description: null,
+    },
+    {
+      id: null,
+      name: "Free Product Kecil",
+      points_cost: 80,
+      color_theme: "purple",
+      description: null,
+    },
     { id: null, name: "Voucher Rp 50K", points_cost: 100, color_theme: "sky", description: null },
   ];
 
@@ -3536,15 +3606,21 @@ function renderDefaultRewards() {
 
   // Keep existing hardcoded rewards as fallback
   rewardsContainer.innerHTML = defaultRewards
-    .map((reward) => `
+    .map(
+      (reward) => `
       <button
         onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name)}')"
-        class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${reward.color_theme}-400/50 hover:bg-${reward.color_theme}-50 transition text-left"
+        class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${
+          reward.color_theme
+        }-400/50 hover:bg-${reward.color_theme}-50 transition text-left"
       >
-        <div class="text-xs text-${reward.color_theme}-500 mb-1 font-semibold">${reward.points_cost} poin</div>
+        <div class="text-xs text-${reward.color_theme}-500 mb-1 font-semibold">${
+        reward.points_cost
+      } poin</div>
         <div class="font-semibold text-sm text-slate-900">${escapeHtml(reward.name)}</div>
       </button>
-    `)
+    `
+    )
     .join("");
 
   // Also update "Tukar Poin" sidebar list with same fallback data
@@ -3557,7 +3633,7 @@ function renderDefaultRewards() {
  */
 function renderTukarPoinList(rewards) {
   const tukarPoinList = document.getElementById("tukarPoinList");
-  
+
   if (!tukarPoinList) {
     return;
   }

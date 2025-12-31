@@ -47,16 +47,16 @@
       const response = await fetch("/api/user-data/progress", {
         credentials: "include",
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {
           const points = data.data.points || 0;
-          
+
           // Update desktop points
           const navPoints = document.getElementById("navPoints");
           if (navPoints) navPoints.textContent = points;
-          
+
           // Update mobile points
           const mobileNavPoints = document.getElementById("mobileNavPoints");
           if (mobileNavPoints) mobileNavPoints.textContent = points;
@@ -212,16 +212,156 @@
     });
   }
 
-  // Initialize mobile media dropdown toggle
-  function initMobileMediaDropdown() {
-    const mobileDropdown = document.getElementById("mobileMediaDropdown");
-    const mobileToggle = mobileDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+  // Initialize mobile kesehatan dropdown toggle
+  function initMobileKesehatanDropdown() {
+    const mobileKesehatanDropdown = document.getElementById("mobileKesehatanDropdown");
+    const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
+    const mobileToggle = mobileKesehatanDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+
+    if (!mobileKesehatanDropdown) {
+      console.warn("mobileKesehatanDropdown element not found");
+      return;
+    }
 
     if (mobileToggle) {
-      mobileToggle.addEventListener("click", function (e) {
+      // Remove any existing listeners by cloning the element
+      const newToggle = mobileToggle.cloneNode(true);
+      mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+
+      newToggle.addEventListener("click", function (e) {
         e.preventDefault();
-        mobileDropdown.classList.toggle("open");
+        e.stopPropagation();
+        console.log("Kesehatan dropdown clicked");
+
+        // Close media dropdown if open
+        if (mobileMediaDropdown) {
+          mobileMediaDropdown.classList.remove("open");
+        }
+
+        // Toggle kesehatan dropdown
+        mobileKesehatanDropdown.classList.toggle("open");
       });
+    }
+  }
+
+  // Initialize mobile media dropdown toggle
+  function initMobileMediaDropdown() {
+    const mobileKesehatanDropdown = document.getElementById("mobileKesehatanDropdown");
+    const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
+    const mobileToggle = mobileMediaDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+
+    if (!mobileMediaDropdown) {
+      console.warn("mobileMediaDropdown element not found");
+      return;
+    }
+
+    if (mobileToggle) {
+      // Remove any existing listeners by cloning the element
+      const newToggle = mobileToggle.cloneNode(true);
+      mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+
+      newToggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Media dropdown clicked");
+
+        // Close kesehatan dropdown if open
+        if (mobileKesehatanDropdown) {
+          mobileKesehatanDropdown.classList.remove("open");
+        }
+
+        // Toggle media dropdown
+        mobileMediaDropdown.classList.toggle("open");
+      });
+    }
+  }
+
+  // Set active navigation link based on current page
+  function setActiveNavLink() {
+    const currentPath = window.location.pathname;
+
+    // Map of paths to link hrefs (normalize paths for matching)
+    const pathMap = {
+      "/": "/",
+      "/index": "/",
+      "/index.html": "/",
+      "/store": "/store",
+      "/store.html": "/store",
+      "/services": "/services",
+      "/services.html": "/services",
+      "/booking": "/booking",
+      "/booking.html": "/booking",
+      "/journey": "/journey",
+      "/journey.html": "/journey",
+      "/periksa-kesehatan": "/periksa-kesehatan",
+      "/docterbee-periksa-kesehatan.html": "/periksa-kesehatan",
+      "/insight": "/insight",
+      "/insight.html": "/insight",
+      "/events": "/events",
+      "/events.html": "/events",
+      "/ai-advisor": "/ai-advisor",
+      "/ai-advisor.html": "/ai-advisor",
+      "/media": "/media",
+      "/media.html": "/media",
+      "/youtube-ai": "/youtube-ai",
+      "/youtube-ai.html": "/youtube-ai",
+      "/podcast": "/podcast",
+      "/podcast.html": "/podcast",
+      "/article": "/article",
+      "/article.html": "/article",
+    };
+
+    // Get normalized path for matching
+    const normalizedPath = pathMap[currentPath] || currentPath;
+
+    // Desktop navigation links
+    const desktopNavLinks = document.querySelectorAll(
+      ".nav-links a:not(#authButtons a):not(.nav-dropdown a)"
+    );
+    desktopNavLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href === normalizedPath) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
+
+    // Mobile navigation links
+    const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+    mobileNavLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href === normalizedPath) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
+
+    // Special handling for dropdown items (Kesehatan dropdown: services, booking, journey, periksa-kesehatan)
+    const kesehatanPages = ["/services", "/booking", "/journey", "/periksa-kesehatan"];
+    const mediaPages = ["/media", "/youtube-ai", "/podcast", "/article", "/insight"];
+
+    if (kesehatanPages.some((page) => normalizedPath.startsWith(page))) {
+      // Highlight parent "Kesehatan" dropdown button on desktop if on a sub-page
+      const kesehatanDropdown = document.querySelector(".nav-dropdown");
+      if (kesehatanDropdown) {
+        const dropdownToggle = kesehatanDropdown.querySelector(".nav-dropdown-toggle");
+        if (dropdownToggle) {
+          dropdownToggle.classList.add("active");
+        }
+      }
+    }
+
+    if (mediaPages.some((page) => normalizedPath.startsWith(page))) {
+      // Highlight parent "Media" dropdown button on desktop if on a sub-page
+      const mediaDropdown = document.querySelectorAll(".nav-dropdown")[1]; // Second dropdown
+      if (mediaDropdown) {
+        const dropdownToggle = mediaDropdown.querySelector(".nav-dropdown-toggle");
+        if (dropdownToggle) {
+          dropdownToggle.classList.add("active");
+        }
+      }
     }
   }
 
@@ -230,10 +370,14 @@
     // Check auth status and update navbar
     checkAuthAndUpdateNavbar();
 
+    // Set active navigation link based on current page
+    setActiveNavLink();
+
     // Initialize mobile menu (hamburger button)
     initMobileMenu();
 
-    // Initialize mobile dropdown
+    // Initialize mobile dropdowns
+    initMobileKesehatanDropdown();
     initMobileMediaDropdown();
 
     // Attach logout handlers

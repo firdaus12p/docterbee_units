@@ -181,15 +181,66 @@
     }
   }
 
-  // Initialize mobile media dropdown toggle
-  function initMobileMediaDropdown() {
-    const mobileDropdown = document.getElementById("mobileMediaDropdown");
-    const mobileToggle = mobileDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+  // Initialize mobile kesehatan dropdown toggle
+  function initMobileKesehatanDropdown() {
+    const mobileKesehatanDropdown = document.getElementById("mobileKesehatanDropdown");
+    const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
+    const mobileToggle = mobileKesehatanDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+
+    if (!mobileKesehatanDropdown) {
+      console.warn("mobileKesehatanDropdown element not found");
+      return;
+    }
 
     if (mobileToggle) {
-      mobileToggle.addEventListener("click", function (e) {
+      // Remove any existing listeners by cloning the element
+      const newToggle = mobileToggle.cloneNode(true);
+      mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+
+      newToggle.addEventListener("click", function (e) {
         e.preventDefault();
-        mobileDropdown.classList.toggle("open");
+        e.stopPropagation();
+        console.log("Kesehatan dropdown clicked");
+
+        // Close media dropdown if open
+        if (mobileMediaDropdown) {
+          mobileMediaDropdown.classList.remove("open");
+        }
+
+        // Toggle kesehatan dropdown
+        mobileKesehatanDropdown.classList.toggle("open");
+      });
+    }
+  }
+
+  // Initialize mobile media dropdown toggle
+  function initMobileMediaDropdown() {
+    const mobileKesehatanDropdown = document.getElementById("mobileKesehatanDropdown");
+    const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
+    const mobileToggle = mobileMediaDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+
+    if (!mobileMediaDropdown) {
+      console.warn("mobileMediaDropdown element not found");
+      return;
+    }
+
+    if (mobileToggle) {
+      // Remove any existing listeners by cloning the element
+      const newToggle = mobileToggle.cloneNode(true);
+      mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+
+      newToggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Media dropdown clicked");
+
+        // Close kesehatan dropdown if open
+        if (mobileKesehatanDropdown) {
+          mobileKesehatanDropdown.classList.remove("open");
+        }
+
+        // Toggle media dropdown
+        mobileMediaDropdown.classList.toggle("open");
       });
     }
   }
@@ -198,7 +249,8 @@
   function init() {
     // Check auth status and update navbar
     checkAuthAndUpdateNavbar();
-    // Initialize mobile dropdown
+    // Initialize mobile dropdowns
+    initMobileKesehatanDropdown();
     initMobileMediaDropdown();
   }
 
