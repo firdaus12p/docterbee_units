@@ -34,6 +34,7 @@ export default [
         formatNumber: "readonly",
         debounce: "readonly",
         copyToClipboard: "readonly",
+        getCategoryColor: "readonly",
         // Shared utilities from modal-utils.js
         showWarning: "readonly",
         showSuccessModal: "readonly",
@@ -92,15 +93,19 @@ export default [
         copyToClipboard: "readonly",
         // Cross-file dependencies (defined in admin-dashboard.js, used by managers)
         API_BASE: "writable",
+        adminFetch: "writable",
         showSuccessModal: "writable",
         openDeleteModal: "writable",
         showDeleteModal: "writable",
+        closeDeleteModal: "writable",
+        executeDeleteCallback: "writable",
         // Manager functions (defined in manager files, called from admin-dashboard.js)
         initRewardsManager: "writable",
         initUsersManager: "writable",
         loadOrders: "writable",
         loadUsers: "writable",
         loadPodcasts: "writable",
+        loadAdminJourneys: "writable",
       },
     },
     rules: {

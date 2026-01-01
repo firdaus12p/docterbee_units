@@ -396,21 +396,6 @@ app.get("/api/admin/check", (req, res) => {
   });
 });
 
-// Middleware to require admin authentication
-const requireAdmin = (req, res, next) => {
-  if (req.session && req.session.isAdmin) {
-    next();
-  } else {
-    res.status(401).json({
-      success: false,
-      error: "Akses ditolak. Silakan login sebagai admin.",
-    });
-  }
-};
-
-// Export middleware for use in route files (if needed later)
-app.set("requireAdmin", requireAdmin);
-
 // DEBUG ENDPOINT - Untuk troubleshooting database
 // Security:
 // - Production: Requires admin login, shows minimal info
