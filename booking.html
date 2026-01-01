@@ -31,7 +31,11 @@
       <div class="container">
         <nav>
           <a href="/" class="logo">
-            <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
+            <img
+              src="assets/images/logo-docterbee.png"
+              alt="DocterBee"
+              class="logo-img"
+            />
           </a>
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
@@ -136,6 +140,24 @@
                 </svg>
               </button>
               <div class="nav-dropdown-menu">
+                <a href="/about">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  Tentang Kami
+                </a>
                 <a href="/insight">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +190,9 @@
                     <path
                       d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
                     ></path>
-                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                    <polygon
+                      points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                    ></polygon>
                   </svg>
                   YouTube &amp; AI
                 </a>
@@ -202,16 +226,27 @@
               >
                 Masuk
               </button>
-              <button class="btn btn-primary" onclick="location.href='/register'">
+              <button
+                class="btn btn-primary"
+                onclick="location.href='/register'"
+              >
                 Daftar Sekarang
               </button>
             </div>
             <!-- Member info (shown when logged in) -->
-            <div id="memberInfo" style="display: none; align-items: center; gap: 12px">
+            <div
+              id="memberInfo"
+              style="display: none; align-items: center; gap: 12px"
+            >
               <span class="points-display" id="pointsDisplay">
                 Points: <b id="navPoints">0</b>
               </span>
-              <a href="/profile" id="profileBtn" class="nav-link" title="Profile">
+              <a
+                href="/profile"
+                id="profileBtn"
+                class="nav-link"
+                title="Profile"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -227,7 +262,9 @@
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </a>
-              <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+              <button id="logoutBtn" class="btn btn-outline-danger">
+                Logout
+              </button>
             </div>
           </div>
 
@@ -254,7 +291,11 @@
             style="height: 48px; width: auto"
           />
         </div>
-        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+        <button
+          class="mobile-menu-close"
+          id="mobileMenuClose"
+          aria-label="Close"
+        >
           <svg
             width="24"
             height="24"
@@ -370,6 +411,24 @@
             </svg>
           </button>
           <div class="mobile-nav-submenu">
+            <a href="/about">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Tentang Kami
+            </a>
             <a href="/insight">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -402,7 +461,9 @@
                 <path
                   d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
                 ></path>
-                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                <polygon
+                  points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                ></polygon>
               </svg>
               YouTube &amp; AI
             </a>
@@ -430,10 +491,18 @@
         <div class="mobile-menu-actions">
           <!-- Auth buttons for guests -->
           <div id="mobileAuthButtons">
-            <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
+            <button
+              class="btn btn-outline"
+              onclick="location.href='/login'"
+              style="width: 100%"
+            >
               Masuk
             </button>
-            <button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">
+            <button
+              class="btn btn-primary"
+              onclick="location.href='/register'"
+              style="width: 100%"
+            >
               Daftar Sekarang
             </button>
           </div>
@@ -464,7 +533,11 @@
               </svg>
               Profile
             </a>
-            <button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">
+            <button
+              id="mobileLogoutBtn"
+              class="btn btn-outline-danger"
+              style="width: 100%"
+            >
               Logout
             </button>
           </div>
@@ -476,7 +549,8 @@
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Booking Praktisi</h1>
       <p class="text-slate-900 mb-6 max-w-2xl">
-        Pilih cabang, praktisi, tanggal, dan jam. *Demo ini hanya simulasi UI tanpa pembayaran.*
+        Pilih cabang, praktisi, tanggal, dan jam. *Demo ini hanya simulasi UI
+        tanpa pembayaran.*
       </p>
 
       <!-- Selected Service Indicator -->
@@ -488,7 +562,10 @@
           <i data-lucide="check-circle" class="w-5 h-5 text-amber-500"></i>
           <div>
             <div class="text-xs text-slate-500 mb-1">Layanan yang dipilih:</div>
-            <div id="serviceIndicatorText" class="text-lg font-semibold text-amber-500"></div>
+            <div
+              id="serviceIndicatorText"
+              class="text-lg font-semibold text-amber-500"
+            ></div>
           </div>
         </div>
       </div>
@@ -498,7 +575,9 @@
         <div class="booking-container space-y-4 md:col-span-2">
           <!-- Data Pribadi -->
           <div class="mb-4">
-            <div class="text-base font-bold text-amber-500 mb-3">Data Pribadi</div>
+            <div class="text-base font-bold text-amber-500 mb-3">
+              Data Pribadi
+            </div>
             <div class="grid md:grid-cols-2 gap-3">
               <label class="booking-label">
                 Nama Lengkap <span class="text-red-400">*</span>
@@ -557,7 +636,9 @@
           </div>
 
           <!-- Data Booking -->
-          <div class="text-base font-bold text-amber-500 mb-3">Detail Booking</div>
+          <div class="text-base font-bold text-amber-500 mb-3">
+            Detail Booking
+          </div>
           <div class="grid md:grid-cols-2 gap-3">
             <label class="booking-label">
               Cabang
@@ -626,19 +707,29 @@
               <span>Diskon:</span>
               <span id="displayDiscount" class="font-semibold">- Rp 0</span>
             </div>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-700">
+            <div
+              class="flex justify-between items-center pt-2 border-t border-slate-700"
+            >
               <span class="text-amber-300 font-semibold">Total Bayar:</span>
-              <span id="displayFinalPrice" class="font-bold text-2xl text-amber-300">Rp 0</span>
+              <span
+                id="displayFinalPrice"
+                class="font-bold text-2xl text-amber-300"
+                >Rp 0</span
+              >
             </div>
           </div>
 
           <div>
-            <label class="booking-label"> Pilih Jam <span class="text-red-400">*</span> </label>
+            <label class="booking-label">
+              Pilih Jam <span class="text-red-400">*</span>
+            </label>
             <div id="slots"></div>
           </div>
 
           <div class="flex gap-3">
-            <button id="btnConfirmBooking" class="btn-primary">Konfirmasi</button>
+            <button id="btnConfirmBooking" class="btn-primary">
+              Konfirmasi
+            </button>
             <button id="btnResetForm" class="btn-secondary">Reset</button>
           </div>
         </div>

@@ -46,8 +46,12 @@ const isProduction = process.env.NODE_ENV === "production";
 const sessionSecret = process.env.SESSION_SECRET;
 
 if (isProduction && !sessionSecret) {
-  console.error("❌ FATAL: SESSION_SECRET environment variable is REQUIRED in production!");
-  console.error("   Please set a strong, random SESSION_SECRET (at least 64 characters).");
+  console.error(
+    "❌ FATAL: SESSION_SECRET environment variable is REQUIRED in production!"
+  );
+  console.error(
+    "   Please set a strong, random SESSION_SECRET (at least 64 characters)."
+  );
   console.error(
     "   You can generate one with: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\""
   );
@@ -70,7 +74,8 @@ if (isProduction) {
 // Session middleware (MUST be before routes)
 app.use(
   session({
-    secret: sessionSecret || "dev-only-insecure-secret-do-not-use-in-production",
+    secret:
+      sessionSecret || "dev-only-insecure-secret-do-not-use-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -134,7 +139,10 @@ if (isProduction) {
     res.setHeader("X-DNS-Prefetch-Control", "off");
 
     // HSTS - enforce HTTPS (only if truly using HTTPS)
-    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains"
+    );
 
     // Basic Content Security Policy
     // Allows: same-origin scripts/styles, inline scripts (needed for some features),
@@ -177,6 +185,7 @@ const cleanUrlPages = [
   "podcast",
   "periksa-kesehatan",
   "member-check",
+  "about",
 ];
 
 // Redirect .html URLs to clean URLs (SEO friendly)
@@ -211,7 +220,9 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
     console.log("📦 Database ready\n");
   } catch (error) {
     console.error("❌ Database initialization failed:", error.message);
-    console.error("⚠️  Server will continue but API routes may not work properly\n");
+    console.error(
+      "⚠️  Server will continue but API routes may not work properly\n"
+    );
   }
 })();
 
@@ -247,7 +258,8 @@ app.use("/uploads", express.static(join(__dirname, "..", "uploads"))); // Serve 
 cleanUrlPages.forEach((page) => {
   app.get(`/${page}`, (req, res) => {
     // Special case: periksa-kesehatan maps to docterbee-periksa-kesehatan.html
-    const fileName = page === "periksa-kesehatan" ? "docterbee-periksa-kesehatan" : page;
+    const fileName =
+      page === "periksa-kesehatan" ? "docterbee-periksa-kesehatan" : page;
     res.sendFile(join(__dirname, "..", `${fileName}.html`));
   });
 });
@@ -267,116 +279,122 @@ app.get("/journey/:slug", (req, res) => {
 // ============================================
 
 // POST /api/admin/login - Admin login with database authentication (rate limited)
-app.post("/api/admin/login", loginRateLimiter.middleware(), async (req, res) => {
-  try {
-    const { username, password } = req.body;
+app.post(
+  "/api/admin/login",
+  loginRateLimiter.middleware(),
+  async (req, res) => {
+    try {
+      const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Username dan password harus diisi",
-      });
-    }
-
-    // Query admin from database - explicitly select needed columns (security best practice)
-    const admin = await queryOne(
-      "SELECT id, username, password FROM admins WHERE username = ? AND is_active = 1",
-      [username]
-    );
-
-    if (!admin) {
-      // Record rate limit failure
-      const rateLimitResult = req.rateLimiter.recordFailure();
-      const attemptsMsg =
-        rateLimitResult.attemptsLeft > 0
-          ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)`
-          : "";
-
-      // Log failed attempt (admin not found) - use NULL for admin_id
-      await query(
-        `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
-         VALUES (NULL, ?, ?, ?, 'failed')`,
-        [username, req.ip, req.get("user-agent")]
-      );
-
-      return res.status(401).json({
-        success: false,
-        error: `Username atau password salah${attemptsMsg}`,
-      });
-    }
-
-    // Verify password with bcrypt
-    const passwordMatch = await bcrypt.compare(password, admin.password);
-
-    if (!passwordMatch) {
-      // Record rate limit failure
-      const rateLimitResult = req.rateLimiter.recordFailure();
-      const attemptsMsg =
-        rateLimitResult.attemptsLeft > 0
-          ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)`
-          : "";
-
-      // Log failed attempt (wrong password)
-      await query(
-        `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
-         VALUES (?, ?, ?, ?, 'failed')`,
-        [admin.id, username, req.ip, req.get("user-agent")]
-      );
-
-      return res.status(401).json({
-        success: false,
-        error: `Username atau password salah${attemptsMsg}`,
-      });
-    }
-
-    // Successful login - reset rate limiter
-    req.rateLimiter.reset();
-
-    // Update last_login timestamp
-    await query("UPDATE admins SET last_login = NOW() WHERE id = ?", [admin.id]);
-
-    // Log successful login
-    await query(
-      `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
-       VALUES (?, ?, ?, ?, 'success')`,
-      [admin.id, username, req.ip, req.get("user-agent")]
-    );
-
-    // Set admin session
-    req.session.isAdmin = true;
-    req.session.adminId = admin.id;
-    req.session.adminUsername = admin.username;
-    req.session.adminRole = admin.role;
-
-    // Save session before sending response
-    req.session.save((err) => {
-      if (err) {
-        console.error("Session save error:", err);
-        return res.status(500).json({
+      if (!username || !password) {
+        return res.status(400).json({
           success: false,
-          error: "Gagal menyimpan session",
+          error: "Username dan password harus diisi",
         });
       }
 
-      res.json({
-        success: true,
-        message: "Admin login berhasil",
-        admin: {
-          id: admin.id,
-          username: admin.username,
-          email: admin.email,
-          role: admin.role,
-        },
+      // Query admin from database - explicitly select needed columns (security best practice)
+      const admin = await queryOne(
+        "SELECT id, username, password FROM admins WHERE username = ? AND is_active = 1",
+        [username]
+      );
+
+      if (!admin) {
+        // Record rate limit failure
+        const rateLimitResult = req.rateLimiter.recordFailure();
+        const attemptsMsg =
+          rateLimitResult.attemptsLeft > 0
+            ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)`
+            : "";
+
+        // Log failed attempt (admin not found) - use NULL for admin_id
+        await query(
+          `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
+         VALUES (NULL, ?, ?, ?, 'failed')`,
+          [username, req.ip, req.get("user-agent")]
+        );
+
+        return res.status(401).json({
+          success: false,
+          error: `Username atau password salah${attemptsMsg}`,
+        });
+      }
+
+      // Verify password with bcrypt
+      const passwordMatch = await bcrypt.compare(password, admin.password);
+
+      if (!passwordMatch) {
+        // Record rate limit failure
+        const rateLimitResult = req.rateLimiter.recordFailure();
+        const attemptsMsg =
+          rateLimitResult.attemptsLeft > 0
+            ? ` (${rateLimitResult.attemptsLeft} percobaan tersisa)`
+            : "";
+
+        // Log failed attempt (wrong password)
+        await query(
+          `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
+         VALUES (?, ?, ?, ?, 'failed')`,
+          [admin.id, username, req.ip, req.get("user-agent")]
+        );
+
+        return res.status(401).json({
+          success: false,
+          error: `Username atau password salah${attemptsMsg}`,
+        });
+      }
+
+      // Successful login - reset rate limiter
+      req.rateLimiter.reset();
+
+      // Update last_login timestamp
+      await query("UPDATE admins SET last_login = NOW() WHERE id = ?", [
+        admin.id,
+      ]);
+
+      // Log successful login
+      await query(
+        `INSERT INTO admin_login_history (admin_id, username, ip_address, user_agent, login_status) 
+       VALUES (?, ?, ?, ?, 'success')`,
+        [admin.id, username, req.ip, req.get("user-agent")]
+      );
+
+      // Set admin session
+      req.session.isAdmin = true;
+      req.session.adminId = admin.id;
+      req.session.adminUsername = admin.username;
+      req.session.adminRole = admin.role;
+
+      // Save session before sending response
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({
+            success: false,
+            error: "Gagal menyimpan session",
+          });
+        }
+
+        res.json({
+          success: true,
+          message: "Admin login berhasil",
+          admin: {
+            id: admin.id,
+            username: admin.username,
+            email: admin.email,
+            role: admin.role,
+          },
+        });
       });
-    });
-  } catch (error) {
-    console.error("Admin login error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Terjadi kesalahan saat login",
-    });
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Terjadi kesalahan saat login",
+      });
+    }
   }
-});
+);
 
 // POST /api/admin/logout - Admin logout
 app.post("/api/admin/logout", (req, res) => {
@@ -457,7 +475,8 @@ app.get("/api/debug", async (req, res) => {
 
     // Add warning in development
     if (!isProduction) {
-      response.warning = "⚠️ Debug endpoint aktif. Nonaktifkan atau lindungi di production!";
+      response.warning =
+        "⚠️ Debug endpoint aktif. Nonaktifkan atau lindungi di production!";
     }
 
     res.json(response);
@@ -476,7 +495,8 @@ function cleanYoutubeUrl(url) {
   try {
     // Remove tracking parameters like si=, feature=, etc
     const urlObj = new URL(url);
-    const videoId = urlObj.searchParams.get("v") || url.split("/").pop().split("?")[0];
+    const videoId =
+      urlObj.searchParams.get("v") || url.split("/").pop().split("?")[0];
 
     // Return clean URL
     if (videoId && videoId.length === 11) {
@@ -527,7 +547,8 @@ async function fetchTranscriptWithRetry(videoId) {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
 
@@ -562,7 +583,8 @@ async function fetchTranscriptWithRetry(videoId) {
         const captionUrl = preferredTrack.baseUrl + "&fmt=srv3";
         const captionResponse = await fetch(captionUrl, {
           headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             Accept: "*/*",
             "Accept-Language": "en-US,en;q=0.9",
             Referer: "https://www.youtube.com/",
@@ -599,8 +621,12 @@ async function fetchTranscriptWithRetry(videoId) {
           }
 
           if (transcript.length > 0) {
-            console.log(`✅ SUCCESS! Raw parsing returned ${transcript.length} segments`);
-            console.log(`📊 First segment: "${transcript[0].text.substring(0, 50)}..."`);
+            console.log(
+              `✅ SUCCESS! Raw parsing returned ${transcript.length} segments`
+            );
+            console.log(
+              `📊 First segment: "${transcript[0].text.substring(0, 50)}..."`
+            );
             return transcript;
           }
         }
@@ -619,7 +645,9 @@ async function fetchTranscriptWithRetry(videoId) {
     const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
 
     if (transcriptItems && transcriptItems.length > 0) {
-      console.log(`✅ SUCCESS! youtube-transcript returned ${transcriptItems.length} segments`);
+      console.log(
+        `✅ SUCCESS! youtube-transcript returned ${transcriptItems.length} segments`
+      );
       return transcriptItems.map((item) => ({
         text: item.text || "",
         offset: item.offset || 0,
@@ -628,7 +656,9 @@ async function fetchTranscriptWithRetry(videoId) {
     }
     console.log(`⚠️ youtube-transcript returned no usable data`);
   } catch (youtubeTranscriptError) {
-    console.log(`⚠️ Method 1 (youtube-transcript) failed: ${youtubeTranscriptError.message}`);
+    console.log(
+      `⚠️ Method 1 (youtube-transcript) failed: ${youtubeTranscriptError.message}`
+    );
   }
 
   // Method 2 & 3: Try youtubei.js (existing implementation)
@@ -657,8 +687,12 @@ async function fetchTranscriptWithRetry(videoId) {
         console.log(
           `✅ Using caption track: ${selectedTrack.name.text} (${selectedTrack.language_code})`
         );
-        console.log(`   Is auto-generated: ${selectedTrack.kind === "asr" ? "Yes" : "No"}`);
-        console.log(`   Base URL: ${selectedTrack.base_url ? "Available" : "Missing"}`);
+        console.log(
+          `   Is auto-generated: ${selectedTrack.kind === "asr" ? "Yes" : "No"}`
+        );
+        console.log(
+          `   Base URL: ${selectedTrack.base_url ? "Available" : "Missing"}`
+        );
 
         // Method 1: Try using getTranscript() if available
         try {
@@ -666,10 +700,13 @@ async function fetchTranscriptWithRetry(videoId) {
           const transcriptData = await info.getTranscript();
 
           if (transcriptData && transcriptData.transcript) {
-            const segments = transcriptData.transcript.content?.body?.initial_segments;
+            const segments =
+              transcriptData.transcript.content?.body?.initial_segments;
 
             if (segments && segments.length > 0) {
-              console.log(`✅ Got ${segments.length} segments via getTranscript()`);
+              console.log(
+                `✅ Got ${segments.length} segments via getTranscript()`
+              );
 
               const transcript = segments
                 .map((seg) => ({
@@ -680,39 +717,54 @@ async function fetchTranscriptWithRetry(videoId) {
                 .filter((t) => t.text.trim());
 
               if (transcript.length > 0) {
-                console.log(`✅ SUCCESS! Formatted ${transcript.length} segments`);
-                console.log(`📊 First: "${transcript[0].text.substring(0, 50)}..."`);
+                console.log(
+                  `✅ SUCCESS! Formatted ${transcript.length} segments`
+                );
+                console.log(
+                  `📊 First: "${transcript[0].text.substring(0, 50)}..."`
+                );
                 return transcript;
               }
             }
           }
           console.log(`⚠️  getTranscript() returned no usable data`);
         } catch (getTranscriptError) {
-          console.log(`❌ getTranscript() failed: ${getTranscriptError.message}`);
+          console.log(
+            `❌ getTranscript() failed: ${getTranscriptError.message}`
+          );
         }
 
         // Method 2: Fetch and parse caption XML directly
         if (selectedTrack.base_url) {
           try {
-            console.log(`🔄 Method 2: Downloading caption XML from base_url...`);
-            console.log(`   URL: ${selectedTrack.base_url.substring(0, 80)}...`);
+            console.log(
+              `🔄 Method 2: Downloading caption XML from base_url...`
+            );
+            console.log(
+              `   URL: ${selectedTrack.base_url.substring(0, 80)}...`
+            );
 
             // Add headers to mimic browser request
             const captionResponse = await fetch(selectedTrack.base_url, {
               headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "User-Agent":
+                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 Accept: "text/xml,application/xml",
                 "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
               },
             });
 
             if (!captionResponse.ok) {
-              throw new Error(`HTTP ${captionResponse.status}: ${captionResponse.statusText}`);
+              throw new Error(
+                `HTTP ${captionResponse.status}: ${captionResponse.statusText}`
+              );
             }
 
             const captionXML = await captionResponse.text();
 
-            console.log(`📥 Downloaded caption XML (${captionXML.length} bytes)`);
+            console.log(
+              `📥 Downloaded caption XML (${captionXML.length} bytes)`
+            );
 
             // Check if XML is actually empty or invalid
             if (!captionXML || captionXML.length === 0) {
@@ -750,7 +802,9 @@ async function fetchTranscriptWithRetry(videoId) {
               console.log(
                 `✅ SUCCESS! Parsed ${transcript.length} transcript segments from youtubei.js`
               );
-              console.log(`📊 First segment: "${transcript[0].text.substring(0, 50)}..."`);
+              console.log(
+                `📊 First segment: "${transcript[0].text.substring(0, 50)}..."`
+              );
               return transcript;
             } else {
               console.log(`⚠️  Parsed XML but found no text segments`);
@@ -791,7 +845,10 @@ app.post("/api/ai-advisor", async (req, res) => {
       });
     }
 
-    console.log("🧠 AI Advisor - Pertanyaan user:", question.substring(0, 100) + "...");
+    console.log(
+      "🧠 AI Advisor - Pertanyaan user:",
+      question.substring(0, 100) + "..."
+    );
 
     const modelName = "gemini-2.5-flash";
     const model = genAI.getGenerativeModel({ model: modelName });
@@ -860,7 +917,11 @@ PENTING:
     const response = await result.response;
     let text = response.text();
 
-    console.log("✅ AI Advisor analisis selesai, panjang:", text.length, "karakter");
+    console.log(
+      "✅ AI Advisor analisis selesai, panjang:",
+      text.length,
+      "karakter"
+    );
 
     // Clean up response (remove markdown code blocks if any)
     text = text
@@ -886,7 +947,11 @@ PENTING:
     }
 
     // Validate structure
-    if (!jsonResponse.verdict || !jsonResponse.recommendations || !jsonResponse.nbsnAnalysis) {
+    if (
+      !jsonResponse.verdict ||
+      !jsonResponse.recommendations ||
+      !jsonResponse.nbsnAnalysis
+    ) {
       return res.json({
         success: true,
         fallbackMode: true,
@@ -913,10 +978,13 @@ PENTING:
     }
 
     if (error.message.includes("quota") || error.message.includes("429")) {
-      const isPerMinute = error.message.includes("per minute") || error.message.includes("RPM");
+      const isPerMinute =
+        error.message.includes("per minute") || error.message.includes("RPM");
 
       return res.status(429).json({
-        error: isPerMinute ? "Per-minute quota (15 RPM) tercapai" : "Daily quota tercapai",
+        error: isPerMinute
+          ? "Per-minute quota (15 RPM) tercapai"
+          : "Daily quota tercapai",
         details: isPerMinute
           ? "Tunggu 60 detik lalu coba lagi"
           : "Quota harian habis, coba besok atau upgrade",
@@ -940,7 +1008,8 @@ app.post("/api/health-check-ai", async (req, res) => {
   }
 
   try {
-    const { usia, gender, keluhan, makan, tidur, aktivitas, redflag } = req.body;
+    const { usia, gender, keluhan, makan, tidur, aktivitas, redflag } =
+      req.body;
 
     // Input validation
     if (!usia || !gender) {
@@ -958,7 +1027,9 @@ app.post("/api/health-check-ai", async (req, res) => {
     // Sanitize arrays to prevent injection
     const sanitizeArray = (arr) => {
       if (!Array.isArray(arr)) return [];
-      return arr.filter((item) => typeof item === "string" && item.length < 100);
+      return arr.filter(
+        (item) => typeof item === "string" && item.length < 100
+      );
     };
 
     const keluhanList = sanitizeArray(keluhan);
@@ -1042,7 +1113,11 @@ PENTING:
     const response = await result.response;
     let text = response.text();
 
-    console.log("✅ Health Check AI analysis complete, length:", text.length, "chars");
+    console.log(
+      "✅ Health Check AI analysis complete, length:",
+      text.length,
+      "chars"
+    );
 
     // Clean up response (remove markdown code blocks if any)
     text = text
@@ -1066,8 +1141,16 @@ PENTING:
     }
 
     // Validate required fields
-    const requiredFields = ["level", "statusText", "ringkasan", "akarMasalah", "solusi"];
-    const missingFields = requiredFields.filter((field) => !jsonResponse[field]);
+    const requiredFields = [
+      "level",
+      "statusText",
+      "ringkasan",
+      "akarMasalah",
+      "solusi",
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !jsonResponse[field]
+    );
 
     if (missingFields.length > 0) {
       console.log("⚠️ Missing fields in response:", missingFields);
@@ -1095,11 +1178,16 @@ PENTING:
     }
 
     if (error.message.includes("quota") || error.message.includes("429")) {
-      const isPerMinute = error.message.includes("per minute") || error.message.includes("RPM");
+      const isPerMinute =
+        error.message.includes("per minute") || error.message.includes("RPM");
 
       return res.status(429).json({
-        error: isPerMinute ? "Per-minute quota tercapai" : "Daily quota tercapai",
-        details: isPerMinute ? "Tunggu 60 detik lalu coba lagi" : "Coba besok atau upgrade",
+        error: isPerMinute
+          ? "Per-minute quota tercapai"
+          : "Daily quota tercapai",
+        details: isPerMinute
+          ? "Tunggu 60 detik lalu coba lagi"
+          : "Coba besok atau upgrade",
         waitTime: isPerMinute ? "60 detik" : "24 jam",
         retryAfter: isPerMinute ? 60 : 86400,
         fallback: true,
@@ -1160,7 +1248,10 @@ app.post("/api/check-transcript", async (req, res) => {
         const text = response.text();
 
         if (!text.includes("TIDAK DAPAT MENGAKSES")) {
-          console.log("✅ Video dapat diakses oleh Gemini:", text.substring(0, 50));
+          console.log(
+            "✅ Video dapat diakses oleh Gemini:",
+            text.substring(0, 50)
+          );
           return res.json({
             available: true,
             segmentCount: 0,
@@ -1201,7 +1292,8 @@ app.post("/api/check-transcript", async (req, res) => {
           return res.json({
             available: false,
             error: "Transcript kosong",
-            message: "Video memiliki subtitle, tapi isinya kosong. Mohon tulis catatan manual.",
+            message:
+              "Video memiliki subtitle, tapi isinya kosong. Mohon tulis catatan manual.",
           });
         }
       } else {
@@ -1209,7 +1301,8 @@ app.post("/api/check-transcript", async (req, res) => {
         return res.json({
           available: false,
           error: "Tidak ada data transcript",
-          message: "Video tidak mengembalikan data subtitle. Mohon tulis catatan manual.",
+          message:
+            "Video tidak mengembalikan data subtitle. Mohon tulis catatan manual.",
         });
       }
     } catch (error) {
@@ -1271,7 +1364,9 @@ app.post("/api/summarize", async (req, res) => {
     // This is the primary method - Gemini can analyze YouTube videos directly!
     if (youtubeUrl && videoId && (!notes || notes.trim() === "")) {
       try {
-        console.log("🎬 PRIORITY 1: Mencoba analisis YouTube langsung dengan Gemini...");
+        console.log(
+          "🎬 PRIORITY 1: Mencoba analisis YouTube langsung dengan Gemini..."
+        );
         console.log("🔗 Video URL:", cleanYoutubeUrl(youtubeUrl));
 
         const directAnalysisPrompt = `Kamu adalah asisten AI untuk aplikasi kesehatan Islami "Docterbee" yang menggabungkan ajaran Qur'an & Sunnah SHAHIH, sains modern, dan framework NBSN (Neuron, Biomolekul, Sensorik, Nature).
@@ -1321,7 +1416,11 @@ PENTING:
         const response = await result.response;
         const text = response.text();
 
-        console.log("✅ Gemini Direct berhasil! Panjang:", text.length, "karakter");
+        console.log(
+          "✅ Gemini Direct berhasil! Panjang:",
+          text.length,
+          "karakter"
+        );
 
         return res.json({
           success: true,
@@ -1351,7 +1450,11 @@ PENTING:
 
           if (transcript && transcript.trim().length > 0) {
             hasTranscript = true;
-            console.log("✅ Transcript berhasil:", transcript.length, "karakter");
+            console.log(
+              "✅ Transcript berhasil:",
+              transcript.length,
+              "karakter"
+            );
           }
         }
       } catch (error) {
@@ -1364,16 +1467,21 @@ PENTING:
     // Validation: need either transcript or notes
     if (!hasTranscript && (!notes || notes.trim() === "")) {
       return res.status(400).json({
-        error: "Transcript tidak tersedia. Mohon tulis catatan/ringkasan video secara manual.",
+        error:
+          "Transcript tidak tersedia. Mohon tulis catatan/ringkasan video secara manual.",
         transcriptError,
       });
     }
 
     // Log what we're analyzing
     if (hasTranscript) {
-      console.log("📝 Menganalisis: AUTO TRANSCRIPT (" + transcript.length + " karakter)");
+      console.log(
+        "📝 Menganalisis: AUTO TRANSCRIPT (" + transcript.length + " karakter)"
+      );
     } else {
-      console.log("📝 Menganalisis: USER NOTES (" + notes.length + " karakter)");
+      console.log(
+        "📝 Menganalisis: USER NOTES (" + notes.length + " karakter)"
+      );
     }
 
     // Use existing model variable from above
@@ -1391,7 +1499,13 @@ KONTEN YANG HARUS DIANALISIS (Sumber: ${contentSource}):
 ${contentToAnalyze}
 ---END KONTEN---
 
-${youtubeUrl ? `\n📹 Video YouTube: ${youtubeUrl}\n${videoId ? `Video ID: ${videoId}` : ""}` : ""}
+${
+  youtubeUrl
+    ? `\n📹 Video YouTube: ${youtubeUrl}\n${
+        videoId ? `Video ID: ${videoId}` : ""
+      }`
+    : ""
+}
 
 TUGAS:
 Analisis KONTEN DI ATAS (yang ada di antara ---BEGIN KONTEN--- dan ---END KONTEN---) dari perspektif kesehatan Islami dan berikan penjelasan dalam Bahasa Indonesia yang mencakup:
@@ -1454,8 +1568,10 @@ PENTING:
     }
 
     if (error.message.includes("quota") || error.message.includes("429")) {
-      const isPerMinute = error.message.includes("per minute") || error.message.includes("RPM");
-      const isDaily = error.message.includes("per day") || error.message.includes("RPD");
+      const isPerMinute =
+        error.message.includes("per minute") || error.message.includes("RPM");
+      const isDaily =
+        error.message.includes("per day") || error.message.includes("RPD");
 
       let quotaType = "API quota";
       let waitTime = "beberapa menit";
@@ -1464,7 +1580,8 @@ PENTING:
       if (isPerMinute) {
         quotaType = "Per-minute quota (15 RPM)";
         waitTime = "60 detik";
-        details = "Free tier: 15 requests per menit. Tunggu 1 menit lalu coba lagi.";
+        details =
+          "Free tier: 15 requests per menit. Tunggu 1 menit lalu coba lagi.";
       } else if (isDaily) {
         quotaType = "Daily quota (1,500 RPD)";
         waitTime = "24 jam";
@@ -1567,17 +1684,19 @@ app.use((req, res, next) => {
   ];
 
   const requestPath = req.path.toLowerCase();
-  
+
   for (const pattern of blockedPatterns) {
     if (pattern.test(requestPath)) {
       // Log suspicious access attempt
-      console.warn(`🚨 Blocked suspicious request: ${req.method} ${req.path} from ${req.ip}`);
-      
+      console.warn(
+        `🚨 Blocked suspicious request: ${req.method} ${req.path} from ${req.ip}`
+      );
+
       // Return 404 (not 403) to not reveal file existence
       return res.status(404).sendFile(join(__dirname, "..", "404.html"));
     }
   }
-  
+
   next();
 });
 
@@ -1592,7 +1711,7 @@ app.use((req, res) => {
       error: "Endpoint tidak ditemukan",
     });
   }
-  
+
   // For all other routes, serve 404.html
   res.status(404).sendFile(join(__dirname, "..", "404.html"));
 });
@@ -1601,6 +1720,8 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log("🚀 Docterbee Backend Server");
   console.log(`📡 Server berjalan di http://localhost:${PORT}`);
-  console.log(`🔑 Gemini API: ${genAI ? "✅ Configured" : "⚠️  Not configured"}`);
+  console.log(
+    `🔑 Gemini API: ${genAI ? "✅ Configured" : "⚠️  Not configured"}`
+  );
   console.log("⏳ Menunggu request...\n");
 });

@@ -26,7 +26,9 @@
 
       if (result.loggedIn && result.user) {
         // User logged in - show member navbar and fetch points
-        console.log("[landing-navbar] User IS logged in, showing member navbar");
+        console.log(
+          "[landing-navbar] User IS logged in, showing member navbar"
+        );
         showMemberNavbar();
         fetchAndDisplayPoints();
       } else {
@@ -36,7 +38,10 @@
       }
     } catch (error) {
       // Network error or server down - show guest navbar as fallback
-      console.warn("[landing-navbar] Could not check auth status:", error.message);
+      console.warn(
+        "[landing-navbar] Could not check auth status:",
+        error.message
+      );
       showGuestNavbar();
     }
   }
@@ -214,9 +219,13 @@
 
   // Initialize mobile kesehatan dropdown toggle
   function initMobileKesehatanDropdown() {
-    const mobileKesehatanDropdown = document.getElementById("mobileKesehatanDropdown");
+    const mobileKesehatanDropdown = document.getElementById(
+      "mobileKesehatanDropdown"
+    );
     const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
-    const mobileToggle = mobileKesehatanDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+    const mobileToggle = mobileKesehatanDropdown?.querySelector(
+      ".mobile-nav-dropdown-toggle"
+    );
 
     if (!mobileKesehatanDropdown) {
       console.warn("mobileKesehatanDropdown element not found");
@@ -246,9 +255,13 @@
 
   // Initialize mobile media dropdown toggle
   function initMobileMediaDropdown() {
-    const mobileKesehatanDropdown = document.getElementById("mobileKesehatanDropdown");
+    const mobileKesehatanDropdown = document.getElementById(
+      "mobileKesehatanDropdown"
+    );
     const mobileMediaDropdown = document.getElementById("mobileMediaDropdown");
-    const mobileToggle = mobileMediaDropdown?.querySelector(".mobile-nav-dropdown-toggle");
+    const mobileToggle = mobileMediaDropdown?.querySelector(
+      ".mobile-nav-dropdown-toggle"
+    );
 
     if (!mobileMediaDropdown) {
       console.warn("mobileMediaDropdown element not found");
@@ -339,14 +352,28 @@
     });
 
     // Special handling for dropdown items (Kesehatan dropdown: services, booking, journey, periksa-kesehatan)
-    const kesehatanPages = ["/services", "/booking", "/journey", "/periksa-kesehatan"];
-    const mediaPages = ["/media", "/youtube-ai", "/podcast", "/article", "/insight"];
+    const kesehatanPages = [
+      "/services",
+      "/booking",
+      "/journey",
+      "/periksa-kesehatan",
+    ];
+    const mediaPages = [
+      "/media",
+      "/youtube-ai",
+      "/podcast",
+      "/article",
+      "/insight",
+      "/about",
+    ];
 
     if (kesehatanPages.some((page) => normalizedPath.startsWith(page))) {
       // Highlight parent "Kesehatan" dropdown button on desktop if on a sub-page
       const kesehatanDropdown = document.querySelector(".nav-dropdown");
       if (kesehatanDropdown) {
-        const dropdownToggle = kesehatanDropdown.querySelector(".nav-dropdown-toggle");
+        const dropdownToggle = kesehatanDropdown.querySelector(
+          ".nav-dropdown-toggle"
+        );
         if (dropdownToggle) {
           dropdownToggle.classList.add("active");
         }
@@ -357,7 +384,9 @@
       // Highlight parent "Media" dropdown button on desktop if on a sub-page
       const mediaDropdown = document.querySelectorAll(".nav-dropdown")[1]; // Second dropdown
       if (mediaDropdown) {
-        const dropdownToggle = mediaDropdown.querySelector(".nav-dropdown-toggle");
+        const dropdownToggle = mediaDropdown.querySelector(
+          ".nav-dropdown-toggle"
+        );
         if (dropdownToggle) {
           dropdownToggle.classList.add("active");
         }

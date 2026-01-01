@@ -31,7 +31,11 @@
       <div class="container">
         <nav>
           <a href="/" class="logo">
-            <img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img" />
+            <img
+              src="assets/images/logo-docterbee.png"
+              alt="DocterBee"
+              class="logo-img"
+            />
           </a>
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
@@ -136,6 +140,24 @@
                 </svg>
               </button>
               <div class="nav-dropdown-menu">
+                <a href="/about">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  Tentang Kami
+                </a>
                 <a href="/insight">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +190,9 @@
                     <path
                       d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
                     ></path>
-                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                    <polygon
+                      points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                    ></polygon>
                   </svg>
                   YouTube &amp; AI
                 </a>
@@ -202,16 +226,27 @@
               >
                 Masuk
               </button>
-              <button class="btn btn-primary" onclick="location.href='/register'">
+              <button
+                class="btn btn-primary"
+                onclick="location.href='/register'"
+              >
                 Daftar Sekarang
               </button>
             </div>
             <!-- Member info (shown when logged in) -->
-            <div id="memberInfo" style="display: none; align-items: center; gap: 12px">
+            <div
+              id="memberInfo"
+              style="display: none; align-items: center; gap: 12px"
+            >
               <span class="points-display" id="pointsDisplay">
                 Points: <b id="navPoints">0</b>
               </span>
-              <a href="/profile" id="profileBtn" class="nav-link" title="Profile">
+              <a
+                href="/profile"
+                id="profileBtn"
+                class="nav-link"
+                title="Profile"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -227,7 +262,9 @@
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </a>
-              <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+              <button id="logoutBtn" class="btn btn-outline-danger">
+                Logout
+              </button>
             </div>
           </div>
 
@@ -254,7 +291,11 @@
             style="height: 48px; width: auto"
           />
         </div>
-        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+        <button
+          class="mobile-menu-close"
+          id="mobileMenuClose"
+          aria-label="Close"
+        >
           <svg
             width="24"
             height="24"
@@ -370,6 +411,24 @@
             </svg>
           </button>
           <div class="mobile-nav-submenu">
+            <a href="/about">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Tentang Kami
+            </a>
             <a href="/insight">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -402,7 +461,9 @@
                 <path
                   d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
                 ></path>
-                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                <polygon
+                  points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                ></polygon>
               </svg>
               YouTube &amp; AI
             </a>
@@ -430,10 +491,18 @@
         <div class="mobile-menu-actions">
           <!-- Auth buttons for guests -->
           <div id="mobileAuthButtons">
-            <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
+            <button
+              class="btn btn-outline"
+              onclick="location.href='/login'"
+              style="width: 100%"
+            >
               Masuk
             </button>
-            <button class="btn btn-primary" onclick="location.href='/register'" style="width: 100%">
+            <button
+              class="btn btn-primary"
+              onclick="location.href='/register'"
+              style="width: 100%"
+            >
               Daftar Sekarang
             </button>
           </div>
@@ -464,7 +533,11 @@
               </svg>
               Profile
             </a>
-            <button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">
+            <button
+              id="mobileLogoutBtn"
+              class="btn btn-outline-danger"
+              style="width: 100%"
+            >
               Logout
             </button>
           </div>
@@ -485,7 +558,9 @@
       <!-- Filter & Services Grid -->
       <div class="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
         <!-- Sidebar Filter -->
-        <aside class="rounded-2xl border border-gray-200 bg-white p-5 text-sm h-fit">
+        <aside
+          class="rounded-2xl border border-gray-200 bg-white p-5 text-sm h-fit"
+        >
           <div class="font-semibold mb-3 flex items-center gap-2 text-red-600">
             <i data-lucide="filter" class="w-4 h-4"></i>
             Filter Layanan
@@ -493,7 +568,9 @@
 
           <!-- Branch Filter -->
           <label class="block mb-3">
-            <span class="text-slate-900 text-xs mb-1 block font-medium">Cabang</span>
+            <span class="text-slate-900 text-xs mb-1 block font-medium"
+              >Cabang</span
+            >
             <select
               id="branchFilter"
               class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-red-600 focus:outline-none"
@@ -507,7 +584,9 @@
 
           <!-- Mode Filter -->
           <label class="block mb-3">
-            <span class="text-slate-900 text-xs mb-1 block font-medium">Mode</span>
+            <span class="text-slate-900 text-xs mb-1 block font-medium"
+              >Mode</span
+            >
             <select
               id="modeFilter"
               class="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-slate-900 focus:border-red-600 focus:outline-none"
@@ -520,29 +599,59 @@
 
           <!-- Category Filter -->
           <div class="mt-4">
-            <div class="font-semibold mb-2 text-xs text-slate-900">Kategori</div>
+            <div class="font-semibold mb-2 text-xs text-slate-900">
+              Kategori
+            </div>
             <ul class="space-y-2">
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catManual" checked class="rounded text-red-600" />
-                <label for="catManual" class="text-slate-900 text-sm cursor-pointer"
+                <input
+                  type="checkbox"
+                  id="catManual"
+                  checked
+                  class="rounded text-red-600"
+                />
+                <label
+                  for="catManual"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Manual Therapy</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catKlinis" checked class="rounded text-red-600" />
-                <label for="catKlinis" class="text-slate-900 text-sm cursor-pointer"
+                <input
+                  type="checkbox"
+                  id="catKlinis"
+                  checked
+                  class="rounded text-red-600"
+                />
+                <label
+                  for="catKlinis"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Konsultasi Klinis</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catNutrisi" checked class="rounded text-red-600" />
-                <label for="catNutrisi" class="text-slate-900 text-sm cursor-pointer"
+                <input
+                  type="checkbox"
+                  id="catNutrisi"
+                  checked
+                  class="rounded text-red-600"
+                />
+                <label
+                  for="catNutrisi"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Nutrisi & Gizi</label
                 >
               </li>
               <li class="flex items-center gap-2">
-                <input type="checkbox" id="catKeluarga" checked class="rounded text-red-600" />
-                <label for="catKeluarga" class="text-slate-900 text-sm cursor-pointer"
+                <input
+                  type="checkbox"
+                  id="catKeluarga"
+                  checked
+                  class="rounded text-red-600"
+                />
+                <label
+                  for="catKeluarga"
+                  class="text-slate-900 text-sm cursor-pointer"
                   >Keluarga & Parenting</label
                 >
               </li>
@@ -551,7 +660,10 @@
         </aside>
 
         <!-- Services Grid -->
-        <section id="servicesGrid" class="md:col-span-2 lg:col-span-3 grid gap-4 md:grid-cols-2">
+        <section
+          id="servicesGrid"
+          class="md:col-span-2 lg:col-span-3 grid gap-4 md:grid-cols-2"
+        >
           <!-- Services akan dimuat secara dinamis dari API -->
           <div class="md:col-span-2 text-center py-12">
             <div

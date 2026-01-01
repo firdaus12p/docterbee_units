@@ -109,7 +109,10 @@
       <div class="container">
         <nav>
           <a href="/" class="logo"
-            ><img src="assets/images/logo-docterbee.png" alt="DocterBee" class="logo-img"
+            ><img
+              src="assets/images/logo-docterbee.png"
+              alt="DocterBee"
+              class="logo-img"
           /></a>
           <div class="nav-links">
             <a href="/" id="guestNavItem">Beranda</a>
@@ -206,6 +209,22 @@
                 </svg>
               </button>
               <div class="nav-dropdown-menu">
+                <a href="/about"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  Tentang Kami</a
+                >
                 <a href="/insight"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -234,7 +253,9 @@
                     <path
                       d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
                     ></path>
-                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                    <polygon
+                      points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                    ></polygon>
                   </svg>
                   YouTube &amp; AI</a
                 >
@@ -264,14 +285,24 @@
                 style="margin-right: 8px"
               >
                 Masuk</button
-              ><button class="btn btn-primary" onclick="location.href='/register'">
+              ><button
+                class="btn btn-primary"
+                onclick="location.href='/register'"
+              >
                 Daftar Sekarang
               </button>
             </div>
-            <div id="memberInfo" style="display: none; align-items: center; gap: 12px">
+            <div
+              id="memberInfo"
+              style="display: none; align-items: center; gap: 12px"
+            >
               <span class="points-display" id="pointsDisplay"
                 >Points: <b id="pointsValue">0</b></span
-              ><a href="/profile" id="profileBtn" class="nav-link active" title="Profile"
+              ><a
+                href="/profile"
+                id="profileBtn"
+                class="nav-link active"
+                title="Profile"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -283,7 +314,9 @@
                 >
                   <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle></svg></a
-              ><button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+              ><button id="logoutBtn" class="btn btn-outline-danger">
+                Logout
+              </button>
             </div>
           </div>
           <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
@@ -303,7 +336,11 @@
             style="height: 48px; width: auto"
           />
         </div>
-        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close">
+        <button
+          class="mobile-menu-close"
+          id="mobileMenuClose"
+          aria-label="Close"
+        >
           <svg
             width="24"
             height="24"
@@ -412,6 +449,22 @@
             </svg>
           </button>
           <div class="mobile-nav-submenu">
+            <a href="/about"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Tentang Kami</a
+            >
             <a href="/insight"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -440,7 +493,9 @@
                 <path
                   d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
                 ></path>
-                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                <polygon
+                  points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                ></polygon>
               </svg>
               YouTube &amp; AI</a
             >
@@ -465,7 +520,11 @@
         </div>
         <div class="mobile-menu-actions">
           <div id="mobileAuthButtons">
-            <button class="btn btn-outline" onclick="location.href='/login'" style="width: 100%">
+            <button
+              class="btn btn-outline"
+              onclick="location.href='/login'"
+              style="width: 100%"
+            >
               Masuk</button
             ><button
               class="btn btn-primary"
@@ -497,7 +556,11 @@
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
               Profile</a
-            ><button id="mobileLogoutBtn" class="btn btn-outline-danger" style="width: 100%">
+            ><button
+              id="mobileLogoutBtn"
+              class="btn btn-outline-danger"
+              style="width: 100%"
+            >
               Logout
             </button>
           </div>
@@ -553,18 +616,34 @@
             <div class="card-flip-wrapper" id="profileCardFlipWrapper">
               <!-- Front Face -->
               <div class="card-face card-face-front">
-                <img id="profileCardFrontImage" src="" alt="Card Front" class="card-image" />
+                <img
+                  id="profileCardFrontImage"
+                  src=""
+                  alt="Card Front"
+                  class="card-image"
+                />
                 <div class="card-overlay">
                   <div class="card-info" id="profileCardInfo">
-                    <div class="card-name" id="profileCardNameDisplay">Nama Anda</div>
-                    <div class="card-phone" id="profileCardPhoneDisplay">08xxxxxxxxxx</div>
-                    <div class="card-points" id="profileCardPointsDisplay">0 Points</div>
+                    <div class="card-name" id="profileCardNameDisplay">
+                      Nama Anda
+                    </div>
+                    <div class="card-phone" id="profileCardPhoneDisplay">
+                      08xxxxxxxxxx
+                    </div>
+                    <div class="card-points" id="profileCardPointsDisplay">
+                      0 Points
+                    </div>
                   </div>
                 </div>
               </div>
               <!-- Back Face -->
               <div class="card-face card-face-back">
-                <img id="profileCardBackImage" src="" alt="Card Back" class="card-image" />
+                <img
+                  id="profileCardBackImage"
+                  src=""
+                  alt="Card Back"
+                  class="card-image"
+                />
               </div>
             </div>
             <div class="card-flip-hint">
@@ -588,9 +667,16 @@
       </div>
 
       <!-- Error State -->
-      <div id="errorState" style="display: none; text-align: center; padding: 3rem">
-        <p class="text-red-600 mb-4">Gagal memuat data profile. Silakan login terlebih dahulu.</p>
-        <button onclick="window.location.href='/login'" class="btn btn-primary">Login</button>
+      <div
+        id="errorState"
+        style="display: none; text-align: center; padding: 3rem"
+      >
+        <p class="text-red-600 mb-4">
+          Gagal memuat data profile. Silakan login terlebih dahulu.
+        </p>
+        <button onclick="window.location.href='/login'" class="btn btn-primary">
+          Login
+        </button>
       </div>
     </main>
 
@@ -619,7 +705,8 @@
           label: "Family Member",
         },
         "Healthy-Smart-Kids": {
-          front: "/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png",
+          front:
+            "/uploads/gambar_kartu/depan/Background-Healthy-&-Smart-Kids.png",
           back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Healthy-&-Smart-Kids.png",
           label: "Healthy & Smart Kids",
         },
@@ -634,7 +721,8 @@
           label: "New Couple",
         },
         "Pregnant-Preparation": {
-          front: "/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png",
+          front:
+            "/uploads/gambar_kartu/depan/Background-Pregnant-Preparatiom.png",
           back: "/uploads/gambar_kartu/belakang/Tampilan-Belakang-Pregnant-Preparatiom.png",
           label: "Pregnant Preparation",
         },
@@ -646,7 +734,9 @@
       };
 
       // Flip card on click
-      const profileCardFlipWrapper = document.getElementById("profileCardFlipWrapper");
+      const profileCardFlipWrapper = document.getElementById(
+        "profileCardFlipWrapper"
+      );
       profileCardFlipWrapper.addEventListener("click", function () {
         this.classList.toggle("flipped");
       });
@@ -724,12 +814,20 @@
           // Update card preview
           document.getElementById("profileCardFrontImage").src = cardData.front;
           document.getElementById("profileCardBackImage").src = cardData.back;
-          document.getElementById("profileCardNameDisplay").textContent = user.name;
-          document.getElementById("profileCardPhoneDisplay").textContent = user.phone;
-          document.getElementById("profileCardPointsDisplay").textContent = `${points} Points`;
+          document.getElementById("profileCardNameDisplay").textContent =
+            user.name;
+          document.getElementById("profileCardPhoneDisplay").textContent =
+            user.phone;
+          document.getElementById(
+            "profileCardPointsDisplay"
+          ).textContent = `${points} Points`;
 
           // Apply smaller font and lower position for specific card types
-          const smallNameTypes = ["Mums-Baby", "New-Couple", "Pregnant-Preparation"];
+          const smallNameTypes = [
+            "Mums-Baby",
+            "New-Couple",
+            "Pregnant-Preparation",
+          ];
           const nameElement = document.getElementById("profileCardNameDisplay");
           const infoElement = document.getElementById("profileCardInfo");
           if (smallNameTypes.includes(cardType)) {
@@ -752,7 +850,9 @@
           pointsDisplay.style.display = "block";
         }
 
-        const mobilePointsDisplay = document.getElementById("mobilePointsDisplay");
+        const mobilePointsDisplay = document.getElementById(
+          "mobilePointsDisplay"
+        );
         const mobileNavPoints = document.getElementById("mobileNavPoints");
         if (mobilePointsDisplay && mobileNavPoints) {
           mobileNavPoints.textContent = points;
