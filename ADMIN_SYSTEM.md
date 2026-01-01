@@ -62,9 +62,9 @@ Output:
 ```
 ✅ Default admin created successfully!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Username: admin
-   Password: docterbee2025
-   Email:    admin@docterbee.com
+   Username: [from .env ADMIN_USERNAME]
+   Password: [from .env ADMIN_PASSWORD]
+   Email:    [from .env ADMIN_EMAIL]
    Role:     super-admin
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️  IMPORTANT: Change the password after first login!
@@ -72,16 +72,17 @@ Output:
 
 ### 4. Login ke Admin Dashboard
 - URL: `http://your-domain.com/admin-dashboard.html`
-- Username: `admin` (dari .env ADMIN_USERNAME)
-- Password: `docterbee2025` (dari .env ADMIN_PASSWORD)
+- Username: (from .env ADMIN_USERNAME)
+- Password: (from .env ADMIN_PASSWORD)
 
 ## Environment Variables (.env)
 
 ```env
 # Admin credentials (used by create-default-admin.mjs)
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=docterbee2025
-ADMIN_EMAIL=admin@docterbee.com
+# ⚠️ SECURITY: Use strong, unique passwords in production!
+ADMIN_USERNAME=your_admin_username_here
+ADMIN_PASSWORD=your_strong_password_here
+ADMIN_EMAIL=your_admin_email_here
 ```
 
 **Note**: Setelah admin dibuat, credentials di .env **tidak digunakan lagi** untuk login. Login menggunakan data dari database.

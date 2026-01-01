@@ -4,7 +4,7 @@
 
 API key Gemini Anda terdeteksi sebagai **"leaked"** oleh Google karena:
 
-1. ❌ **API key lama** (`AIzaSyDWyrKdPiRMS-P4_Yq1M_otRue_P_kSuIk`) **hardcoded** di file dokumentasi
+1. ❌ **API key lama** (`AIzaSy...[REDACTED]`) **hardcoded** di file dokumentasi
 2. ❌ File dokumentasi (`docs/README-GEMINI-API.md` dan `docs/TROUBLESHOOTING.md`) **di-commit ke Git**
 3. ❌ Meskipun di local/private repo, Google scanner **tetap mendeteksi** API key di Git history
 
