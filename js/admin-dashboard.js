@@ -43,6 +43,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Mobile menu navigation items
+  document.querySelectorAll(".admin-mobile-nav-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const section = item.getAttribute("data-section");
+      switchSection(section);
+      closeAdminMobileMenu();
+    });
+  });
+
+  // Hamburger button
+  const hamburgerBtn = document.getElementById("adminHamburgerBtn");
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", openAdminMobileMenu);
+  }
+
+  // Close mobile menu button
+  const closeMenuBtn = document.getElementById("closeAdminMobileMenu");
+  if (closeMenuBtn) {
+    closeMenuBtn.addEventListener("click", closeAdminMobileMenu);
+  }
+
+  // Close mobile menu on overlay click
+  const mobileMenuOverlay = document.getElementById("adminMobileMenuOverlay");
+  if (mobileMenuOverlay) {
+    mobileMenuOverlay.addEventListener("click", closeAdminMobileMenu);
+  }
+
   // Booking section
   document.getElementById("refreshBookings").addEventListener("click", loadBookings);
   document.getElementById("filterBookingStatus").addEventListener("change", loadBookings);
@@ -216,11 +243,44 @@ function showDashboard() {
 
 // Tab switching
 function switchSection(section) {
-  // Update active tab
+  // Map section to display name
+  const sectionNames = {
+    bookings: "Booking Monitor",
+    insight: "Edukasi Manager",
+    events: "Program Manager",
+    coupons: "Coupon Manager",
+    services: "Services Manager",
+    products: "Products Manager",
+    orders: "Orders Manager",
+    rewards: "Rewards Manager",
+    users: "Users Manager",
+    podcasts: "Podcasts Manager",
+    journeys: "Journey Manager",
+  };
+
+  // Update active tab (desktop)
   document.querySelectorAll(".dashboard-tab").forEach((tab) => {
     tab.classList.remove("active");
   });
-  document.querySelector(`[data-section="${section}"]`).classList.add("active");
+  const activeDesktopTab = document.querySelector(`.dashboard-tab[data-section="${section}"]`);
+  if (activeDesktopTab) {
+    activeDesktopTab.classList.add("active");
+  }
+
+  // Update active item (mobile menu)
+  document.querySelectorAll(".admin-mobile-nav-item").forEach((item) => {
+    item.classList.remove("active");
+  });
+  const activeMobileItem = document.querySelector(`.admin-mobile-nav-item[data-section="${section}"]`);
+  if (activeMobileItem) {
+    activeMobileItem.classList.add("active");
+  }
+
+  // Update current section title (mobile)
+  const sectionTitle = document.getElementById("currentSectionTitle");
+  if (sectionTitle) {
+    sectionTitle.textContent = sectionNames[section] || section;
+  }
 
   // Show section
   document.querySelectorAll(".dashboard-section").forEach((sec) => {
@@ -266,6 +326,34 @@ function switchSection(section) {
     if (typeof loadAdminJourneys === "function") {
       loadAdminJourneys();
     }
+  }
+}
+
+// Admin Mobile Menu Functions
+function openAdminMobileMenu() {
+  const menu = document.getElementById("adminMobileMenu");
+  const overlay = document.getElementById("adminMobileMenuOverlay");
+  
+  if (menu && overlay) {
+    menu.classList.add("open");
+    overlay.classList.add("show");
+    document.body.style.overflow = "hidden"; // Prevent background scroll
+    
+    // Refresh icons
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  }
+}
+
+function closeAdminMobileMenu() {
+  const menu = document.getElementById("adminMobileMenu");
+  const overlay = document.getElementById("adminMobileMenuOverlay");
+  
+  if (menu && overlay) {
+    menu.classList.remove("open");
+    overlay.classList.remove("show");
+    document.body.style.overflow = ""; // Restore scroll
   }
 }
 

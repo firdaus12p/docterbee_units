@@ -110,94 +110,160 @@
         </div>
       </header>
 
+      <!-- Mobile Menu Overlay -->
+      <div id="adminMobileMenuOverlay" class="admin-mobile-menu-overlay"></div>
+
+      <!-- Mobile Menu Sidebar -->
+      <div id="adminMobileMenu" class="admin-mobile-menu">
+        <div class="admin-mobile-menu-header">
+          <div class="flex items-center gap-2">
+            <div class="logo-box"></div>
+            <span class="font-semibold text-slate-100">Menu Admin</span>
+          </div>
+          <button id="closeAdminMobileMenu" class="admin-close-menu-btn" aria-label="Close Menu">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <nav class="admin-mobile-menu-nav">
+          <button class="admin-mobile-nav-item active" data-section="bookings">
+            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+            <span>Booking Monitor</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="insight">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span>Edukasi Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="events">
+            <i data-lucide="video" class="w-5 h-5"></i>
+            <span>Program Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="coupons">
+            <i data-lucide="tag" class="w-5 h-5"></i>
+            <span>Coupon Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="services">
+            <i data-lucide="briefcase" class="w-5 h-5"></i>
+            <span>Services Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="products">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span>Products Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="orders">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+            <span>Orders Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="rewards">
+            <i data-lucide="gift" class="w-5 h-5"></i>
+            <span>Rewards Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="users">
+            <i data-lucide="users" class="w-5 h-5"></i>
+            <span>Users Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="podcasts">
+            <i data-lucide="headphones" class="w-5 h-5"></i>
+            <span>Podcasts Manager</span>
+          </button>
+          <button class="admin-mobile-nav-item" data-section="journeys">
+            <i data-lucide="compass" class="w-5 h-5"></i>
+            <span>Journey Manager</span>
+          </button>
+        </nav>
+      </div>
+
       <!-- Main Content -->
       <main class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
-        <!-- Tab Navigation -->
-        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 dashboard-tab-scroll">
+        <!-- Tab Navigation Header with Hamburger for Mobile -->
+        <div class="flex items-center gap-3 mb-6">
+          <!-- Hamburger Button (visible on mobile only) -->
+          <button
+            id="adminHamburgerBtn"
+            class="admin-hamburger-btn md:hidden"
+            aria-label="Open Menu"
+          >
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Current Section Title (visible on mobile only) -->
+          <h2 id="currentSectionTitle" class="text-lg font-semibold text-amber-400 md:hidden">Booking Monitor</h2>
+        </div>
+
+        <!-- Desktop Tab Navigation (hidden on mobile) -->
+        <div class="hidden md:flex gap-2 mb-6 overflow-x-auto pb-2 dashboard-tab-scroll">
           <button
             class="dashboard-tab active whitespace-nowrap"
             data-section="bookings"
           >
             <i data-lucide="calendar-check" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Booking Monitor</span>
-            <span class="sm:hidden">Booking</span>
+            <span>Booking Monitor</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="insight"
           >
             <i data-lucide="book-open" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Edukasi Manager</span>
-            <span class="sm:hidden">Edukasi</span>
+            <span>Edukasi Manager</span>
           </button>
           <button class="dashboard-tab whitespace-nowrap" data-section="events">
             <i data-lucide="video" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Program Manager</span>
-            <span class="sm:hidden">Program</span>
+            <span>Program Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="coupons"
           >
             <i data-lucide="tag" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Coupon Manager</span>
-            <span class="sm:hidden">Coupon</span>
+            <span>Coupon Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="services"
           >
             <i data-lucide="briefcase" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Services Manager</span>
-            <span class="sm:hidden">Services</span>
+            <span>Services Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="products"
           >
             <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Products Manager</span>
-            <span class="sm:hidden">Products</span>
+            <span>Products Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="orders"
           >
             <i data-lucide="receipt" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Orders Manager</span>
-            <span class="sm:hidden">Orders</span>
+            <span>Orders Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="rewards"
           >
             <i data-lucide="gift" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Rewards Manager</span>
-            <span class="sm:hidden">Rewards</span>
+            <span>Rewards Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="users"
           >
             <i data-lucide="users" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Users Manager</span>
-            <span class="sm:hidden">Users</span>
+            <span>Users Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="podcasts"
           >
             <i data-lucide="headphones" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Podcasts Manager</span>
-            <span class="sm:hidden">Podcasts</span>
+            <span>Podcasts Manager</span>
           </button>
           <button
             class="dashboard-tab whitespace-nowrap"
             data-section="journeys"
           >
             <i data-lucide="compass" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Journey Manager</span>
-            <span class="sm:hidden">Journey</span>
+            <span>Journey Manager</span>
           </button>
         </div>
 

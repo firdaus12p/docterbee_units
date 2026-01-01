@@ -1817,6 +1817,188 @@ header {
    Admin Dashboard Styles
    ======================================== */
 
+/* Admin Mobile Menu Overlay */
+.admin-mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.admin-mobile-menu-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Admin Mobile Menu Sidebar */
+.admin-mobile-menu {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 280px;
+  max-width: 85vw;
+  height: 100vh;
+  height: 100dvh;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  border-right: 1px solid rgba(251, 191, 36, 0.2);
+  z-index: 999;
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.admin-mobile-menu.open {
+  left: 0;
+}
+
+.admin-mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.15);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.admin-close-menu-btn {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-close-menu-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: rotate(90deg);
+}
+
+.admin-mobile-menu-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.3) transparent;
+}
+
+.admin-mobile-menu-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-mobile-menu-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-mobile-menu-nav::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.3);
+  border-radius: 2px;
+}
+
+.admin-mobile-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.admin-mobile-nav-item:hover {
+  background: rgba(251, 191, 36, 0.05);
+  color: #fbbf24;
+  border-left-color: rgba(251, 191, 36, 0.5);
+  padding-left: 1.5rem;
+}
+
+.admin-mobile-nav-item.active {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.15), transparent);
+  color: #fbbf24;
+  border-left-color: #fbbf24;
+  font-weight: 600;
+}
+
+.admin-mobile-nav-item i {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.admin-mobile-nav-item.active i {
+  opacity: 1;
+}
+
+/* Admin Hamburger Button */
+.admin-hamburger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05));
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-hamburger-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(251, 191, 36, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.admin-hamburger-btn:hover::before {
+  width: 100px;
+  height: 100px;
+}
+
+.admin-hamburger-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.1));
+  border-color: rgba(251, 191, 36, 0.5);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+}
+
+.admin-hamburger-btn:active {
+  transform: scale(0.95);
+}
+
+.admin-hamburger-btn i {
+  position: relative;
+  z-index: 1;
+}
+
 .dashboard-tab {
   display: inline-flex;
   align-items: center;
