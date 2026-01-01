@@ -338,11 +338,13 @@ async function initializeTables() {
         reward_id INT DEFAULT NULL,
         reward_name VARCHAR(255) NOT NULL,
         points_cost INT NOT NULL,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' COMMENT 'Approval status by admin',
         redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (reward_id) REFERENCES rewards(id) ON DELETE SET NULL,
         INDEX idx_user_id (user_id),
         INDEX idx_reward_id (reward_id),
+        INDEX idx_status (status),
         INDEX idx_redeemed_at (redeemed_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
@@ -523,6 +525,13 @@ async function runMigrations(connection) {
     // Migration: Add Coffee category to products table
     await safeModifyEnum(connection, 'products', 'category',
       "ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee') NOT NULL");
+    
+    // Migration: Add status column to reward_redemptions table (for existing tables)
+    await safeAddColumn(connection, 'reward_redemptions', 'status',
+      "ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' COMMENT 'Approval status by admin' AFTER points_cost");
+    
+    // Migration: Add index for status column in reward_redemptions
+    await safeAddIndex(connection, 'reward_redemptions', 'idx_status', 'status');
     
     // Migration: Seed default "Journey Hidup Sehat" data
     await seedDefaultJourney(connection);
