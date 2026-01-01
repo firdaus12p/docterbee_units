@@ -172,8 +172,64 @@
         </nav>
       </div>
 
-      <!-- Main Content -->
-      <main class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+      <!-- Admin Layout: Sidebar + Main Content -->
+      <div class="admin-layout">
+        <!-- Desktop Sidebar (visible on lg+, hidden on mobile/tablet) -->
+        <aside id="adminDesktopSidebar" class="admin-sidebar">
+          <div class="admin-sidebar-header">
+            <div class="logo-box"></div>
+            <span class="font-semibold text-slate-100">Menu Admin</span>
+          </div>
+          <nav class="admin-sidebar-nav">
+            <button class="admin-sidebar-nav-item active" data-section="bookings">
+              <i data-lucide="calendar-check" class="w-5 h-5"></i>
+              <span>Booking Monitor</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="insight">
+              <i data-lucide="book-open" class="w-5 h-5"></i>
+              <span>Edukasi Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="events">
+              <i data-lucide="video" class="w-5 h-5"></i>
+              <span>Program Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="coupons">
+              <i data-lucide="tag" class="w-5 h-5"></i>
+              <span>Coupon Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="services">
+              <i data-lucide="briefcase" class="w-5 h-5"></i>
+              <span>Services Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="products">
+              <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+              <span>Products Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="orders">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Orders Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="rewards">
+              <i data-lucide="gift" class="w-5 h-5"></i>
+              <span>Rewards Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="users">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Users Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="podcasts">
+              <i data-lucide="headphones" class="w-5 h-5"></i>
+              <span>Podcasts Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="journeys">
+              <i data-lucide="compass" class="w-5 h-5"></i>
+              <span>Journey Manager</span>
+            </button>
+          </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main-content">
         <!-- Tab Navigation Header with Hamburger for Mobile -->
         <div class="flex items-center gap-3 mb-6">
           <!-- Hamburger Button (visible on mobile only) -->
@@ -189,84 +245,7 @@
           <h2 id="currentSectionTitle" class="text-lg font-semibold text-amber-400 md:hidden">Booking Monitor</h2>
         </div>
 
-        <!-- Desktop Tab Navigation (hidden on mobile) -->
-        <div class="hidden md:flex gap-2 mb-6 overflow-x-auto pb-2 dashboard-tab-scroll">
-          <button
-            class="dashboard-tab active whitespace-nowrap"
-            data-section="bookings"
-          >
-            <i data-lucide="calendar-check" class="w-4 h-4"></i>
-            <span>Booking Monitor</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="insight"
-          >
-            <i data-lucide="book-open" class="w-4 h-4"></i>
-            <span>Edukasi Manager</span>
-          </button>
-          <button class="dashboard-tab whitespace-nowrap" data-section="events">
-            <i data-lucide="video" class="w-4 h-4"></i>
-            <span>Program Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="coupons"
-          >
-            <i data-lucide="tag" class="w-4 h-4"></i>
-            <span>Coupon Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="services"
-          >
-            <i data-lucide="briefcase" class="w-4 h-4"></i>
-            <span>Services Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="products"
-          >
-            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-            <span>Products Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="orders"
-          >
-            <i data-lucide="receipt" class="w-4 h-4"></i>
-            <span>Orders Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="rewards"
-          >
-            <i data-lucide="gift" class="w-4 h-4"></i>
-            <span>Rewards Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="users"
-          >
-            <i data-lucide="users" class="w-4 h-4"></i>
-            <span>Users Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="podcasts"
-          >
-            <i data-lucide="headphones" class="w-4 h-4"></i>
-            <span>Podcasts Manager</span>
-          </button>
-          <button
-            class="dashboard-tab whitespace-nowrap"
-            data-section="journeys"
-          >
-            <i data-lucide="compass" class="w-4 h-4"></i>
-            <span>Journey Manager</span>
-          </button>
-        </div>
-
+        <!-- Desktop tabs removed - using sidebar navigation on desktop (lg+) -->
         <!-- Section: Booking Monitor -->
         <section id="section-bookings" class="dashboard-section">
           <div
@@ -1279,7 +1258,6 @@
             </div>
           </div>
         </section>
-      </main>
 
       <!-- Delete Confirmation Modal -->
       <div
@@ -1357,7 +1335,6 @@
               </p>
             </div>
           </div>
-        </div>
         </div>
       </div>
 
@@ -1785,6 +1762,8 @@
           </div>
         </div>
       </section>
+      </main>
+      </div> <!-- End admin-layout -->
 
       <!-- Journey Form Modal -->
       <div id="journeyModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">

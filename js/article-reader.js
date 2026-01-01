@@ -13,7 +13,7 @@ async function loadArticle() {
   const slug = urlParams.get("slug");
 
   if (!slug) {
-    showError("Artikel tidak ditemukan. Slug tidak ada di URL.");
+    showArticleError("Artikel tidak ditemukan. Slug tidak ada di URL.");
     return;
   }
 
@@ -32,7 +32,7 @@ async function loadArticle() {
     loadRelatedArticles(currentArticle.category, currentArticle.id);
   } catch (error) {
     console.error("Error loading article:", error);
-    showError(error.message);
+    showArticleError(error.message);
   }
 }
 
@@ -200,7 +200,7 @@ function copyLink() {
 // ============================================
 // ERROR HANDLING
 // ============================================
-function showError(message) {
+function showArticleError(message) {
   const main = document.querySelector("main");
   main.innerHTML = `
     <div class="text-center py-12">

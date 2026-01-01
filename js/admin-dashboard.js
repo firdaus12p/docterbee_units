@@ -35,20 +35,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // Logout button - FIX: Changed from "submit" to "click"
   document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
-  // Tab navigation
-  document.querySelectorAll(".dashboard-tab").forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const section = tab.getAttribute("data-section");
-      switchSection(section);
-    });
-  });
-
   // Mobile menu navigation items
   document.querySelectorAll(".admin-mobile-nav-item").forEach((item) => {
     item.addEventListener("click", () => {
       const section = item.getAttribute("data-section");
       switchSection(section);
       closeAdminMobileMenu();
+    });
+  });
+
+  // Desktop sidebar navigation items
+  document.querySelectorAll(".admin-sidebar-nav-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const section = item.getAttribute("data-section");
+      switchSection(section);
     });
   });
 
@@ -258,15 +258,6 @@ function switchSection(section) {
     journeys: "Journey Manager",
   };
 
-  // Update active tab (desktop)
-  document.querySelectorAll(".dashboard-tab").forEach((tab) => {
-    tab.classList.remove("active");
-  });
-  const activeDesktopTab = document.querySelector(`.dashboard-tab[data-section="${section}"]`);
-  if (activeDesktopTab) {
-    activeDesktopTab.classList.add("active");
-  }
-
   // Update active item (mobile menu)
   document.querySelectorAll(".admin-mobile-nav-item").forEach((item) => {
     item.classList.remove("active");
@@ -274,6 +265,15 @@ function switchSection(section) {
   const activeMobileItem = document.querySelector(`.admin-mobile-nav-item[data-section="${section}"]`);
   if (activeMobileItem) {
     activeMobileItem.classList.add("active");
+  }
+
+  // Update active item (desktop sidebar)
+  document.querySelectorAll(".admin-sidebar-nav-item").forEach((item) => {
+    item.classList.remove("active");
+  });
+  const activeSidebarItem = document.querySelector(`.admin-sidebar-nav-item[data-section="${section}"]`);
+  if (activeSidebarItem) {
+    activeSidebarItem.classList.add("active");
   }
 
   // Update current section title (mobile)
