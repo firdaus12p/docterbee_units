@@ -120,7 +120,11 @@
             <div class="logo-box"></div>
             <span class="font-semibold text-slate-100">Menu Admin</span>
           </div>
-          <button id="closeAdminMobileMenu" class="admin-close-menu-btn" aria-label="Close Menu">
+          <button
+            id="closeAdminMobileMenu"
+            class="admin-close-menu-btn"
+            aria-label="Close Menu"
+          >
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
@@ -181,7 +185,10 @@
             <span class="font-semibold text-slate-100">Menu Admin</span>
           </div>
           <nav class="admin-sidebar-nav">
-            <button class="admin-sidebar-nav-item active" data-section="bookings">
+            <button
+              class="admin-sidebar-nav-item active"
+              data-section="bookings"
+            >
               <i data-lucide="calendar-check" class="w-5 h-5"></i>
               <span>Booking Monitor</span>
             </button>
@@ -230,1466 +237,1950 @@
 
         <!-- Main Content Area -->
         <main class="admin-main-content">
-        <!-- Tab Navigation Header with Hamburger for Mobile -->
-        <div class="flex items-center gap-3 mb-6">
-          <!-- Hamburger Button (visible on mobile only) -->
-          <button
-            id="adminHamburgerBtn"
-            class="admin-hamburger-btn md:hidden"
-            aria-label="Open Menu"
-          >
-            <i data-lucide="menu" class="w-6 h-6"></i>
-          </button>
+          <!-- Tab Navigation Header with Hamburger for Mobile -->
+          <div class="flex items-center gap-3 mb-6">
+            <!-- Hamburger Button (visible on mobile only) -->
+            <button
+              id="adminHamburgerBtn"
+              class="admin-hamburger-btn md:hidden"
+              aria-label="Open Menu"
+            >
+              <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
 
-          <!-- Current Section Title (visible on mobile only) -->
-          <h2 id="currentSectionTitle" class="text-lg font-semibold text-amber-400 md:hidden">Booking Monitor</h2>
-        </div>
+            <!-- Current Section Title (visible on mobile only) -->
+            <h2
+              id="currentSectionTitle"
+              class="text-lg font-semibold text-amber-400 md:hidden"
+            >
+              Booking Monitor
+            </h2>
+          </div>
 
-        <!-- Desktop tabs removed - using sidebar navigation on desktop (lg+) -->
-        <!-- Section: Booking Monitor -->
-        <section id="section-bookings" class="dashboard-section">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-          >
-            <h2 class="text-xl sm:text-2xl font-bold">Booking Monitor</h2>
-            <div class="flex gap-2">
-              <select
-                id="filterBookingStatus"
-                class="bg-slate-800 border border-slate-700 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm flex-1 sm:flex-none"
-              >
-                <option value="">Semua Status</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+          <!-- Desktop tabs removed - using sidebar navigation on desktop (lg+) -->
+          <!-- Section: Booking Monitor -->
+          <section id="section-bookings" class="dashboard-section">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Booking Monitor</h2>
+              <div class="flex gap-2">
+                <select
+                  id="filterBookingStatus"
+                  class="bg-slate-800 border border-slate-700 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm flex-1 sm:flex-none"
+                >
+                  <option value="">Semua Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <button
+                  id="refreshBookings"
+                  class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500"
+                >
+                  Refresh
+                </button>
+              </div>
+            </div>
+            <div class="booking-container overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-white border-b border-slate-200">
+                  <tr>
+                    <th class="text-left p-3 text-slate-900">ID</th>
+                    <th class="text-left p-3 text-slate-900">Layanan</th>
+                    <th class="text-left p-3 text-slate-900">Cabang</th>
+                    <th class="text-left p-3 text-slate-900">Praktisi</th>
+                    <th class="text-left p-3 text-slate-900">Tanggal</th>
+                    <th class="text-left p-3 text-slate-900">Waktu</th>
+                    <th class="text-left p-3 text-slate-900">Mode</th>
+                    <th class="text-left p-3 text-slate-900">Harga</th>
+                    <th class="text-left p-3 text-slate-900">Total</th>
+                    <th class="text-left p-3 text-slate-900">Status</th>
+                    <th class="text-left p-3 text-slate-900">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingsTableBody">
+                  <tr>
+                    <td colspan="11" class="text-center p-6 text-slate-400">
+                      Loading...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Section: Edukasi Manager -->
+          <section id="section-insight" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Edukasi Manager</h2>
               <button
-                id="refreshBookings"
-                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500"
+                id="btnNewArticle"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
               >
-                Refresh
+                + Edukasi Baru
               </button>
             </div>
-          </div>
-          <div class="booking-container overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-white border-b border-slate-200">
-                <tr>
-                  <th class="text-left p-3 text-slate-900">ID</th>
-                  <th class="text-left p-3 text-slate-900">Layanan</th>
-                  <th class="text-left p-3 text-slate-900">Cabang</th>
-                  <th class="text-left p-3 text-slate-900">Praktisi</th>
-                  <th class="text-left p-3 text-slate-900">Tanggal</th>
-                  <th class="text-left p-3 text-slate-900">Waktu</th>
-                  <th class="text-left p-3 text-slate-900">Mode</th>
-                  <th class="text-left p-3 text-slate-900">Harga</th>
-                  <th class="text-left p-3 text-slate-900">Total</th>
-                  <th class="text-left p-3 text-slate-900">Status</th>
-                  <th class="text-left p-3 text-slate-900">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="bookingsTableBody">
-                <tr>
-                  <td colspan="11" class="text-center p-6 text-slate-400">
-                    Loading...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Section: Edukasi Manager -->
-        <section id="section-insight" class="dashboard-section hidden">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-          >
-            <h2 class="text-xl sm:text-2xl font-bold">Edukasi Manager</h2>
-            <button
-              id="btnNewArticle"
-              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
-            >
-              + Edukasi Baru
-            </button>
-          </div>
-          <div
-            id="articlesGrid"
-            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-          >
-            <div class="booking-container p-6 text-center text-slate-400">
-              Loading...
-            </div>
-          </div>
-
-          <!-- Article Form Modal -->
-          <div
-            id="articleModal"
-            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
-          >
             <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              id="articlesGrid"
+              class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             >
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold" id="articleModalTitle">
-                  Edukasi Baru
-                </h3>
-                <button
-                  id="closeArticleModal"
-                  class="text-slate-400 hover:text-slate-200"
-                >
-                  <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+              <div class="booking-container p-6 text-center text-slate-400">
+                Loading...
               </div>
-              <form id="articleForm" class="space-y-4">
-                <input type="hidden" id="articleId" />
-                <div>
-                  <label class="block text-sm mb-2">Judul</label>
-                  <input
-                    type="text"
-                    id="articleTitle"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Slug (URL)</label>
-                  <input
-                    type="text"
-                    id="articleSlug"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="contoh-artikel"
-                    required
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Excerpt (Ringkasan)</label>
-                  <textarea
-                    id="articleExcerpt"
-                    rows="2"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  ></textarea>
-                </div>
-                
-                <!-- Header Image Upload -->
-                <div>
-                  <label class="block text-sm mb-2">Gambar Hero (Header)</label>
-                  
-                  <!-- File Input -->
-                  <input
-                    type="file"
-                    id="insightHeaderImageFile"
-                    accept="image/*"
-                    onchange="uploadInsightHeaderImage(this)"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
-                  >
-                  
-                  <!-- Hidden input untuk menyimpan path -->
-                  <input type="hidden" id="insightHeaderImage">
-                  
-                  <!-- Preview Image -->
-                  <div id="insightHeaderImagePreview" class="hidden mt-3">
-                    <div class="relative inline-block">
-                      <img 
-                        id="insightHeaderImagePreviewImg" 
-                        src="" 
-                        alt="Preview" 
-                        class="w-full max-w-md h-48 object-cover rounded-lg border-2 border-slate-700"
-                      >
-                      <button
-                        type="button"
-                        onclick="removeInsightHeaderImage()"
-                        class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition"
-                        title="Hapus gambar"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <p class="text-xs text-slate-400 mt-1">
-                    Upload gambar (JPG, PNG, GIF). Maksimal 5MB.
-                  </p>
-                </div>
-                
-                <div>
-                  <label class="block text-sm mb-2">Konten</label>
-                  
-                  <!-- Upload Image Button -->
-                  <div class="mb-2">
-                    <button
-                      type="button"
-                      onclick="uploadInsightContentImage()"
-                      class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                      </svg>
-                      <span>Upload Gambar ke Konten</span>
-                    </button>
-                    <p class="text-xs text-slate-400 mt-1">
-                      Klik untuk upload gambar. Gambar akan di-insert di posisi cursor.
-                    </p>
-                  </div>
-                  
-                  <textarea
-                    id="articleContent"
-                    rows="8"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    required
-                  ></textarea>
-                </div>
-                <div>
-                  <label class="block text-sm mb-2"
-                    >Tags (pisah dengan koma)</label
-                  >
-                  <input
-                    type="text"
-                    id="articleTags"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Nutrisi,Ibadah,Kebiasaan"
-                  />
-                </div>
-                
-                <!-- Category -->
-                <div>
-                  <label class="block text-sm mb-2">Kategori</label>
-                  <select
-                    id="articleCategory"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  >
-                    <option value="">Pilih Kategori</option>
-                    <option value="Nutrisi">Nutrisi</option>
-                    <option value="Ibadah">Ibadah</option>
-                    <option value="Kebiasaan">Kebiasaan</option>
-                    <option value="Sains">Sains</option>
-                  </select>
-                  <p class="text-xs text-slate-400 mt-1">
-                    Pilih kategori untuk memudahkan filtering di halaman Edukasi
-                  </p>
-                </div>
-                
-                <!-- Tipe Edukasi -->
-                <div>
-                  <label class="block text-sm mb-2">Tipe Edukasi</label>
-                  <div class="flex gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="articleType" id="articleTypeGeneral" value="general" checked 
-                        class="w-4 h-4 accent-amber-400" onchange="toggleProductSelect()">
-                      <span class="text-sm">Umum</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="articleType" id="articleTypeProduct" value="product" 
-                        class="w-4 h-4 accent-amber-400" onchange="toggleProductSelect()">
-                      <span class="text-sm">Untuk Produk</span>
-                    </label>
-                  </div>
-                  <p class="text-xs text-slate-400 mt-1">
-                    Pilih "Untuk Produk" jika artikel ini adalah informasi terkait produk tertentu
-                  </p>
-                </div>
+            </div>
 
-                <!-- Pilihan Produk (hidden by default) -->
-                <div id="productSelectContainer" class="hidden">
-                  <label class="block text-sm mb-2">Pilih Produk <span class="text-red-400">*</span></label>
-                  <select id="articleProductId" 
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none">
-                    <option value="">-- Pilih Produk --</option>
-                    <!-- Options loaded dynamically -->
-                  </select>
-                  <p class="text-xs text-slate-400 mt-1">
-                    Artikel ini akan ditampilkan sebagai tombol "Baca Edukasi" di halaman Store untuk produk yang dipilih
-                  </p>
-                </div>
-                
-                
-                <div class="flex gap-2">
+            <!-- Article Form Modal -->
+            <div
+              id="articleModal"
+              class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-bold" id="articleModalTitle">
+                    Edukasi Baru
+                  </h3>
                   <button
-                    type="submit"
-                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                    id="closeArticleModal"
+                    class="text-slate-400 hover:text-slate-200"
                   >
-                    Simpan
-                  </button>
-                  <button
-                    type="button"
-                    id="cancelArticle"
-                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
-                  >
-                    Batal
+                    <i data-lucide="x" class="w-6 h-6"></i>
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section: Program Manager -->
-        <section id="section-events" class="dashboard-section hidden">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-          >
-            <h2 class="text-xl sm:text-2xl font-bold">Program Manager</h2>
-            <button
-              id="btnNewEvent"
-              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
-            >
-              + Program Baru
-            </button>
-          </div>
-          <div
-            id="eventsGrid"
-            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2"
-          >
-            <div class="booking-container p-6 text-center text-slate-400">
-              Loading...
-            </div>
-          </div>
-
-          <!-- Program Form Modal -->
-          <div
-            id="eventModal"
-            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
-          >
-            <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold" id="eventModalTitle">
-                  Program Baru
-                </h3>
-                <button
-                  id="closeEventModal"
-                  class="text-slate-400 hover:text-slate-200"
-                >
-                  <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-              </div>
-              <form id="eventForm" class="space-y-4">
-                <input type="hidden" id="eventId" />
-                <div>
-                  <label class="block text-sm mb-2">Judul Program</label>
-                  <input
-                    type="text"
-                    id="eventTitle"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <form id="articleForm" class="space-y-4">
+                  <input type="hidden" id="articleId" />
                   <div>
-                    <label class="block text-sm mb-2">Tanggal</label>
-                    <input
-                      type="date"
-                      id="eventDate"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm mb-2">Mode</label>
-                    <select
-                      id="eventMode"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      required
-                    >
-                      <option value="online">Online</option>
-                      <option value="offline">Offline</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Topik</label>
-                  <select
-                    id="eventTopic"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    required
-                  >
-                    <option value="quranic">Qur'anic Lifestyle</option>
-                    <option value="nutrition">Nutrisi</option>
-                    <option value="science">Sains</option>
-                    <option value="parenting">Parenting</option>
-                    <option value="productivity">Produktivitas</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Deskripsi</label>
-                  <textarea
-                    id="eventDescription"
-                    rows="3"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  ></textarea>
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Pemateri / Host</label>
-                  <input
-                    type="text"
-                    id="eventSpeaker"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Nama pemateri atau host acara"
-                  />
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm mb-2"
-                      >Biaya Pendaftaran (Rp)</label
-                    >
+                    <label class="block text-sm mb-2">Judul</label>
                     <input
                       type="text"
-                      id="eventRegistrationFee"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      placeholder="0 = Gratis"
-                      value="0"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm mb-2">Akhir Pendaftaran</label>
-                    <input
-                      type="date"
-                      id="eventRegistrationDeadline"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Lokasi / Link Zoom</label>
-                  <input
-                    type="text"
-                    id="eventLocation"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Offline: Alamat lengkap | Online: https://zoom.us/..."
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm mb-2"
-                    >Link Tambahan (Opsional)</label
-                  >
-                  <input
-                    type="text"
-                    id="eventLink"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Link materi, pendaftaran, atau info lainnya"
-                  />
-                </div>
-                <div class="flex gap-2">
-                  <button
-                    type="submit"
-                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
-                  >
-                    Simpan
-                  </button>
-                  <button
-                    type="button"
-                    id="cancelEvent"
-                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
-                  >
-                    Batal
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section: Coupon Manager -->
-        <section id="section-coupons" class="dashboard-section hidden">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-          >
-            <h2 class="text-xl sm:text-2xl font-bold">Coupon Manager</h2>
-            <button
-              id="btnNewCoupon"
-              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
-            >
-              + Kode Promo Baru
-            </button>
-          </div>
-          <div
-            id="couponsGrid"
-            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-          >
-            <div class="booking-container p-6 text-center text-slate-400">
-              Loading...
-            </div>
-          </div>
-
-          <!-- Coupon Form Modal -->
-          <div
-            id="couponModal"
-            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
-          >
-            <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold" id="couponModalTitle">
-                  Kode Promo Baru
-                </h3>
-                <button
-                  id="closeCouponModal"
-                  class="text-slate-400 hover:text-slate-200"
-                >
-                  <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-              </div>
-              <form id="couponForm" class="space-y-4">
-                <input type="hidden" id="couponId" />
-                <div>
-                  <label class="block text-sm mb-2">Kode Promo</label>
-                  <input
-                    type="text"
-                    id="couponCode"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none uppercase"
-                    placeholder="WELCOME2025"
-                    required
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Deskripsi</label>
-                  <input
-                    type="text"
-                    id="couponDescription"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Diskon selamat datang 15%"
-                  />
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm mb-2">Tipe Diskon</label>
-                    <select
-                      id="couponDiscountType"
+                      id="articleTitle"
                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
                       required
-                    >
-                      <option value="percentage">Percentage (%)</option>
-                      <option value="fixed">Fixed (Rp)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm mb-2">Nilai Diskon</label>
-                    <input
-                      type="number"
-                      id="couponDiscountValue"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      placeholder="15"
-                      step="0.01"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm mb-2">Tipe Kupon</label>
-                  <select
-                    id="couponType"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    required
-                  >
-                    <option value="both">Produk & Layanan</option>
-                    <option value="store">Hanya Produk</option>
-                    <option value="services">Hanya Layanan</option>
-                  </select>
-                  <small class="text-slate-400"
-                    >Tentukan di mana kupon ini bisa digunakan</small
-                  >
-                </div>
-                <div>
-                  <label class="block text-sm mb-2"
-                    >Min. Nilai Booking (Rp)</label
-                  >
-                  <input
-                    type="text"
-                    id="couponMinBookingValue"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="0"
-                    value="0"
-                  />
-                  <small class="text-slate-400"
-                    >Minimal nilai booking untuk menggunakan kupon (0 = tidak
-                    ada minimum)</small
-                  >
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm mb-2"
-                      >Max Uses (kosongkan = unlimited)</label
-                    >
-                    <input
-                      type="number"
-                      id="couponMaxUses"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      placeholder="100"
                     />
                   </div>
                   <div>
-                    <label class="block text-sm mb-2">Expires At</label>
-                    <input
-                      type="datetime-local"
-                      id="couponExpiresAt"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    />
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="couponIsActive"
-                    class="w-4 h-4"
-                    checked
-                  />
-                  <label class="text-sm">Aktif</label>
-                </div>
-                <div class="flex gap-2">
-                  <button
-                    type="submit"
-                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
-                  >
-                    Simpan
-                  </button>
-                  <button
-                    type="button"
-                    id="cancelCoupon"
-                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
-                  >
-                    Batal
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section: Services Manager -->
-        <section id="section-services" class="dashboard-section hidden">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-          >
-            <h2 class="text-xl sm:text-2xl font-bold">Services Manager</h2>
-            <button
-              id="btnNewService"
-              class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-amber-500 flex items-center gap-2 justify-center sm:justify-start"
-            >
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Tambah Service</span>
-            </button>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table
-              id="servicesTable"
-              class="w-full text-sm border border-slate-800 rounded-lg overflow-hidden"
-            >
-              <thead class="bg-slate-800">
-                <tr>
-                  <th class="px-3 py-3 text-left">ID</th>
-                  <th class="px-3 py-3 text-left">Nama Layanan</th>
-                  <th class="px-3 py-3 text-left">Kategori</th>
-                  <th class="px-3 py-3 text-left">Harga</th>
-                  <th class="px-3 py-3 text-left">Cabang</th>
-                  <th class="px-3 py-3 text-left">Mode</th>
-                  <th class="px-3 py-3 text-left">Status</th>
-                  <th class="px-3 py-3 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="servicesTableBody">
-                <tr>
-                  <td colspan="8" class="text-center py-8 text-slate-400">
-                    Loading...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Service Modal -->
-          <div
-            id="serviceModal"
-            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
-          >
-            <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-            >
-              <h3 id="serviceModalTitle" class="text-xl font-bold mb-4">
-                Tambah Service Baru
-              </h3>
-              <form id="serviceForm" class="space-y-4">
-                <input type="hidden" id="serviceId" />
-
-                <div>
-                  <label class="block text-sm mb-2">Nama Layanan *</label>
-                  <input
-                    type="text"
-                    id="serviceName"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Contoh: Bekam Profesional"
-                    required
-                  />
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm mb-2">Kategori *</label>
-                    <select
-                      id="serviceCategory"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      required
-                    >
-                      <option value="">Pilih Kategori</option>
-                      <option value="manual">Manual Therapy</option>
-                      <option value="klinis">Layanan Klinis</option>
-                      <option value="konsultasi">Konsultasi</option>
-                      <option value="perawatan">Perawatan</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm mb-2">Harga (Rp) *</label>
+                    <label class="block text-sm mb-2">Slug (URL)</label>
                     <input
                       type="text"
-                      id="servicePrice"
+                      id="articleSlug"
                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      placeholder="150.000"
+                      placeholder="contoh-artikel"
                       required
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm mb-2">Deskripsi *</label>
-                  <textarea
-                    id="serviceDescription"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Terapi hijamah sesuai SOP medis & hygiene. Berdasarkan hadis shahih."
-                    rows="3"
-                    required
-                  ></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm mb-2">Cabang/Kota *</label>
-                    <div
-                      class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 space-y-2"
-                    >
-                      <label class="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="serviceBranch"
-                          value="Kolaka"
-                          class="w-4 h-4 rounded"
-                        />
-                        <span class="text-sm">Kolaka</span>
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="serviceBranch"
-                          value="Makassar"
-                          class="w-4 h-4 rounded"
-                        />
-                        <span class="text-sm">Makassar</span>
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="serviceBranch"
-                          value="Kendari"
-                          class="w-4 h-4 rounded"
-                        />
-                        <span class="text-sm">Kendari</span>
-                      </label>
-                    </div>
-                    <p class="text-xs text-slate-400 mt-1">
-                      Pilih minimal satu cabang
-                    </p>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm mb-2">Mode *</label>
-                    <select
-                      id="serviceMode"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      required
-                    >
-                      <option value="">Pilih Mode</option>
-                      <option value="online">Online</option>
-                      <option value="offline">Offline</option>
-                      <option value="both">Online & Offline</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm mb-2">Praktisi (Opsional)</label>
-                  <input
-                    type="text"
-                    id="servicePractitioner"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="dr. Ahmad, SpGZ"
-                  />
-                </div>
-
-                <div class="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="serviceIsActive"
-                    class="w-4 h-4"
-                    checked
-                  />
-                  <label class="text-sm">Aktif</label>
-                </div>
-
-                <div class="flex gap-2">
-                  <button
-                    type="submit"
-                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
-                  >
-                    Simpan
-                  </button>
-                  <button
-                    type="button"
-                    id="cancelService"
-                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
-                  >
-                    Batal
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section: Products Manager -->
-        <section id="section-products" class="dashboard-section hidden">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-          >
-            <h2 class="text-xl sm:text-2xl font-bold">Products Manager</h2>
-            <button
-              id="btnNewProduct"
-              class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
-            >
-              + Produk Baru
-            </button>
-          </div>
-          <div
-            id="productsGrid"
-            class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-          >
-            <div class="booking-container p-6 text-center text-slate-400">
-              Loading...
-            </div>
-          </div>
-
-          <!-- Product Modal -->
-          <div
-            id="productModal"
-            class="fixed inset-0 bg-black/60 z-40 hidden flex items-center justify-center p-4"
-          >
-            <div
-              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold" id="productModalTitle">
-                  Tambah Produk
-                </h3>
-                <button
-                  type="button"
-                  id="closeProductModalBtn"
-                  class="text-slate-400 hover:text-slate-200"
-                  onclick="closeProductModal()"
-                >
-                  <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-              </div>
-              <form id="productForm" class="space-y-4">
-                <input type="hidden" id="productId" />
-
-                <div>
-                  <label class="block text-sm mb-2"
-                    >Nama Produk <span class="text-red-400">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="productName"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="Contoh: Madu Hutan Sumbawa Premium"
-                    required
-                  />
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm mb-2"
-                      >Kategori <span class="text-red-400">*</span></label
+                      >Excerpt (Ringkasan)</label
                     >
-                    <select
-                      id="productCategory"
+                    <textarea
+                      id="articleExcerpt"
+                      rows="2"
                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      required
-                    >
-                      <option value="">Pilih Kategori</option>
-                      <option value="Zona Sunnah">🌙 Zona Sunnah</option>
-                      <option value="1001 Rempah">🧂 1001 Rempah</option>
-                      <option value="Zona Honey">🍯 Zona Honey</option>
-                      <option value="Cold Pressed">🥤 Cold Pressed</option>
-                      <option value="Coffee">☕ Coffee</option>
-                    </select>
+                    ></textarea>
                   </div>
 
+                  <!-- Header Image Upload -->
                   <div>
                     <label class="block text-sm mb-2"
-                      >Harga Normal (Rp) <span class="text-red-400">*</span></label
+                      >Gambar Hero (Header)</label
                     >
-                    <input
-                      type="text"
-                      id="productPrice"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      placeholder="20.000"
-                      required
-                    />
-                    <p class="text-xs text-slate-400 mt-1">
-                      Gunakan titik sebagai pemisah ribuan
-                    </p>
-                  </div>
 
-                  <div>
-                    <label class="block text-sm mb-2"
-                      >Harga Member (Rp)</label
-                    >
-                    <input
-                      type="text"
-                      id="productMemberPrice"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-emerald-400 focus:outline-none"
-                      placeholder="18.000"
-                    />
-                    <p class="text-xs text-slate-400 mt-1">
-                      Kosongkan jika tidak ada harga member
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm mb-2"
-                    >Teks Promosi</label
-                  >
-                  <input
-                    type="text"
-                    id="productPromoText"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                    placeholder="PROMO RAMADAN - Diskon hingga 20%"
-                  />
-                  <p class="text-xs text-slate-400 mt-1">
-                    Teks promosi opsional yang akan ditampilkan di card produk
-                  </p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm mb-2">Gambar Produk</label>
+                    <!-- File Input -->
                     <input
                       type="file"
-                      id="productImage"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600 file:cursor-pointer"
+                      id="insightHeaderImageFile"
+                      accept="image/*"
+                      onchange="uploadInsightHeaderImage(this)"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
                     />
-                    <input type="hidden" id="productImageUrl" />
+
+                    <!-- Hidden input untuk menyimpan path -->
+                    <input type="hidden" id="insightHeaderImage" />
+
+                    <!-- Preview Image -->
+                    <div id="insightHeaderImagePreview" class="hidden mt-3">
+                      <div class="relative inline-block">
+                        <img
+                          id="insightHeaderImagePreviewImg"
+                          src=""
+                          alt="Preview"
+                          class="w-full max-w-md h-48 object-cover rounded-lg border-2 border-slate-700"
+                        />
+                        <button
+                          type="button"
+                          onclick="removeInsightHeaderImage()"
+                          class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition"
+                          title="Hapus gambar"
+                        >
+                          <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
                     <p class="text-xs text-slate-400 mt-1">
-                      Format: JPG, PNG, WebP. Max 5MB
+                      Upload gambar (JPG, PNG, GIF). Maksimal 5MB.
                     </p>
-                    <div id="productImagePreview" class="mt-2 hidden">
-                      <img
-                        id="productImagePreviewImg"
-                        src=""
-                        alt="Preview"
-                        class="w-full h-32 object-cover rounded-lg border border-slate-700"
-                      />
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Konten</label>
+
+                    <!-- Upload Image Button -->
+                    <div class="mb-2">
                       <button
                         type="button"
-                        id="removeProductImageBtn"
-                        class="text-xs text-red-400 hover:text-red-300 mt-1"
+                        onclick="uploadInsightContentImage()"
+                        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2"
                       >
-                        Hapus Gambar
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <span>Upload Gambar ke Konten</span>
                       </button>
+                      <p class="text-xs text-slate-400 mt-1">
+                        Klik untuk upload gambar. Gambar akan di-insert di
+                        posisi cursor.
+                      </p>
+                    </div>
+
+                    <textarea
+                      id="articleContent"
+                      rows="8"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    ></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Tags (pisah dengan koma)</label
+                    >
+                    <input
+                      type="text"
+                      id="articleTags"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Nutrisi,Ibadah,Kebiasaan"
+                    />
+                  </div>
+
+                  <!-- Category -->
+                  <div>
+                    <label class="block text-sm mb-2">Kategori</label>
+                    <select
+                      id="articleCategory"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    >
+                      <option value="">Pilih Kategori</option>
+                      <option value="Nutrisi">Nutrisi</option>
+                      <option value="Ibadah">Ibadah</option>
+                      <option value="Kebiasaan">Kebiasaan</option>
+                      <option value="Sains">Sains</option>
+                    </select>
+                    <p class="text-xs text-slate-400 mt-1">
+                      Pilih kategori untuk memudahkan filtering di halaman
+                      Edukasi
+                    </p>
+                  </div>
+
+                  <!-- Tipe Edukasi -->
+                  <div>
+                    <label class="block text-sm mb-2">Tipe Edukasi</label>
+                    <div class="flex gap-4">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="articleType"
+                          id="articleTypeGeneral"
+                          value="general"
+                          checked
+                          class="w-4 h-4 accent-amber-400"
+                          onchange="toggleProductSelect()"
+                        />
+                        <span class="text-sm">Umum</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="articleType"
+                          id="articleTypeProduct"
+                          value="product"
+                          class="w-4 h-4 accent-amber-400"
+                          onchange="toggleProductSelect()"
+                        />
+                        <span class="text-sm">Untuk Produk</span>
+                      </label>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">
+                      Pilih "Untuk Produk" jika artikel ini adalah informasi
+                      terkait produk tertentu
+                    </p>
+                  </div>
+
+                  <!-- Pilihan Produk (hidden by default) -->
+                  <div id="productSelectContainer" class="hidden">
+                    <label class="block text-sm mb-2"
+                      >Pilih Produk <span class="text-red-400">*</span></label
+                    >
+                    <select
+                      id="articleProductId"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    >
+                      <option value="">-- Pilih Produk --</option>
+                      <!-- Options loaded dynamically -->
+                    </select>
+                    <p class="text-xs text-slate-400 mt-1">
+                      Artikel ini akan ditampilkan sebagai tombol "Baca Edukasi"
+                      di halaman Store untuk produk yang dipilih
+                    </p>
+                  </div>
+
+                  <div class="flex gap-2">
+                    <button
+                      type="submit"
+                      class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      id="cancelArticle"
+                      class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section: Program Manager -->
+          <section id="section-events" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Program Manager</h2>
+              <button
+                id="btnNewEvent"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
+              >
+                + Program Baru
+              </button>
+            </div>
+            <div
+              id="eventsGrid"
+              class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2"
+            >
+              <div class="booking-container p-6 text-center text-slate-400">
+                Loading...
+              </div>
+            </div>
+
+            <!-- Program Form Modal -->
+            <div
+              id="eventModal"
+              class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-bold" id="eventModalTitle">
+                    Program Baru
+                  </h3>
+                  <button
+                    id="closeEventModal"
+                    class="text-slate-400 hover:text-slate-200"
+                  >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                  </button>
+                </div>
+                <form id="eventForm" class="space-y-4">
+                  <input type="hidden" id="eventId" />
+                  <div>
+                    <label class="block text-sm mb-2">Judul Program</label>
+                    <input
+                      type="text"
+                      id="eventTitle"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2">Tanggal</label>
+                      <input
+                        type="date"
+                        id="eventDate"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm mb-2">Mode</label>
+                      <select
+                        id="eventMode"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        required
+                      >
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Topik</label>
+                    <select
+                      id="eventTopic"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    >
+                      <option value="quranic">Qur'anic Lifestyle</option>
+                      <option value="nutrition">Nutrisi</option>
+                      <option value="science">Sains</option>
+                      <option value="parenting">Parenting</option>
+                      <option value="productivity">Produktivitas</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Deskripsi</label>
+                    <textarea
+                      id="eventDescription"
+                      rows="3"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    ></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Pemateri / Host</label>
+                    <input
+                      type="text"
+                      id="eventSpeaker"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Nama pemateri atau host acara"
+                    />
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2"
+                        >Biaya Pendaftaran (Rp)</label
+                      >
+                      <input
+                        type="text"
+                        id="eventRegistrationFee"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="0 = Gratis"
+                        value="0"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm mb-2"
+                        >Akhir Pendaftaran</label
+                      >
+                      <input
+                        type="date"
+                        id="eventRegistrationDeadline"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Lokasi / Link Zoom</label>
+                    <input
+                      type="text"
+                      id="eventLocation"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Offline: Alamat lengkap | Online: https://zoom.us/..."
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Link Tambahan (Opsional)</label
+                    >
+                    <input
+                      type="text"
+                      id="eventLink"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Link materi, pendaftaran, atau info lainnya"
+                    />
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      type="submit"
+                      class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      id="cancelEvent"
+                      class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section: Coupon Manager -->
+          <section id="section-coupons" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Coupon Manager</h2>
+              <button
+                id="btnNewCoupon"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
+              >
+                + Kode Promo Baru
+              </button>
+            </div>
+            <div
+              id="couponsGrid"
+              class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            >
+              <div class="booking-container p-6 text-center text-slate-400">
+                Loading...
+              </div>
+            </div>
+
+            <!-- Coupon Form Modal -->
+            <div
+              id="couponModal"
+              class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-bold" id="couponModalTitle">
+                    Kode Promo Baru
+                  </h3>
+                  <button
+                    id="closeCouponModal"
+                    class="text-slate-400 hover:text-slate-200"
+                  >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                  </button>
+                </div>
+                <form id="couponForm" class="space-y-4">
+                  <input type="hidden" id="couponId" />
+                  <div>
+                    <label class="block text-sm mb-2">Kode Promo</label>
+                    <input
+                      type="text"
+                      id="couponCode"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none uppercase"
+                      placeholder="WELCOME2025"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Deskripsi</label>
+                    <input
+                      type="text"
+                      id="couponDescription"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Diskon selamat datang 15%"
+                    />
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2">Tipe Diskon</label>
+                      <select
+                        id="couponDiscountType"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        required
+                      >
+                        <option value="percentage">Percentage (%)</option>
+                        <option value="fixed">Fixed (Rp)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm mb-2">Nilai Diskon</label>
+                      <input
+                        type="number"
+                        id="couponDiscountValue"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="15"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Tipe Kupon</label>
+                    <select
+                      id="couponType"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      required
+                    >
+                      <option value="both">Produk & Layanan</option>
+                      <option value="store">Hanya Produk</option>
+                      <option value="services">Hanya Layanan</option>
+                    </select>
+                    <small class="text-slate-400"
+                      >Tentukan di mana kupon ini bisa digunakan</small
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Min. Nilai Booking (Rp)</label
+                    >
+                    <input
+                      type="text"
+                      id="couponMinBookingValue"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="0"
+                      value="0"
+                    />
+                    <small class="text-slate-400"
+                      >Minimal nilai booking untuk menggunakan kupon (0 = tidak
+                      ada minimum)</small
+                    >
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2"
+                        >Max Uses (kosongkan = unlimited)</label
+                      >
+                      <input
+                        type="number"
+                        id="couponMaxUses"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="100"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm mb-2">Expires At</label>
+                      <input
+                        type="datetime-local"
+                        id="couponExpiresAt"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="couponIsActive"
+                      class="w-4 h-4"
+                      checked
+                    />
+                    <label class="text-sm">Aktif</label>
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      type="submit"
+                      class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      id="cancelCoupon"
+                      class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section: Services Manager -->
+          <section id="section-services" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Services Manager</h2>
+              <button
+                id="btnNewService"
+                class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-amber-500 flex items-center gap-2 justify-center sm:justify-start"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Tambah Service</span>
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table
+                id="servicesTable"
+                class="w-full text-sm border border-slate-800 rounded-lg overflow-hidden"
+              >
+                <thead class="bg-slate-800">
+                  <tr>
+                    <th class="px-3 py-3 text-left">ID</th>
+                    <th class="px-3 py-3 text-left">Nama Layanan</th>
+                    <th class="px-3 py-3 text-left">Kategori</th>
+                    <th class="px-3 py-3 text-left">Harga</th>
+                    <th class="px-3 py-3 text-left">Cabang</th>
+                    <th class="px-3 py-3 text-left">Mode</th>
+                    <th class="px-3 py-3 text-left">Status</th>
+                    <th class="px-3 py-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="servicesTableBody">
+                  <tr>
+                    <td colspan="8" class="text-center py-8 text-slate-400">
+                      Loading...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Service Modal -->
+            <div
+              id="serviceModal"
+              class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              >
+                <h3 id="serviceModalTitle" class="text-xl font-bold mb-4">
+                  Tambah Service Baru
+                </h3>
+                <form id="serviceForm" class="space-y-4">
+                  <input type="hidden" id="serviceId" />
+
+                  <div>
+                    <label class="block text-sm mb-2">Nama Layanan *</label>
+                    <input
+                      type="text"
+                      id="serviceName"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Contoh: Bekam Profesional"
+                      required
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2">Kategori *</label>
+                      <select
+                        id="serviceCategory"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        required
+                      >
+                        <option value="">Pilih Kategori</option>
+                        <option value="manual">Manual Therapy</option>
+                        <option value="klinis">Layanan Klinis</option>
+                        <option value="konsultasi">Konsultasi</option>
+                        <option value="perawatan">Perawatan</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm mb-2">Harga (Rp) *</label>
+                      <input
+                        type="text"
+                        id="servicePrice"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="150.000"
+                        required
+                      />
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-sm mb-2">Stok</label>
-                    <input
-                      type="number"
-                      id="productStock"
+                    <label class="block text-sm mb-2">Deskripsi *</label>
+                    <textarea
+                      id="serviceDescription"
                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                      placeholder="100"
-                      min="0"
-                      value="0"
+                      placeholder="Terapi hijamah sesuai SOP medis & hygiene. Berdasarkan hadis shahih."
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2">Cabang/Kota *</label>
+                      <div
+                        class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 space-y-2"
+                      >
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="serviceBranch"
+                            value="Kolaka"
+                            class="w-4 h-4 rounded"
+                          />
+                          <span class="text-sm">Kolaka</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="serviceBranch"
+                            value="Makassar"
+                            class="w-4 h-4 rounded"
+                          />
+                          <span class="text-sm">Makassar</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="serviceBranch"
+                            value="Kendari"
+                            class="w-4 h-4 rounded"
+                          />
+                          <span class="text-sm">Kendari</span>
+                        </label>
+                      </div>
+                      <p class="text-xs text-slate-400 mt-1">
+                        Pilih minimal satu cabang
+                      </p>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm mb-2">Mode *</label>
+                      <select
+                        id="serviceMode"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        required
+                      >
+                        <option value="">Pilih Mode</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                        <option value="both">Online & Offline</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Praktisi (Opsional)</label
+                    >
+                    <input
+                      type="text"
+                      id="servicePractitioner"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="dr. Ahmad, SpGZ"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label class="block text-sm mb-2"
-                    >Deskripsi <span class="text-red-400">*</span></label
-                  >
-                  <textarea
-                    id="productDescription"
-                    rows="4"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none resize-none"
-                    placeholder="Deskripsi lengkap produk..."
-                    required
-                  ></textarea>
-                </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="serviceIsActive"
+                      class="w-4 h-4"
+                      checked
+                    />
+                    <label class="text-sm">Aktif</label>
+                  </div>
 
-                <div class="flex gap-3">
-                  <button
-                    type="submit"
-                    class="flex-1 px-6 bg-emerald-600 hover:bg-emerald-500 py-2 rounded-lg"
-                  >
-                    Simpan
-                  </button>
-                  <button
-                    type="button"
-                    id="cancelProduct"
-                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
-                  >
-                    Batal
-                  </button>
-                </div>
-              </form>
+                  <div class="flex gap-2">
+                    <button
+                      type="submit"
+                      class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      id="cancelService"
+                      class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-      <!-- Delete Confirmation Modal -->
-      <div
-        id="deleteModal"
-        class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
-      >
-        <div
-          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md"
-        >
-          <div class="flex items-center gap-3 mb-4">
+          <!-- Section: Products Manager -->
+          <section id="section-products" class="dashboard-section hidden">
             <div
-              class="w-12 h-12 rounded-full bg-red-900/30 flex items-center justify-center"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
             >
-              <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
-            </div>
-            <div>
-              <h3 class="text-lg sm:text-xl font-bold text-red-400">
-                Konfirmasi Hapus
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-400">
-                Tindakan ini tidak dapat dibatalkan
-              </p>
-            </div>
-          </div>
-          <p
-            class="text-sm sm:text-base text-slate-300 mb-6"
-            id="deleteModalMessage"
-          >
-            Apakah Anda yakin ingin menghapus item ini secara permanen?
-          </p>
-          <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <button
-              id="confirmDelete"
-              class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 sm:py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors"
-            >
-              Ya, Hapus Permanen
-            </button>
-            <button
-              id="cancelDelete"
-              class="flex-1 bg-slate-800 hover:bg-slate-700 py-2.5 sm:py-2 rounded-lg text-sm sm:text-base transition-colors"
-            >
-              Batal
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Success Notification Modal -->
-      <div
-        id="successModal"
-        class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4"
-      >
-        <div
-          class="bg-slate-900 border border-emerald-800 rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95 opacity-0"
-          id="successModalContent"
-        >
-          <div class="flex items-center gap-3">
-            <div
-              class="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center"
-            >
-              <i
-                data-lucide="check-circle"
-                class="w-6 h-6 text-emerald-400"
-              ></i>
-            </div>
-            <div class="flex-1">
-              <h3 class="text-lg sm:text-xl font-bold text-emerald-400">
-                Berhasil!
-              </h3>
-              <p
-                class="text-xs sm:text-sm text-slate-300"
-                id="successModalMessage"
-              >
-                Operasi berhasil dilakukan
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============================================ -->
-      <!-- SECTION: REWARDS MANAGER -->
-      <!-- ============================================ -->
-      <section id="section-rewards" class="dashboard-section hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h2 class="text-xl sm:text-2xl font-bold">Rewards Manager</h2>
-          <button
-            id="btnNewReward"
-            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
-          >
-            + Tambah Reward
-          </button>
-        </div>
-        <div
-          id="rewardsGrid"
-          class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-        >
-          <div class="booking-container p-6 text-center text-slate-400">
-            Loading...
-          </div>
-        </div>
-
-        <!-- Reward Form Modal -->
-        <div
-          id="rewardModal"
-          class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
-        >
-          <div
-            class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <h3 id="rewardModalTitle" class="text-xl font-bold">
-                Tambah Reward Baru
-              </h3>
+              <h2 class="text-xl sm:text-2xl font-bold">Products Manager</h2>
               <button
-                id="closeRewardModal"
-                class="text-slate-400 hover:text-slate-200 transition"
+                id="btnNewProduct"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
               >
-                <i data-lucide="x" class="w-6 h-6"></i>
+                + Produk Baru
               </button>
             </div>
-            <form id="rewardForm" class="space-y-4">
-              <input type="hidden" id="rewardId" />
-
-              <div>
-                <label class="block text-sm mb-2">Nama Reward <span class="text-red-400">*</span></label>
-                <input
-                  type="text"
-                  id="rewardName"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  placeholder="Contoh: Diskon 10%"
-                  required
-                />
+            <div
+              id="productsGrid"
+              class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            >
+              <div class="booking-container p-6 text-center text-slate-400">
+                Loading...
               </div>
+            </div>
 
-              <div>
-                <label class="block text-sm mb-2">Deskripsi</label>
-                <textarea
-                  id="rewardDescription"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  rows="2"
-                  placeholder="Deskripsi singkat reward (opsional)"
-                ></textarea>
+            <!-- Product Modal -->
+            <div
+              id="productModal"
+              class="fixed inset-0 bg-black/60 z-40 hidden flex items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-bold" id="productModalTitle">
+                    Tambah Produk
+                  </h3>
+                  <button
+                    type="button"
+                    id="closeProductModalBtn"
+                    class="text-slate-400 hover:text-slate-200"
+                    onclick="closeProductModal()"
+                  >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                  </button>
+                </div>
+                <form id="productForm" class="space-y-4">
+                  <input type="hidden" id="productId" />
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Nama Produk <span class="text-red-400">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="productName"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Contoh: Madu Hutan Sumbawa Premium"
+                      required
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2"
+                        >Kategori <span class="text-red-400">*</span></label
+                      >
+                      <select
+                        id="productCategory"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        required
+                      >
+                        <option value="">Pilih Kategori</option>
+                        <option value="Zona Sunnah">🌙 Zona Sunnah</option>
+                        <option value="1001 Rempah">🧂 1001 Rempah</option>
+                        <option value="Zona Honey">🍯 Zona Honey</option>
+                        <option value="Cold Pressed">🥤 Cold Pressed</option>
+                        <option value="Coffee">☕ Coffee</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm mb-2"
+                        >Harga Normal (Rp)
+                        <span class="text-red-400">*</span></label
+                      >
+                      <input
+                        type="text"
+                        id="productPrice"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="20.000"
+                        required
+                      />
+                      <p class="text-xs text-slate-400 mt-1">
+                        Gunakan titik sebagai pemisah ribuan
+                      </p>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm mb-2"
+                        >Harga Member (Rp)</label
+                      >
+                      <input
+                        type="text"
+                        id="productMemberPrice"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-emerald-400 focus:outline-none"
+                        placeholder="18.000"
+                      />
+                      <p class="text-xs text-slate-400 mt-1">
+                        Kosongkan jika tidak ada harga member
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Teks Promosi</label>
+                    <input
+                      type="text"
+                      id="productPromoText"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="PROMO RAMADAN - Diskon hingga 20%"
+                    />
+                    <p class="text-xs text-slate-400 mt-1">
+                      Teks promosi opsional yang akan ditampilkan di card produk
+                    </p>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm mb-2">Gambar Produk</label>
+                      <input
+                        type="file"
+                        id="productImage"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600 file:cursor-pointer"
+                      />
+                      <input type="hidden" id="productImageUrl" />
+                      <p class="text-xs text-slate-400 mt-1">
+                        Format: JPG, PNG, WebP. Max 5MB
+                      </p>
+                      <div id="productImagePreview" class="mt-2 hidden">
+                        <img
+                          id="productImagePreviewImg"
+                          src=""
+                          alt="Preview"
+                          class="w-full h-32 object-cover rounded-lg border border-slate-700"
+                        />
+                        <button
+                          type="button"
+                          id="removeProductImageBtn"
+                          class="text-xs text-red-400 hover:text-red-300 mt-1"
+                        >
+                          Hapus Gambar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm mb-2">Stok</label>
+                      <input
+                        type="number"
+                        id="productStock"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="100"
+                        min="0"
+                        value="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Deskripsi <span class="text-red-400">*</span></label
+                    >
+                    <textarea
+                      id="productDescription"
+                      rows="4"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none resize-none"
+                      placeholder="Deskripsi lengkap produk..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <button
+                      type="submit"
+                      class="flex-1 px-6 bg-emerald-600 hover:bg-emerald-500 py-2 rounded-lg"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      id="cancelProduct"
+                      class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
               </div>
+            </div>
+          </section>
 
-              <div>
-                <label class="block text-sm mb-2">Biaya Poin <span class="text-red-400">*</span></label>
-                <input
-                  type="number"
-                  id="rewardPoints"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  placeholder="Contoh: 20"
-                  min="1"
-                  required
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm mb-2">Warna Tema</label>
-                <select
-                  id="rewardColor"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+          <!-- Delete Confirmation Modal -->
+          <div
+            id="deleteModal"
+            class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+          >
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div
+                  class="w-12 h-12 rounded-full bg-red-900/30 flex items-center justify-center"
                 >
-                  <option value="amber">Amber (Kuning)</option>
-                  <option value="emerald">Emerald (Hijau)</option>
-                  <option value="purple">Purple (Ungu)</option>
-                  <option value="sky">Sky (Biru Muda)</option>
-                  <option value="blue">Blue (Biru)</option>
-                  <option value="rose">Rose (Merah Muda)</option>
-                </select>
-                <p class="text-xs text-slate-500 mt-1">Warna untuk tampilan di halaman Store</p>
+                  <i
+                    data-lucide="alert-triangle"
+                    class="w-6 h-6 text-red-400"
+                  ></i>
+                </div>
+                <div>
+                  <h3 class="text-lg sm:text-xl font-bold text-red-400">
+                    Konfirmasi Hapus
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-400">
+                    Tindakan ini tidak dapat dibatalkan
+                  </p>
+                </div>
               </div>
-
-              <div>
-                <label class="block text-sm mb-2">Urutan Tampilan</label>
-                <input
-                  type="number"
-                  id="rewardSortOrder"
-                  class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                  placeholder="0"
-                  value="0"
-                  min="0"
-                />
-                <p class="text-xs text-slate-500 mt-1">Reward dengan urutan lebih kecil ditampilkan terlebih dahulu</p>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="rewardActive"
-                  class="w-4 h-4 bg-slate-800 border-slate-700 rounded focus:ring-amber-400"
-                  checked
-                />
-                <label for="rewardActive" class="text-sm">Aktif (tampilkan di halaman Store)</label>
-              </div>
-
-              <div class="flex gap-3 pt-2">
+              <p
+                class="text-sm sm:text-base text-slate-300 mb-6"
+                id="deleteModalMessage"
+              >
+                Apakah Anda yakin ingin menghapus item ini secara permanen?
+              </p>
+              <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
-                  type="button"
-                  onclick="closeRewardModal()"
-                  class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg transition"
+                  id="confirmDelete"
+                  class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 sm:py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors"
+                >
+                  Ya, Hapus Permanen
+                </button>
+                <button
+                  id="cancelDelete"
+                  class="flex-1 bg-slate-800 hover:bg-slate-700 py-2.5 sm:py-2 rounded-lg text-sm sm:text-base transition-colors"
                 >
                   Batal
                 </button>
-                <button
-                  type="submit"
-                  class="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-900 py-2 rounded-lg font-semibold transition"
+              </div>
+            </div>
+          </div>
+
+          <!-- Success Notification Modal -->
+          <div
+            id="successModal"
+            class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4"
+          >
+            <div
+              class="bg-slate-900 border border-emerald-800 rounded-2xl p-6 w-full max-w-md transform transition-all duration-300 scale-95 opacity-0"
+              id="successModalContent"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center"
                 >
-                  Simpan
+                  <i
+                    data-lucide="check-circle"
+                    class="w-6 h-6 text-emerald-400"
+                  ></i>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg sm:text-xl font-bold text-emerald-400">
+                    Berhasil!
+                  </h3>
+                  <p
+                    class="text-xs sm:text-sm text-slate-300"
+                    id="successModalMessage"
+                  >
+                    Operasi berhasil dilakukan
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================ -->
+          <!-- SECTION: REWARDS MANAGER -->
+          <!-- ============================================ -->
+          <section id="section-rewards" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Rewards Manager</h2>
+              <button
+                id="btnNewReward"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto"
+              >
+                + Tambah Reward
+              </button>
+            </div>
+            <div
+              id="rewardsGrid"
+              class="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            >
+              <div class="booking-container p-6 text-center text-slate-400">
+                Loading...
+              </div>
+            </div>
+
+            <!-- Reward Form Modal -->
+            <div
+              id="rewardModal"
+              class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 id="rewardModalTitle" class="text-xl font-bold">
+                    Tambah Reward Baru
+                  </h3>
+                  <button
+                    id="closeRewardModal"
+                    class="text-slate-400 hover:text-slate-200 transition"
+                  >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                  </button>
+                </div>
+                <form id="rewardForm" class="space-y-4">
+                  <input type="hidden" id="rewardId" />
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Nama Reward <span class="text-red-400">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="rewardName"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Contoh: Diskon 10%"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Deskripsi</label>
+                    <textarea
+                      id="rewardDescription"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      rows="2"
+                      placeholder="Deskripsi singkat reward (opsional)"
+                    ></textarea>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Biaya Poin <span class="text-red-400">*</span></label
+                    >
+                    <input
+                      type="number"
+                      id="rewardPoints"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Contoh: 20"
+                      min="1"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Warna Tema</label>
+                    <select
+                      id="rewardColor"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    >
+                      <option value="amber">Amber (Kuning)</option>
+                      <option value="emerald">Emerald (Hijau)</option>
+                      <option value="purple">Purple (Ungu)</option>
+                      <option value="sky">Sky (Biru Muda)</option>
+                      <option value="blue">Blue (Biru)</option>
+                      <option value="rose">Rose (Merah Muda)</option>
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1">
+                      Warna untuk tampilan di halaman Store
+                    </p>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Urutan Tampilan</label>
+                    <input
+                      type="number"
+                      id="rewardSortOrder"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="0"
+                      value="0"
+                      min="0"
+                    />
+                    <p class="text-xs text-slate-500 mt-1">
+                      Reward dengan urutan lebih kecil ditampilkan terlebih
+                      dahulu
+                    </p>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="rewardActive"
+                      class="w-4 h-4 bg-slate-800 border-slate-700 rounded focus:ring-amber-400"
+                      checked
+                    />
+                    <label for="rewardActive" class="text-sm"
+                      >Aktif (tampilkan di halaman Store)</label
+                    >
+                  </div>
+
+                  <div class="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onclick="closeRewardModal()"
+                      class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg transition"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      class="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-900 py-2 rounded-lg font-semibold transition"
+                    >
+                      Simpan
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============================================ -->
+          <!-- SECTION: ORDERS MANAGER -->
+          <!-- ============================================ -->
+          <section id="section-orders" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Orders Manager</h2>
+              <button
+                onclick="openQRScanner()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 w-full sm:w-auto justify-center"
+              >
+                <i data-lucide="scan" class="w-4 h-4"></i>
+                Scan QR Code
+              </button>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-slate-700">
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Order #
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Customer
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Type
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Location
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Total
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Points
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Created
+                    </th>
+                    <th
+                      class="text-left px-4 py-3 text-sm font-semibold text-slate-400"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <tr>
+                    <td colspan="9" class="text-center py-8 text-slate-400">
+                      Loading orders...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- SECTION: USERS MANAGER -->
+          <section id="section-users" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Users Manager</h2>
+              <div class="text-sm text-slate-400">
+                Total: <span id="totalUsers">0</span> users
+              </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="mb-4">
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-3 flex items-center pointer-events-none"
+                >
+                  <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+                </div>
+                <input
+                  type="text"
+                  id="usersSearchInput"
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-12 pr-11 py-2.5 text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/30 transition placeholder-slate-500"
+                  placeholder="Cari berdasarkan nama, email, atau nomor HP..."
+                />
+                <button
+                  id="clearUsersSearch"
+                  class="absolute inset-y-0 right-3 hidden items-center text-slate-400 hover:text-slate-200 transition"
+                  title="Hapus pencarian"
+                >
+                  <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================ -->
-      <!-- SECTION: ORDERS MANAGER -->
-      <!-- ============================================ -->
-      <section id="section-orders" class="dashboard-section hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-          <h2 class="text-xl sm:text-2xl font-bold">Orders Manager</h2>
-          <button
-            onclick="openQRScanner()"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 w-full sm:w-auto justify-center"
-          >
-            <i data-lucide="scan" class="w-4 h-4"></i>
-            Scan QR Code
-          </button>
-        </div>
-
-        <!-- Orders Table -->
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-slate-700">
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Order #</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Customer</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Type</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Location</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Total</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Points</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Status</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Created</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="ordersTableBody">
-              <tr>
-                <td colspan="9" class="text-center py-8 text-slate-400">
-                  Loading orders...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- SECTION: USERS MANAGER -->
-      <section id="section-users" class="dashboard-section hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h2 class="text-xl sm:text-2xl font-bold">Users Manager</h2>
-          <div class="text-sm text-slate-400">
-            Total: <span id="totalUsers">0</span> users
-          </div>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="mb-4">
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+              <p
+                id="usersSearchInfo"
+                class="text-xs text-slate-500 mt-1.5 hidden"
+              >
+                Menampilkan <span id="usersSearchCount">0</span> hasil pencarian
+              </p>
             </div>
-            <input
-              type="text"
-              id="usersSearchInput"
-              class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-10 py-2.5 text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/30 transition placeholder-slate-500"
-              placeholder="Cari berdasarkan nama, email, atau nomor HP..."
-            />
-            <button
-              id="clearUsersSearch"
-              class="absolute inset-y-0 right-0 pr-3 hidden items-center text-slate-400 hover:text-slate-200 transition"
-              title="Hapus pencarian"
+
+            <!-- Users Table -->
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden"
             >
-              <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-          </div>
-          <p id="usersSearchInfo" class="text-xs text-slate-500 mt-1.5 hidden">
-            Menampilkan <span id="usersSearchCount">0</span> hasil pencarian
-          </p>
-        </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-slate-800">
+                    <tr>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        ID
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Nama
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Email
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Phone
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Terdaftar
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Status
+                      </th>
+                      <th
+                        class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                      >
+                        Points
+                      </th>
+                      <th
+                        class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                      >
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTableBody">
+                    <tr>
+                      <td
+                        colspan="8"
+                        class="px-4 py-8 text-center text-slate-400"
+                      >
+                        Memuat data users...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
 
-        <!-- Users Table -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-800">
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">ID</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Nama</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Email</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Phone</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Terdaftar</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Status</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Points</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="usersTableBody">
-                <tr>
-                  <td colspan="8" class="px-4 py-8 text-center text-slate-400">
-                    Memuat data users...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+          <!-- SECTION: PODCASTS MANAGER -->
+          <section id="section-podcasts" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Podcasts Manager</h2>
+              <button
+                id="btnNewPodcast"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Podcast Baru</span>
+              </button>
+            </div>
 
-      <!-- SECTION: PODCASTS MANAGER -->
-      <section id="section-podcasts" class="dashboard-section hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h2 class="text-xl sm:text-2xl font-bold">Podcasts Manager</h2>
-          <button
-            id="btnNewPodcast"
-            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
+            <!-- Podcasts Table -->
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden"
+            >
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-slate-800">
+                    <tr>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        ID
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Judul
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                      >
+                        Audio
+                      </th>
+                      <th
+                        class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                      >
+                        Urutan
+                      </th>
+                      <th
+                        class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                      >
+                        Status
+                      </th>
+                      <th
+                        class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                      >
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="podcastsTableBody">
+                    <tr>
+                      <td
+                        colspan="6"
+                        class="px-4 py-8 text-center text-slate-400"
+                      >
+                        Memuat data podcasts...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Podcast Form Modal -->
+          <div
+            id="podcastModal"
+            class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
           >
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>Podcast Baru</span>
-          </button>
-        </div>
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold" id="podcastModalTitle">
+                  Podcast Baru
+                </h3>
+                <button
+                  id="closePodcastModal"
+                  class="text-slate-400 hover:text-slate-200"
+                >
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+              </div>
+              <form
+                id="podcastForm"
+                class="space-y-4"
+                enctype="multipart/form-data"
+              >
+                <input type="hidden" id="podcastId" />
 
-        <!-- Podcasts Table -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-800">
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">ID</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Judul</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Audio</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Urutan</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Status</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="podcastsTableBody">
-                <tr>
-                  <td colspan="6" class="px-4 py-8 text-center text-slate-400">
-                    Memuat data podcasts...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                <div>
+                  <label class="block text-sm mb-2"
+                    >Judul Podcast <span class="text-red-400">*</span></label
+                  >
+                  <input
+                    type="text"
+                    id="podcastTitle"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="Masukkan judul podcast"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-sm mb-2"
+                    >File Audio
+                    <span class="text-red-400" id="podcastAudioRequired"
+                      >*</span
+                    ></label
+                  >
+                  <input
+                    type="file"
+                    id="podcastAudio"
+                    accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
+                  />
+                  <p class="text-xs text-slate-400 mt-1">
+                    Format: MP3, WAV, OGG. Maksimal 50MB
+                  </p>
+                </div>
+
+                <!-- Current Audio Preview (for edit mode) -->
+                <div id="currentAudioPreview" class="hidden">
+                  <label class="block text-sm mb-2">Audio Saat Ini</label>
+                  <audio
+                    id="currentAudioPlayer"
+                    controls
+                    class="w-full"
+                  ></audio>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Upload file baru untuk mengganti audio ini
+                  </p>
+                </div>
+
+                <div>
+                  <label class="block text-sm mb-2">Urutan (Sort Order)</label>
+                  <input
+                    type="number"
+                    id="podcastSortOrder"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    placeholder="0"
+                    value="0"
+                    min="0"
+                  />
+                  <p class="text-xs text-slate-400 mt-1">
+                    Angka lebih kecil akan tampil lebih awal
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="podcastIsActive"
+                    class="w-4 h-4 accent-amber-400"
+                    checked
+                  />
+                  <label for="podcastIsActive" class="text-sm"
+                    >Aktif (tampil di halaman Media)</label
+                  >
+                </div>
+
+                <div class="flex gap-2 pt-4">
+                  <button
+                    type="submit"
+                    class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500 transition"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    id="cancelPodcast"
+                    class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg transition"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <!-- Podcast Form Modal -->
+          <!-- SECTION: JOURNEY MANAGER -->
+          <section id="section-journeys" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Journey Manager</h2>
+              <button
+                id="btnNewJourney"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Journey Baru</span>
+              </button>
+            </div>
+
+            <!-- Journey Selector -->
+            <div class="mb-4">
+              <label class="block text-sm mb-2"
+                >Pilih Journey untuk Edit:</label
+              >
+              <select
+                id="adminJourneySelector"
+                class="w-full sm:w-auto min-w-[300px] bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+              >
+                <option value="">Loading...</option>
+              </select>
+            </div>
+
+            <!-- Journey Details Panel -->
+            <div id="journeyDetailsPanel" class="hidden mb-6">
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-4"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-lg font-semibold">Detail Journey</h3>
+                  <div class="flex gap-2">
+                    <button
+                      id="btnEditJourney"
+                      class="text-xs bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      id="btnDeleteJourney"
+                      class="text-xs bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                  <div>
+                    <span class="text-slate-400">Nama:</span>
+                    <span id="journeyDetailName" class="font-medium">-</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400">Slug:</span>
+                    <span
+                      id="journeyDetailSlug"
+                      class="font-mono text-amber-400"
+                      >-</span
+                    >
+                  </div>
+                  <div>
+                    <span class="text-slate-400">Status:</span>
+                    <span id="journeyDetailStatus">-</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Units Table -->
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-4"
+              >
+                <div
+                  class="px-4 py-3 border-b border-slate-800 flex items-center justify-between"
+                >
+                  <h3 class="font-semibold">Units dalam Journey</h3>
+                  <button
+                    id="btnNewUnit"
+                    class="text-xs bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded flex items-center gap-1"
+                  >
+                    <i data-lucide="plus" class="w-3 h-3"></i> Unit Baru
+                  </button>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="bg-slate-800">
+                      <tr>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-semibold text-slate-400"
+                        >
+                          ID
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-semibold text-slate-400"
+                        >
+                          Judul Unit
+                        </th>
+                        <th
+                          class="px-4 py-2 text-center text-xs font-semibold text-slate-400"
+                        >
+                          Warna
+                        </th>
+                        <th
+                          class="px-4 py-2 text-center text-xs font-semibold text-slate-400"
+                        >
+                          Items
+                        </th>
+                        <th
+                          class="px-4 py-2 text-center text-xs font-semibold text-slate-400"
+                        >
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="unitsTableBody">
+                      <tr>
+                        <td
+                          colspan="5"
+                          class="px-4 py-6 text-center text-slate-400"
+                        >
+                          Pilih journey untuk melihat units
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Items Table (shown when unit selected) -->
+              <div
+                id="itemsPanel"
+                class="hidden bg-slate-900 border border-slate-800 rounded-xl overflow-hidden"
+              >
+                <div
+                  class="px-4 py-3 border-b border-slate-800 flex items-center justify-between"
+                >
+                  <h3 class="font-semibold">
+                    Items dalam Unit:
+                    <span id="selectedUnitTitle" class="text-amber-400">-</span>
+                  </h3>
+                  <button
+                    id="btnNewItem"
+                    class="text-xs bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded flex items-center gap-1"
+                  >
+                    <i data-lucide="plus" class="w-3 h-3"></i> Item Baru
+                  </button>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="bg-slate-800">
+                      <tr>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-semibold text-slate-400"
+                        >
+                          Key
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-semibold text-slate-400"
+                        >
+                          Pertanyaan
+                        </th>
+                        <th
+                          class="px-4 py-2 text-center text-xs font-semibold text-slate-400"
+                        >
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                      <tr>
+                        <td
+                          colspan="3"
+                          class="px-4 py-6 text-center text-slate-400"
+                        >
+                          Pilih unit untuk melihat items
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+      <!-- End admin-layout -->
+
+      <!-- Journey Form Modal -->
       <div
-        id="podcastModal"
+        id="journeyModal"
         class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
       >
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg"
+        >
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold" id="podcastModalTitle">Podcast Baru</h3>
-            <button id="closePodcastModal" class="text-slate-400 hover:text-slate-200">
+            <h3 class="text-xl font-bold" id="journeyModalTitle">
+              Journey Baru
+            </h3>
+            <button
+              id="closeJourneyModal"
+              class="text-slate-400 hover:text-slate-200"
+            >
               <i data-lucide="x" class="w-6 h-6"></i>
             </button>
           </div>
-          <form id="podcastForm" class="space-y-4" enctype="multipart/form-data">
-            <input type="hidden" id="podcastId" />
-            
+          <form id="journeyForm" class="space-y-4">
+            <input type="hidden" id="journeyFormId" />
             <div>
-              <label class="block text-sm mb-2">Judul Podcast <span class="text-red-400">*</span></label>
+              <label class="block text-sm mb-2">Nama Journey</label>
               <input
                 type="text"
-                id="podcastTitle"
+                id="journeyFormName"
                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                placeholder="Masukkan judul podcast"
                 required
               />
             </div>
-
             <div>
-              <label class="block text-sm mb-2">File Audio <span class="text-red-400" id="podcastAudioRequired">*</span></label>
+              <label class="block text-sm mb-2">Slug (URL)</label>
               <input
-                type="file"
-                id="podcastAudio"
-                accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
-                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
+                type="text"
+                id="journeyFormSlug"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none font-mono"
+                placeholder="contoh-journey"
+                required
               />
-              <p class="text-xs text-slate-400 mt-1">Format: MP3, WAV, OGG. Maksimal 50MB</p>
+              <p class="text-xs text-slate-400 mt-1">
+                Huruf kecil, angka, dan tanda hubung (-) saja
+              </p>
             </div>
-
-            <!-- Current Audio Preview (for edit mode) -->
-            <div id="currentAudioPreview" class="hidden">
-              <label class="block text-sm mb-2">Audio Saat Ini</label>
-              <audio id="currentAudioPlayer" controls class="w-full"></audio>
-              <p class="text-xs text-slate-400 mt-1">Upload file baru untuk mengganti audio ini</p>
-            </div>
-
             <div>
-              <label class="block text-sm mb-2">Urutan (Sort Order)</label>
-              <input
-                type="number"
-                id="podcastSortOrder"
+              <label class="block text-sm mb-2">Deskripsi</label>
+              <textarea
+                id="journeyFormDesc"
+                rows="2"
                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
-                placeholder="0"
-                value="0"
-                min="0"
-              />
-              <p class="text-xs text-slate-400 mt-1">Angka lebih kecil akan tampil lebih awal</p>
+              ></textarea>
             </div>
-
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="podcastIsActive" class="w-4 h-4 accent-amber-400" checked />
-              <label for="podcastIsActive" class="text-sm">Aktif (tampil di halaman Media)</label>
+              <input
+                type="checkbox"
+                id="journeyFormActive"
+                class="w-4 h-4 accent-amber-400"
+                checked
+              />
+              <label for="journeyFormActive" class="text-sm">Aktif</label>
             </div>
-
             <div class="flex gap-2 pt-4">
               <button
                 type="submit"
-                class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500 transition"
+                class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
               >
                 Simpan
               </button>
               <button
                 type="button"
-                id="cancelPodcast"
-                class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg transition"
+                id="cancelJourneyModal"
+                class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
               >
                 Batal
               </button>
@@ -1698,140 +2189,20 @@
         </div>
       </div>
 
-      <!-- SECTION: JOURNEY MANAGER -->
-      <section id="section-journeys" class="dashboard-section hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h2 class="text-xl sm:text-2xl font-bold">Journey Manager</h2>
-          <button
-            id="btnNewJourney"
-            class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
-          >
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>Journey Baru</span>
-          </button>
-        </div>
-
-        <!-- Journey Selector -->
-        <div class="mb-4">
-          <label class="block text-sm mb-2">Pilih Journey untuk Edit:</label>
-          <select id="adminJourneySelector" class="w-full sm:w-auto min-w-[300px] bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none">
-            <option value="">Loading...</option>
-          </select>
-        </div>
-
-        <!-- Journey Details Panel -->
-        <div id="journeyDetailsPanel" class="hidden mb-6">
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-4">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-semibold">Detail Journey</h3>
-              <div class="flex gap-2">
-                <button id="btnEditJourney" class="text-xs bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">Edit</button>
-                <button id="btnDeleteJourney" class="text-xs bg-red-500 hover:bg-red-600 px-3 py-1 rounded">Hapus</button>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-              <div><span class="text-slate-400">Nama:</span> <span id="journeyDetailName" class="font-medium">-</span></div>
-              <div><span class="text-slate-400">Slug:</span> <span id="journeyDetailSlug" class="font-mono text-amber-400">-</span></div>
-              <div><span class="text-slate-400">Status:</span> <span id="journeyDetailStatus">-</span></div>
-            </div>
-          </div>
-
-          <!-- Units Table -->
-          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-4">
-            <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-              <h3 class="font-semibold">Units dalam Journey</h3>
-              <button id="btnNewUnit" class="text-xs bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded flex items-center gap-1">
-                <i data-lucide="plus" class="w-3 h-3"></i> Unit Baru
-              </button>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="bg-slate-800">
-                  <tr>
-                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">ID</th>
-                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">Judul Unit</th>
-                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Warna</th>
-                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Items</th>
-                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="unitsTableBody">
-                  <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Pilih journey untuk melihat units</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Items Table (shown when unit selected) -->
-          <div id="itemsPanel" class="hidden bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-            <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-              <h3 class="font-semibold">Items dalam Unit: <span id="selectedUnitTitle" class="text-amber-400">-</span></h3>
-              <button id="btnNewItem" class="text-xs bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded flex items-center gap-1">
-                <i data-lucide="plus" class="w-3 h-3"></i> Item Baru
-              </button>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="bg-slate-800">
-                  <tr>
-                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">Key</th>
-                    <th class="px-4 py-2 text-left text-xs font-semibold text-slate-400">Pertanyaan</th>
-                    <th class="px-4 py-2 text-center text-xs font-semibold text-slate-400">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="itemsTableBody">
-                  <tr><td colspan="3" class="px-4 py-6 text-center text-slate-400">Pilih unit untuk melihat items</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-      </main>
-      </div> <!-- End admin-layout -->
-
-      <!-- Journey Form Modal -->
-      <div id="journeyModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold" id="journeyModalTitle">Journey Baru</h3>
-            <button id="closeJourneyModal" class="text-slate-400 hover:text-slate-200">
-              <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-          </div>
-          <form id="journeyForm" class="space-y-4">
-            <input type="hidden" id="journeyFormId" />
-            <div>
-              <label class="block text-sm mb-2">Nama Journey</label>
-              <input type="text" id="journeyFormName" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
-            </div>
-            <div>
-              <label class="block text-sm mb-2">Slug (URL)</label>
-              <input type="text" id="journeyFormSlug" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none font-mono" placeholder="contoh-journey" required />
-              <p class="text-xs text-slate-400 mt-1">Huruf kecil, angka, dan tanda hubung (-) saja</p>
-            </div>
-            <div>
-              <label class="block text-sm mb-2">Deskripsi</label>
-              <textarea id="journeyFormDesc" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"></textarea>
-            </div>
-            <div class="flex items-center gap-2">
-              <input type="checkbox" id="journeyFormActive" class="w-4 h-4 accent-amber-400" checked />
-              <label for="journeyFormActive" class="text-sm">Aktif</label>
-            </div>
-            <div class="flex gap-2 pt-4">
-              <button type="submit" class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500">Simpan</button>
-              <button type="button" id="cancelJourneyModal" class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg">Batal</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <!-- Unit Form Modal -->
-      <div id="unitModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+      <div
+        id="unitModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+      >
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg"
+        >
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold" id="unitModalTitle">Unit Baru</h3>
-            <button id="closeUnitModal" class="text-slate-400 hover:text-slate-200">
+            <button
+              id="closeUnitModal"
+              class="text-slate-400 hover:text-slate-200"
+            >
               <i data-lucide="x" class="w-6 h-6"></i>
             </button>
           </div>
@@ -1840,11 +2211,19 @@
             <input type="hidden" id="unitFormJourneyId" />
             <div>
               <label class="block text-sm mb-2">Judul Unit</label>
-              <input type="text" id="unitFormTitle" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+              <input
+                type="text"
+                id="unitFormTitle"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                required
+              />
             </div>
             <div>
               <label class="block text-sm mb-2">Warna (CSS Class)</label>
-              <select id="unitFormColor" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none">
+              <select
+                id="unitFormColor"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+              >
                 <option value="text-amber-500">Amber</option>
                 <option value="text-emerald-500">Emerald</option>
                 <option value="text-sky-500">Sky</option>
@@ -1854,23 +2233,47 @@
               </select>
             </div>
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="unitFormActive" class="w-4 h-4 accent-amber-400" checked />
+              <input
+                type="checkbox"
+                id="unitFormActive"
+                class="w-4 h-4 accent-amber-400"
+                checked
+              />
               <label for="unitFormActive" class="text-sm">Aktif</label>
             </div>
             <div class="flex gap-2 pt-4">
-              <button type="submit" class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500">Simpan</button>
-              <button type="button" id="cancelUnitModal" class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg">Batal</button>
+              <button
+                type="submit"
+                class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+              >
+                Simpan
+              </button>
+              <button
+                type="button"
+                id="cancelUnitModal"
+                class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+              >
+                Batal
+              </button>
             </div>
           </form>
         </div>
       </div>
 
       <!-- Item Form Modal -->
-      <div id="itemModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div
+        id="itemModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+      >
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        >
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold" id="itemModalTitle">Item Baru</h3>
-            <button id="closeItemModal" class="text-slate-400 hover:text-slate-200">
+            <button
+              id="closeItemModal"
+              class="text-slate-400 hover:text-slate-200"
+            >
               <i data-lucide="x" class="w-6 h-6"></i>
             </button>
           </div>
@@ -1879,32 +2282,74 @@
             <input type="hidden" id="itemFormUnitId" />
             <div>
               <label class="block text-sm mb-2">Item Key</label>
-              <input type="text" id="itemFormKey" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none font-mono" placeholder="contohKey" required />
+              <input
+                type="text"
+                id="itemFormKey"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none font-mono"
+                placeholder="contohKey"
+                required
+              />
               <p class="text-xs text-slate-400 mt-1">camelCase, tanpa spasi</p>
             </div>
             <div>
               <label class="block text-sm mb-2">Pertanyaan</label>
-              <textarea id="itemFormQuestion" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required></textarea>
+              <textarea
+                id="itemFormQuestion"
+                rows="2"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                required
+              ></textarea>
             </div>
             <div>
               <label class="block text-sm mb-2">Dalil</label>
-              <input type="text" id="itemFormDalil" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+              <input
+                type="text"
+                id="itemFormDalil"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                required
+              />
             </div>
             <div>
               <label class="block text-sm mb-2">Sains</label>
-              <input type="text" id="itemFormSains" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+              <input
+                type="text"
+                id="itemFormSains"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                required
+              />
             </div>
             <div>
               <label class="block text-sm mb-2">NBSN</label>
-              <input type="text" id="itemFormNbsn" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none" required />
+              <input
+                type="text"
+                id="itemFormNbsn"
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                required
+              />
             </div>
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="itemFormActive" class="w-4 h-4 accent-amber-400" checked />
+              <input
+                type="checkbox"
+                id="itemFormActive"
+                class="w-4 h-4 accent-amber-400"
+                checked
+              />
               <label for="itemFormActive" class="text-sm">Aktif</label>
             </div>
             <div class="flex gap-2 pt-4">
-              <button type="submit" class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500">Simpan</button>
-              <button type="button" id="cancelItemModal" class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg">Batal</button>
+              <button
+                type="submit"
+                class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500"
+              >
+                Simpan
+              </button>
+              <button
+                type="button"
+                id="cancelItemModal"
+                class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg"
+              >
+                Batal
+              </button>
             </div>
           </form>
         </div>
@@ -1915,40 +2360,86 @@
         id="rewardsModal"
         class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
       >
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+        >
           <!-- Modal Header -->
           <div class="flex justify-between items-center mb-6">
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">
-                <i data-lucide="award" class="w-6 h-6 inline mr-2 text-emerald-400"></i>
+                <i
+                  data-lucide="award"
+                  class="w-6 h-6 inline mr-2 text-emerald-400"
+                ></i>
                 Riwayat Penukaran Reward
               </h3>
               <p class="text-sm text-slate-400">
-                User: <span class="text-white font-semibold" id="rewardUserName">-</span> 
-                <span class="text-slate-500">(ID: <span id="rewardUserId">-</span>)</span>
+                User:
+                <span class="text-white font-semibold" id="rewardUserName"
+                  >-</span
+                >
+                <span class="text-slate-500"
+                  >(ID: <span id="rewardUserId">-</span>)</span
+                >
               </p>
             </div>
             <button
               onclick="closeRewardsModal()"
               class="text-slate-400 hover:text-white transition"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           <!-- Rewards Table -->
-          <div class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
+          <div
+            class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden"
+          >
             <table class="w-full text-sm">
               <thead class="bg-slate-800">
                 <tr>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">No</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Nama Reward</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Poin Digunakan</th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Tanggal</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Status</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
+                  <th
+                    class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                  >
+                    No
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                  >
+                    Nama Reward
+                  </th>
+                  <th
+                    class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                  >
+                    Poin Digunakan
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                  >
+                    Tanggal
+                  </th>
+                  <th
+                    class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                  >
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody id="rewardsHistoryBody">
@@ -1979,7 +2470,8 @@
           <div class="footer-content">
             <div>© 2025 DocterBee. All rights reserved.</div>
             <div>
-              Berbasis <strong>Sains & Alam</strong>. | <a href="#">Privacy</a> ·
+              Berbasis <strong>Sains & Alam</strong>. |
+              <a href="#">Privacy</a> ·
               <a href="#">Terms</a>
             </div>
           </div>
@@ -1988,11 +2480,19 @@
     </div>
 
     <!-- QR Scanner Modal -->
-    <div id="qrScannerModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg">
+    <div
+      id="qrScannerModal"
+      class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg"
+      >
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-bold">Scan QR Code</h3>
-          <button onclick="closeQRScanner()" class="text-slate-400 hover:text-slate-200">
+          <button
+            onclick="closeQRScanner()"
+            class="text-slate-400 hover:text-slate-200"
+          >
             <i data-lucide="x" class="w-6 h-6"></i>
           </button>
         </div>
@@ -2004,11 +2504,19 @@
     </div>
 
     <!-- Order Details Modal -->
-    <div id="orderDetailsModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div
+      id="orderDetailsModal"
+      class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-bold">Order Details</h3>
-          <button onclick="closeOrderDetailsModal()" class="text-slate-400 hover:text-slate-200">
+          <button
+            onclick="closeOrderDetailsModal()"
+            class="text-slate-400 hover:text-slate-200"
+          >
             <i data-lucide="x" class="w-6 h-6"></i>
           </button>
         </div>
@@ -2019,11 +2527,19 @@
     </div>
 
     <!-- Booking Details Modal -->
-    <div id="bookingDetailModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div
+      id="bookingDetailModal"
+      class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+      >
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-2xl font-bold text-white">Detail Booking</h3>
-          <button onclick="closeBookingDetailModal()" class="text-slate-400 hover:text-slate-200 transition">
+          <button
+            onclick="closeBookingDetailModal()"
+            class="text-slate-400 hover:text-slate-200 transition"
+          >
             <i data-lucide="x" class="w-6 h-6"></i>
           </button>
         </div>
@@ -2034,17 +2550,25 @@
     </div>
 
     <!-- User Password Reset Modal -->
-    <div id="userModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md">
+    <div
+      id="userModal"
+      class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md"
+      >
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-bold" id="userModalTitle">Reset Password</h3>
-          <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-200">
+          <button
+            onclick="closeUserModal()"
+            class="text-slate-400 hover:text-slate-200"
+          >
             <i data-lucide="x" class="w-6 h-6"></i>
           </button>
         </div>
         <form id="userForm" class="space-y-4">
           <input type="hidden" id="userId" />
-          
+
           <div>
             <label class="block text-sm mb-2">Nama</label>
             <input
@@ -2066,7 +2590,9 @@
           </div>
 
           <div>
-            <label class="block text-sm mb-2">Password Baru <span class="text-red-400">*</span></label>
+            <label class="block text-sm mb-2"
+              >Password Baru <span class="text-red-400">*</span></label
+            >
             <input
               type="password"
               id="userPassword"
