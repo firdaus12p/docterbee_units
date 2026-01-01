@@ -2181,26 +2181,14 @@ header {
 .admin-main-content {
   flex: 1;
   min-width: 0; /* Prevent content overflow */
-  padding: 1.5rem 1rem;
+  padding: 0.5rem 1rem;
   max-width: 100%;
   overflow-x: hidden;
 }
 
 @media (min-width: 1024px) {
   .admin-main-content {
-    padding: 1.5rem 2rem;
-  }
-}
-
-/* Hide hamburger on desktop when sidebar is visible */
-@media (min-width: 1024px) {
-  .admin-hamburger-btn {
-    display: none !important;
-  }
-
-  /* Hide current section title on desktop */
-  #currentSectionTitle {
-    display: none !important;
+    padding: 0.5rem 2rem;
   }
 }
 
