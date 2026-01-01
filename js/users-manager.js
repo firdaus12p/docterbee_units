@@ -7,6 +7,14 @@
 /* global showSuccess, showError, showWarning, showConfirm, API_BASE, adminFetch */
 
 // ============================================
+// Users State Management
+// ============================================
+let allUsers = []; // Store all users for client-side filtering
+let usersLoaded = false;
+let searchDebounceTimer = null;
+const SEARCH_DEBOUNCE_MS = 300;
+
+// ============================================
 // Load Users
 // ============================================
 async function loadUsers() {
@@ -15,8 +23,17 @@ async function loadUsers() {
     const data = await response.json();
 
     if (data.success) {
-      displayUsers(data.data);
+      allUsers = data.data; // Store all users
+      displayUsers(allUsers);
       document.getElementById("totalUsers").textContent = data.count || 0;
+      
+      // Clear search when reloading
+      const searchInput = document.getElementById("usersSearchInput");
+      if (searchInput) {
+        searchInput.value = "";
+        hideSearchInfo();
+        hideClearButton();
+      }
     } else {
       throw new Error(data.error || "Gagal memuat users");
     }
@@ -30,6 +47,99 @@ async function loadUsers() {
       </tr>
     `;
   }
+}
+
+// ============================================
+// Search Users (Client-side filtering)
+// ============================================
+function searchUsers(query) {
+  const searchTerm = query.toLowerCase().trim();
+  
+  if (!searchTerm) {
+    // Show all users if search is empty
+    displayUsers(allUsers);
+    hideSearchInfo();
+    hideClearButton();
+    return;
+  }
+  
+  // Filter users by name, email, or phone
+  const filteredUsers = allUsers.filter((user) => {
+    const name = (user.name || "").toLowerCase();
+    const email = (user.email || "").toLowerCase();
+    const phone = (user.phone || "").toLowerCase();
+    
+    return (
+      name.includes(searchTerm) ||
+      email.includes(searchTerm) ||
+      phone.includes(searchTerm)
+    );
+  });
+  
+  displayUsers(filteredUsers);
+  showSearchInfo(filteredUsers.length);
+  showClearButton();
+}
+
+// ============================================
+// Search UI Helpers
+// ============================================
+function showSearchInfo(count) {
+  const searchInfo = document.getElementById("usersSearchInfo");
+  const searchCount = document.getElementById("usersSearchCount");
+  if (searchInfo && searchCount) {
+    searchCount.textContent = count;
+    searchInfo.classList.remove("hidden");
+  }
+}
+
+function hideSearchInfo() {
+  const searchInfo = document.getElementById("usersSearchInfo");
+  if (searchInfo) {
+    searchInfo.classList.add("hidden");
+  }
+}
+
+function showClearButton() {
+  const clearBtn = document.getElementById("clearUsersSearch");
+  if (clearBtn) {
+    clearBtn.classList.remove("hidden");
+    clearBtn.classList.add("flex");
+  }
+}
+
+function hideClearButton() {
+  const clearBtn = document.getElementById("clearUsersSearch");
+  if (clearBtn) {
+    clearBtn.classList.add("hidden");
+    clearBtn.classList.remove("flex");
+  }
+}
+
+function clearSearch() {
+  const searchInput = document.getElementById("usersSearchInput");
+  if (searchInput) {
+    searchInput.value = "";
+    searchInput.focus();
+  }
+  displayUsers(allUsers);
+  hideSearchInfo();
+  hideClearButton();
+}
+
+// Debounced search handler
+function handleSearchInput(e) {
+  const query = e.target.value;
+  
+  // Clear previous timeout
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+  
+  // Debounce the search
+  searchDebounceTimer = setTimeout(() => {
+    searchUsers(query);
+  }, SEARCH_DEBOUNCE_MS);
 }
 
 // ============================================
@@ -287,7 +397,6 @@ async function deleteUser(userId) {
 // ============================================
 // Initialize Users Section
 // ============================================
-let usersLoaded = false;
 
 if (typeof window !== "undefined") {
   // Auto-load users when users section becomes active
@@ -306,6 +415,7 @@ if (typeof window !== "undefined") {
         ) {
           usersLoaded = true;
           loadUsers();
+          initSearchListeners();
         } else if (usersSection && usersSection.classList.contains("hidden")) {
           // Reset flag when section is hidden so it can reload next time
           usersLoaded = false;
@@ -496,6 +606,42 @@ function sendWhatsAppToUser(phone, userName) {
   window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 }
 
+// ============================================
+// Initialize Search Listeners
+// ============================================
+let searchListenersInitialized = false;
+
+function initSearchListeners() {
+  // Prevent duplicate listeners
+  if (searchListenersInitialized) return;
+  
+  const searchInput = document.getElementById("usersSearchInput");
+  const clearBtn = document.getElementById("clearUsersSearch");
+  
+  if (searchInput) {
+    // Search on input with debounce
+    searchInput.addEventListener("input", handleSearchInput);
+    
+    // Clear search on Escape key
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        clearSearch();
+      }
+    });
+  }
+  
+  if (clearBtn) {
+    clearBtn.addEventListener("click", clearSearch);
+  }
+  
+  searchListenersInitialized = true;
+  
+  // Re-initialize Lucide icons for search bar
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
 // Export functions for use in HTML
 if (typeof window !== "undefined") {
   window.loadUsers = loadUsers;
@@ -508,4 +654,7 @@ if (typeof window !== "undefined") {
   window.deleteUser = deleteUser;
   window.approveRedemption = approveRedemption;
   window.sendWhatsAppToUser = sendWhatsAppToUser;
+  window.clearSearch = clearSearch;
+  window.searchUsers = searchUsers;
 }
+
