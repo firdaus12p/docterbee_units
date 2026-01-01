@@ -7,9 +7,12 @@
 rules-for-ai.md
 
 # ===============================
-# DOCUMENTATION (KEEP LOCAL ONLY)
+# DATABASE DUMPS (CONTAINS CUSTOMER DATA - NEVER PUSH!)
 # ===============================
-docs/
+u508442634_*.sql
+*_data_*.sql
+*_backup*.sql
+*_dump*.sql
 
 # ===============================
 # NODE / NPM
@@ -57,15 +60,18 @@ desktop.ini
 .eslintcache
 
 # ===============================
-# LINTING & TEST RESULTS (TEMPORARY)
+# LINTING & TEST (DEV ONLY - NOT FOR SERVER)
 # ===============================
 lint-output.txt
 lint-result.txt
 eslint-report.html
 test-results/
+tests/
+eslint.config.mjs
+.prettierrc
 
 # ===============================
-# TROUBLESHOOTING SCRIPTS (LOCAL ONLY - MAY CONTAIN CREDENTIALS)
+# TROUBLESHOOTING SCRIPTS (LOCAL ONLY)
 # ===============================
 troubleshoot-*.sh
 troubleshoot-*.bat
@@ -82,7 +88,33 @@ debug-*.bat
 .playwright-mcp/
 
 # ===============================
-# OPTIONAL (NO CI/CD YET)
+# GITHUB / CI (NOT NEEDED ON SERVER)
 # ===============================
 .github/
 .antigravity/
+
+# ===============================
+# DEPLOYMENT & SETUP SCRIPTS (RUN ONCE THEN EXCLUDE)
+# ===============================
+deploy.sh
+backend/scripts/
+backend/migrations/
+
+# ===============================
+# INTERNAL DOCUMENTATION (SECURITY - NOT FOR SERVER)
+# These contain internal system details that shouldn't be exposed
+# BUT they are NOT gitignored so AI can read them for context
+# Add to server .gitignore or exclude during deployment
+# ===============================
+# ADMIN_SYSTEM.md        <- Contains default credentials, kept for AI context
+# CLEANUP_AUDIT.md       <- Audit log, kept for AI context
+# PRD-*.md               <- Product docs, kept for AI context
+# WALKTHROUGH_*.md       <- Technical docs, kept for AI context
+
+# ===============================
+# DOCUMENTATION (KEEP FOR AI CONTEXT)
+# docs/ folder NOT ignored - needed for AI understanding
+# database_schema.sql NOT ignored - needed for AI understanding
+# .env.example NOT ignored - template for setup
+# AGENTS.md NOT ignored - development guide
+# ===============================
