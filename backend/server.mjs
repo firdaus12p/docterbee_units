@@ -1541,6 +1541,61 @@ app.get("/api", (req, res) => {
     },
   });
 });
+// ============================================
+// SECURITY: Block access to sensitive files/paths
+// ============================================
+app.use((req, res, next) => {
+  const blockedPatterns = [
+    /\.env/i,
+    /\.git/i,
+    /\.htaccess/i,
+    /\.htpasswd/i,
+    /\.sql$/i,
+    /\.bak$/i,
+    /\.backup$/i,
+    /\.log$/i,
+    /\/var\/www\//i,
+    /\/etc\//i,
+    /\/proc\//i,
+    /phpinfo/i,
+    /wp-admin/i,
+    /wp-login/i,
+    /wp-content/i,
+    /node_modules/i,
+    /package\.json$/i,
+    /package-lock\.json$/i,
+  ];
+
+  const requestPath = req.path.toLowerCase();
+  
+  for (const pattern of blockedPatterns) {
+    if (pattern.test(requestPath)) {
+      // Log suspicious access attempt
+      console.warn(`🚨 Blocked suspicious request: ${req.method} ${req.path} from ${req.ip}`);
+      
+      // Return 404 (not 403) to not reveal file existence
+      return res.status(404).sendFile(join(__dirname, "..", "404.html"));
+    }
+  }
+  
+  next();
+});
+
+// ============================================
+// 404 HANDLER - Must be AFTER all routes
+// ============================================
+app.use((req, res) => {
+  // For API routes, return JSON error
+  if (req.path.startsWith("/api/")) {
+    return res.status(404).json({
+      success: false,
+      error: "Endpoint tidak ditemukan",
+    });
+  }
+  
+  // For all other routes, serve 404.html
+  res.status(404).sendFile(join(__dirname, "..", "404.html"));
+});
 
 // Start server
 app.listen(PORT, () => {
