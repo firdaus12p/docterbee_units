@@ -278,10 +278,11 @@ app.post("/api/admin/login", loginRateLimiter.middleware(), async (req, res) => 
       });
     }
 
-    // Query admin from database
-    const admin = await queryOne("SELECT * FROM admins WHERE username = ? AND is_active = 1", [
-      username,
-    ]);
+    // Query admin from database - explicitly select needed columns (security best practice)
+    const admin = await queryOne(
+      "SELECT id, username, password FROM admins WHERE username = ? AND is_active = 1",
+      [username]
+    );
 
     if (!admin) {
       // Record rate limit failure

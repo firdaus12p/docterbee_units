@@ -7,6 +7,53 @@
 // Note: escapeHtml, formatDate, and getCategoryColor are defined in utils.js (global)
 // ============================================
 
+/**
+ * Render a single article card HTML
+ * @param {Object} article - Article data object
+ * @returns {string} HTML string for article card
+ */
+function renderArticleCard(article) {
+  return `
+    <article 
+      class="article-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      onclick="openArticle('${article.slug}')"
+    >
+      ${article.header_image ? `
+        <div class="article-image">
+          <img 
+            src="${article.header_image}" 
+            alt="${escapeHtml(article.title)}"
+            class="w-full h-36 object-cover"
+            onerror="this.parentElement.style.display='none'"
+          >
+        </div>
+      ` : ""}
+      <div class="p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCategoryColor(article.category)}">
+            ${article.category}
+          </span>
+          <span class="text-xs text-slate-500">
+            ${article.views} views
+          </span>
+        </div>
+        <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2">
+          ${escapeHtml(article.title)}
+        </h3>
+        ${article.excerpt ? `
+          <p class="text-sm text-slate-600 line-clamp-2 mb-2">
+            ${escapeHtml(article.excerpt)}
+          </p>
+        ` : ""}
+        <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
+          <span>${article.author}</span>
+          <span>${formatDate(article.created_at)}</span>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
 // ============================================
 // LOAD ARTICLES
 // ============================================
@@ -45,59 +92,11 @@ async function loadInsightArticles() {
       return;
     }
 
-    // Render articles
+    // Render articles using shared helper
     articlesContainer.innerHTML = articles
       .map((article) => {
         console.log("🎨 Rendering article:", article.title);
-        return `
-        <article 
-          class="article-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          onclick="openArticle('${article.slug}')"
-        >
-          ${
-            article.header_image
-              ? `
-            <div class="article-image">
-              <img 
-                src="${article.header_image}" 
-                alt="${escapeHtml(article.title)}"
-                class="w-full h-36 object-cover"
-                onerror="this.parentElement.style.display='none'"
-              >
-            </div>
-          `
-              : ""
-          }
-          <div class="p-4">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCategoryColor(
-                article.category
-              )}">
-                ${article.category}
-              </span>
-              <span class="text-xs text-slate-500">
-                ${article.views} views
-              </span>
-            </div>
-            <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2">
-              ${escapeHtml(article.title)}
-            </h3>
-            ${
-              article.excerpt
-                ? `
-              <p class="text-sm text-slate-600 line-clamp-2 mb-2">
-                ${escapeHtml(article.excerpt)}
-              </p>
-            `
-                : ""
-            }
-            <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
-              <span>${article.author}</span>
-              <span>${formatDate(article.created_at)}</span>
-            </div>
-          </div>
-        </article>
-      `;
+        return renderArticleCard(article);
       })
       .join("");
   } catch (error) {
@@ -154,59 +153,9 @@ async function filterArticlesByCategory() {
       return;
     }
 
-    // Render filtered articles (same as loadInsightArticles)
+    // Render filtered articles using shared helper
     articlesContainer.innerHTML = articles
-      .map(
-        (article) => `
-        <article 
-          class="article-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          onclick="openArticle('${article.slug}')"
-        >
-          ${
-            article.header_image
-              ? `
-            <div class="article-image">
-              <img 
-                src="${article.header_image}" 
-                alt="${escapeHtml(article.title)}"
-                class="w-full h-36 object-cover"
-                onerror="this.parentElement.style.display='none'"
-              >
-            </div>
-          `
-              : ""
-          }
-          <div class="p-4">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCategoryColor(
-                article.category
-              )}">
-                ${article.category}
-              </span>
-              <span class="text-xs text-slate-500">
-                ${article.views} views
-              </span>
-            </div>
-            <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2">
-              ${escapeHtml(article.title)}
-            </h3>
-            ${
-              article.excerpt
-                ? `
-              <p class="text-sm text-slate-600 line-clamp-2 mb-2">
-                ${escapeHtml(article.excerpt)}
-              </p>
-            `
-                : ""
-            }
-            <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
-              <span>${article.author}</span>
-              <span>${formatDate(article.created_at)}</span>
-            </div>
-          </div>
-        </article>
-      `
-      )
+      .map((article) => renderArticleCard(article))
       .join("");
   } catch (error) {
     console.error("Error filtering articles:", error);

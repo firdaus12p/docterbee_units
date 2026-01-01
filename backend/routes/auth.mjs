@@ -125,9 +125,9 @@ router.post("/login", loginRateLimiter.middleware(), async (req, res) => {
       });
     }
 
-    // Find user
+    // Find user - explicitly select needed columns only (security: exclude loading unnecessary data)
     const user = await queryOne(
-      "SELECT * FROM users WHERE email = ? AND is_active = 1",
+      "SELECT id, name, email, phone, password FROM users WHERE email = ? AND is_active = 1",
       [email]
     );
 
