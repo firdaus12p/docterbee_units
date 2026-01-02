@@ -1,0 +1,27 @@
+# Robots.txt for DocterBee
+# https://docterbee.com
+
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin-dashboard.html
+Disallow: /backend/
+Disallow: /api/
+Disallow: /uploads/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /.env
+Disallow: /login.html
+Disallow: /register.html
+Disallow: /profile.html
+Disallow: /member-check.html
+
+# Allow search engines to access static assets
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+
+# Sitemap location
+Sitemap: https://docterbee.com/sitemap.xml

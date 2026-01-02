@@ -269,17 +269,25 @@ function showUnit(unitId) {
         <div class="question-head flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div>
             <div class="font-semibold">${escapeHtml(item.q)}</div>
-            <div class="text-xs text-slate-900 mt-1 font-medium">${escapeHtml(item.dalil)}</div>
+            <div class="text-xs text-slate-900 mt-1 font-medium">${escapeHtml(
+              item.dalil
+            )}</div>
           </div>
-          <div class="text-xs ${unit.color} font-semibold">Dalil · Sains · NBSN</div>
+          <div class="text-xs ${
+            unit.color
+          } font-semibold">Dalil · Sains · NBSN</div>
         </div>
         <div class="mt-3 flex flex-wrap gap-2">
-          <button class="btn-yes ${isAnswered ? "selected" : ""}" data-unit="${unitId}" data-key="${
+          <button class="btn-yes ${
+            isAnswered ? "selected" : ""
+          }" data-unit="${unitId}" data-key="${
         item.key
       }" data-value="1">Ya</button>
           <button class="btn-no ${
             !isAnswered && answers[item.key] === 0 ? "selected" : ""
-          }" data-unit="${unitId}" data-key="${item.key}" data-value="0">Belum</button>
+          }" data-unit="${unitId}" data-key="${
+        item.key
+      }" data-value="0">Belum</button>
           <button class="btn-info" data-unit="${unitId}" data-key="${
         item.key
       }">Lihat Penjelasan</button>
@@ -289,7 +297,9 @@ function showUnit(unitId) {
           <div><b>Sains:</b> ${escapeHtml(item.sains)}</div>
           <div><b>NBSN:</b> ${escapeHtml(item.nbsn)}</div>
         </div>
-        <div class="${statusClass}" id="ans_${unitId}_${item.key}">${statusText}</div>
+        <div class="${statusClass}" id="ans_${unitId}_${
+        item.key
+      }">${statusText}</div>
       </div>
     `;
     })
@@ -415,8 +425,12 @@ function answer(unitId, key, value) {
   }
 
   // Update button selected states
-  const yesBtn = document.querySelector(`.btn-yes[data-unit="${unitId}"][data-key="${key}"]`);
-  const noBtn = document.querySelector(`.btn-no[data-unit="${unitId}"][data-key="${key}"]`);
+  const yesBtn = document.querySelector(
+    `.btn-yes[data-unit="${unitId}"][data-key="${key}"]`
+  );
+  const noBtn = document.querySelector(
+    `.btn-no[data-unit="${unitId}"][data-key="${key}"]`
+  );
 
   if (yesBtn && noBtn) {
     if (value === 1) {
@@ -696,7 +710,8 @@ async function init() {
   // Only run journey-related code if we're on a journey page
   // This prevents redirects from other pages (login, register, etc.)
   const currentPath = window.location.pathname;
-  const isJourneyPage = currentPath === "/journey" || currentPath.startsWith("/journey/");
+  const isJourneyPage =
+    currentPath === "/journey" || currentPath.startsWith("/journey/");
 
   if (!isJourneyPage) {
     // Not on journey page, skip journey-specific initialization
@@ -932,10 +947,20 @@ async function confirmBooking() {
   const customerPhone = document.getElementById("customerPhone")?.value.trim();
   const customerAge = document.getElementById("customerAge")?.value;
   const customerGender = document.getElementById("customerGender")?.value;
-  const customerAddress = document.getElementById("customerAddress")?.value.trim();
+  const customerAddress = document
+    .getElementById("customerAddress")
+    ?.value.trim();
 
-  if (!customerName || !customerPhone || !customerAge || !customerGender || !customerAddress) {
-    showWarning("Mohon lengkapi semua data pribadi yang bertanda * (wajib diisi).");
+  if (
+    !customerName ||
+    !customerPhone ||
+    !customerAge ||
+    !customerGender ||
+    !customerAddress
+  ) {
+    showWarning(
+      "Mohon lengkapi semua data pribadi yang bertanda * (wajib diisi)."
+    );
     return;
   }
 
@@ -1033,13 +1058,16 @@ async function validatePromoCode() {
     const result = await response.json();
 
     if (result.success && result.valid) {
-      promoResult.className = "text-sm text-emerald-400 bg-emerald-900/20 p-3 rounded-lg";
+      promoResult.className =
+        "text-sm text-emerald-400 bg-emerald-900/20 p-3 rounded-lg";
       promoResult.innerHTML = `
         <div class="flex items-center gap-2 mb-1">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <b>Kode promo valid!</b>
         </div>
-        <div class="text-xs opacity-80">${escapeHtml(result.data.description || "")}</div>
+        <div class="text-xs opacity-80">${escapeHtml(
+          result.data.description || ""
+        )}</div>
         <div class="mt-1">
           Diskon: <b>${
             result.data.discountType === "percentage"
@@ -1062,7 +1090,8 @@ async function validatePromoCode() {
     } else {
       // Handle already used error with special styling
       if (result.alreadyUsed) {
-        promoResult.className = "text-sm text-red-600 bg-red-900/20 p-3 rounded-lg";
+        promoResult.className =
+          "text-sm text-red-600 bg-red-900/20 p-3 rounded-lg";
         promoResult.innerHTML = `
           <div class="flex items-center gap-2 mb-1">
             <i data-lucide="alert-circle" class="w-4 h-4"></i>
@@ -1074,7 +1103,8 @@ async function validatePromoCode() {
         `;
       } else {
         // Generic error
-        promoResult.className = "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
+        promoResult.className =
+          "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
         promoResult.innerHTML = `
           <div class="flex items-center gap-2">
             <i data-lucide="x-circle" class="w-4 h-4"></i>
@@ -1095,7 +1125,8 @@ async function validatePromoCode() {
   } catch (error) {
     console.error("Error validating promo:", error);
     promoResult.className = "text-sm text-red-400 bg-red-900/20 p-3 rounded-lg";
-    promoResult.textContent = "Gagal memvalidasi kode promo. Pastikan server backend berjalan.";
+    promoResult.textContent =
+      "Gagal memvalidasi kode promo. Pastikan server backend berjalan.";
     bookingState.validatedCoupon = null;
 
     // Update price display (remove discount)
@@ -1108,18 +1139,22 @@ async function validatePromoCode() {
 // Save booking to database
 async function saveBookingToDatabase() {
   // Get customer data
-  const customerName = document.getElementById("customerName")?.value.trim() || "";
-  const customerPhone = document.getElementById("customerPhone")?.value.trim() || "";
+  const customerName =
+    document.getElementById("customerName")?.value.trim() || "";
+  const customerPhone =
+    document.getElementById("customerPhone")?.value.trim() || "";
   const customerAge = document.getElementById("customerAge")?.value;
   const customerGender = document.getElementById("customerGender")?.value || "";
-  const customerAddress = document.getElementById("customerAddress")?.value.trim() || "";
+  const customerAddress =
+    document.getElementById("customerAddress")?.value.trim() || "";
 
   // Get booking data
   const dateRaw = document.getElementById("date")?.value;
   const branch = document.getElementById("branch")?.value || "";
   const practitioner = document.getElementById("pract")?.value || "";
   const mode = document.getElementById("mode")?.value || "";
-  const promoCode = document.getElementById("promoCode")?.value.trim().toUpperCase() || null;
+  const promoCode =
+    document.getElementById("promoCode")?.value.trim().toUpperCase() || null;
   const time = bookingState.selectedTime;
   const service = bookingState.serviceName || "";
 
@@ -1136,7 +1171,9 @@ async function saveBookingToDatabase() {
   }
 
   // Extract mode value (remove text in parentheses)
-  const modeValue = mode.toLowerCase().includes("online") ? "online" : "offline";
+  const modeValue = mode.toLowerCase().includes("online")
+    ? "online"
+    : "offline";
 
   try {
     const response = await fetch("/api/bookings", {
@@ -1189,7 +1226,9 @@ async function saveBookingToDatabase() {
 // Load service price from API
 async function loadServicePrice(serviceName) {
   try {
-    const response = await fetch(`/api/bookings/prices/${encodeURIComponent(serviceName)}`);
+    const response = await fetch(
+      `/api/bookings/prices/${encodeURIComponent(serviceName)}`
+    );
     const result = await response.json();
 
     if (result.success) {
@@ -1222,7 +1261,9 @@ function updatePriceDisplay() {
   priceSummary?.classList.remove("hidden");
 
   // Format price
-  const formattedPrice = new Intl.NumberFormat("id-ID").format(bookingState.price);
+  const formattedPrice = new Intl.NumberFormat("id-ID").format(
+    bookingState.price
+  );
   displayPrice.textContent = `Rp ${formattedPrice}`;
 
   // Calculate discount if coupon is validated
@@ -1232,7 +1273,9 @@ function updatePriceDisplay() {
   if (bookingState.validatedCoupon) {
     const coupon = bookingState.validatedCoupon;
     if (coupon.discountType === "percentage") {
-      discountAmount = Math.round((bookingState.price * coupon.discountValue) / 100);
+      discountAmount = Math.round(
+        (bookingState.price * coupon.discountValue) / 100
+      );
     } else {
       discountAmount = coupon.discountValue;
     }
@@ -1240,7 +1283,9 @@ function updatePriceDisplay() {
 
     // Show discount row
     discountRow?.classList.remove("hidden");
-    const formattedDiscount = new Intl.NumberFormat("id-ID").format(discountAmount);
+    const formattedDiscount = new Intl.NumberFormat("id-ID").format(
+      discountAmount
+    );
     displayDiscount.textContent = `- Rp ${formattedDiscount}`;
   } else {
     // Hide discount row
@@ -1279,7 +1324,9 @@ function initBooking() {
 
     // Show service indicator
     const serviceIndicator = document.getElementById("serviceIndicator");
-    const serviceIndicatorText = document.getElementById("serviceIndicatorText");
+    const serviceIndicatorText = document.getElementById(
+      "serviceIndicatorText"
+    );
     if (serviceIndicator && serviceIndicatorText) {
       serviceIndicatorText.textContent = bookingState.serviceName;
       serviceIndicator.classList.remove("hidden");
@@ -1408,7 +1455,9 @@ async function renderEvents() {
       // Format registration fee
       const feeText =
         event.registration_fee && event.registration_fee > 0
-          ? `Rp ${new Intl.NumberFormat("id-ID").format(event.registration_fee)}`
+          ? `Rp ${new Intl.NumberFormat("id-ID").format(
+              event.registration_fee
+            )}`
           : "GRATIS";
 
       // Format registration deadline
@@ -1548,32 +1597,6 @@ function initEvents() {
 // ==================== INSIGHT PAGE FUNCTIONS ====================
 
 /**
- * Insight articles data
- */
-const INSIGHT_DATA = [
-  {
-    title: "Madu 3–5mm & Autofagi",
-    tag: "Sains · Nutrisi",
-    brief: "Bagaimana komponen bioaktif madu mikro mendukung proses perbaikan sel.",
-  },
-  {
-    title: "Puasa Senin-Kamis & Metabolisme",
-    tag: "Ibadah · Sains",
-    brief: "Efek puasa terhadap sensitivitas insulin & hormon lapar.",
-  },
-  {
-    title: "Shalat Tepat Waktu & Stres",
-    tag: "Ibadah · Kebiasaan",
-    brief: "Hubungan ritme ibadah dan stabilitas sistem limbik.",
-  },
-  {
-    title: "Batasi Gula Tambahan",
-    tag: "Nutrisi · Kebiasaan",
-    brief: "Mengapa gula rafinasi menaikkan inflamasi sistemik.",
-  },
-];
-
-/**
  * Render insight articles
  */
 async function renderInsightArticles() {
@@ -1621,54 +1644,22 @@ async function renderInsightArticles() {
   }
 }
 
-/**
- * Summarize article with NBSN recommendations
- * @param {number} index - Article index
- */
-function summarizeArticle(index) {
-  const article = INSIGHT_DATA[index];
-  const resultContainer = document.getElementById("insightResult");
-
-  if (!resultContainer) return;
-
-  const nbsnHTML = `
-    <div class="grid md:grid-cols-2 gap-4">
-      <div class="nbsn-card">
-        <div class="font-semibold mb-1">Ringkasan</div>
-        <p class="text-slate-200/85">${escapeHtml(article.brief)}</p>
-      </div>
-      <div class="nbsn-card">
-        <div class="font-semibold mb-1">Rekomendasi NBSN</div>
-        <ul class="list-disc pl-5 text-slate-200/85">
-          <li><b>Neuron:</b> catat emosi & syukur harian.</li>
-          <li><b>Biomolekul:</b> madu murni 1–2 sdm/hari, hidrasi cukup.</li>
-          <li><b>Sensorik:</b> tidur 7–8 jam, paparan matahari pagi.</li>
-          <li><b>Nature:</b> puasa sunnah & kurangi gula rafinasi.</li>
-        </ul>
-      </div>
-    </div>
-  `;
-
-  resultContainer.innerHTML = nbsnHTML;
-
-  // Add points for reading insight
-  addPoints(2);
-}
-
 // Summarize article by slug (load from API)
 async function summarizeArticleById(slug) {
   const resultContainer = document.getElementById("insightResult");
 
   if (!resultContainer) return;
 
-  resultContainer.innerHTML = '<p class="text-slate-400">Loading article...</p>';
+  resultContainer.innerHTML =
+    '<p class="text-slate-400">Loading article...</p>';
 
   try {
     const response = await fetch(`/api/insight/${slug}`);
     const result = await response.json();
 
     if (!result.success) {
-      resultContainer.innerHTML = '<p class="text-red-400">Artikel tidak ditemukan</p>';
+      resultContainer.innerHTML =
+        '<p class="text-red-400">Artikel tidak ditemukan</p>';
       return;
     }
 
@@ -1700,7 +1691,8 @@ async function summarizeArticleById(slug) {
     addPoints(2);
   } catch (error) {
     console.error("Error loading article:", error);
-    resultContainer.innerHTML = '<p class="text-red-400">Gagal memuat artikel</p>';
+    resultContainer.innerHTML =
+      '<p class="text-red-400">Gagal memuat artikel</p>';
   }
 }
 
@@ -1770,7 +1762,8 @@ async function renderPodcastList() {
   if (!podcastList) return;
 
   // Show loading state
-  podcastList.innerHTML = '<p class="text-slate-400 text-sm animate-pulse">Memuat podcast...</p>';
+  podcastList.innerHTML =
+    '<p class="text-slate-400 text-sm animate-pulse">Memuat podcast...</p>';
 
   try {
     // Fetch podcasts from API
@@ -1972,7 +1965,8 @@ function loadYouTube() {
   const videoId = extractYouTubeId(ytUrl);
 
   if (!videoId) {
-    ytPlayer.innerHTML = '<div class="p-6 text-center text-slate-400">URL tidak valid.</div>';
+    ytPlayer.innerHTML =
+      '<div class="p-6 text-center text-slate-400">URL tidak valid.</div>';
     return;
   }
 
@@ -2032,7 +2026,8 @@ async function checkTranscript() {
   // Show loading
   if (btnCheck) {
     btnCheck.disabled = true;
-    btnCheck.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Checking...';
+    btnCheck.innerHTML =
+      '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Checking...';
     lucide.createIcons();
   }
 
@@ -2115,7 +2110,8 @@ async function checkTranscript() {
     // Reset button
     if (btnCheck) {
       btnCheck.disabled = false;
-      btnCheck.innerHTML = '<i data-lucide="search" class="w-3 h-3"></i> Check Transcript';
+      btnCheck.innerHTML =
+        '<i data-lucide="search" class="w-3 h-3"></i> Check Transcript';
       lucide.createIcons();
     }
   }
@@ -2255,16 +2251,22 @@ async function analyzeMedia() {
 
     // Show error with troubleshooting
     aiResult.innerHTML = `
-      <div class="ai-analysis-card border-${isQuotaError ? "amber" : "red"}-500/30">
+      <div class="ai-analysis-card border-${
+        isQuotaError ? "amber" : "red"
+      }-500/30">
         <div class="font-semibold mb-2 flex items-center gap-2 text-${
           isQuotaError ? "amber" : "red"
         }-600">
-          <i data-lucide="${isQuotaError ? "clock" : "alert-triangle"}" class="w-5 h-5"></i>
+          <i data-lucide="${
+            isQuotaError ? "clock" : "alert-triangle"
+          }" class="w-5 h-5"></i>
           ${isQuotaError ? "Kuota API Tercapai" : "Gagal Menganalisis"}
         </div>
         <p class="text-slate-700 mb-3">${escapeHtml(error.message)}</p>
         <div class="text-sm text-slate-600">
-          <p class="font-semibold mb-1">${isQuotaError ? "Solusi" : "Troubleshooting"}:</p>
+          <p class="font-semibold mb-1">${
+            isQuotaError ? "Solusi" : "Troubleshooting"
+          }:</p>
           <ul class="list-disc pl-5 space-y-1">
             ${
               isQuotaError
@@ -2292,7 +2294,8 @@ async function analyzeMedia() {
     // Reset button state
     if (btnAnalyze) {
       btnAnalyze.disabled = false;
-      btnAnalyze.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Analisis AI';
+      btnAnalyze.innerHTML =
+        '<i data-lucide="sparkles" class="w-4 h-4"></i> Analisis AI';
       lucide.createIcons();
     }
 
@@ -2316,10 +2319,16 @@ function markdownToHtml(text) {
   let html = escapeHtml(text);
 
   // Convert **bold** to <strong>
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong class='font-semibold text-slate-900'>$1</strong>");
+  html = html.replace(
+    /\*\*(.+?)\*\*/g,
+    "<strong class='font-semibold text-slate-900'>$1</strong>"
+  );
 
   // Convert *italic* to <em> (only if not part of **bold**)
-  html = html.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em class='italic text-slate-800'>$1</em>");
+  html = html.replace(
+    /(?<!\*)\*([^*]+?)\*(?!\*)/g,
+    "<em class='italic text-slate-800'>$1</em>"
+  );
 
   // Convert `code` to <code>
   html = html.replace(
@@ -2337,7 +2346,9 @@ function formatAISummary(text, metadata = {}) {
   let metadataBadge = "";
   if (metadata.source) {
     const sourceLabel =
-      metadata.source === "auto-transcript" ? "✨ Auto Transcript" : "📝 User Notes";
+      metadata.source === "auto-transcript"
+        ? "✨ Auto Transcript"
+        : "📝 User Notes";
     const sourceColor =
       metadata.source === "auto-transcript"
         ? "bg-emerald-100 border-emerald-400/50 text-emerald-700"
@@ -2373,7 +2384,9 @@ function formatAISummary(text, metadata = {}) {
     if (markdownHeaderMatch) {
       // Close previous section
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join(
+          ""
+        )}</ul>`;
         currentList = [];
       }
       // Close previous section card if exists
@@ -2385,7 +2398,10 @@ function formatAISummary(text, metadata = {}) {
       let iconName = "info";
       let iconColor = "text-sky-500";
 
-      if (headerText.includes("Ringkasan") || headerText.includes("ringkasan")) {
+      if (
+        headerText.includes("Ringkasan") ||
+        headerText.includes("ringkasan")
+      ) {
         iconName = "info";
         iconColor = "text-sky-500";
       } else if (
@@ -2396,7 +2412,10 @@ function formatAISummary(text, metadata = {}) {
       ) {
         iconName = "book-open";
         iconColor = "text-emerald-500";
-      } else if (headerText.includes("Selaras") || headerText.includes("selaras")) {
+      } else if (
+        headerText.includes("Selaras") ||
+        headerText.includes("selaras")
+      ) {
         iconName = "check-circle";
         iconColor = "text-emerald-500";
       } else if (
@@ -2413,10 +2432,16 @@ function formatAISummary(text, metadata = {}) {
       ) {
         iconName = "flask-conical";
         iconColor = "text-sky-500";
-      } else if (headerText.includes("NBSN") || headerText.includes("Rekomendasi")) {
+      } else if (
+        headerText.includes("NBSN") ||
+        headerText.includes("Rekomendasi")
+      ) {
         iconName = "brain";
         iconColor = "text-purple-500";
-      } else if (headerText.includes("Analisis") || headerText.includes("Konten")) {
+      } else if (
+        headerText.includes("Analisis") ||
+        headerText.includes("Konten")
+      ) {
         iconName = "file-text";
         iconColor = "text-blue-500";
       }
@@ -2434,7 +2459,9 @@ function formatAISummary(text, metadata = {}) {
     else if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
       // Close previous section
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join(
+          ""
+        )}</ul>`;
         currentList = [];
       }
       // Close previous section card if exists
@@ -2450,7 +2477,10 @@ function formatAISummary(text, metadata = {}) {
       if (headerText.includes("Selaras") || headerText.includes("selaras")) {
         iconName = "check-circle";
         iconColor = "text-emerald-500";
-      } else if (headerText.includes("Koreksi") || headerText.includes("koreksi")) {
+      } else if (
+        headerText.includes("Koreksi") ||
+        headerText.includes("koreksi")
+      ) {
         iconName = "alert-circle";
         iconColor = "text-red-600";
       } else if (headerText.includes("Sains") || headerText.includes("sains")) {
@@ -2483,7 +2513,9 @@ function formatAISummary(text, metadata = {}) {
     // Regular paragraph
     else if (trimmed) {
       if (currentList.length > 0) {
-        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
+        html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join(
+          ""
+        )}</ul>`;
         currentList = [];
       }
       html += `<p class="text-slate-700">${markdownToHtml(trimmed)}</p>`;
@@ -2492,7 +2524,9 @@ function formatAISummary(text, metadata = {}) {
 
   // Close remaining list
   if (currentList.length > 0) {
-    html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join("")}</ul>`;
+    html += `<ul class="list-disc pl-5 text-slate-700">${currentList.join(
+      ""
+    )}</ul>`;
   }
 
   // Close last section
@@ -2604,7 +2638,9 @@ async function renderServices() {
         return `
           <div class="event-card">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-              <div class="text-lg font-semibold text-slate-900">${escapeHtml(service.name)}</div>
+              <div class="text-lg font-semibold text-slate-900">${escapeHtml(
+                service.name
+              )}</div>
               ${categoryBadge}
             </div>
             <p class="text-sm text-slate-900 mb-3">
@@ -2687,7 +2723,9 @@ function getModeInfoHTML(mode) {
 
   return `
     <div class="flex items-center gap-2 mb-3 text-xs text-slate-900">
-      <i data-lucide="${icons[mode] || "video"}" class="w-3.5 h-3.5 text-emerald-400"></i>
+      <i data-lucide="${
+        icons[mode] || "video"
+      }" class="w-3.5 h-3.5 text-emerald-400"></i>
       <span>${labels[mode] || mode}</span>
     </div>
   `;
@@ -2831,7 +2869,11 @@ function showStoreTab(tabName) {
 
   if (targetSection) targetSection.classList.remove("hidden");
   if (targetTab) {
-    targetTab.classList.remove("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
+    targetTab.classList.remove(
+      "bg-slate-800",
+      "text-slate-300",
+      "hover:bg-slate-700"
+    );
     targetTab.classList.add("bg-red-600", "text-white");
   }
 
@@ -2859,7 +2901,9 @@ async function loadProductsFromAPI() {
         name: product.name,
         cat: product.category, // API uses "category" field
         price: parseFloat(product.price),
-        member_price: product.member_price ? parseFloat(product.member_price) : null,
+        member_price: product.member_price
+          ? parseFloat(product.member_price)
+          : null,
         promo_text: product.promo_text || null,
         description: product.description,
         image: product.image_url,
@@ -2956,16 +3000,21 @@ async function renderDineInMenu() {
  * @returns {string} HTML string
  */
 function renderDineInMenuItem(product, color) {
-  const hasMemberPrice = product.member_price && product.member_price < product.price;
+  const hasMemberPrice =
+    product.member_price && product.member_price < product.price;
 
   // Format prices
   const normalPrice = `Rp ${product.price.toLocaleString("id-ID")}`;
-  const memberPrice = hasMemberPrice ? `Rp ${product.member_price.toLocaleString("id-ID")}` : null;
+  const memberPrice = hasMemberPrice
+    ? `Rp ${product.member_price.toLocaleString("id-ID")}`
+    : null;
 
   return `
     <div class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${color}-400/50 transition-all">
       <div class="flex justify-between items-start mb-1 gap-2">
-        <span class="font-semibold text-slate-900">${escapeHtml(product.name)}</span>
+        <span class="font-semibold text-slate-900">${escapeHtml(
+          product.name
+        )}</span>
         <div class="text-right flex-shrink-0">
           ${
             hasMemberPrice
@@ -2989,7 +3038,11 @@ function renderDineInMenuItem(product, color) {
           : ""
       }
       <p class="text-xs text-slate-600">
-        ${product.description ? escapeHtml(product.description) : "Produk kesehatan berkualitas"}
+        ${
+          product.description
+            ? escapeHtml(product.description)
+            : "Produk kesehatan berkualitas"
+        }
       </p>
     </div>
   `;
@@ -3015,7 +3068,8 @@ async function checkUserLoginStatus() {
 
 // Render product pricing with member/normal price display
 function renderProductPricing(product) {
-  const hasMemberPrice = product.member_price !== null && product.member_price > 0;
+  const hasMemberPrice =
+    product.member_price !== null && product.member_price > 0;
 
   // If logged in and has member price: show member price large, normal price strikethrough
   if (isUserLoggedIn && hasMemberPrice) {
@@ -3073,7 +3127,9 @@ function renderProductPricing(product) {
     </div>
     ${
       product.promo_text
-        ? `<div class="text-xs text-red-700 font-medium">${escapeHtml(product.promo_text)}</div>`
+        ? `<div class="text-xs text-red-700 font-medium">${escapeHtml(
+            product.promo_text
+          )}</div>`
         : ""
     }
   `;
@@ -3098,7 +3154,12 @@ function addToCart(productId) {
 
   // Call store cart function
   if (typeof window.addToStoreCart === "function") {
-    window.addToStoreCart(product.id, product.name, product.price, product.image);
+    window.addToStoreCart(
+      product.id,
+      product.name,
+      product.price,
+      product.image
+    );
   } else {
     console.error("addToStoreCart function not available");
     showToast("Error: Tidak dapat menambahkan ke keranjang", "error");
@@ -3125,12 +3186,20 @@ async function filterStoreCategory(category) {
     if (buttonEl) {
       if (btn.category === category) {
         // Active state: red background with white text, remove hover effects
-        buttonEl.classList.remove("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
+        buttonEl.classList.remove(
+          "bg-slate-800",
+          "text-slate-300",
+          "hover:bg-slate-700"
+        );
         buttonEl.classList.add("bg-red-600", "text-white");
       } else {
         // Inactive state: dark background with light text, restore hover
         buttonEl.classList.remove("bg-red-600", "text-white");
-        buttonEl.classList.add("bg-slate-800", "text-slate-300", "hover:bg-slate-700");
+        buttonEl.classList.add(
+          "bg-slate-800",
+          "text-slate-300",
+          "hover:bg-slate-700"
+        );
       }
     }
   });
@@ -3182,7 +3251,9 @@ async function filterStoreCategory(category) {
           <div class="text-xs uppercase tracking-wider text-red-600 mb-1 font-semibold">${getCategoryLabel(
             p.cat
           )}</div>
-          <div class="font-semibold text-slate-900 text-lg">${escapeHtml(p.name)}</div>
+          <div class="font-semibold text-slate-900 text-lg">${escapeHtml(
+            p.name
+          )}</div>
           ${
             p.description
               ? `<p class="text-sm text-slate-600 mt-1 line-clamp-2">${escapeHtml(
@@ -3278,7 +3349,8 @@ function updateCartDisplay() {
   }
 
   if (cart.length === 0) {
-    cartContainer.innerHTML = '<div class="text-sm text-slate-400">Keranjang masih kosong</div>';
+    cartContainer.innerHTML =
+      '<div class="text-sm text-slate-400">Keranjang masih kosong</div>';
     return;
   }
 
@@ -3291,11 +3363,13 @@ function updateCartDisplay() {
       <div class="flex items-center justify-between text-sm border-b border-slate-800 pb-2">
         <div class="flex-1">
           <div class="font-medium text-slate-200">${escapeHtml(item.name)}</div>
-          <div class="text-xs text-slate-400">${item.qty} × Rp ${item.price.toLocaleString(
-        "id-ID"
-      )}</div>
+          <div class="text-xs text-slate-400">${
+            item.qty
+          } × Rp ${item.price.toLocaleString("id-ID")}</div>
         </div>
-        <div class="font-semibold text-red-500">Rp ${subtotal.toLocaleString("id-ID")}</div>
+        <div class="font-semibold text-red-500">Rp ${subtotal.toLocaleString(
+          "id-ID"
+        )}</div>
       </div>
     `;
     })
@@ -3337,7 +3411,9 @@ async function redeemReward(cost, rewardName, rewardId = null) {
   const current = data.value || 0;
 
   if (current < cost) {
-    showWarning(`Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`);
+    showWarning(
+      `Points kamu belum cukup. Butuh ${cost} points untuk redeem ${rewardName}.`
+    );
     return;
   }
 
@@ -3473,7 +3549,11 @@ async function refreshPoints() {
       const newPoints = data.data.points || 0;
       if (pointsBigEl) {
         // Animate number change
-        animatePointsChange(pointsBigEl, parseInt(pointsBigEl.textContent) || 0, newPoints);
+        animatePointsChange(
+          pointsBigEl,
+          parseInt(pointsBigEl.textContent) || 0,
+          newPoints
+        );
       }
 
       // Update navbar points
@@ -3491,7 +3571,9 @@ async function refreshPoints() {
 
     // Show user-friendly message
     if (error.message.includes("login")) {
-      showWarning("Hanya Member yang dapat melihat poin, Silahkan daftar terlebih dahulu.");
+      showWarning(
+        "Hanya Member yang dapat melihat poin, Silahkan daftar terlebih dahulu."
+      );
     } else {
       showError("Gagal memuat poin terbaru");
     }
@@ -3537,7 +3619,9 @@ function animatePointsChange(element, from, to) {
 
 // Render rewards from API data
 function renderRewards(rewards) {
-  const rewardsContainer = document.querySelector(".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4");
+  const rewardsContainer = document.querySelector(
+    ".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4"
+  );
 
   if (!rewardsContainer) {
     console.warn("Rewards container not found");
@@ -3552,19 +3636,22 @@ function renderRewards(rewards) {
 
       return `
         <button
-          onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name).replace(
-        /'/g,
-        "\\'"
-      )}', ${reward.id})"
+          onclick="redeemReward(${reward.points_cost}, '${escapeHtml(
+        reward.name
+      ).replace(/'/g, "\\'")}', ${reward.id})"
           class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${hoverBorderClass} hover:bg-${hoverBgClass} transition text-left"
         >
           <div class="text-xs text-${colorClass} mb-1 font-semibold">
             ${reward.points_cost} poin
           </div>
-          <div class="font-semibold text-sm text-slate-900">${escapeHtml(reward.name)}</div>
+          <div class="font-semibold text-sm text-slate-900">${escapeHtml(
+            reward.name
+          )}</div>
           ${
             reward.description
-              ? `<p class="text-xs text-slate-600 mt-1">${escapeHtml(reward.description)}</p>`
+              ? `<p class="text-xs text-slate-600 mt-1">${escapeHtml(
+                  reward.description
+                )}</p>`
               : ""
           }
         </button>
@@ -3580,7 +3667,13 @@ function renderRewards(rewards) {
 function renderDefaultRewards() {
   // Define fallback rewards data
   const defaultRewards = [
-    { id: null, name: "Diskon 10%", points_cost: 20, color_theme: "amber", description: null },
+    {
+      id: null,
+      name: "Diskon 10%",
+      points_cost: 20,
+      color_theme: "amber",
+      description: null,
+    },
     {
       id: null,
       name: "Konsultasi Gratis",
@@ -3595,10 +3688,18 @@ function renderDefaultRewards() {
       color_theme: "purple",
       description: null,
     },
-    { id: null, name: "Voucher Rp 50K", points_cost: 100, color_theme: "sky", description: null },
+    {
+      id: null,
+      name: "Voucher Rp 50K",
+      points_cost: 100,
+      color_theme: "sky",
+      description: null,
+    },
   ];
 
-  const rewardsContainer = document.querySelector(".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4");
+  const rewardsContainer = document.querySelector(
+    ".grid.gap-3.sm\\:grid-cols-2.md\\:grid-cols-4"
+  );
 
   if (!rewardsContainer) {
     return;
@@ -3609,15 +3710,19 @@ function renderDefaultRewards() {
     .map(
       (reward) => `
       <button
-        onclick="redeemReward(${reward.points_cost}, '${escapeHtml(reward.name)}')"
+        onclick="redeemReward(${reward.points_cost}, '${escapeHtml(
+        reward.name
+      )}')"
         class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${
           reward.color_theme
         }-400/50 hover:bg-${reward.color_theme}-50 transition text-left"
       >
-        <div class="text-xs text-${reward.color_theme}-500 mb-1 font-semibold">${
-        reward.points_cost
-      } poin</div>
-        <div class="font-semibold text-sm text-slate-900">${escapeHtml(reward.name)}</div>
+        <div class="text-xs text-${
+          reward.color_theme
+        }-500 mb-1 font-semibold">${reward.points_cost} poin</div>
+        <div class="font-semibold text-sm text-slate-900">${escapeHtml(
+          reward.name
+        )}</div>
       </button>
     `
     )
@@ -3639,12 +3744,16 @@ function renderTukarPoinList(rewards) {
   }
 
   if (!rewards || rewards.length === 0) {
-    tukarPoinList.innerHTML = '<li class="text-slate-400 text-sm">Tidak ada reward tersedia</li>';
+    tukarPoinList.innerHTML =
+      '<li class="text-slate-400 text-sm">Tidak ada reward tersedia</li>';
     return;
   }
 
   tukarPoinList.innerHTML = rewards
-    .map((reward) => `<li>🎁 ${escapeHtml(reward.name)}: ${reward.points_cost} poin</li>`)
+    .map(
+      (reward) =>
+        `<li>🎁 ${escapeHtml(reward.name)}: ${reward.points_cost} poin</li>`
+    )
     .join("");
 }
 
@@ -3661,11 +3770,19 @@ function renderLocations() {
           <i data-lucide="map-pin" class="w-5 h-5 text-red-600"></i>
         </div>
         <div class="flex-1">
-          <div class="font-semibold text-slate-900 mb-1">${escapeHtml(loc.name)}</div>
-          <div class="text-xs text-slate-900 mb-2">${escapeHtml(loc.address)}</div>
+          <div class="font-semibold text-slate-900 mb-1">${escapeHtml(
+            loc.name
+          )}</div>
+          <div class="text-xs text-slate-900 mb-2">${escapeHtml(
+            loc.address
+          )}</div>
           <div class="text-xs text-slate-700 space-y-1">
-            <div><i data-lucide="phone" class="w-3 h-3 inline"></i> ${escapeHtml(loc.phone)}</div>
-            <div><i data-lucide="clock" class="w-3 h-3 inline"></i> ${escapeHtml(loc.hours)}</div>
+            <div><i data-lucide="phone" class="w-3 h-3 inline"></i> ${escapeHtml(
+              loc.phone
+            )}</div>
+            <div><i data-lucide="clock" class="w-3 h-3 inline"></i> ${escapeHtml(
+              loc.hours
+            )}</div>
           </div>
         </div>
       </div>
@@ -3686,43 +3803,6 @@ function renderLocations() {
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
   }
-}
-
-// Check-in at location (earn points)
-function checkIn(locationId) {
-  const loc = LOCATIONS.find((l) => l.id === locationId);
-  if (!loc) return;
-
-  // Tambah 5 points untuk check-in
-  addPoints(5);
-  showSuccess(`Check-in berhasil di ${loc.name}! +5 points`, "Check-in Berhasil");
-}
-
-// Set pickup location
-function setPickup(locationId) {
-  const loc = LOCATIONS.find((l) => l.id === locationId);
-  if (!loc) return;
-
-  _storeSet("db_pickup", loc);
-
-  const pickupInfo = document.getElementById("pickupLocation");
-  if (pickupInfo) {
-    pickupInfo.innerHTML = `
-      <div class="text-sm space-y-1">
-        <div class="flex items-center gap-2 text-emerald-300">
-          <i data-lucide="check-circle" class="w-4 h-4"></i>
-          <span class="font-semibold">Pickup dipilih</span>
-        </div>
-        <div class="text-slate-300">${escapeHtml(loc.name)}</div>
-        <div class="text-xs text-slate-400">${escapeHtml(loc.address)}</div>
-      </div>
-    `;
-    if (typeof lucide !== "undefined" && lucide.createIcons) {
-      lucide.createIcons();
-    }
-  }
-
-  showSuccess(`Lokasi pickup diset ke ${loc.name}`, "Pickup Location Set");
 }
 
 // Initialize store page
@@ -3808,6 +3888,8 @@ document.addEventListener("docterbee:pointsEarned", (e) => {
   const points = e.detail?.points;
   if (typeof points === "number" && points > 0) {
     addPoints(points);
-    console.log(`✅ [script.js] Received pointsEarned event, added ${points} points`);
+    console.log(
+      `✅ [script.js] Received pointsEarned event, added ${points} points`
+    );
   }
 });
