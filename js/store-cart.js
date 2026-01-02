@@ -584,6 +584,7 @@ function showQRCodeModal(orderData) {
   const warningText = document.getElementById("qrWarningText");
   const expiryLabel = document.getElementById("qrExpiryLabel");
   const countdownEl = document.getElementById("qrCountdown");
+  const checkOrderStatusBtn = document.getElementById("checkOrderStatusBtn");
 
   // Set order info
   orderNumberEl.textContent = orderData.order_number;
@@ -609,6 +610,14 @@ function showQRCodeModal(orderData) {
       countdownInterval = null;
     }
 
+    // Hide "Cek Status Pesanan" button (order already completed)
+    if (checkOrderStatusBtn) {
+      checkOrderStatusBtn.classList.add("hidden");
+    }
+
+    // Clear last order to hide "Lihat QR Terakhir" button (order completed)
+    clearLastOrder();
+
     // Add points if not already claimed
     claimOrderPoints(orderData);
   } else {
@@ -619,6 +628,11 @@ function showQRCodeModal(orderData) {
     warningText.style.display = "block";
     expiryLabel.textContent = "Berlaku Hingga:";
     expiresAtEl.className = "font-semibold text-red-500 text-xs";
+
+    // Show "Cek Status Pesanan" button (order still pending)
+    if (checkOrderStatusBtn) {
+      checkOrderStatusBtn.classList.remove("hidden");
+    }
 
     // Format expiry time
     const expiryDate = new Date(orderData.expires_at);
