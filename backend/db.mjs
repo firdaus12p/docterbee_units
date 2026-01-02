@@ -688,21 +688,12 @@ async function seedDefaultJourney(connection) {
 // Execute query helper
 async function query(sql, params) {
   try {
-    // Transaction control statements don't support prepared statement protocol
-    // Use pool.query() for these commands instead of pool.execute()
-    const transactionCommands = ['START TRANSACTION', 'COMMIT', 'ROLLBACK', 'BEGIN'];
-    const sqlTrimmed = sql.trim().toUpperCase();
-    const isTransactionCommand = transactionCommands.some(cmd => sqlTrimmed.startsWith(cmd));
-    
-    if (isTransactionCommand) {
-      // Use query() for transaction commands (no prepared statements)
-      const [results] = await pool.query(sql, params);
-      return results;
-    } else {
-      // Use execute() for regular queries (with prepared statements)
-      const [results] = await pool.execute(sql, params);
-      return results;
-    }
+    // Use pool.query() for all queries (more flexible with dynamic SQL)
+    // Note: pool.execute() uses prepared statements which are strict about
+    // parameter types and can fail with "Incorrect arguments to mysqld_stmt_execute"
+    // when using dynamic SQL with variable number of parameters
+    const [results] = await pool.query(sql, params);
+    return results;
   } catch (error) {
     console.error("❌ Query error:", error.message);
     throw error;
