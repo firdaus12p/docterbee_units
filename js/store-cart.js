@@ -41,9 +41,14 @@ function addToStoreCartInternal(productId, productName, price, imageUrl) {
 
   if (existingItem) {
     existingItem.quantity += 1;
+    // Ensure product_id exists (backward compat for old localStorage data)
+    if (!existingItem.product_id) {
+      existingItem.product_id = productId;
+    }
   } else {
     cart.push({
       id: productId,
+      product_id: productId, // Required for backend stock deduction
       name: productName,
       price: numPrice,
       image: imageUrl || null,
@@ -904,6 +909,21 @@ function loadCartFromLocalStorage() {
       const parsed = JSON.parse(savedCart);
       // Ensure cart is always an array
       cart = Array.isArray(parsed) ? parsed : [];
+      
+      // Migrate old cart items: add product_id if missing (backward compat)
+      let needsUpdate = false;
+      cart.forEach((item) => {
+        if (!item.product_id && item.id) {
+          item.product_id = item.id;
+          needsUpdate = true;
+        }
+      });
+      
+      // Save migrated cart back to localStorage
+      if (needsUpdate) {
+        localStorage.setItem("docterbee_cart", JSON.stringify(cart));
+        console.log("🔄 Cart migrated: added product_id to old items");
+      }
     } catch (error) {
       console.error("Error parsing cart from localStorage:", error);
       cart = [];

@@ -2204,22 +2204,26 @@ function deleteProduct(id, name) {
 
 function getProductCategoryBadgeClass(category) {
   const badgeClasses = {
+    Coffee: "bg-amber-100 text-amber-900 font-semibold",
+    "Cold Pressed": "bg-green-100 text-green-700 font-semibold",
+    Tea: "bg-emerald-100 text-emerald-700 font-semibold",
+    Jus: "bg-orange-100 text-orange-700 font-semibold",
+    "Zona Honey": "bg-amber-100 text-amber-700 font-semibold",
     "Zona Sunnah": "bg-purple-100 text-purple-700 font-semibold",
     "1001 Rempah": "bg-orange-100 text-orange-700 font-semibold",
-    "Zona Honey": "bg-amber-100 text-amber-700 font-semibold",
-    "Cold Pressed": "bg-green-100 text-green-700 font-semibold",
-    Coffee: "bg-amber-100 text-amber-900 font-semibold",
   };
   return badgeClasses[category] || "bg-slate-200 text-slate-700";
 }
 
 function getProductCategoryIcon(category) {
   const icons = {
+    Coffee: "☕",
+    "Cold Pressed": "🥤",
+    Tea: "🍵",
+    Jus: "🧃",
+    "Zona Honey": "🍯",
     "Zona Sunnah": "🌙",
     "1001 Rempah": "🧂",
-    "Zona Honey": "🍯",
-    "Cold Pressed": "🥤",
-    Coffee: "☕",
   };
   return icons[category] || "📦";
 }

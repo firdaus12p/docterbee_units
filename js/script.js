@@ -2959,30 +2959,58 @@ async function renderDineInMenu() {
 
   // Category icons and colors
   const categoryStyles = {
+    Coffee: { icon: "☕", color: "amber" },
+    "Cold Pressed": { icon: "🥤", color: "sky" },
+    Tea: { icon: "🍵", color: "emerald" },
+    Jus: { icon: "🧃", color: "orange" },
+    "Zona Honey": { icon: "🍯", color: "amber" },
     "Zona Sunnah": { icon: "🌙", color: "amber" },
     "1001 Rempah": { icon: "🧂", color: "emerald" },
-    "Zona Honey": { icon: "🍯", color: "amber" },
-    "Cold Pressed": { icon: "🥤", color: "sky" },
-    Coffee: { icon: "☕", color: "amber" },
     Lainnya: { icon: "📦", color: "slate" },
   };
 
-  // Render categories
-  let html = "";
-  Object.keys(categorizedProducts).forEach((category) => {
-    const products = categorizedProducts[category];
-    const style = categoryStyles[category] || categoryStyles["Lainnya"];
+  // Define category order for consistent rendering
+  const CATEGORY_ORDER = ["Coffee", "Cold Pressed", "Tea", "Jus", "Zona Honey", "Zona Sunnah", "1001 Rempah"];
 
-    html += `
-      <div>
-        <h3 class="font-semibold text-${style.color}-500 mb-2">
-          ${style.icon} ${escapeHtml(category)}
-        </h3>
-        <div class="grid gap-3 sm:grid-cols-2">
-          ${products.map((p) => renderDineInMenuItem(p, style.color)).join("")}
+  // Render categories in defined order
+  let html = "";
+  
+  // First render categories in order
+  CATEGORY_ORDER.forEach((category) => {
+    if (categorizedProducts[category]) {
+      const products = categorizedProducts[category];
+      const style = categoryStyles[category] || categoryStyles["Lainnya"];
+
+      html += `
+        <div>
+          <h3 class="font-semibold text-${style.color}-500 mb-2">
+            ${style.icon} ${escapeHtml(category)}
+          </h3>
+          <div class="grid gap-3 sm:grid-cols-2">
+            ${products.map((p) => renderDineInMenuItem(p, style.color)).join("")}
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
+  });
+  
+  // Then render any remaining categories not in the order list
+  Object.keys(categorizedProducts).forEach((category) => {
+    if (!CATEGORY_ORDER.includes(category)) {
+      const products = categorizedProducts[category];
+      const style = categoryStyles[category] || categoryStyles["Lainnya"];
+
+      html += `
+        <div>
+          <h3 class="font-semibold text-${style.color}-500 mb-2">
+            ${style.icon} ${escapeHtml(category)}
+          </h3>
+          <div class="grid gap-3 sm:grid-cols-2">
+            ${products.map((p) => renderDineInMenuItem(p, style.color)).join("")}
+          </div>
+        </div>
+      `;
+    }
   });
 
   container.innerHTML = html;
@@ -3171,14 +3199,19 @@ async function filterStoreCategory(category) {
   const grid = document.getElementById("productGrid");
   if (!grid) return;
 
+  // Category order for sorting products (used when showing "all")
+  const CATEGORY_ORDER = ["Coffee", "Cold Pressed", "Tea", "Jus", "Zona Honey", "Zona Sunnah", "1001 Rempah"];
+
   // Update active state for filter buttons IMMEDIATELY (synchronous)
   const filterButtons = [
     { id: "filterAll", category: "all" },
+    { id: "filterCoffee", category: "Coffee" },
+    { id: "filterColdPressed", category: "Cold Pressed" },
+    { id: "filterTea", category: "Tea" },
+    { id: "filterJus", category: "Jus" },
+    { id: "filterZonaHoney", category: "Zona Honey" },
     { id: "filterZonaSunnah", category: "Zona Sunnah" },
     { id: "filter1001Rempah", category: "1001 Rempah" },
-    { id: "filterZonaHoney", category: "Zona Honey" },
-    { id: "filterColdPressed", category: "Cold Pressed" },
-    { id: "filterCoffee", category: "Coffee" },
   ];
 
   filterButtons.forEach((btn) => {
@@ -3224,6 +3257,16 @@ async function filterStoreCategory(category) {
   let filtered = PRODUCTS;
   if (category && category !== "all") {
     filtered = PRODUCTS.filter((p) => p.cat === category);
+  } else {
+    // For "all" category, sort products by category order
+    filtered = [...PRODUCTS].sort((a, b) => {
+      const indexA = CATEGORY_ORDER.indexOf(a.cat);
+      const indexB = CATEGORY_ORDER.indexOf(b.cat);
+      // If category not in order list, put at end
+      const orderA = indexA === -1 ? CATEGORY_ORDER.length : indexA;
+      const orderB = indexB === -1 ? CATEGORY_ORDER.length : indexB;
+      return orderA - orderB;
+    });
   }
 
   if (filtered.length === 0) {
@@ -3313,11 +3356,13 @@ async function filterStoreCategory(category) {
 
 function getCategoryLabel(cat) {
   const labels = {
+    Coffee: "☕ Coffee",
+    "Cold Pressed": "🥤 Cold Pressed",
+    Tea: "🍵 Tea",
+    Jus: "🧃 Jus",
+    "Zona Honey": "🍯 Zona Honey",
     "Zona Sunnah": "🌙 Zona Sunnah",
     "1001 Rempah": "🧂 1001 Rempah",
-    "Zona Honey": "🍯 Zona Honey",
-    "Cold Pressed": "🥤 Cold Pressed",
-    Coffee: "☕ Coffee",
     // Legacy support for old category names
     "zona-sunnah": "🌙 Zona Sunnah",
     rempah: "🧂 1001 Rempah",
@@ -3326,6 +3371,8 @@ function getCategoryLabel(cat) {
     coffee: "☕ Coffee",
     coffeebee: "☕ CoffeeBee",
     teabee: "🍵 TeaBee",
+    tea: "🍵 Tea",
+    jus: "🧃 Jus",
     "susu-kurma": "🥛 Susu Kurma",
     "buah-lokal": "🍊 Buah Lokal",
   };

@@ -205,7 +205,7 @@ async function initializeTables() {
       CREATE TABLE IF NOT EXISTS products (
         id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
-        category ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee') NOT NULL,
+        category ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee', 'Tea', 'Jus') NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
         description TEXT NOT NULL,
         image_url VARCHAR(500) DEFAULT NULL,
@@ -522,9 +522,9 @@ async function runMigrations(connection) {
     `);
     console.log("✅ Migration: coupon_usage table");
     
-    // Migration: Add Coffee category to products table
+    // Migration: Add Tea and Jus categories to products table (extends existing ENUM)
     await safeModifyEnum(connection, 'products', 'category',
-      "ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee') NOT NULL");
+      "ENUM('Zona Sunnah', '1001 Rempah', 'Zona Honey', 'Cold Pressed', 'Coffee', 'Tea', 'Jus') NOT NULL");
     
     // Migration: Add status column to reward_redemptions table (for existing tables)
     await safeAddColumn(connection, 'reward_redemptions', 'status',

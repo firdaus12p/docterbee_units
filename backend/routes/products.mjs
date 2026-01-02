@@ -4,6 +4,18 @@ import { requireAdmin } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
+// Valid product categories - single source of truth
+// Must match ENUM in db.mjs products table
+const VALID_PRODUCT_CATEGORIES = [
+  "Zona Sunnah",
+  "1001 Rempah",
+  "Zona Honey",
+  "Cold Pressed",
+  "Coffee",
+  "Tea",
+  "Jus"
+];
+
 // GET /api/products - Get all products with optional filters
 router.get("/", async (req, res) => {
   try {
@@ -107,11 +119,10 @@ router.post("/", requireAdmin, async (req, res) => {
     }
 
     // Validate category
-    const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed", "Coffee"];
-    if (!validCategories.includes(category)) {
+    if (!VALID_PRODUCT_CATEGORIES.includes(category)) {
       return res.status(400).json({
         success: false,
-        error: "Kategori tidak valid",
+        error: `Kategori tidak valid. Kategori yang didukung: ${VALID_PRODUCT_CATEGORIES.join(", ")}`,
       });
     }
 
@@ -179,11 +190,10 @@ router.patch("/:id", requireAdmin, async (req, res) => {
 
     // Validate category if provided
     if (category) {
-      const validCategories = ["Zona Sunnah", "1001 Rempah", "Zona Honey", "Cold Pressed", "Coffee"];
-      if (!validCategories.includes(category)) {
+      if (!VALID_PRODUCT_CATEGORIES.includes(category)) {
         return res.status(400).json({
           success: false,
-          error: "Kategori tidak valid",
+          error: `Kategori tidak valid. Kategori yang didukung: ${VALID_PRODUCT_CATEGORIES.join(", ")}`,
         });
       }
     }
