@@ -1520,42 +1520,14 @@
         `;
       }
 
-      // Get status badge HTML
+      // Get status badge HTML - uses shared utility from utils.js
+      // This is a thin wrapper for backward compatibility with existing code
       function getActivityStatusBadge(status, isOrder) {
-        const statusLower = (status || "").toLowerCase();
-        let badgeClass = "status-pending";
-        let label = status;
-
-        if (isOrder) {
-          // Order statuses
-          if (statusLower === "completed") {
-            badgeClass = "status-completed";
-            label = "Selesai";
-          } else if (statusLower === "pending") {
-            badgeClass = "status-pending";
-            label = "Menunggu";
-          } else if (statusLower === "cancelled") {
-            badgeClass = "status-cancelled";
-            label = "Dibatalkan";
-          } else if (statusLower === "expired") {
-            badgeClass = "status-expired";
-            label = "Kedaluwarsa";
-          }
-        } else {
-          // Reward redemption statuses
-          if (statusLower === "approved") {
-            badgeClass = "status-approved";
-            label = "Disetujui";
-          } else if (statusLower === "pending") {
-            badgeClass = "status-pending";
-            label = "Menunggu";
-          } else if (statusLower === "rejected") {
-            badgeClass = "status-rejected";
-            label = "Ditolak";
-          }
-        }
-
-        return `<span class="status-badge ${badgeClass}">${label}</span>`;
+        const activityType = isOrder ? "order" : "reward";
+        // Use the shared utility function from js/utils.js
+        return typeof getActivityStatusBadgeHtml === "function"
+          ? getActivityStatusBadgeHtml(status, activityType)
+          : `<span class="status-badge">${status}</span>`; // Fallback
       }
 
       // Render pagination buttons

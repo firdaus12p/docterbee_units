@@ -626,10 +626,11 @@ The original plan was to use `showModal()` from `modal-utils.js`, but this funct
 
 | File | Lines Added/Modified | Purpose |
 |------|---------------------|---------|
-| `backend/routes/user-data.mjs` | +205 | 3 new API endpoints |
+| `backend/routes/user-data.mjs` | +205 → Refactored | 3 new API endpoints, SQL UNION pagination |
 | `backend/routes/orders.mjs` | +40 | Soft delete with fallback |
 | `backend/db.mjs` | +8 | Auto-migration for deleted_at |
-| `profile.html` | +900 | HTML, CSS, JavaScript |
+| `profile.html` | +900 → -28 | HTML, CSS, JavaScript, removed duplication |
+| `js/utils.js` | +46 | Shared activity status badge utilities |
 | `migrations/add_soft_delete_orders.sql` | NEW | Backup migration file |
 
 ### Security Review Summary
@@ -640,3 +641,22 @@ The original plan was to use `showModal()` from `modal-utils.js`, but this funct
 ✅ XSS prevented (escapeHtml on all user content)
 ✅ IDOR protected
 
+---
+
+## Code Review Follow-ups (AI)
+
+**Review Date:** 2026-01-03T16:48:00+08:00
+**Reviewer:** BMad Master (Adversarial Code Review Workflow)
+
+### ✅ Issues Fixed
+
+1. **[HIGH] Pagination Performance** - Moved from JavaScript slice to SQL UNION with LIMIT/OFFSET
+2. **[HIGH] Code Duplication** - Extracted status badge logic to `js/utils.js`
+3. **[MEDIUM] Timezone Handling** - Added proper time boundaries (00:00:00 to 23:59:59)
+4. **[MEDIUM] Limit Cap** - Added max limit of 50 to prevent abuse
+
+### 📋 Remaining Action Items (LOW Priority)
+
+- [ ] **[AI-Review][LOW]** Extract CSS from `profile.html` inline styles (lines 106-485) to separate `css/profile-activity.css` file for maintainability
+- [ ] **[AI-Review][LOW]** Replace emoji icons (🛒, 🎁) with Lucide Icons for visual consistency with rest of UI
+- [ ] **[AI-Review][LOW]** Add loading spinner inside modal when fetching order/reward details instead of blocking UI

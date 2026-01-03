@@ -255,6 +255,7 @@ router.delete("/cart", requireAuth, async (req, res) => {
 // === USER ACTIVITY HISTORY ===
 
 // GET /api/user-data/activities - Get unified activity history (orders + redemptions)
+// Uses SQL UNION for database-level pagination (performance optimized)
 router.get("/activities", requireAuth, async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -266,96 +267,158 @@ router.get("/activities", requireAuth, async (req, res) => {
       endDate 
     } = req.query;
 
-    const pageNum = parseInt(page) || 1;
-    const limitNum = parseInt(limit) || 10;
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit) || 10)); // Cap at 50
+    const offset = (pageNum - 1) * limitNum;
 
-    let orders = [];
-    let redemptions = [];
+    // Build date filter conditions with proper timezone handling
+    const buildDateFilter = (columnName) => {
+      let filter = "";
+      const params = [];
+      if (startDate) {
+        filter += ` AND ${columnName} >= ?`;
+        params.push(startDate + " 00:00:00");
+      }
+      if (endDate) {
+        filter += ` AND ${columnName} <= ?`;
+        params.push(endDate + " 23:59:59");
+      }
+      return { filter, params };
+    };
 
-    // Build date filter conditions
-    let orderDateFilter = "";
-    let redemptionDateFilter = "";
-    const orderParams = [userId];
-    const redemptionParams = [userId];
+    let activities = [];
+    let totalCount = 0;
 
-    if (startDate) {
-      orderDateFilter += " AND created_at >= ?";
-      redemptionDateFilter += " AND redeemed_at >= ?";
-      orderParams.push(startDate);
-      redemptionParams.push(startDate);
-    }
-    if (endDate) {
-      // Add 1 day to include the end date fully
-      orderDateFilter += " AND created_at <= ?";
-      redemptionDateFilter += " AND redeemed_at <= ?";
-      orderParams.push(endDate + " 23:59:59");
-      redemptionParams.push(endDate + " 23:59:59");
-    }
+    // Strategy: Use SQL UNION for 'all' type, single query otherwise
+    if (type === 'all') {
+      // Build UNION query for combined results with database-level pagination
+      const orderDateInfo = buildDateFilter("created_at");
+      const rewardDateInfo = buildDateFilter("redeemed_at");
+      
+      // Count query for total (needed for pagination info)
+      const countParams = [userId, ...orderDateInfo.params, userId, ...rewardDateInfo.params];
+      const countResult = await query(
+        `SELECT 
+          (SELECT COUNT(*) FROM orders WHERE user_id = ?${orderDateInfo.filter}) +
+          (SELECT COUNT(*) FROM reward_redemptions WHERE user_id = ?${rewardDateInfo.filter}) 
+         AS total`,
+        countParams
+      );
+      totalCount = countResult[0]?.total || 0;
 
-    // Query orders if type is 'all' or 'order'
-    if (type === 'all' || type === 'order') {
-      orders = await query(
-        `SELECT id, order_number, total_amount, points_earned, status, payment_status, 
-                store_location, order_type, created_at, items, coupon_discount
-         FROM orders 
-         WHERE user_id = ?${orderDateFilter}
-         ORDER BY created_at DESC`,
-        orderParams
+      // UNION query with pagination at SQL level
+      const unionParams = [
+        userId, ...orderDateInfo.params,
+        userId, ...rewardDateInfo.params,
+        limitNum, offset
+      ];
+      
+      activities = await query(
+        `(SELECT 
+            id, 'order' AS type, created_at AS activity_date,
+            order_number, total_amount, points_earned, status, payment_status,
+            store_location, order_type, coupon_discount, items,
+            NULL AS reward_name, NULL AS points_cost
+          FROM orders 
+          WHERE user_id = ?${orderDateInfo.filter})
+         UNION ALL
+         (SELECT 
+            id, 'reward' AS type, redeemed_at AS activity_date,
+            NULL AS order_number, NULL AS total_amount, NULL AS points_earned, status, NULL AS payment_status,
+            NULL AS store_location, NULL AS order_type, NULL AS coupon_discount, NULL AS items,
+            reward_name, points_cost
+          FROM reward_redemptions 
+          WHERE user_id = ?${rewardDateInfo.filter})
+         ORDER BY activity_date DESC
+         LIMIT ? OFFSET ?`,
+        unionParams
+      );
+
+    } else if (type === 'order') {
+      // Orders only
+      const dateInfo = buildDateFilter("created_at");
+      const params = [userId, ...dateInfo.params];
+      
+      const countResult = await query(
+        `SELECT COUNT(*) AS total FROM orders WHERE user_id = ?${dateInfo.filter}`,
+        params
+      );
+      totalCount = countResult[0]?.total || 0;
+
+      activities = await query(
+        `SELECT 
+            id, 'order' AS type, created_at AS activity_date,
+            order_number, total_amount, points_earned, status, payment_status,
+            store_location, order_type, coupon_discount, items,
+            NULL AS reward_name, NULL AS points_cost
+          FROM orders 
+          WHERE user_id = ?${dateInfo.filter}
+          ORDER BY created_at DESC
+          LIMIT ? OFFSET ?`,
+        [...params, limitNum, offset]
+      );
+
+    } else if (type === 'reward') {
+      // Rewards only
+      const dateInfo = buildDateFilter("redeemed_at");
+      const params = [userId, ...dateInfo.params];
+      
+      const countResult = await query(
+        `SELECT COUNT(*) AS total FROM reward_redemptions WHERE user_id = ?${dateInfo.filter}`,
+        params
+      );
+      totalCount = countResult[0]?.total || 0;
+
+      activities = await query(
+        `SELECT 
+            id, 'reward' AS type, redeemed_at AS activity_date,
+            NULL AS order_number, NULL AS total_amount, NULL AS points_earned, status, NULL AS payment_status,
+            NULL AS store_location, NULL AS order_type, NULL AS coupon_discount, NULL AS items,
+            reward_name, points_cost
+          FROM reward_redemptions 
+          WHERE user_id = ?${dateInfo.filter}
+          ORDER BY redeemed_at DESC
+          LIMIT ? OFFSET ?`,
+        [...params, limitNum, offset]
       );
     }
 
-    // Query redemptions if type is 'all' or 'reward'
-    if (type === 'all' || type === 'reward') {
-      redemptions = await query(
-        `SELECT id, reward_name, points_cost, status, redeemed_at
-         FROM reward_redemptions 
-         WHERE user_id = ?${redemptionDateFilter}
-         ORDER BY redeemed_at DESC`,
-        redemptionParams
-      );
-    }
+    // Normalize results to consistent format
+    const normalizedActivities = activities.map(row => {
+      if (row.type === 'order') {
+        return {
+          id: row.id,
+          type: 'order',
+          activity_date: row.activity_date,
+          order_number: row.order_number,
+          total_amount: parseFloat(row.total_amount),
+          points_earned: row.points_earned,
+          status: row.status,
+          payment_status: row.payment_status,
+          store_location: row.store_location,
+          order_type: row.order_type,
+          coupon_discount: parseFloat(row.coupon_discount || 0),
+          items: row.items
+        };
+      } else {
+        return {
+          id: row.id,
+          type: 'reward',
+          activity_date: row.activity_date,
+          reward_name: row.reward_name,
+          points_cost: row.points_cost,
+          status: row.status
+        };
+      }
+    });
 
-    // Normalize orders to unified format
-    const normalizedOrders = orders.map(order => ({
-      id: order.id,
-      type: 'order',
-      activity_date: order.created_at,
-      order_number: order.order_number,
-      total_amount: parseFloat(order.total_amount),
-      points_earned: order.points_earned,
-      status: order.status,
-      payment_status: order.payment_status,
-      store_location: order.store_location,
-      order_type: order.order_type,
-      coupon_discount: parseFloat(order.coupon_discount || 0),
-      items: order.items
-    }));
-
-    // Normalize redemptions to unified format
-    const normalizedRedemptions = redemptions.map(redemption => ({
-      id: redemption.id,
-      type: 'reward',
-      activity_date: redemption.redeemed_at,
-      reward_name: redemption.reward_name,
-      points_cost: redemption.points_cost,
-      status: redemption.status
-    }));
-
-    // Merge and sort by activity_date DESC
-    const allActivities = [...normalizedOrders, ...normalizedRedemptions]
-      .sort((a, b) => new Date(b.activity_date) - new Date(a.activity_date));
-
-    // Calculate pagination
-    const totalCount = allActivities.length;
+    // Calculate pagination info
     const totalPages = Math.ceil(totalCount / limitNum);
-    const startIndex = (pageNum - 1) * limitNum;
-    const endIndex = startIndex + limitNum;
-    const paginatedActivities = allActivities.slice(startIndex, endIndex);
 
     res.json({
       success: true,
       data: {
-        activities: paginatedActivities,
+        activities: normalizedActivities,
         totalCount,
         currentPage: pageNum,
         totalPages,
