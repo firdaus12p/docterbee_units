@@ -13,6 +13,31 @@ let pendingOrderData = null;
 // Coupon state for store
 let storeCouponData = null;
 
+/**
+ * Sync cart variable from localStorage
+ * Called when external sources (like drawer) modify localStorage directly
+ */
+function syncCartFromLocalStorage() {
+  const savedCart = localStorage.getItem("docterbee_cart");
+  if (savedCart) {
+    try {
+      const parsed = JSON.parse(savedCart);
+      cart = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error("Error syncing cart from localStorage:", error);
+      cart = [];
+    }
+  } else {
+    cart = [];
+  }
+  // Update UI to reflect changes
+  updateCartUI();
+  updateCartCount();
+}
+
+// Export sync function to window for external access
+window.syncCartFromLocalStorage = syncCartFromLocalStorage;
+
 // ============================================
 // CART FUNCTIONS
 // ============================================
@@ -60,8 +85,10 @@ function addToStoreCartInternal(productId, productName, price, imageUrl) {
   updateCartCount();
   saveCartToLocalStorage();
 
-  // Show feedback
-  showToast(`${productName} ditambahkan ke keranjang`);
+  // Update floating cart badge (visual feedback replaces toast)
+  if (typeof updateCartBadge === 'function') {
+    updateCartBadge();
+  }
 }
 
 // Remove from cart
@@ -551,6 +578,11 @@ async function submitOrder() {
     updateCartUI();
     updateCartCount();
     saveCartToLocalStorage();
+    
+    // Hide cart badge immediately after checkout
+    if (typeof updateCartBadge === 'function') {
+      updateCartBadge();
+    }
 
     // Clear coupon
     clearStoreCoupon();

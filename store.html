@@ -89,6 +89,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/landing-page.css" />
+    <link rel="stylesheet" href="css/store-enhancements.css" />
     <style>
       main, main section, main aside, main div { opacity: 1 !important; transform: none !important; }
     </style>
@@ -273,56 +274,64 @@
           <button
             id="filterAll"
             onclick="filterStoreCategory('all')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white whitespace-nowrap transition-colors"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white whitespace-nowrap transition-colors"
+            data-tooltip="Tampilkan semua produk kesehatan"
           >
             Semua Produk
           </button>
           <button
             id="filterCoffee"
             onclick="filterStoreCategory('Coffee')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Kopi sehat tanpa gula berlebih"
           >
             ☕ Coffee
           </button>
           <button
             id="filterColdPressed"
             onclick="filterStoreCategory('Cold Pressed')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Jus segar diperas dingin tanpa pengawet"
           >
             🥤 Cold Pressed
           </button>
           <button
             id="filterTea"
             onclick="filterStoreCategory('Tea')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Teh herbal dan kesehatan premium"
           >
             🍵 Tea
           </button>
           <button
             id="filterJus"
             onclick="filterStoreCategory('Jus')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Jus buah segar untuk vitalitas"
           >
             🧃 Jus
           </button>
           <button
             id="filterZonaHoney"
             onclick="filterStoreCategory('Zona Honey')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Koleksi madu murni dan olahan madu premium"
           >
             🍯 Zona Honey
           </button>
           <button
             id="filterZonaSunnah"
             onclick="filterStoreCategory('Zona Sunnah')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Produk sesuai anjuran Sunnah Nabi SAW"
           >
             🌙 Zona Sunnah
           </button>
           <button
             id="filter1001Rempah"
             onclick="filterStoreCategory('1001 Rempah')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            class="category-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+            data-tooltip="Rempah-rempah berkualitas dan herbal Indonesia"
           >
             🧂 1001 Rempah
           </button>
@@ -336,198 +345,49 @@
 
         </div>
 
-        <!-- ========== SHOPPING CART ========== -->
-        <div class="border-t border-gray-200 pt-6 space-y-4">
-          <div class="rounded-2xl border-2 border-red-600/40 bg-white p-6">
-            <h2 class="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
-              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-              Keranjang Belanja
-            </h2>
-
-            <!-- Cart Items -->
-            <div id="cartItems" class="space-y-2 mb-4">
-              <p class="text-slate-500 text-sm text-center py-8">
-                Keranjang belanja kosong. Tambahkan produk untuk mulai berbelanja.
-              </p>
-            </div>
-
-            <!-- Order Options -->
-            <div class="border-t border-gray-200 pt-4 space-y-4">
-              <!-- Order Type -->
-              <div>
-                <label class="block text-sm font-semibold text-slate-900 mb-2">
-                  Tipe Pesanan
-                </label>
-                <div class="flex gap-3">
-                  <label class="flex-1 cursor-pointer">
-                    <input 
-                      type="radio" 
-                      name="orderType" 
-                      value="dine_in" 
-                      checked
-                      class="peer hidden"
-                    >
-                    <div class="border-2 border-gray-200 peer-checked:border-red-600 peer-checked:bg-red-50 rounded-lg p-3 text-center transition">
-                      <i data-lucide="utensils" class="w-5 h-5 mx-auto mb-1 text-red-600"></i>
-                      <div class="text-sm font-semibold text-slate-900">Dine In</div>
-                      <div class="text-xs text-slate-500">Makan di tempat</div>
-                    </div>
-                  </label>
-                  <label class="flex-1 cursor-pointer">
-                    <input 
-                      type="radio" 
-                      name="orderType" 
-                      value="take_away"
-                      class="peer hidden"
-                    >
-                    <div class="border-2 border-gray-200 peer-checked:border-emerald-400 peer-checked:bg-emerald-50 rounded-lg p-3 text-center transition">
-                      <i data-lucide="shopping-bag" class="w-5 h-5 mx-auto mb-1 text-emerald-500"></i>
-                      <div class="text-sm font-semibold text-slate-900">Take Away</div>
-                      <div class="text-xs text-slate-500">Bawa pulang</div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Store Location -->
-              <div>
-                <label class="block text-sm font-semibold text-slate-900 mb-2">
-                  Pilih Lokasi Store
-                </label>
-                <select 
-                  id="storeLocation"
-                  class="w-full bg-slate-50 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-red-600 focus:outline-none transition"
-                >
-                  <option value="">-- Pilih Lokasi --</option>
-                  <option value="kolaka">🏪 Docterbee Kolaka ZE Center</option>
-                  <option value="makassar">🏪 Docterbee Makassar Pettarani</option>
-                  <option value="kendari">🏪 Docterbee Kendari ByPass</option>
-                </select>
-              </div>
-
-              <!-- Customer Info (for guest users) -->
-              <div id="guestCustomerInfo" class="hidden space-y-3">
-                <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
-                  <div class="flex items-start gap-2">
-                    <i data-lucide="info" class="w-4 h-4 text-red-700 mt-0.5 flex-shrink-0"></i>
-                    <p class="text-slate-700">
-                      <strong>Info:</strong> Silahkan isi nama dan nomor HP Anda untuk memproses pesanan.
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1">
-                    Nama Lengkap <span class="text-red-500">*</span>
-                  </label>
-                  <input 
-                    type="text" 
-                    id="guestName"
-                    placeholder="Nama Anda"
-                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1">
-                    Nomor HP / WhatsApp <span class="text-red-500">*</span>
-                  </label>
-                  <input 
-                    type="tel" 
-                    id="guestPhone"
-                    placeholder="08123456789"
-                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition"
-                  />
-                  <p class="text-xs text-slate-500 mt-1">
-                    💡 Punya akun? Gunakan nomor HP yang terdaftar untuk claim points!
-                  </p>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1">
-                    Alamat (opsional)
-                  </label>
-                  <textarea 
-                    id="guestAddress"
-                    placeholder="Alamat lengkap (jika diperlukan untuk delivery)"
-                    rows="2"
-                    class="w-full bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition resize-none"
-                  ></textarea>
-                </div>
-              </div>
-
-              <!-- Coupon Code Input -->
-              <div class="border-t border-gray-200 pt-4">
-                <label class="block text-sm font-semibold text-slate-900 mb-2">
-                  Kode Promo (Opsional)
-                </label>
-                <div class="flex gap-2">
-                  <input 
-                    type="text" 
-                    id="storeCouponCode"
-                    placeholder="Masukkan kode promo"
-                    class="flex-1 bg-white border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none transition uppercase"
-                  />
-                  <button 
-                    id="validateStoreCouponBtn"
-                    onclick="validateStoreCoupon()"
-                    class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg transition text-sm whitespace-nowrap"
-                  >
-                    Gunakan
-                  </button>
-                </div>
-                <!-- Coupon Status -->
-                <div id="storeCouponStatus" class="mt-2 text-xs hidden"></div>
-                <!-- Discount Display -->
-                <div id="storeDiscountInfo" class="mt-2 text-sm text-emerald-600 font-semibold hidden">
-                  <!-- Will show discount amount -->
-                </div>
-              </div>
-
-              <!-- Total & Submit -->
-              <div class="border-t border-gray-200 pt-4">
-                <div id="storeOriginalTotal" class="flex items-center justify-between mb-2 text-sm text-slate-600 hidden">
-                  <span>Subtotal</span>
-                  <span>Rp <span id="storeOriginalAmount">0</span></span>
-                </div>
-                <div id="storeDiscountAmount" class="flex items-center justify-between mb-2 text-sm text-emerald-600 hidden">
-                  <span>Diskon Promo</span>
-                  <span>- Rp <span id="storeDiscountValue">0</span></span>
-                </div>
-                <div class="flex items-center justify-between mb-4">
-                  <span class="text-lg font-semibold text-slate-900">Total Pembayaran</span>
-                  <span class="text-2xl font-bold text-red-600">
-                    Rp <span id="cartTotal">0</span>
-                  </span>
-                </div>
-                
-                <button 
-                  id="submitOrderBtn"
-                  onclick="submitOrder()"
-                  class="w-full bg-gradient-to-r from-red-600 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <i data-lucide="send" class="w-5 h-5"></i>
-                  Kirim Pesanan
-                </button>
-                
-                <!-- Last Order QR Button -->
-                <button 
-                  id="lastOrderBtn"
-                  onclick="reopenLastOrderQR()"
-                  class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 mt-3"
-                >
-                  <i data-lucide="history" class="w-4 h-4"></i>
-                  Lihat QR Terakhir
-                </button>
-                
-                <p class="text-xs text-slate-500 text-center mt-2">
-                  Anda akan mendapatkan QR code untuk di-scan di kasir
-                </p>
-              </div>
-            </div>
+        <!-- ========== HIDDEN CART FORM ELEMENTS (Required for submitOrder compatibility) ========== -->
+        <div id="hiddenCartFormElements" style="display: none;">
+          <!-- Hidden Cart Items Container (used by updateCartUI for backward compat) -->
+          <div id="cartItems"></div>
+          
+          <!-- Order Type (synced from drawer) -->
+          <input type="radio" name="orderType" value="dine_in" checked>
+          <input type="radio" name="orderType" value="take_away">
+          
+          <!-- Store Location (synced from drawer) -->
+          <select id="storeLocation">
+            <option value="">-- Pilih Lokasi --</option>
+            <option value="kolaka">Docterbee Kolaka ZE Center</option>
+            <option value="makassar">Docterbee Makassar Pettarani</option>
+            <option value="kendari">Docterbee Kendari ByPass</option>
+          </select>
+          
+          <!-- Guest Customer Info (synced from checkout modal) -->
+          <div id="guestCustomerInfo">
+            <input type="text" id="guestName" />
+            <input type="tel" id="guestPhone" />
+            <textarea id="guestAddress"></textarea>
           </div>
+          
+          <!-- Coupon elements (synced from drawer) -->
+          <input type="text" id="storeCouponCode" />
+          <button id="validateStoreCouponBtn"></button>
+          <div id="storeCouponStatus"></div>
+          <div id="storeDiscountInfo"></div>
+          
+          <!-- Total display elements (updated by updateCartUIWithDiscount) -->
+          <div id="storeOriginalTotal"><span id="storeOriginalAmount">0</span></div>
+          <div id="storeDiscountAmount"><span id="storeDiscountValue">0</span></div>
+          <span id="cartTotal">0</span>
+          
+          <!-- Submit button reference -->
+          <button id="submitOrderBtn"></button>
+          
+          <!-- Last Order Button -->
+          <button id="lastOrderBtn" class="hidden"></button>
+        </div>
 
-          <!-- Info Cards -->
+        <!-- Info Cards -->
           <div class="grid gap-4 md:grid-cols-2">
             <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-2 hover:border-red-600/50 transition-all">
               <div class="flex items-center gap-2 text-red-600 font-semibold">
@@ -550,7 +410,6 @@
               </p>
             </div>
           </div>
-        </div>
       </section>
 
       <!-- =============== DINE-IN MENU TAB =============== -->
@@ -824,6 +683,128 @@
       </div>
     </div>
 
+    <!-- =============== FLOATING CART BUTTON =============== -->
+    <button id="floating-cart-btn" class="floating-cart-button" onclick="toggleCartDrawer()" title="Keranjang Belanja">
+      <i data-lucide="shopping-cart"></i>
+      <span class="cart-badge hidden" id="cart-badge">0</span>
+    </button>
+
+    <!-- =============== CART DRAWER =============== -->
+    <div id="cart-drawer-overlay" class="cart-drawer-overlay" onclick="toggleCartDrawer()"></div>
+    <div id="cart-drawer" class="cart-drawer">
+      <div class="cart-drawer-header">
+        <h2><i data-lucide="shopping-cart"></i> Keranjang Belanja</h2>
+        <button class="close-drawer-btn" onclick="toggleCartDrawer()">×</button>
+      </div>
+      <div class="cart-drawer-body" id="cart-drawer-body">
+        <!-- Cart content will be populated dynamically -->
+      </div>
+    </div>
+
+    <!-- =============== PRODUCT DETAIL MODAL =============== -->
+    <div id="product-detail-modal" class="modal-base product-detail-modal">
+      <div class="modal-overlay" onclick="closeProductDetail()"></div>
+      <div class="modal-content">
+        <button class="modal-close-btn" onclick="closeProductDetail()">×</button>
+        <div class="product-detail-grid">
+          <div class="pd-image-section">
+            <img id="pd-image" src="" alt="" class="pd-main-image">
+            <div class="pd-category-badge" id="pd-category"></div>
+          </div>
+          <div class="pd-info-section">
+            <h2 id="pd-name" class="pd-title"></h2>
+            <div id="pd-pricing" class="pd-pricing-section"></div>
+            <div id="pd-stock" class="pd-stock-section"></div>
+            <div class="pd-description-section">
+              <h3>Deskripsi Produk</h3>
+              <p id="pd-description"></p>
+            </div>
+            <div class="pd-quantity-section">
+              <label>Jumlah:</label>
+              <div class="quantity-selector">
+                <button onclick="decrementPdQuantity()">−</button>
+                <input type="number" id="pd-quantity" value="1" min="1" readonly>
+                <button onclick="incrementPdQuantity()">+</button>
+              </div>
+            </div>
+            <button id="pd-add-to-cart-btn" class="btn-add-to-cart-large" onclick="addToCartFromDetail()">
+              <i data-lucide="shopping-cart"></i>
+              Tambah ke Keranjang
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== CHECKOUT MODAL =============== -->
+    <div id="checkout-modal" class="modal-base checkout-modal">
+      <div class="modal-overlay" onclick="closeCheckoutModal()"></div>
+      <div class="modal-content">
+        <button class="modal-close-btn" onclick="closeCheckoutModal()">×</button>
+        <div class="checkout-modal-header">
+          <h2>Konfirmasi Checkout</h2>
+          <p>Lengkapi data untuk melanjutkan pesanan</p>
+        </div>
+        <div class="checkout-modal-body">
+          <!-- For Logged-in Users -->
+          <div id="checkout-member-info" class="hidden">
+            <div class="info-box success">
+              <i data-lucide="check-circle"></i>
+              <div>
+                <p class="font-semibold">Anda sudah login sebagai member</p>
+                <p class="text-sm" style="color: #475569; margin-top: 4px;">Poin akan otomatis masuk setelah transaksi selesai</p>
+              </div>
+            </div>
+            <div class="order-summary">
+              <h3>Ringkasan Pesanan</h3>
+              <div id="checkout-items-logged" class="checkout-items-list"></div>
+              <div class="total-row">
+                <span>Total Bayar</span>
+                <span class="total-amount" id="checkout-total-logged">Rp 0</span>
+              </div>
+            </div>
+          </div>
+          <!-- For Guest Users -->
+          <div id="checkout-guest-form">
+            <div class="info-box warning">
+              <i data-lucide="info"></i>
+              <p>Isi data di bawah untuk checkout. Atau <a href="/login" class="link">login</a> untuk auto-fill dan dapatkan poin!</p>
+            </div>
+            <form id="guest-checkout-form" class="form-grid">
+              <div class="form-group">
+                <label>Nama Lengkap <span class="required">*</span></label>
+                <input type="text" id="checkout-guest-name" placeholder="Nama Anda" required>
+              </div>
+              <div class="form-group">
+                <label>Nomor HP / WhatsApp <span class="required">*</span></label>
+                <input type="tel" id="checkout-guest-phone" placeholder="08123456789" required>
+                <p class="form-hint">💡 Gunakan nomor yang terdaftar untuk claim poin!</p>
+              </div>
+              <div class="form-group full-width">
+                <label>Alamat (Opsional)</label>
+                <textarea id="checkout-guest-address" placeholder="Alamat lengkap jika diperlukan" rows="2"></textarea>
+              </div>
+            </form>
+            <div class="order-summary">
+              <h3>Ringkasan Pesanan</h3>
+              <div id="checkout-items-guest" class="checkout-items-list"></div>
+              <div class="total-row">
+                <span>Total Bayar</span>
+                <span class="total-amount" id="checkout-total-guest">Rp 0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="checkout-modal-footer">
+          <button class="btn btn-outline" onclick="closeCheckoutModal()">Batal</button>
+          <button class="btn btn-primary" onclick="confirmCheckout()">
+            <i data-lucide="check"></i>
+            Pesan Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ================= FOOTER ================= -->
     <footer>
       <div class="container">
@@ -842,6 +823,7 @@
     <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
     <script src="js/store-cart.js"></script>
+    <script src="js/store-enhancements.js"></script>
     <script>
       // Initialize Lucide icons
       if (typeof lucide !== "undefined") {
