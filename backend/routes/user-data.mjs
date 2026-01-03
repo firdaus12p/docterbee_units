@@ -252,4 +252,209 @@ router.delete("/cart", requireAuth, async (req, res) => {
   }
 });
 
+// === USER ACTIVITY HISTORY ===
+
+// GET /api/user-data/activities - Get unified activity history (orders + redemptions)
+router.get("/activities", requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { 
+      page = 1, 
+      limit = 10, 
+      type = 'all', 
+      startDate, 
+      endDate 
+    } = req.query;
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+
+    let orders = [];
+    let redemptions = [];
+
+    // Build date filter conditions
+    let orderDateFilter = "";
+    let redemptionDateFilter = "";
+    const orderParams = [userId];
+    const redemptionParams = [userId];
+
+    if (startDate) {
+      orderDateFilter += " AND created_at >= ?";
+      redemptionDateFilter += " AND redeemed_at >= ?";
+      orderParams.push(startDate);
+      redemptionParams.push(startDate);
+    }
+    if (endDate) {
+      // Add 1 day to include the end date fully
+      orderDateFilter += " AND created_at <= ?";
+      redemptionDateFilter += " AND redeemed_at <= ?";
+      orderParams.push(endDate + " 23:59:59");
+      redemptionParams.push(endDate + " 23:59:59");
+    }
+
+    // Query orders if type is 'all' or 'order'
+    if (type === 'all' || type === 'order') {
+      orders = await query(
+        `SELECT id, order_number, total_amount, points_earned, status, payment_status, 
+                store_location, order_type, created_at, items, coupon_discount
+         FROM orders 
+         WHERE user_id = ?${orderDateFilter}
+         ORDER BY created_at DESC`,
+        orderParams
+      );
+    }
+
+    // Query redemptions if type is 'all' or 'reward'
+    if (type === 'all' || type === 'reward') {
+      redemptions = await query(
+        `SELECT id, reward_name, points_cost, status, redeemed_at
+         FROM reward_redemptions 
+         WHERE user_id = ?${redemptionDateFilter}
+         ORDER BY redeemed_at DESC`,
+        redemptionParams
+      );
+    }
+
+    // Normalize orders to unified format
+    const normalizedOrders = orders.map(order => ({
+      id: order.id,
+      type: 'order',
+      activity_date: order.created_at,
+      order_number: order.order_number,
+      total_amount: parseFloat(order.total_amount),
+      points_earned: order.points_earned,
+      status: order.status,
+      payment_status: order.payment_status,
+      store_location: order.store_location,
+      order_type: order.order_type,
+      coupon_discount: parseFloat(order.coupon_discount || 0),
+      items: order.items
+    }));
+
+    // Normalize redemptions to unified format
+    const normalizedRedemptions = redemptions.map(redemption => ({
+      id: redemption.id,
+      type: 'reward',
+      activity_date: redemption.redeemed_at,
+      reward_name: redemption.reward_name,
+      points_cost: redemption.points_cost,
+      status: redemption.status
+    }));
+
+    // Merge and sort by activity_date DESC
+    const allActivities = [...normalizedOrders, ...normalizedRedemptions]
+      .sort((a, b) => new Date(b.activity_date) - new Date(a.activity_date));
+
+    // Calculate pagination
+    const totalCount = allActivities.length;
+    const totalPages = Math.ceil(totalCount / limitNum);
+    const startIndex = (pageNum - 1) * limitNum;
+    const endIndex = startIndex + limitNum;
+    const paginatedActivities = allActivities.slice(startIndex, endIndex);
+
+    res.json({
+      success: true,
+      data: {
+        activities: paginatedActivities,
+        totalCount,
+        currentPage: pageNum,
+        totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching user activities:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Gagal memuat riwayat aktivitas" 
+    });
+  }
+});
+
+// GET /api/user-data/activities/order/:orderId - Get order detail for receipt modal
+router.get("/activities/order/:orderId", requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const orderId = parseInt(req.params.orderId);
+
+    if (isNaN(orderId)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid order ID"
+      });
+    }
+
+    // Query order with ownership verification
+    const order = await queryOne(
+      `SELECT id, order_number, user_id, customer_name, customer_phone, 
+              total_amount, points_earned, status, payment_status, 
+              store_location, order_type, created_at, completed_at, 
+              items, coupon_code, coupon_discount, original_total, qr_code_data
+       FROM orders 
+       WHERE id = ? AND user_id = ?`,
+      [orderId, userId]
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order tidak ditemukan"
+      });
+    }
+
+    res.json({
+      success: true,
+      data: order
+    });
+  } catch (error) {
+    console.error("Error fetching order detail:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Gagal memuat detail order" 
+    });
+  }
+});
+
+// GET /api/user-data/activities/reward/:redemptionId - Get reward redemption detail
+router.get("/activities/reward/:redemptionId", requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const redemptionId = parseInt(req.params.redemptionId);
+
+    if (isNaN(redemptionId)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid redemption ID"
+      });
+    }
+
+    // Query redemption with ownership verification
+    const redemption = await queryOne(
+      `SELECT id, user_id, reward_id, reward_name, points_cost, status, redeemed_at
+       FROM reward_redemptions 
+       WHERE id = ? AND user_id = ?`,
+      [redemptionId, userId]
+    );
+
+    if (!redemption) {
+      return res.status(404).json({
+        success: false,
+        error: "Penukaran reward tidak ditemukan"
+      });
+    }
+
+    res.json({
+      success: true,
+      data: redemption
+    });
+  } catch (error) {
+    console.error("Error fetching reward detail:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Gagal memuat detail reward" 
+    });
+  }
+});
+
 export default router;

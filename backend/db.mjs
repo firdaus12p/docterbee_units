@@ -536,6 +536,14 @@ async function runMigrations(connection) {
     // Migration: Seed default "Journey Hidup Sehat" data
     await seedDefaultJourney(connection);
     
+    // Migration: Add deleted_at column to orders table for soft delete functionality
+    // User's order history is preserved even when admin "deletes" an order
+    await safeAddColumn(connection, 'orders', 'deleted_at',
+      "DATETIME NULL DEFAULT NULL COMMENT 'Soft delete timestamp - NULL means not deleted'");
+    
+    // Migration: Add index for deleted_at column in orders (for faster filtering)
+    await safeAddIndex(connection, 'orders', 'idx_orders_deleted_at', 'deleted_at');
+    
     console.log("✅ Migrations completed");
   } catch (error) {
     console.error("❌ Migration error:", error.message);

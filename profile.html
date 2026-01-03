@@ -102,6 +102,386 @@
         opacity: 1 !important;
         transform: none !important;
       }
+
+      /* Activity History Styles */
+      .activity-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .filter-chips {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .filter-chip {
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+      }
+      .filter-chip:hover {
+        border-color: #667eea;
+      }
+      .filter-chip.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: transparent;
+      }
+      .date-filters {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .date-filters input {
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.875rem;
+      }
+      .btn-apply-date {
+        padding: 0.5rem 1rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.875rem;
+      }
+      .btn-apply-date:hover {
+        background: #5a67d8;
+      }
+
+      .activities-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .activity-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .activity-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
+      }
+      .activity-card.order {
+        border-left: 4px solid #10b981;
+      }
+      .activity-card.reward {
+        border-left: 4px solid #f59e0b;
+      }
+      .activity-icon {
+        font-size: 1.5rem;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+      .activity-icon.order {
+        background: #d1fae5;
+      }
+      .activity-icon.reward {
+        background: #fef3c7;
+      }
+      .activity-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .activity-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+      }
+      .activity-date {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+      .activity-amount {
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .activity-value {
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .activity-points {
+        font-size: 0.75rem;
+        color: #6b7280;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .status-pending {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .status-completed,
+      .status-approved {
+        background: #d1fae5;
+        color: #047857;
+      }
+      .status-cancelled,
+      .status-rejected {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .status-expired {
+        background: #e5e7eb;
+        color: #6b7280;
+      }
+
+      .activities-loading {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+      }
+      .activities-empty {
+        text-align: center;
+        padding: 3rem;
+        color: #9ca3af;
+      }
+      .activities-empty svg {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        opacity: 0.5;
+      }
+
+      .activities-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+      }
+      .page-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .page-btn:hover:not(:disabled) {
+        border-color: #667eea;
+      }
+      .page-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+      .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Receipt Modal Styles */
+      .receipt-modal {
+        max-width: 400px;
+        margin: 0 auto;
+        font-family: 'Courier New', monospace;
+      }
+      .receipt-header {
+        text-align: center;
+        border-bottom: 2px dashed #e5e7eb;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+      .receipt-logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+      }
+      .receipt-order-number {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+      }
+      .receipt-info {
+        margin-bottom: 1rem;
+      }
+      .receipt-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem 0;
+        font-size: 0.875rem;
+      }
+      .receipt-items {
+        border-top: 1px dashed #e5e7eb;
+        border-bottom: 1px dashed #e5e7eb;
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+      }
+      .receipt-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem 0;
+        font-size: 0.875rem;
+      }
+      .receipt-item-name {
+        flex: 1;
+      }
+      .receipt-item-qty {
+        width: 40px;
+        text-align: center;
+      }
+      .receipt-item-price {
+        width: 100px;
+        text-align: right;
+      }
+      .receipt-summary {
+        margin-bottom: 1rem;
+      }
+      .receipt-summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem 0;
+        font-size: 0.875rem;
+      }
+      .receipt-total {
+        font-size: 1.25rem;
+        font-weight: bold;
+        border-top: 2px solid #1f2937;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+      }
+      .receipt-footer {
+        text-align: center;
+        padding-top: 1rem;
+        border-top: 2px dashed #e5e7eb;
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+
+      @media (max-width: 768px) {
+        .activity-filters {
+          flex-direction: column;
+        }
+        .date-filters {
+          width: 100%;
+        }
+        .date-filters input {
+          flex: 1;
+        }
+        .activity-card {
+          flex-direction: column;
+          text-align: center;
+        }
+        .activity-amount {
+          text-align: center;
+          margin-top: 0.5rem;
+        }
+      }
+
+      /* Custom Activity Detail Modal */
+      .activity-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .activity-modal-box {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 420px;
+        width: 100%;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        animation: modalSlideIn 0.2s ease-out;
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      .activity-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .activity-modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+      }
+      .activity-modal-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #f3f4f6;
+        border-radius: 8px;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        color: #6b7280;
+        transition: all 0.2s;
+      }
+      .activity-modal-close:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+      }
+      .activity-modal-content {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .activity-modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: center;
+      }
+
+      @media (max-width: 480px) {
+        .activity-modal-box {
+          max-height: 90vh;
+          border-radius: 12px;
+        }
+        .activity-modal-content {
+          padding: 1rem;
+        }
+        .receipt-modal {
+          font-size: 0.875rem;
+        }
+      }
     </style>
   </head>
   <body class="bg-gray-50 text-slate-900">
@@ -666,6 +1046,104 @@
         </div>
       </div>
 
+      <!-- Activity History Section -->
+      <div class="profile-info-card" id="activityHistorySection">
+        <h2 class="text-xl font-bold mb-4">📋 Riwayat Aktivitas</h2>
+
+        <!-- Filter Controls -->
+        <div class="activity-filters">
+          <div class="filter-chips">
+            <button class="filter-chip active" data-type="all">Semua</button>
+            <button class="filter-chip" data-type="order">🛒 Belanja</button>
+            <button class="filter-chip" data-type="reward">🎁 Reward</button>
+          </div>
+          <div class="date-filters">
+            <input type="date" id="activityStartDate" title="Dari tanggal" />
+            <span style="color: #6b7280">-</span>
+            <input type="date" id="activityEndDate" title="Sampai tanggal" />
+            <button class="btn-apply-date" onclick="applyDateFilter()">
+              Terapkan
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="activitiesLoading" class="activities-loading">
+          <p>⏳ Memuat riwayat aktivitas...</p>
+        </div>
+
+        <!-- Activities Container -->
+        <div
+          id="activitiesContainer"
+          class="activities-container"
+          style="display: none"
+        ></div>
+
+        <!-- Empty State -->
+        <div id="activitiesEmpty" class="activities-empty" style="display: none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+          <p>Belum ada riwayat aktivitas</p>
+          <p style="font-size: 0.875rem; margin-top: 0.5rem">
+            Mulai belanja atau tukar reward untuk melihat riwayat Anda
+          </p>
+        </div>
+
+        <!-- Error State for Activities -->
+        <div id="activitiesError" class="activities-empty" style="display: none">
+          <p style="color: #b91c1c">❌ Gagal memuat riwayat aktivitas</p>
+          <button
+            class="btn-apply-date"
+            onclick="loadActivities()"
+            style="margin-top: 1rem"
+          >
+            Coba Lagi
+          </button>
+        </div>
+
+        <!-- Pagination -->
+        <div id="activitiesPagination" class="activities-pagination"></div>
+      </div>
+
+      <!-- Activity Detail Modal (Custom - renders HTML content) -->
+      <div
+        id="activityDetailModal"
+        class="activity-modal-overlay"
+        style="display: none"
+        onclick="closeActivityDetailModal(event)"
+      >
+        <div class="activity-modal-box" onclick="event.stopPropagation()">
+          <div class="activity-modal-header">
+            <h3 id="activityModalTitle">Detail</h3>
+            <button
+              class="activity-modal-close"
+              onclick="closeActivityDetailModal()"
+            >
+              ×
+            </button>
+          </div>
+          <div id="activityModalContent" class="activity-modal-content">
+            <!-- Content will be injected here -->
+          </div>
+          <div class="activity-modal-footer">
+            <button class="btn-apply-date" onclick="closeActivityDetailModal()">
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Error State -->
       <div
         id="errorState"
@@ -783,6 +1261,11 @@
           // Hide loading, show content
           document.getElementById("loadingState").style.display = "none";
           document.getElementById("profileContent").style.display = "block";
+
+          // Load activity history after profile loads successfully
+          if (typeof loadActivities === "function") {
+            loadActivities();
+          }
         } catch (error) {
           console.error("Error loading profile:", error);
           document.getElementById("loadingState").style.display = "none";
@@ -886,6 +1369,519 @@
 
       // Load data on page load
       loadProfileData();
+
+      // ============================================
+      // ACTIVITY HISTORY FUNCTIONALITY
+      // ============================================
+
+      // State variables for activity history
+      let currentActivityPage = 1;
+      let currentActivityType = "all";
+      let currentStartDate = "";
+      let currentEndDate = "";
+
+      // Load activities from API
+      async function loadActivities(
+        page = 1,
+        type = "all",
+        startDate = "",
+        endDate = ""
+      ) {
+        const loadingEl = document.getElementById("activitiesLoading");
+        const containerEl = document.getElementById("activitiesContainer");
+        const emptyEl = document.getElementById("activitiesEmpty");
+        const errorEl = document.getElementById("activitiesError");
+        const paginationEl = document.getElementById("activitiesPagination");
+
+        // Show loading, hide others
+        loadingEl.style.display = "block";
+        containerEl.style.display = "none";
+        emptyEl.style.display = "none";
+        errorEl.style.display = "none";
+        paginationEl.innerHTML = "";
+
+        try {
+          // Build query params
+          const params = new URLSearchParams({
+            page: page.toString(),
+            limit: "10",
+            type: type,
+          });
+          if (startDate) params.append("startDate", startDate);
+          if (endDate) params.append("endDate", endDate);
+
+          const response = await fetch(
+            `/api/user-data/activities?${params.toString()}`,
+            { credentials: "include" }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch activities");
+          }
+
+          const result = await response.json();
+
+          if (!result.success) {
+            throw new Error(result.error || "Failed to load activities");
+          }
+
+          const { activities, totalCount, currentPage, totalPages } =
+            result.data;
+
+          // Update state
+          currentActivityPage = currentPage;
+          currentActivityType = type;
+          currentStartDate = startDate;
+          currentEndDate = endDate;
+
+          // Hide loading
+          loadingEl.style.display = "none";
+
+          if (activities.length === 0) {
+            // Show empty state
+            emptyEl.style.display = "block";
+          } else {
+            // Render activities
+            containerEl.style.display = "flex";
+            renderActivityCards(activities);
+
+            // Render pagination if needed
+            if (totalPages > 1) {
+              renderPagination(currentPage, totalPages);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading activities:", error);
+          loadingEl.style.display = "none";
+          errorEl.style.display = "block";
+        }
+      }
+
+      // Render activity cards
+      function renderActivityCards(activities) {
+        const container = document.getElementById("activitiesContainer");
+        container.innerHTML = activities.map(createActivityCard).join("");
+      }
+
+      // Create single activity card HTML
+      function createActivityCard(activity) {
+        const isOrder = activity.type === "order";
+        const icon = isOrder ? "🛒" : "🎁";
+        const iconClass = isOrder ? "order" : "reward";
+
+        // Format date using global formatDateTime if available, else fallback
+        const dateStr =
+          typeof formatDateTime === "function"
+            ? formatDateTime(activity.activity_date)
+            : new Date(activity.activity_date).toLocaleString("id-ID");
+
+        // Title
+        const title = isOrder
+          ? `Order #${escapeHtml(activity.order_number)}`
+          : escapeHtml(activity.reward_name);
+
+        // Amount/Points
+        let amountHtml = "";
+        if (isOrder) {
+          const formatted =
+            typeof formatCurrency === "function"
+              ? formatCurrency(activity.total_amount)
+              : `Rp ${activity.total_amount.toLocaleString("id-ID")}`;
+          amountHtml = `
+            <div class="activity-value">${formatted}</div>
+            <div class="activity-points">+${activity.points_earned} poin</div>
+          `;
+        } else {
+          amountHtml = `
+            <div class="activity-value" style="color: #b45309;">-${activity.points_cost} poin</div>
+          `;
+        }
+
+        // Status badge
+        const statusBadge = getActivityStatusBadge(activity.status, isOrder);
+
+        // Click handler
+        const clickHandler = isOrder
+          ? `openOrderDetailModal(${activity.id})`
+          : `openRewardDetailModal(${activity.id})`;
+
+        return `
+          <div class="activity-card ${iconClass}" onclick="${clickHandler}">
+            <div class="activity-icon ${iconClass}">${icon}</div>
+            <div class="activity-info">
+              <div class="activity-title">${title}</div>
+              <div class="activity-date">${dateStr}</div>
+              ${statusBadge}
+            </div>
+            <div class="activity-amount">
+              ${amountHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      // Get status badge HTML
+      function getActivityStatusBadge(status, isOrder) {
+        const statusLower = (status || "").toLowerCase();
+        let badgeClass = "status-pending";
+        let label = status;
+
+        if (isOrder) {
+          // Order statuses
+          if (statusLower === "completed") {
+            badgeClass = "status-completed";
+            label = "Selesai";
+          } else if (statusLower === "pending") {
+            badgeClass = "status-pending";
+            label = "Menunggu";
+          } else if (statusLower === "cancelled") {
+            badgeClass = "status-cancelled";
+            label = "Dibatalkan";
+          } else if (statusLower === "expired") {
+            badgeClass = "status-expired";
+            label = "Kedaluwarsa";
+          }
+        } else {
+          // Reward redemption statuses
+          if (statusLower === "approved") {
+            badgeClass = "status-approved";
+            label = "Disetujui";
+          } else if (statusLower === "pending") {
+            badgeClass = "status-pending";
+            label = "Menunggu";
+          } else if (statusLower === "rejected") {
+            badgeClass = "status-rejected";
+            label = "Ditolak";
+          }
+        }
+
+        return `<span class="status-badge ${badgeClass}">${label}</span>`;
+      }
+
+      // Render pagination buttons
+      function renderPagination(currentPage, totalPages) {
+        const container = document.getElementById("activitiesPagination");
+        let html = "";
+
+        // Previous button
+        html += `<button class="page-btn" onclick="goToActivityPage(${
+          currentPage - 1
+        })" ${currentPage === 1 ? "disabled" : ""}>← Prev</button>`;
+
+        // Page numbers (show max 5 pages)
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+          html += `<button class="page-btn ${
+            i === currentPage ? "active" : ""
+          }" onclick="goToActivityPage(${i})">${i}</button>`;
+        }
+
+        // Next button
+        html += `<button class="page-btn" onclick="goToActivityPage(${
+          currentPage + 1
+        })" ${currentPage === totalPages ? "disabled" : ""}>Next →</button>`;
+
+        container.innerHTML = html;
+      }
+
+      // Go to specific page
+      function goToActivityPage(page) {
+        loadActivities(
+          page,
+          currentActivityType,
+          currentStartDate,
+          currentEndDate
+        );
+      }
+
+      // Filter chip click handler
+      function handleFilterClick(type) {
+        // Update active state
+        document.querySelectorAll(".filter-chip").forEach((chip) => {
+          chip.classList.remove("active");
+          if (chip.dataset.type === type) {
+            chip.classList.add("active");
+          }
+        });
+
+        // Reload with new filter
+        loadActivities(1, type, currentStartDate, currentEndDate);
+      }
+
+      // Apply date filter
+      function applyDateFilter() {
+        const startDate =
+          document.getElementById("activityStartDate").value || "";
+        const endDate = document.getElementById("activityEndDate").value || "";
+        loadActivities(1, currentActivityType, startDate, endDate);
+      }
+
+      // Open order detail modal (receipt style)
+      async function openOrderDetailModal(orderId) {
+        try {
+          const response = await fetch(
+            `/api/user-data/activities/order/${orderId}`,
+            { credentials: "include" }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch order");
+          }
+
+          const result = await response.json();
+          if (!result.success) {
+            throw new Error(result.error);
+          }
+
+          const order = result.data;
+
+          // Parse items if string
+          const items =
+            typeof order.items === "string"
+              ? JSON.parse(order.items)
+              : order.items;
+
+          // Format date
+          const dateStr =
+            typeof formatDateTime === "function"
+              ? formatDateTime(order.created_at)
+              : new Date(order.created_at).toLocaleString("id-ID");
+
+          // Build items HTML
+          let itemsHtml = items
+            .map((item) => {
+              const price = parseFloat(item.price) || 0;
+              const qty = parseInt(item.quantity) || 1;
+              const subtotal = price * qty;
+              return `
+              <div class="receipt-item">
+                <span class="receipt-item-name">${escapeHtml(item.name)}</span>
+                <span class="receipt-item-qty">x${qty}</span>
+                <span class="receipt-item-price">${
+                  typeof formatCurrency === "function"
+                    ? formatCurrency(subtotal)
+                    : `Rp ${subtotal.toLocaleString("id-ID")}`
+                }</span>
+              </div>
+            `;
+            })
+            .join("");
+
+          // Calculate subtotal
+          const subtotal = parseFloat(order.original_total || order.total_amount);
+          const discount = parseFloat(order.coupon_discount) || 0;
+          const total = parseFloat(order.total_amount);
+
+          // Status badge
+          const statusBadge = getActivityStatusBadge(order.status, true);
+
+          // Build modal content
+          const modalContent = `
+            <div class="receipt-modal">
+              <div class="receipt-header">
+                <div class="receipt-logo">🐝 DocterBee</div>
+                <div class="receipt-order-number">#${escapeHtml(
+                  order.order_number
+                )}</div>
+                ${statusBadge}
+              </div>
+              
+              <div class="receipt-info">
+                <div class="receipt-info-row">
+                  <span>Tanggal:</span>
+                  <span>${dateStr}</span>
+                </div>
+                <div class="receipt-info-row">
+                  <span>Lokasi:</span>
+                  <span>${escapeHtml(order.store_location || "-")}</span>
+                </div>
+                <div class="receipt-info-row">
+                  <span>Tipe:</span>
+                  <span>${escapeHtml(order.order_type || "-")}</span>
+                </div>
+              </div>
+              
+              <div class="receipt-items">
+                ${itemsHtml}
+              </div>
+              
+              <div class="receipt-summary">
+                ${
+                  discount > 0
+                    ? `
+                  <div class="receipt-summary-row">
+                    <span>Subtotal:</span>
+                    <span>${
+                      typeof formatCurrency === "function"
+                        ? formatCurrency(subtotal)
+                        : `Rp ${subtotal.toLocaleString("id-ID")}`
+                    }</span>
+                  </div>
+                  <div class="receipt-summary-row" style="color: #10b981;">
+                    <span>Diskon${
+                      order.coupon_code ? ` (${order.coupon_code})` : ""
+                    }:</span>
+                    <span>-${
+                      typeof formatCurrency === "function"
+                        ? formatCurrency(discount)
+                        : `Rp ${discount.toLocaleString("id-ID")}`
+                    }</span>
+                  </div>
+                `
+                    : ""
+                }
+                <div class="receipt-summary-row">
+                  <span>Poin Didapat:</span>
+                  <span style="color: #667eea;">+${
+                    order.points_earned || 0
+                  } poin</span>
+                </div>
+                <div class="receipt-summary-row receipt-total">
+                  <span>TOTAL:</span>
+                  <span>${
+                    typeof formatCurrency === "function"
+                      ? formatCurrency(total)
+                      : `Rp ${total.toLocaleString("id-ID")}`
+                  }</span>
+                </div>
+              </div>
+              
+              <div class="receipt-footer">
+                Terima kasih telah berbelanja di DocterBee!
+              </div>
+            </div>
+          `;
+
+          // Show modal using custom activity modal (renders HTML)
+          showActivityDetailModal("Struk Pembelian", modalContent);
+        } catch (error) {
+          console.error("Error fetching order detail:", error);
+          if (typeof showError === "function") {
+            showError("Gagal memuat detail order");
+          } else {
+            alert("Gagal memuat detail order");
+          }
+        }
+      }
+
+      // Open reward detail modal
+      async function openRewardDetailModal(redemptionId) {
+        try {
+          const response = await fetch(
+            `/api/user-data/activities/reward/${redemptionId}`,
+            { credentials: "include" }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch reward");
+          }
+
+          const result = await response.json();
+          if (!result.success) {
+            throw new Error(result.error);
+          }
+
+          const reward = result.data;
+
+          // Format date
+          const dateStr =
+            typeof formatDateTime === "function"
+              ? formatDateTime(reward.redeemed_at)
+              : new Date(reward.redeemed_at).toLocaleString("id-ID");
+
+          // Status badge
+          const statusBadge = getActivityStatusBadge(reward.status, false);
+
+          // Status explanation
+          let statusExplanation = "";
+          if (reward.status === "pending") {
+            statusExplanation =
+              '<p style="font-size: 0.875rem; color: #6b7280; margin-top: 1rem;">Penukaran Anda sedang diproses oleh admin. Mohon tunggu konfirmasi.</p>';
+          } else if (reward.status === "approved") {
+            statusExplanation =
+              '<p style="font-size: 0.875rem; color: #047857; margin-top: 1rem;">✅ Penukaran telah disetujui! Silakan ambil reward Anda di toko.</p>';
+          } else if (reward.status === "rejected") {
+            statusExplanation =
+              '<p style="font-size: 0.875rem; color: #b91c1c; margin-top: 1rem;">❌ Penukaran ditolak. Poin telah dikembalikan ke akun Anda.</p>';
+          }
+
+          // Build modal content
+          const modalContent = `
+            <div style="text-align: center; padding: 1rem;">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🎁</div>
+              <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">
+                ${escapeHtml(reward.reward_name)}
+              </h3>
+              <div style="font-size: 1.25rem; color: #b45309; font-weight: bold; margin-bottom: 1rem;">
+                -${reward.points_cost} Poin
+              </div>
+              <div style="color: #6b7280; margin-bottom: 1rem;">
+                ${dateStr}
+              </div>
+              ${statusBadge}
+              ${statusExplanation}
+            </div>
+          `;
+
+          // Show modal using custom activity modal (renders HTML)
+          showActivityDetailModal("Detail Penukaran Reward", modalContent);
+        } catch (error) {
+          console.error("Error fetching reward detail:", error);
+          if (typeof showError === "function") {
+            showError("Gagal memuat detail reward");
+          } else {
+            alert("Gagal memuat detail reward");
+          }
+        }
+      }
+
+      // Add event listeners to filter chips
+      document.querySelectorAll(".filter-chip").forEach((chip) => {
+        chip.addEventListener("click", () =>
+          handleFilterClick(chip.dataset.type)
+        );
+      });
+
+      // ============================================
+      // CUSTOM ACTIVITY DETAIL MODAL FUNCTIONS
+      // ============================================
+
+      // Show activity detail modal with HTML content
+      function showActivityDetailModal(title, htmlContent) {
+        const modal = document.getElementById("activityDetailModal");
+        const titleEl = document.getElementById("activityModalTitle");
+        const contentEl = document.getElementById("activityModalContent");
+
+        if (modal && titleEl && contentEl) {
+          titleEl.textContent = title;
+          contentEl.innerHTML = htmlContent; // Renders HTML
+          modal.style.display = "flex";
+          document.body.style.overflow = "hidden"; // Prevent background scroll
+        }
+      }
+
+      // Close activity detail modal
+      function closeActivityDetailModal(event) {
+        // If event exists and target is not the overlay, don't close
+        if (event && event.target && event.target.id !== "activityDetailModal") {
+          return;
+        }
+
+        const modal = document.getElementById("activityDetailModal");
+        if (modal) {
+          modal.style.display = "none";
+          document.body.style.overflow = ""; // Restore scroll
+        }
+      }
+
+      // Close on ESC key
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeActivityDetailModal();
+        }
+      });
     </script>
 
     <!-- ================= FOOTER ================= -->

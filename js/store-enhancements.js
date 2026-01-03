@@ -462,9 +462,9 @@ function addToCartFromDetail() {
 // ============================================
 
 /**
- * Open checkout modal
+ * Open checkout modal (or direct checkout for logged-in users)
  */
-function openCheckoutModal() {
+async function openCheckoutModal() {
   const cart = JSON.parse(localStorage.getItem('docterbee_cart') || '[]');
   
   // Validate cart not empty
@@ -493,22 +493,49 @@ function openCheckoutModal() {
     return;
   }
   
-  // Check if user logged in
-  const isLoggedIn = !!sessionStorage.getItem('userId');
+  // Check if user logged in via API (more reliable than sessionStorage)
+  try {
+    const response = await fetch('/api/auth/check', { credentials: 'include' });
+    const result = await response.json();
+    
+    if (result.loggedIn && result.user) {
+      // User is logged in - skip modal and proceed directly
+      console.log('✅ User logged in, proceeding with direct checkout');
+      
+      // Close cart drawer if open
+      if (cartDrawerOpen) {
+        toggleCartDrawer();
+      }
+      
+      // Sync store location to hidden form
+      if (drawerLocation && mainLocation && drawerLocation.value) {
+        mainLocation.value = drawerLocation.value;
+      }
+      
+      // Sync order type
+      const drawerOrderType = document.querySelector('input[name="drawerOrderType"]:checked');
+      if (drawerOrderType) {
+        const mainOrderType = document.querySelector(`input[name="orderType"][value="${drawerOrderType.value}"]`);
+        if (mainOrderType) mainOrderType.checked = true;
+      }
+      
+      // Directly call submitOrder for logged-in users
+      if (typeof submitOrder === 'function') {
+        await submitOrder();
+      }
+      return;
+    }
+  } catch (error) {
+    console.warn('Could not check auth status, showing modal:', error.message);
+  }
   
-  // Show appropriate section
+  // Guest user - show checkout modal with form
   const memberInfo = document.getElementById('checkout-member-info');
   const guestForm = document.getElementById('checkout-guest-form');
   
-  if (isLoggedIn) {
-    if (memberInfo) memberInfo.classList.remove('hidden');
-    if (guestForm) guestForm.classList.add('hidden');
-    populateCheckoutSummary('logged');
-  } else {
-    if (memberInfo) memberInfo.classList.add('hidden');
-    if (guestForm) guestForm.classList.remove('hidden');
-    populateCheckoutSummary('guest');
-  }
+  if (memberInfo) memberInfo.classList.add('hidden');
+  if (guestForm) guestForm.classList.remove('hidden');
+  populateCheckoutSummary('guest');
   
   // Show modal
   const modal = document.getElementById('checkout-modal');

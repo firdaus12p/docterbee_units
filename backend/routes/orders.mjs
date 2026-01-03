@@ -271,12 +271,26 @@ router.post("/", async (req, res) => {
 
 // ============================================
 // GET /api/orders - Get all orders (admin only)
+// Excludes soft-deleted orders (deleted_at IS NOT NULL) if column exists
 // ============================================
 router.get("/", requireAdmin, async (req, res) => {
   try {
     const { status, payment_status, limit = 50, offset = 0 } = req.query;
 
-    let whereClause = "WHERE 1=1";
+    // Check if deleted_at column exists (graceful fallback for migration)
+    let hasDeletedAtColumn = false;
+    try {
+      const columnCheck = await query(
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orders' AND COLUMN_NAME = 'deleted_at'"
+      );
+      hasDeletedAtColumn = columnCheck.length > 0;
+    } catch (e) {
+      // If check fails, assume column doesn't exist
+      hasDeletedAtColumn = false;
+    }
+
+    // Build WHERE clause - filter out soft-deleted orders if column exists
+    let whereClause = hasDeletedAtColumn ? "WHERE deleted_at IS NULL" : "WHERE 1=1";
     const params = [];
 
     if (status) {
@@ -790,24 +804,46 @@ router.post("/:id/assign-points-by-phone", requireAdmin, async (req, res) => {
 });
 
 // ============================================
-// DELETE /api/orders/:id - Delete order (admin only)
+// DELETE /api/orders/:id - Soft delete order (admin only)
+// Sets deleted_at timestamp instead of removing the row
+// User's order history is preserved, but order won't appear in admin list
+// Falls back to hard delete if deleted_at column doesn't exist yet
 // ============================================
 router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Check if deleted_at column exists (graceful fallback for migration)
+    let hasDeletedAtColumn = false;
+    try {
+      const columnCheck = await query(
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orders' AND COLUMN_NAME = 'deleted_at'"
+      );
+      hasDeletedAtColumn = columnCheck.length > 0;
+    } catch (e) {
+      hasDeletedAtColumn = false;
+    }
+
     // Check if order exists
-    const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);
+    const checkQuery = hasDeletedAtColumn 
+      ? "SELECT * FROM orders WHERE id = ? AND deleted_at IS NULL"
+      : "SELECT * FROM orders WHERE id = ?";
+    
+    const order = await queryOne(checkQuery, [id]);
 
     if (!order) {
       return res.status(404).json({
         success: false,
-        error: "Order tidak ditemukan",
+        error: "Order tidak ditemukan atau sudah dihapus",
       });
     }
 
-    // Delete order
-    await query("DELETE FROM orders WHERE id = ?", [id]);
+    // Soft delete if column exists, hard delete otherwise
+    if (hasDeletedAtColumn) {
+      await query("UPDATE orders SET deleted_at = NOW() WHERE id = ?", [id]);
+    } else {
+      await query("DELETE FROM orders WHERE id = ?", [id]);
+    }
 
     res.json({
       success: true,
