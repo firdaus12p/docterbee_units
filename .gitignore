@@ -86,6 +86,9 @@ debug-*.bat
 .gemini/
 .serena/
 .playwright-mcp/
+_bmad/
+_bmad-output/
+.agent/
 
 # ===============================
 # GITHUB / CI (NOT NEEDED ON SERVER)
@@ -102,19 +105,16 @@ backend/migrations/
 
 # ===============================
 # INTERNAL DOCUMENTATION (SECURITY - NOT FOR SERVER)
-# These contain internal system details that shouldn't be exposed
-# BUT they are NOT gitignored so AI can read them for context
-# Add to server .gitignore or exclude during deployment
 # ===============================
-# ADMIN_SYSTEM.md        <- Contains default credentials, kept for AI context
-# CLEANUP_AUDIT.md       <- Audit log, kept for AI context
-# PRD-*.md               <- Product docs, kept for AI context
-# WALKTHROUGH_*.md       <- Technical docs, kept for AI context
+ADMIN_SYSTEM.md
+CLEANUP_AUDIT.md
+PRD-*.md
+WALKTHROUGH_*.md
+rules-for-ai.md
+AGENTS.md
 
 # ===============================
-# DOCUMENTATION (KEEP FOR AI CONTEXT)
-# docs/ folder NOT ignored - needed for AI understanding
-# database_schema.sql NOT ignored - needed for AI understanding
-# .env.example NOT ignored - template for setup
-# AGENTS.md NOT ignored - development guide
+# DOCUMENTATION FOLDER
 # ===============================
+docs/
+database_schema.sql
