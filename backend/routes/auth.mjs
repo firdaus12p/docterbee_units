@@ -1,7 +1,9 @@
 import express from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { query, queryOne } from "../db.mjs";
 import { loginRateLimiter } from "../utils/rate-limiter.mjs";
+import { sendVerificationEmail } from "../utils/mailer.mjs";
 
 const router = express.Router();
 
@@ -249,19 +251,31 @@ router.get("/me", async (req, res) => {
 // ============================================
 // GET /api/auth/check - Check if logged in
 // ============================================
-router.get("/check", (req, res) => {
-  res.json({
-    success: true,
-    loggedIn: !!req.session.userId,
-    user: req.session.userId
-      ? {
-          id: req.session.userId,
-          name: req.session.userName,
-          email: req.session.userEmail,
-          phone: req.session.userPhone,
-        }
-      : null,
-  });
+router.get("/check", async (req, res) => {
+  if (!req.session.userId) {
+    return res.json({ success: true, loggedIn: false, user: null });
+  }
+
+  try {
+    const user = await queryOne(
+      "SELECT id, name, email, phone, is_email_verified FROM users WHERE id = ? AND is_active = 1",
+      [req.session.userId]
+    );
+
+    res.json({
+      success: true,
+      loggedIn: !!user,
+      user: user ? {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        is_email_verified: !!user.is_email_verified
+      } : null,
+    });
+  } catch (error) {
+    res.json({ success: true, loggedIn: true, user: { id: req.session.userId, name: req.session.userName } });
+  }
 });
 
 // ============================================
@@ -351,6 +365,104 @@ router.post("/change-password", async (req, res) => {
       success: false,
       error: "Terjadi kesalahan. Jika Anda tidak yakin apakah password berhasil diubah, coba login dengan password baru Anda.",
     });
+  }
+});
+
+// ============================================
+// POST /api/auth/update-email - Update & Send verification
+// ============================================
+router.post("/update-email", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ success: false, error: "Silakan login terlebih dahulu" });
+    }
+
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: "Email harus diisi" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.endsWith('.local')) {
+      return res.status(400).json({ success: false, error: "Format email tidak valid" });
+    }
+
+    // Check if email taken
+    const existing = await queryOne("SELECT id FROM users WHERE email = ? AND id != ?", [email, req.session.userId]);
+    if (existing) {
+      return res.status(400).json({ success: false, error: "Email ini sudah digunakan oleh akun lain" });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    
+    // Update pending_token and verification status
+    await query(
+      "UPDATE users SET pending_email = ?, email_verification_token = ?, is_email_verified = 0 WHERE id = ?",
+      [email, token, req.session.userId]
+    );
+
+    // Get user name for email
+    const user = await queryOne("SELECT name FROM users WHERE id = ?", [req.session.userId]);
+
+    // Send the email
+    await sendVerificationEmail(email, user.name, token);
+
+    res.json({
+      success: true,
+      message: "Link verifikasi telah dikirim ke email baru Anda. Silakan cek inbox (atau spam)."
+    });
+  } catch (error) {
+    console.error("Error updating email:", error);
+    res.status(500).json({ success: false, error: "Gagal mengirim email verifikasi" });
+  }
+});
+
+// ============================================
+// GET /api/auth/verify-email - Verify token
+// ============================================
+router.get("/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) {
+      return res.send("<h1>Token tidak valid</h1>");
+    }
+
+    const user = await queryOne(
+      "SELECT id, pending_email FROM users WHERE email_verification_token = ?",
+      [token]
+    );
+
+    if (!user) {
+      return res.send(`
+        <div style="font-family: sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: #ef4444;">Link Kadaluarsa atau Tidak Valid</h1>
+          <p>Silakan minta link verifikasi baru dari dashboard Anda.</p>
+          <a href="/journey" style="color: #6366f1;">Kembali ke Dashboard</a>
+        </div>
+      `);
+    }
+
+    // Success! Update email and mark as verified
+    await query(
+      "UPDATE users SET email = ?, pending_email = NULL, email_verification_token = NULL, is_email_verified = 1 WHERE id = ?",
+      [user.pending_email || 'check_db', user.id]
+    );
+
+    // If it's a current session, update session email
+    if (req.session.userId === user.id && user.pending_email) {
+      req.session.userEmail = user.pending_email;
+    }
+
+    res.send(`
+      <div style="font-family: sans-serif; text-align: center; padding: 50px;">
+        <h1 style="color: #22c55e;">Email Berhasil Diverifikasi! 🎉</h1>
+        <p>Akun Anda sekarang sudah aktif dan aman.</p>
+        <a href="/journey" style="background: #6366f1; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block; margin-top: 20px;">Masuk ke Dashboard</a>
+      </div>
+    `);
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    res.status(500).send("Terjadi kesalahan server");
   }
 });
 

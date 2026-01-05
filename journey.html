@@ -598,6 +598,46 @@
 
     <!-- Main Content -->
     <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
+      <!-- Verification Banner (Hidden by default) -->
+      <div id="verificationBanner" class="hidden mb-6 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg shadow-sm">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-amber-700">
+              Email Anda belum diverifikasi. <span class="font-bold">Verifikasi email</span> diperlukan untuk fitur keamanan mandiri.
+            </p>
+          </div>
+          <div class="ml-auto pl-3">
+            <button id="btnOpenVerifyModal" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded-md text-xs font-semibold transition-colors">
+              Amankan Akun
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Update Modal (Hidden by default) -->
+      <div id="emailVerifyModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all scale-95 opacity-0" id="emailVerifyModalBox">
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Amankan Akun Anda</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Masukkan email aktif Anda. Kami akan mengirimkan link verifikasi untuk mengaktifkan fitur keamanan mandiri.</p>
+          
+          <form id="emailVerifyForm">
+            <div class="mb-4">
+              <label for="newEmail" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Aktif</label>
+              <input type="email" id="newEmail" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="contoh@gmail.com">
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+              <button type="button" id="btnCloseVerifyModal" class="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors">Nanti Saja</button>
+              <button type="submit" id="btnSubmitEmail" class="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold shadow-lg shadow-amber-200 dark:shadow-none transition-all">Kirim Link</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Journey Selector -->
       <div class="mb-4">
         <label
@@ -678,6 +718,7 @@
     <script src="/js/modal-utils.js"></script>
     <script src="/js/user-data-sync.js"></script>
     <script src="/js/landing-navbar.js"></script>
+    <script src="/js/email-verification.js"></script>
     <!-- Note: auth-check.js NOT included - Journey supports guest mode -->
     <script src="/js/utils.js"></script>
     <script src="/js/script.js"></script>
