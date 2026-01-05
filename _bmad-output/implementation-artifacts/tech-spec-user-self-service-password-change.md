@@ -98,7 +98,7 @@ Tambahkan fitur Self-Service Change Password di halaman Profil user, dengan vali
 
 **Task breakdown ordered by dependency (lowest level first):**
 
-- [ ] **Task 1: Backend - Add Change Password Endpoint**
+- [x] **Task 1: Backend - Add Change Password Endpoint**
   - File: `backend/routes/auth.mjs`
   - Action: Add new `POST /api/user/change-password` route handler after the `/me` endpoint
   - Implementation:
@@ -136,7 +136,7 @@ Tambahkan fitur Self-Service Change Password di halaman Profil user, dengan vali
     - 500 for server errors
   - Notes: Follow existing auth.mjs patterns (try/catch, response format, error logging)
 
-- [ ] **Task 2: Frontend - Add Change Password Card to Profile Page**
+- [x] **Task 2: Frontend - Add Change Password Card to Profile Page**
   - File: `profile.html`
   - Action: Add new "Keamanan Akun" card section after Profile Info Card (before Activity History section)
   - Implementation:
@@ -159,7 +159,7 @@ Tambahkan fitur Self-Service Change Password di halaman Profil user, dengan vali
     - Add submit button with Tailwind classes (match existing button styles)
   - Notes: Use existing `.profile-info-card` styling for consistency
 
-- [ ] **Task 3: Frontend - Add Show/Hide Password Toggle**
+- [x] **Task 3: Frontend - Add Show/Hide Password Toggle**
   - File: `profile.html` (same card from Task 2)
   - Action: Add eye icon buttons for each password field to toggle visibility
   - Implementation:
@@ -169,7 +169,7 @@ Tambahkan fitur Self-Service Change Password di halaman Profil user, dengan vali
     - Use lucide icons if available, or inline SVG
   - Notes: Optional for MVP if time-constrained (can be added in iteration)
 
-- [ ] **Task 4: Frontend - Add Change Password Form Logic**
+- [x] **Task 4: Frontend - Add Change Password Form Logic**
   - File: `profile.html` (inline `<script>` at bottom, or separate `js/profile-password.js`)
   - Action: Implement form submission logic with validation
   - Implementation:
@@ -196,7 +196,7 @@ Tambahkan fitur Self-Service Change Password di halaman Profil user, dengan vali
     - Handle network errors: Show helpful message asking user to try login with new password
   - Notes: Use existing `showSuccess()`, `showError()` functions from `js/utils.js`
 
-- [ ] **Task 5: Frontend - Add "Lupa Password?" Link to Login Page**
+- [x] **Task 5: Frontend - Add "Lupa Password?" Link to Login Page**
   - File: `login.html`
   - Action: Add WhatsApp link below login form (after "Belum punya akun?" text)
   - Implementation:
@@ -219,47 +219,47 @@ Tambahkan fitur Self-Service Change Password di halaman Profil user, dengan vali
 
 **Backend API (`POST /api/user/change-password`):**
 
-- [ ] **AC1**: Given user is logged in and provides correct current password and valid new password (min 6 chars, different from current), when user submits change password request, then password is updated in database with bcrypt hash and response returns `{ success: true, message: 'Password berhasil diubah...' }`
+- [x] **AC1**: Given user is logged in and provides correct current password and valid new password (min 6 chars, different from current), when user submits change password request, then password is updated in database with bcrypt hash and response returns `{ success: true, message: 'Password berhasil diubah...' }`
 
-- [ ] **AC2**: Given user is NOT logged in, when user attempts to access change password endpoint, then API returns 401 status with error message "Silakan login terlebih dahulu"
+- [x] **AC2**: Given user is NOT logged in, when user attempts to access change password endpoint, then API returns 401 status with error message "Silakan login terlebih dahulu"
 
-- [ ] **AC3**: Given user is logged in but provides incorrect current password, when user submits change password request, then API returns 401 status with error message "Password saat ini tidak sesuai. Silakan coba lagi."
+- [x] **AC3**: Given user is logged in but provides incorrect current password, when user submits change password request, then API returns 401 status with error message "Password saat ini tidak sesuai. Silakan coba lagi."
 
-- [ ] **AC4**: Given user is logged in and provides correct current password but new password is less than 6 characters, when user submits request, then API returns 400 status with error message "Password minimal 6 karakter"
+- [x] **AC4**: Given user is logged in and provides correct current password but new password is less than 6 characters, when user submits request, then API returns 400 status with error message "Password minimal 6 karakter"
 
-- [ ] **AC5**: Given user is logged in and provides new password that is identical to current password, when user submits request, then API returns 400 status with error message "Password baru harus berbeda dari password saat ini"
+- [x] **AC5**: Given user is logged in and provides new password that is identical to current password, when user submits request, then API returns 400 status with error message "Password baru harus berbeda dari password saat ini"
 
-- [ ] **AC6**: Given user successfully changes password, when user checks their session, then session remains active (user NOT logged out)
+- [x] **AC6**: Given user successfully changes password, when user checks their session, then session remains active (user NOT logged out)
 
-- [ ] **AC7**: Given leading/trailing whitespace in password inputs, when backend processes them, then whitespace is trimmed before validation and hashing
+- [x] **AC7**: Given leading/trailing whitespace in password inputs, when backend processes them, then whitespace is trimmed before validation and hashing
 
 **Frontend Profile Page:**
 
-- [ ] **AC8**: Given user is on profile page, when page loads, then "Keamanan Akun" card is visible immediately after Profile Info Card
+- [x] **AC8**: Given user is on profile page, when page loads, then "Keamanan Akun" card is visible immediately after Profile Info Card
 
-- [ ] **AC9**: Given user sees the change password form, when user views field labels, then labels are "Password Saat Ini", "Password Baru", "Konfirmasi Password Baru" (user-friendly Indonesian)
+- [x] **AC9**: Given user sees the change password form, when user views field labels, then labels are "Password Saat Ini", "Password Baru", "Konfirmasi Password Baru" (user-friendly Indonesian)
 
-- [ ] **AC10**: Given user fills all 3 password fields correctly, when user submits form, then form data is sent to `/api/user/change-password` endpoint with `currentPassword` and `newPassword` in JSON body
+- [x] **AC10**: Given user fills all 3 password fields correctly, when user submits form, then form data is sent to `/api/user/change-password` endpoint with `currentPassword` and `newPassword` in JSON body
 
-- [ ] **AC11**: Given user enters mismatched passwords in "Password Baru" and "Konfirmasi" fields, when user submits form, then frontend shows error "Password baru dan konfirmasi tidak cocok" WITHOUT making API call
+- [x] **AC11**: Given user enters mismatched passwords in "Password Baru" and "Konfirmasi" fields, when user submits form, then frontend shows error "Password baru dan konfirmasi tidak cocok" WITHOUT making API call
 
-- [ ] **AC12**: Given user successfully changes password (200 response from API), when response is received, then success message "Password berhasil diubah..." is displayed and form fields are cleared
+- [x] **AC12**: Given user successfully changes password (200 response from API), when response is received, then success message "Password berhasil diubah..." is displayed and form fields are cleared
 
-- [ ] **AC13**: Given API returns error (e.g., current password wrong), when error response is received, then error message from backend is displayed to user via `showError()`
+- [x] **AC13**: Given API returns error (e.g., current password wrong), when error response is received, then error message from backend is displayed to user via `showError()`
 
 **Frontend Login Page:**
 
-- [ ] **AC14**: Given user is on login page, when user looks below the form, then "Lupa password? Hubungi Admin" link is visible
+- [x] **AC14**: Given user is on login page, when user looks below the form, then "Lupa password? Hubungi Admin" link is visible
 
-- [ ] **AC15**: Given user clicks "Hubungi Admin" link, when clicked, then WhatsApp opens in new tab with pre-filled message "Halo admin, saya lupa password akun DocterBee saya. Mohon bantuannya."
+- [x] **AC15**: Given user clicks "Hubungi Admin" link, when clicked, then WhatsApp opens in new tab with pre-filled message "Halo admin, saya lupa password akun DocterBee saya. Mohon bantuannya."
 
 **Integration:**
 
-- [ ] **AC16**: Given user has password changed by admin (manual reset), when user changes their own password using new endpoint, then old temporary password no longer works and new self-set password works for login
+- [x] **AC16**: Given user has password changed by admin (manual reset), when user changes their own password using new endpoint, then old temporary password no longer works and new self-set password works for login
 
-- [ ] **AC17**: Given user changes password successfully, when user logs out and attempts to login with OLD password, then login fails with "Email atau password salah"
+- [x] **AC17**: Given user changes password successfully, when user logs out and attempts to login with OLD password, then login fails with "Email atau password salah"
 
-- [ ] **AC18**: Given user changes password successfully, when user logs out and attempts to login with NEW password, then login succeeds and user is redirected to journey page
+- [x] **AC18**: Given user changes password successfully, when user logs out and attempts to login with NEW password, then login succeeds and user is redirected to journey page
 
 **Error Scenarios to Handle:**
 

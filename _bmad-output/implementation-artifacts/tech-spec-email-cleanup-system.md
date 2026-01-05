@@ -74,26 +74,26 @@ await resend.emails.send({
 ### Tasks
 
 **Phase 1: Database & Infra**
-- [ ] Install dependency: `npm install resend`.
-- [ ] Database Migration: Tambahkan kolom `is_email_verified`, `email_verification_token`, `pending_email` ke tabel `users`.
-- [ ] Init script: Update `is_email_verified = 0` untuk user dengan email `%migrated.local`.
+- [x] Install dependency: `npm install resend`.
+- [x] Database Migration: Tambahkan kolom `is_email_verified`, `email_verification_token`, `pending_email` ke tabel `users`.
+- [x] Init script: Update `is_email_verified = 0` untuk user dengan email `%migrated.local`.
 
 **Phase 2: Backend Logic**
-- [ ] Pembuatan `backend/utils/mailer.mjs` sebagai wrapper library Resend.
-- [ ] Implementasi endpoint `POST /api/auth/update-email` (verifikasi email baru).
-- [ ] Implementasi endpoint `GET /api/auth/verify-email` (handler klik link verifikasi).
-- [ ] Update route login untuk menyertakan status `is_email_verified` di response.
+- [x] Pembuatan `backend/utils/mailer.mjs` sebagai wrapper library Resend.
+- [x] Implementasi endpoint `POST /api/auth/update-email` (verifikasi email baru).
+- [x] Implementasi endpoint `GET /api/auth/verify-email` (handler klik link verifikasi).
+- [x] Update route login untuk menyertakan status `is_email_verified` di response.
 
 **Phase 3: Frontend UI**
-- [ ] Implementasi Banner Verifikasi di `journey.html` (menggunakan data dari session/sync).
-- [ ] Pembuatan Modal Update Email di `journey.html`.
-- [ ] Integrasi frontend fetch ke endpoint update/resend verification.
+- [x] Implementasi Banner Verifikasi di `journey.html` (menggunakan data dari session/sync).
+- [x] Pembuatan Modal Update Email di `journey.html`.
+- [x] Integrasi frontend fetch ke endpoint update/resend verification.
 
 ### Acceptance Criteria
 
-- [ ] **AC1**: User dengan email dummy otomatis terdeteksi sebagai unverified.
-- [ ] **AC2**: Banner "Verifikasi Email" muncul di Journey page bagi user unverified.
-- [ ] **AC3**: Sistem mengirim email verifikasi menggunakan library Resend saat user input email baru.
+- [x] **AC1**: User dengan email dummy otomatis terdeteksi sebagai unverified.
+- [x] **AC2**: Banner "Verifikasi Email" muncul di Journey page bagi user unverified.
+- [x] **AC3**: Sistem mengirim email verifikasi menggunakan library Resend saat user input email baru.
 - [x] **AC4**: Status database berubah menjadi `is_email_verified = 1` setelah token valid diakses via URL.
 - [x] **AC5**: Banner menghilang secara otomatis setelah user berhasil verifikasi.
 

@@ -114,49 +114,44 @@
     if (mobileMemberInfo) mobileMemberInfo.style.display = "flex";
   }
 
-  // Handle logout
-  async function performLogout() {
-    try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+  // Handle logout - delegate to global handleLogout from script.js if available.
+  // This prevents duplicate code and ensures consistent logout behavior.
+  // Fallback implementation only used on rare pages that don't load script.js.
+  function handleLogout() {
+    // Check if global handleLogout exists (from script.js)
+    if (typeof window.handleLogout === "function") {
+      window.handleLogout();
+      return;
+    }
 
-      if (response.ok) {
-        // Directly reload without success modal (user already confirmed)
-        window.location.reload();
-      } else {
-        if (typeof showError === "function") {
-          showError("Gagal logout. Silakan coba lagi.");
+    // Fallback: minimal implementation for pages without script.js
+    const doLogout = async () => {
+      try {
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          window.location.reload();
         } else {
           alert("Gagal logout. Silakan coba lagi.");
         }
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-      if (typeof showError === "function") {
-        showError("Terjadi kesalahan saat logout.");
-      } else {
+      } catch (error) {
+        console.error("Logout error:", error);
         alert("Terjadi kesalahan saat logout.");
       }
-    }
-  }
+    };
 
-  function handleLogout() {
     if (typeof showConfirm === "function") {
       showConfirm(
         "Apakah Anda yakin ingin logout?",
-        () => {
-          performLogout();
-        },
+        doLogout,
         null,
         "Konfirmasi Logout"
       );
-    } else {
-      // Fallback if modal-utils.js not loaded
-      if (confirm("Apakah Anda yakin ingin logout?")) {
-        performLogout();
-      }
+    } else if (confirm("Apakah Anda yakin ingin logout?")) {
+      doLogout();
     }
   }
 

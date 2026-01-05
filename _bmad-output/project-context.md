@@ -2,9 +2,9 @@
 project_name: 'docterbee_units'
 user_name: 'Daus'
 date: '2026-01-05'
-sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns', 'business_context', 'architecture_details']
+sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns', 'business_context', 'architecture_details', 'key_files']
 status: 'complete'
-rule_count: 55
+rule_count: 60
 optimized_for_llm: true
 ---
 
@@ -113,6 +113,8 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - `email_verification_token`: String. Used for email activation links.
 - `email_verification_expires`: DATETIME. Token expires after 24 hours.
 - `pending_email`: String. Stores new email during verification process to prevent locking out users.
+- `reset_password_token`: String. Used for forgot password flow.
+- `reset_password_expires`: DATETIME. Token expires after 1 hour.
 - `created_at` / `updated_at`: Standard timestamps.
 
 **Table: `coupon_usage` (Anti-Abuse)**
@@ -130,6 +132,35 @@ _This file contains critical rules and patterns that AI agents must follow when 
 | Login (`/login`) | 8 | 2 min | Brute-force prevention |
 | Email (`/update-email`, `/resend-verification`) | 3 | 10 min | Billing/reputation protection |
 | Forgot Password (`/forgot-password`) | 8 | 2 min | Uses login limiter |
+
+---
+
+## Key Files Reference
+
+**Backend Utilities:**
+- `backend/utils/mailer.mjs`: Email service wrapper using Resend API. Contains `sendVerificationEmail()` and `sendForgotPasswordEmail()`.
+- `backend/utils/rate-limiter.mjs`: In-memory rate limiter. Exports `loginRateLimiter` (8/2min) and `emailRateLimiter` (3/10min).
+
+**Authentication Routes (`backend/routes/auth.mjs`):**
+- `POST /api/auth/register`: New user registration.
+- `POST /api/auth/login`: User login with rate limiting.
+- `POST /api/auth/logout`: Session destruction.
+- `POST /api/auth/change-password`: Self-service password change (requires verified email).
+- `POST /api/auth/update-email`: Request email change with verification.
+- `GET /api/auth/verify-email`: Token verification handler.
+- `POST /api/auth/resend-verification`: Resend verification email.
+- `POST /api/auth/forgot-password`: Request password reset link.
+- `POST /api/auth/reset-password`: Set new password with valid token.
+
+**Frontend Shared Functions:**
+- `js/utils.js`: Global utilities (`escapeHtml`, `formatCurrency`, `formatDate`, `debounce`, etc.). All exported to `window.*`.
+- `js/modal-utils.js`: Modal dialogs (`showSuccess`, `showError`, `showWarning`, `showConfirm`).
+- `js/script.js`: Main app logic. Contains `performLogout()` and `handleLogout()` (authoritative versions).
+- `js/landing-navbar.js`: Navbar logic. Delegates logout to global `handleLogout` from script.js.
+
+**Code Consolidation Notes (2026-01-05):**
+- `handleLogout` and `performLogout`: Consolidated to single source in `script.js`. `landing-navbar.js` delegates to global version.
+- `initMobileMenu`: Actual implementation in `landing-navbar.js`. Empty stub in `script.js` for backward compatibility.
 
 ---
 

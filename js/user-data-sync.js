@@ -65,7 +65,8 @@ function clearUserDataSync() {
   currentUserId = null;
 
   // Clear localStorage
-  localStorage.removeItem("db_units");
+  localStorage.removeItem("db_journey_progress");
+  localStorage.removeItem("db_units"); // Clear legacy key
   localStorage.removeItem("db_points");
   localStorage.removeItem("docterbee_cart");
 
@@ -106,8 +107,11 @@ async function loadUserProgress() {
       }
 
       // Save to localStorage for immediate access
-      localStorage.setItem("db_units", JSON.stringify(unitData));
+      localStorage.setItem("db_journey_progress", JSON.stringify(unitData));
       localStorage.setItem("db_points", JSON.stringify({ value: points }));
+      
+      // Cleanup legacy key if it exists
+      localStorage.removeItem("db_units");
 
       // Refresh UI if on journey page
       if (typeof window.refreshNav === "function") window.refreshNav();
@@ -134,8 +138,8 @@ async function saveUserProgress() {
   }
 
   try {
-    // Read from localStorage
-    const unitData = JSON.parse(localStorage.getItem("db_units") || "{}");
+    // Read from localStorage (use standardized key)
+    const unitData = JSON.parse(localStorage.getItem("db_journey_progress") || "{}");
     const pointsData = JSON.parse(
       localStorage.getItem("db_points") || '{"value":0}'
     );
