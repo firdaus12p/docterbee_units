@@ -64,6 +64,34 @@ async function initializeTables() {
     `);
     console.log("✅ Table: users");
 
+    // AUTO-MIGRATION: Add Email Verification Columns if not exist
+    try {
+      // 1. Add Columns (using individual try-catches to be safe if some columns already exist)
+      const usersColumns = [
+        { name: "is_email_verified", type: "TINYINT(1) DEFAULT 0" },
+        { name: "email_verification_token", type: "VARCHAR(255) DEFAULT NULL" },
+        { name: "pending_email", type: "VARCHAR(100) DEFAULT NULL" }
+      ];
+
+      for (const col of usersColumns) {
+        try {
+          await connection.query(`ALTER TABLE users ADD COLUMN ${col.name} ${col.type}`);
+          console.log(`  ➕ Migration: Added column ${col.name}`);
+        } catch (e) {
+          // Ignore "Duplicate column name" error (ER_DUP_COLUMN_NAME / 1060)
+          if (e.errno !== 1060 && e.code !== 'ER_DUP_COLUMN_NAME') throw e;
+        }
+      }
+
+      // 2. Flag Migrated Emails
+      await connection.query(`
+        UPDATE users SET is_email_verified = 0 
+        WHERE email LIKE '%@migrated.local' AND is_email_verified = 1
+      `);
+    } catch (err) {
+      console.warn("  ⚠️ Auto-migration warning:", err.message);
+    }
+
     // Create admins table for admin authentication
     await connection.query(`
       CREATE TABLE IF NOT EXISTS admins (
