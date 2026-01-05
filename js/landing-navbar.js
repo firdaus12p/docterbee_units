@@ -8,41 +8,46 @@
 
   // Check authentication status and update navbar
   async function checkAuthAndUpdateNavbar() {
-    console.log("[landing-navbar] Checking auth status...");
+    // --- FAST PATH: Instant UI from Cache ---
+    const cachedAuthState = sessionStorage.getItem("isLoggedIn");
+    if (cachedAuthState === "true") {
+      showMemberNavbar();
+      // Optionally show cached points if available to reduce layout shift
+      const cachedPoints = sessionStorage.getItem("userPoints");
+      if (cachedPoints) {
+        if (document.getElementById("navPoints")) document.getElementById("navPoints").textContent = cachedPoints;
+        if (document.getElementById("mobileNavPoints")) document.getElementById("mobileNavPoints").textContent = cachedPoints;
+      }
+    } else {
+      showGuestNavbar();
+    }
+
+    console.log("[landing-navbar] Verifying auth status with server...");
     try {
       const response = await fetch("/api/auth/check", {
         credentials: "include",
       });
 
       if (!response.ok) {
-        // User not logged in - show guest navbar
-        console.log("[landing-navbar] User NOT logged in (response not ok)");
+        sessionStorage.setItem("isLoggedIn", "false");
         showGuestNavbar();
         return;
       }
 
       const result = await response.json();
-      console.log("[landing-navbar] Auth check result:", result);
-
+      
       if (result.loggedIn && result.user) {
-        // User logged in - show member navbar and fetch points
-        console.log(
-          "[landing-navbar] User IS logged in, showing member navbar"
-        );
+        // Update cache and show proper UI
+        sessionStorage.setItem("isLoggedIn", "true");
         showMemberNavbar();
         fetchAndDisplayPoints();
       } else {
-        // User not logged in - show guest navbar
-        console.log("[landing-navbar] User NOT logged in (no user in result)");
+        sessionStorage.setItem("isLoggedIn", "false");
         showGuestNavbar();
       }
     } catch (error) {
-      // Network error or server down - show guest navbar as fallback
-      console.warn(
-        "[landing-navbar] Could not check auth status:",
-        error.message
-      );
-      showGuestNavbar();
+      console.warn("[landing-navbar] Could not verify auth status:", error.message);
+      // Keep existing UI if network fails
     }
   }
 
@@ -57,6 +62,9 @@
         const data = await response.json();
         if (data.success && data.data) {
           const points = data.data.points || 0;
+          
+          // Save to session cache for next page load
+          sessionStorage.setItem("userPoints", points);
 
           // Update desktop points
           const navPoints = document.getElementById("navPoints");
@@ -131,6 +139,10 @@
           method: "POST",
           credentials: "include",
         });
+
+        // Clear local cache instantly
+        sessionStorage.removeItem("isLoggedIn");
+        sessionStorage.removeItem("userPoints");
 
         if (response.ok) {
           window.location.reload();

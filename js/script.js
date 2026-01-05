@@ -588,6 +588,10 @@ async function performLogout() {
     const data = await response.json();
 
     if (data.success) {
+      // Clear local auth cache
+      sessionStorage.removeItem("isLoggedIn");
+      sessionStorage.removeItem("userPoints");
+
       // Clear user data sync
       if (window.UserDataSync) {
         window.UserDataSync.clear();
