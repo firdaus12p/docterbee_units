@@ -264,4 +264,94 @@ router.get("/check", (req, res) => {
   });
 });
 
+// ============================================
+// POST /api/auth/change-password - Self-service password change
+// ============================================
+router.post("/change-password", async (req, res) => {
+  try {
+    // Validate user is logged in
+    if (!req.session.userId) {
+      return res.status(401).json({
+        success: false,
+        error: "Silakan login terlebih dahulu",
+      });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    // Validation - required fields
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: "Password saat ini dan password baru harus diisi",
+      });
+    }
+
+    // Trim password inputs to prevent whitespace issues
+    const trimmedCurrentPassword = currentPassword.trim();
+    const trimmedNewPassword = newPassword.trim();
+
+    // Validate new password minimum length
+    if (trimmedNewPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "Password minimal 6 karakter",
+      });
+    }
+
+    // Validate new password is different from current
+    if (trimmedNewPassword === trimmedCurrentPassword) {
+      return res.status(400).json({
+        success: false,
+        error: "Password baru harus berbeda dari password saat ini",
+      });
+    }
+
+    // Get user from database
+    const user = await queryOne(
+      "SELECT id, password FROM users WHERE id = ? AND is_active = 1",
+      [req.session.userId]
+    );
+
+    // Security: Return same error for "user not found" to prevent user enumeration
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "Password saat ini tidak sesuai. Silakan coba lagi.",
+      });
+    }
+
+    // Verify current password using bcrypt.compare (constant-time by design)
+    const isValidPassword = await bcrypt.compare(trimmedCurrentPassword, user.password);
+
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: "Password saat ini tidak sesuai. Silakan coba lagi.",
+      });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(trimmedNewPassword, 10);
+
+    // Update password in database (simple query - transaction optional for single UPDATE)
+    await query(
+      "UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?",
+      [hashedNewPassword, req.session.userId]
+    );
+
+    // Session remains active (do NOT destroy session)
+    res.json({
+      success: true,
+      message: "Password berhasil diubah. Gunakan password baru untuk login berikutnya.",
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({
+      success: false,
+      error: "Terjadi kesalahan. Jika Anda tidak yakin apakah password berhasil diubah, coba login dengan password baru Anda.",
+    });
+  }
+});
+
 export default router;

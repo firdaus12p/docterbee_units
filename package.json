@@ -32,6 +32,7 @@
     "express-session": "^1.18.2",
     "multer": "^2.0.2",
     "mysql2": "^3.11.5",
+    "resend": "^6.6.0",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^16.0.1"
   },

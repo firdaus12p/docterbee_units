@@ -1,9 +1,11 @@
 ---
 project_name: 'docterbee_units'
 user_name: 'Daus'
-date: '2026-01-03'
-sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'quality_workflow_rules', 'business_context', 'architecture_details']
-existing_patterns_found: 12
+date: '2026-01-05'
+sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns', 'business_context', 'architecture_details']
+status: 'complete'
+rule_count: 55
+optimized_for_llm: true
 ---
 
 # Project Context for AI Agents
@@ -21,27 +23,11 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - **Gamified Education**: "Journey Hidup Sehat" (Healthy Living Journey) with daily health challenges and rewards
 - **AI-Powered Tools**: Health check advisor and YouTube content summarizer
 
-### Business Model & Revenue Streams
-1. **Product Sales**: Madu premium, herbal remedies, cold-pressed juices, coffee, tea
-2. **Service Bookings**: Health consultations (online/offline), manual therapy, clinical treatments
-3. **Membership Program**: Card-based membership with points system and reward redemption
-4. **Educational Content**: Free health education to build community trust and engagement
-
-### Target Audience
-- **Demographics**: Ages 20-65, all religions (primarily Muslim), Indonesia-focused
-- **Psychographics**: Health-conscious individuals seeking natural/herbal alternatives
-- **Geographic**: Primary locations Makassar & Kolaka (Sulawesi), with nationwide shipping
-- **Behavior**: Values traditional medicine backed by science, prefers holistic health approaches
-
 ### Critical User Flows
-1. **Guest → Member Journey**:
-   - Browse products/services as guest → Register → Select membership card type → Account activation → Access member benefits
-2. **Shopping Flow**:
-   - Browse store → Filter by category → Add to cart → Apply coupon (optional) → Generate QR code → Complete order at physical location
-3. **Journey (Gamification)**:
-   - Login → Access daily health questions → Answer based on Qur'an/Science/NBSN framework → Earn points → Track progress
-4. **Reward Redemption**:
-   - Accumulate points through purchases & journey completion → Browse rewards catalog → Request redemption → Admin approval → Claim reward
+1. **Guest → Member Journey**: Browse products/services as guest → Register → Select membership card type → Account activation → Access member benefits
+2. **Shopping Flow**: Browse store → Filter by category → Add to cart → Apply coupon (optional) → Generate QR code → Complete order at physical location
+3. **Journey (Gamification)**: Login → Access daily health questions → Answer based on Qur'an/Science/NBSN framework → Earn points → Track progress
+4. **Reward Redemption**: Accumulate points → Browse rewards catalog → Request redemption → Admin approval → Claim reward
 
 ---
 
@@ -59,40 +45,6 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ---
 
-## Architecture & Infrastructure
-
-### Database Migration Strategy
-**Auto-Migration System** (located in `backend/db.mjs`):
-- **On Server Restart**: Automatically creates missing tables via `initializeTables()` function
-- **Idempotent Migrations**: Safe to run multiple times via `runMigrations()` with helper functions:
-  - `safeAddColumn()`: Adds columns only if they don't exist
-  - `safeAddIndex()`: Adds indexes only if they don't exist
-  - `safeModifyEnum()`: Safely extends ENUM types
-- **Default Data Seeding**: Automatically seeds "Journey Hidup Sehat" default data on first run
-- **Developer Note**: To apply schema changes, simply restart the server. No manual migration commands needed.
-
-### API Architecture
-- **Current State**: Flat API structure (no versioning)
-  - Format: `/api/{resource}` (e.g., `/api/products`, `/api/auth`, `/api/bookings`)
-- **Future Consideration**: Migrate to `/api/v1/...` before major public launch to enable backward compatibility
-- **Error Response Format**: Standardize as `{ success: false, error: { code: 'ERROR_CODE', message: '...' } }`
-- **Success Response Format**: `{ success: true, data: {...} }`
-
-### Performance Targets
-- **API Response Time**: < 300ms average (excluding external AI calls)
-- **Page Load (First Contentful Paint)**: < 1.5s
-- **AI Endpoints (Gemini)**: < 5s (acceptable due to external API dependency)
-- **Database Queries**: Optimize queries returning > 100 rows; use indexes on frequently queried columns
-
-### Deployment Architecture
-- **Environment**: Traditional server deployment (non-containerized)
-- **File Structure for Production**:
-  - **Required**: `backend/`, `js/`, `css/`, `assets/`, all `.html` files, `package.json`, `package-lock.json`
-  - **Excluded**: `.git/`, `.env`, `node_modules/` (reinstall on server), `_bmad/`, `tests/`, all temp/dev files
-- **Uploads Folder**: Create empty `uploads/` directory on server; do NOT sync local uploads to production
-
----
-
 ## Critical Implementation Rules
 
 ### Language-Specific Rules (JavaScript/Node.js)
@@ -104,14 +56,16 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - **Naming**: camelCase for variables/functions. kebab-case for filenames.
 - **Database**: Use parameterized queries or prepared statements via `mysql2` to prevent SQL injection.
 - **Environment**: Access config via `process.env`. Validate existence of critical ENV variables on startup.
+- **Math Precision**: Be careful with floating point math for prices. Use appropriate rounding/decimal handling logic.
 
 ### Framework-Specific Rules
 
 **Backend (Express.js):**
-- **Architecture**: Separated Logic. Keep `server.mjs` clean. Move business logic to `backend/services/` and routing to `backend/routes/` (if/when refactoring).
+- **Architecture**: Separated Logic. Keep `server.mjs` clean. Move business logic to `backend/services/` and routing to `backend/routes/`.
 - **Middleware**: Use middleware for cross-cutting concerns (auth, validation, logging).
 - **Responses**: Standardize JSON response format (e.g., `{ success: true, data: ... }` vs `{ success: false, error: ... }`).
 - **Security Headers**: Ensure CORS and Security headers are configured correctly for the specific frontend origin.
+- **Atomic Operations**: For critical data like **Stock Deduction**, ALWAYS use database transactions (`START TRANSACTION`, `COMMIT`, `ROLLBACK`) and locking (`FOR UPDATE`) to prevent race conditions.
 
 **Frontend (Vanilla HTML/CSS/JS):**
 - **DOM Manipulation**: Use efficient selectors (id/class). Minimize layout thrashing.
@@ -120,18 +74,43 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ### Code Quality & Testing
 
-- **Linting**: STRICTLY follow ESLint Configuration (v9+ Flat Config). Run `npm run lint` before committing.
+- **Linting**: STRICTLY use **ESLint v9+ Flat Config** (`eslint.config.js`). DO NOT create legacy `.eslintrc` files.
 - **Testing**:
-  - Unit Tests: Use `node --test` (native test runner) as configured in `package.json`.
-  - Structure: Tests located in `tests/` directory.
-  - Coverage: Aim for high coverage on critical business logic (e.g., AI integration, Auth).
-- **Comments**: Explain "WHY" not "WHAT". Document complex algorithm or AI prompt logic clearly.
+  - **Runner**: Use native `node --test` only. Import `test` from `node:test` and `assert` from `node:assert`.
+  - **Structure**: Tests located in `tests/` directory.
+  - **Coverage**: Focus coverage on business logic (Points Calculation, Stock Deduction), not just boilerplate.
+- **Comments**: Explain "WHY" decisions were made, especially for complex SQL or AI prompt engineering.
 
 ### Development Workflow & Anti-Patterns
 
-- **Git Scope**:
-  - **Do NOT commit secrets (.env)**.
-  - **Commit Messages**: Clear and descriptive (e.g., "feat: add ai chat endpoint", "fix: resolve login cors issue").
-- **Dependency Analysis**: ALWAYS use MCP Serena (or equivalent tool) to analyze impact before making changes.
-- **Stability First**: Prioritize code stability over "fancy" refactors. Do NOT over-engineer abstractions without need.
-- **Security Anti-Pattern**: NEVER commit SQL dumps with real user data (`.sql` files in gitignore are there for a reason!).
+- **Migration Strategy (CRITICAL)**:
+  - **System**: Use the **Idempotent Migration System** in `backend/db.mjs` (`initializeTables`).
+  - **Rule**: Schema changes are applied on **Server Restart**. NEVER create manual `.sql` migration files implies urgency.
+  - **Verification**: Always check server logs for "✅ Table/Column created" after restart.
+- **Database Safety**:
+  - **Dynamic SQL**: ALWAYS use the `query(sql, params)` helper with parameterized arrays `?`. NEVER use template literals `${}` for values.
+  - **Soft Deletes**: When using `JOIN`, explicitly check `t1.deleted_at IS NULL AND t2.deleted_at IS NULL` for ALL tables supporting soft deletes.
+- **AI Integration**:
+  - **Timeouts**: ALL external API calls (Gemini/YouTube) MUST have a strictly enforced timeout (e.g., 15s) to prevent hanging requests.
+  - **Token Management**: Truncate/summarize inputs before sending to Gemini to avoid context overflow errors.
+- **Financial/Stock Logic**:
+  - **Atomic Transactions**: Use `START TRANSACTION` + `FOR UPDATE` locking for any logic affecting Product Stock or User Points.
+  - **Trust Levels**: NEVER trust price/discount calculations from the frontend. Re-calculate everything on the backend.
+
+---
+
+## Usage Guidelines
+
+**For AI Agents:**
+- Read this file before implementing any code
+- Follow ALL rules exactly as documented
+- When in doubt, prefer the more restrictive option
+- Update this file if new patterns emerge
+
+**For Humans:**
+- Keep this file lean and focused on agent needs
+- Update when technology stack changes
+- Review quarterly for outdated rules
+- Remove rules that become obvious over time
+
+Last Updated: 2026-01-05
