@@ -4,7 +4,7 @@
 .env
 .env.*
 !.env.example
-rules-for-ai.md
+temp_*.md
 
 # ===============================
 # DATABASE DUMPS (CONTAINS CUSTOMER DATA - NEVER PUSH!)
@@ -69,6 +69,7 @@ test-results/
 tests/
 eslint.config.mjs
 .prettierrc
+temp_consistency_check.md
 
 # ===============================
 # TROUBLESHOOTING SCRIPTS (LOCAL ONLY)
@@ -81,40 +82,9 @@ debug-*.sh
 debug-*.bat
 
 # ===============================
-# AI / MCP / COPILOT (LOCAL ONLY)
-# ===============================
-.gemini/
-.serena/
-.playwright-mcp/
-_bmad/
-_bmad-output/
-.agent/
-
-# ===============================
-# GITHUB / CI (NOT NEEDED ON SERVER)
-# ===============================
-.github/
-.antigravity/
-
-# ===============================
 # DEPLOYMENT & SETUP SCRIPTS (RUN ONCE THEN EXCLUDE)
 # ===============================
 deploy.sh
 backend/scripts/
 backend/migrations/
-
-# ===============================
-# INTERNAL DOCUMENTATION (SECURITY - NOT FOR SERVER)
-# ===============================
-ADMIN_SYSTEM.md
-CLEANUP_AUDIT.md
-PRD-*.md
-WALKTHROUGH_*.md
-rules-for-ai.md
-AGENTS.md
-
-# ===============================
-# DOCUMENTATION FOLDER
-# ===============================
-docs/
 database_schema.sql
