@@ -1,0 +1,245 @@
+### Page state
+- Page URL: http://localhost:3000/admin-dashboard
+- Page Title: Admin Dashboard - Docterbee
+- Page Snapshot:
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e26]:
+    - complementary [ref=e27]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Docterbee
+        - generic [ref=e32]: Admin Panel
+      - navigation [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]: Menu Utama
+          - button "Booking Monitor" [ref=e36] [cursor=pointer]:
+            - img [ref=e161]
+            - generic [ref=e40]: Booking Monitor
+          - button "Orders Manager" [ref=e41] [cursor=pointer]:
+            - img [ref=e164]
+            - generic [ref=e45]: Orders Manager
+          - button "Users Manager" [ref=e46] [cursor=pointer]:
+            - img [ref=e167]
+            - generic [ref=e52]: Users Manager
+        - generic [ref=e53]:
+          - generic [ref=e54]: Konten
+          - button "Edukasi Manager" [ref=e55] [cursor=pointer]:
+            - img [ref=e172]
+            - generic [ref=e58]: Edukasi Manager
+          - button "Program Manager" [ref=e59] [cursor=pointer]:
+            - img [ref=e174]
+            - generic [ref=e63]: Program Manager
+          - button "Podcasts Manager" [ref=e64] [cursor=pointer]:
+            - img [ref=e177]
+            - generic [ref=e67]: Podcasts Manager
+          - button "Journey Manager" [ref=e68] [cursor=pointer]:
+            - img [ref=e179]
+            - generic [ref=e72]: Journey Manager
+        - generic [ref=e73]:
+          - generic [ref=e74]: Toko
+          - button "Products Manager" [ref=e75] [cursor=pointer]:
+            - img [ref=e182]
+            - generic [ref=e79]: Products Manager
+          - button "Services Manager" [ref=e80] [cursor=pointer]:
+            - img [ref=e185]
+            - generic [ref=e84]: Services Manager
+          - button "Coupon Manager" [ref=e85] [cursor=pointer]:
+            - img [ref=e188]
+            - generic [ref=e89]: Coupon Manager
+          - button "Rewards Manager" [ref=e90] [cursor=pointer]:
+            - img [ref=e191]
+            - generic [ref=e95]: Rewards Manager
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - generic [ref=e98]: A
+          - generic [ref=e99]:
+            - generic [ref=e100]: Administrator
+            - generic [ref=e101]: Super Admin
+        - button "Logout" [ref=e102] [cursor=pointer]:
+          - img [ref=e195]
+          - generic [ref=e106]: Logout
+    - generic:
+      - banner [ref=e108]:
+        - heading "Orders Manager" [level=1] [ref=e198]
+        - link [ref=e112] [cursor=pointer]:
+          - /url: /
+          - img [ref=e199]
+      - main [ref=e116]
+    - generic [ref=e202]:
+      - button "Scan QR Code" [ref=e205] [cursor=pointer]:
+        - img [ref=e206]
+        - text: Scan QR Code
+      - table [ref=e212]:
+        - rowgroup [ref=e213]:
+          - 'row "Order # Customer Type Location Total Points Status Created Actions" [ref=e214]':
+            - 'columnheader "Order #" [ref=e215]'
+            - columnheader "Customer" [ref=e216]
+            - columnheader "Type" [ref=e217]
+            - columnheader "Location" [ref=e218]
+            - columnheader "Total" [ref=e219]
+            - columnheader "Points" [ref=e220]
+            - columnheader "Status" [ref=e221]
+            - columnheader "Created" [ref=e222]
+            - columnheader "Actions" [ref=e223]
+        - rowgroup [ref=e224]:
+          - row "ORD-20251231-12B32B firdaus 0895374751514 Dine In kolaka Rp 30.000 COMPLETED PAID ⏳ 3 pts Claimable 31 Des 2025, 12.42 Assign Points" [ref=e225]:
+            - cell "ORD-20251231-12B32B" [ref=e226]
+            - cell "firdaus 0895374751514" [ref=e227]:
+              - generic [ref=e228]: firdaus
+              - generic [ref=e229]: "0895374751514"
+            - cell "Dine In" [ref=e230]
+            - cell "kolaka" [ref=e231]
+            - cell "Rp 30.000" [ref=e232]
+            - cell "COMPLETED PAID" [ref=e233]:
+              - generic [ref=e234]:
+                - generic [ref=e235]: COMPLETED
+                - generic [ref=e236]: PAID
+            - cell "⏳ 3 pts Claimable" [ref=e237]:
+              - generic [ref=e238]:
+                - generic [ref=e239]: ⏳ 3 pts
+                - generic [ref=e240]: Claimable
+            - cell "31 Des 2025, 12.42" [ref=e241]
+            - cell "Assign Points" [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]:
+                  - button "View Details" [ref=e245]:
+                    - img [ref=e246]
+                  - button "Hapus Order" [active] [ref=e249]:
+                    - img [ref=e250]
+                - button "Assign Points" [ref=e253]:
+                  - img [ref=e254]
+                  - text: Assign Points
+          - row "ORD-20251226-08F91D Firdaus 0895374751414 Dine In kolaka Rp 30.000 COMPLETED PAID ✓ 3 pts Assigned 26 Des 2025, 19.13" [ref=e257]:
+            - cell "ORD-20251226-08F91D" [ref=e258]
+            - cell "Firdaus 0895374751414" [ref=e259]:
+              - generic [ref=e260]: Firdaus
+              - generic [ref=e261]: "0895374751414"
+            - cell "Dine In" [ref=e262]
+            - cell "kolaka" [ref=e263]
+            - cell "Rp 30.000" [ref=e264]
+            - cell "COMPLETED PAID" [ref=e265]:
+              - generic [ref=e266]:
+                - generic [ref=e267]: COMPLETED
+                - generic [ref=e268]: PAID
+            - cell "✓ 3 pts Assigned" [ref=e269]:
+              - generic [ref=e270]:
+                - generic [ref=e271]: ✓ 3 pts
+                - generic [ref=e272]: Assigned
+            - cell "26 Des 2025, 19.13" [ref=e273]
+            - cell [ref=e274]:
+              - generic [ref=e276]:
+                - button "View Details" [ref=e277]:
+                  - img [ref=e278]
+                - button "Hapus Order" [ref=e281]:
+                  - img [ref=e282]
+          - row "ORD-20251226-0DEF64 Firdaus 0895374751414 Dine In makassar Rp 50.000 EXPIRED UNPAID - 26 Des 2025, 14.15" [ref=e285]:
+            - cell "ORD-20251226-0DEF64" [ref=e286]
+            - cell "Firdaus 0895374751414" [ref=e287]:
+              - generic [ref=e288]: Firdaus
+              - generic [ref=e289]: "0895374751414"
+            - cell "Dine In" [ref=e290]
+            - cell "makassar" [ref=e291]
+            - cell "Rp 50.000" [ref=e292]
+            - cell "EXPIRED UNPAID" [ref=e293]:
+              - generic [ref=e294]:
+                - generic [ref=e295]: EXPIRED
+                - generic [ref=e296]: UNPAID
+            - cell "-" [ref=e297]
+            - cell "26 Des 2025, 14.15" [ref=e298]
+            - cell [ref=e299]:
+              - generic [ref=e301]:
+                - button "View Details" [ref=e302]:
+                  - img [ref=e303]
+                - button "Hapus Order" [ref=e306]:
+                  - img [ref=e307]
+          - row "ORD-20251223-53B65E Firdaus 0895374751414 Take Away kolaka Rp 30.000 COMPLETED PAID ✓ 3 pts Assigned 23 Des 2025, 17.53" [ref=e310]:
+            - cell "ORD-20251223-53B65E" [ref=e311]
+            - cell "Firdaus 0895374751414" [ref=e312]:
+              - generic [ref=e313]: Firdaus
+              - generic [ref=e314]: "0895374751414"
+            - cell "Take Away" [ref=e315]
+            - cell "kolaka" [ref=e316]
+            - cell "Rp 30.000" [ref=e317]
+            - cell "COMPLETED PAID" [ref=e318]:
+              - generic [ref=e319]:
+                - generic [ref=e320]: COMPLETED
+                - generic [ref=e321]: PAID
+            - cell "✓ 3 pts Assigned" [ref=e322]:
+              - generic [ref=e323]:
+                - generic [ref=e324]: ✓ 3 pts
+                - generic [ref=e325]: Assigned
+            - cell "23 Des 2025, 17.53" [ref=e326]
+            - cell [ref=e327]:
+              - generic [ref=e329]:
+                - button "View Details" [ref=e330]:
+                  - img [ref=e331]
+                - button "Hapus Order" [ref=e334]:
+                  - img [ref=e335]
+          - row "ORD-20251221-EB70BA Firdaus 0895374751414 Take Away kolaka Rp 8.500 COMPLETED PAID ✓ 0 pts Assigned 21 Des 2025, 13.25" [ref=e338]:
+            - cell "ORD-20251221-EB70BA" [ref=e339]
+            - cell "Firdaus 0895374751414" [ref=e340]:
+              - generic [ref=e341]: Firdaus
+              - generic [ref=e342]: "0895374751414"
+            - cell "Take Away" [ref=e343]
+            - cell "kolaka" [ref=e344]
+            - cell "Rp 8.500" [ref=e345]
+            - cell "COMPLETED PAID" [ref=e346]:
+              - generic [ref=e347]:
+                - generic [ref=e348]: COMPLETED
+                - generic [ref=e349]: PAID
+            - cell "✓ 0 pts Assigned" [ref=e350]:
+              - generic [ref=e351]:
+                - generic [ref=e352]: ✓ 0 pts
+                - generic [ref=e353]: Assigned
+            - cell "21 Des 2025, 13.25" [ref=e354]
+            - cell [ref=e355]:
+              - generic [ref=e357]:
+                - button "View Details" [ref=e358]:
+                  - img [ref=e359]
+                - button "Hapus Order" [ref=e362]:
+                  - img [ref=e363]
+          - row "ORD-20251221-B2D8C2 Firdaus 0895374751414 Take Away kolaka Rp 30.000 COMPLETED PAID ✓ 3 pts Assigned 21 Des 2025, 13.25" [ref=e366]:
+            - cell "ORD-20251221-B2D8C2" [ref=e367]
+            - cell "Firdaus 0895374751414" [ref=e368]:
+              - generic [ref=e369]: Firdaus
+              - generic [ref=e370]: "0895374751414"
+            - cell "Take Away" [ref=e371]
+            - cell "kolaka" [ref=e372]
+            - cell "Rp 30.000" [ref=e373]
+            - cell "COMPLETED PAID" [ref=e374]:
+              - generic [ref=e375]:
+                - generic [ref=e376]: COMPLETED
+                - generic [ref=e377]: PAID
+            - cell "✓ 3 pts Assigned" [ref=e378]:
+              - generic [ref=e379]:
+                - generic [ref=e380]: ✓ 3 pts
+                - generic [ref=e381]: Assigned
+            - cell "21 Des 2025, 13.25" [ref=e382]
+            - cell [ref=e383]:
+              - generic [ref=e385]:
+                - button "View Details" [ref=e386]:
+                  - img [ref=e387]
+                - button "Hapus Order" [ref=e390]:
+                  - img [ref=e391]
+  - contentinfo [ref=e18]:
+    - generic [ref=e20]:
+      - generic [ref=e21]: © 2025 DocterBee. All rights reserved.
+      - generic [ref=e22]:
+        - text: Berbasis
+        - strong [ref=e23]: Sains & Alam
+        - text: . |
+        - link "Privacy" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+        - text: ·
+        - link "Terms" [ref=e25] [cursor=pointer]:
+          - /url: "#"
+  - generic [ref=e395]:
+    - generic [ref=e397]:
+      - generic:
+        - img
+      - heading "Konfirmasi Hapus Order" [level=3] [ref=e400]
+    - paragraph [ref=e402]: Hapus order ini? Data akan dihapus permanen dan tidak dapat dikembalikan.
+    - generic [ref=e403]:
+      - button "Tidak" [ref=e404]
+      - button "Ya" [ref=e405]
+```
