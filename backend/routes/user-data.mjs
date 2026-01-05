@@ -121,11 +121,22 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
       // Start transaction
       await query("START TRANSACTION");
 
-      // Lock user_progress row to prevent concurrent redemptions
+      // Lock user_progress and check verification status in one go (or separate check)
+      const user = await queryOne("SELECT is_email_verified FROM users WHERE id = ?", [userId]);
+      if (!user || !user.is_email_verified) {
+        await query("ROLLBACK");
+        return res.status(403).json({
+          success: false,
+          error: "VERIFICATION_REQUIRED", // Frontend can use this code
+          message: "Email belum diverifikasi. Silakan verifikasi email Anda di halaman Profil untuk menukarkan poin."
+        });
+      }
+
       const progress = await queryOne(
         "SELECT points FROM user_progress WHERE user_id = ? FOR UPDATE",
         [userId]
       );
+
 
       const currentPoints = progress ? progress.points : 0;
 

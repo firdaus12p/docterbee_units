@@ -186,6 +186,7 @@ const cleanUrlPages = [
   "periksa-kesehatan",
   "member-check",
   "about",
+  "reset-password",
 ];
 
 // Redirect .html URLs to clean URLs (SEO friendly)

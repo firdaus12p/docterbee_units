@@ -984,8 +984,20 @@
             <div class="info-value" id="infoCardType">-</div>
           </div>
           <div class="info-row">
-            <div class="info-label">Points</div>
-            <div class="info-value" id="infoPoints">0 Points</div>
+            <div class="info-label">Status Email</div>
+            <div class="info-value" id="infoEmailStatus">
+              <span class="text-gray-400">Loading...</span>
+            </div>
+          </div>
+          <div id="verifyNowAction" class="mt-2" style="display: none;">
+            <button 
+              onclick="resendVerification()" 
+              id="resendVerifyBtn"
+              class="text-xs bg-amber-100 text-amber-700 font-bold px-3 py-1.5 rounded-lg border border-amber-200 hover:bg-amber-200 transition-colors flex items-center gap-1"
+            >
+              <i data-lucide="mail-warning" class="w-3.5 h-3.5"></i>
+              Verifikasi Sekarang
+            </button>
           </div>
         </div>
 
@@ -1379,6 +1391,34 @@
         document.getElementById("profileName").textContent = user.name;
         document.getElementById("profileEmail").textContent = user.email;
 
+        // Update email verification status
+        const emailStatusEl = document.getElementById("infoEmailStatus");
+        const verifyActionEl = document.getElementById("verifyNowAction");
+        
+        // Convert to boolean explicitly (handles both 0/1 and true/false)
+        const isVerified = !!user.is_email_verified;
+        
+        if (isVerified) {
+          emailStatusEl.innerHTML = `
+            <span class="flex items-center gap-1.5 text-emerald-600 font-bold">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              Terverifikasi
+            </span>
+          `;
+          verifyActionEl.style.display = "none";
+        } else {
+          emailStatusEl.innerHTML = `
+            <span class="flex items-center gap-1.5 text-amber-600 font-bold">
+              <i data-lucide="alert-circle" class="w-4 h-4"></i>
+              Belum Verifikasi
+            </span>
+          `;
+          verifyActionEl.style.display = "block";
+        }
+
+        // Re-run lucide icons if added
+        if (window.lucide) window.lucide.createIcons();
+
         // Update info rows
         document.getElementById("infoName").textContent = user.name;
         document.getElementById("infoEmail").textContent = user.email;
@@ -1419,8 +1459,11 @@
           }
         }
 
-        // Update points
-        document.getElementById("infoPoints").textContent = `${points} Points`;
+        // Update points (if element exists)
+        const infoPointsEl = document.getElementById("infoPoints");
+        if (infoPointsEl) {
+          infoPointsEl.textContent = `${points} Points`;
+        }
 
         // Update navbar points (desktop and mobile)
         const pointsDisplay = document.getElementById("pointsDisplay");
@@ -1462,6 +1505,46 @@
         if (typeof handleLogout === "function") {
           mobileLogoutBtn.addEventListener("click", handleLogout);
         }
+      }
+
+      // Resend verification email
+      async function resendVerification() {
+        const btn = document.getElementById("resendVerifyBtn");
+        const originalText = btn.innerHTML;
+        
+        try {
+          btn.disabled = true;
+          btn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Mengirim...';
+          if (window.lucide) window.lucide.createIcons();
+
+          const response = await fetch("/api/auth/resend-verification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include"
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            showSuccess(data.message);
+            btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i> Terkirim!';
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerHTML = originalText;
+              if (window.lucide) window.lucide.createIcons();
+            }, 5000);
+          } else {
+            showError(data.error || "Gagal mengirim email verifikasi");
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+          }
+        } catch (error) {
+          console.error("Resend error:", error);
+          showError("Terjadi kesalahan teknis");
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+        if (window.lucide) window.lucide.createIcons();
       }
 
       // Load data on page load
@@ -2025,16 +2108,26 @@
             
             const data = await response.json();
             
-            if (data.success) {
+            if (response.ok && data.success) {
               showSuccess(data.message || "Password berhasil diubah. Gunakan password baru untuk login berikutnya.");
               // Clear form
               changePasswordForm.reset();
             } else {
+              // Handle unverified email error (403 from backend)
+              if (response.status === 403) {
+                 showWarning(
+                   "Gagal Mengubah Password!\n\n" +
+                   "Akun Anda harus terverifikasi untuk mengubah password.\n\n" +
+                   "Silakan verifikasi email Anda terlebih dahulu di bagian Informasi Akun.",
+                   "Verifikasi Diperlukan"
+                 );
+                 return;
+              }
               showError(data.error || "Gagal mengubah password");
             }
           } catch (error) {
             console.error("Error changing password:", error);
-            showError("Terjadi kesalahan. Jika Anda tidak yakin apakah password berhasil diubah, coba login dengan password baru Anda.");
+            showError("Terjadi kesalahan teknis. Silakan coba lagi nanti.");
           } finally {
             // Re-enable button
             submitBtn.disabled = false;

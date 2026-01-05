@@ -27,7 +27,10 @@ _This file contains critical rules and patterns that AI agents must follow when 
 1. **Guest → Member Journey**: Browse products/services as guest → Register → Select membership card type → Account activation → Access member benefits
 2. **Shopping Flow**: Browse store → Filter by category → Add to cart → Apply coupon (optional) → Generate QR code → Complete order at physical location
 3. **Journey (Gamification)**: Login → Access daily health questions → Answer based on Qur'an/Science/NBSN framework → Earn points → Track progress
-4. **Reward Redemption**: Accumulate points → Browse rewards catalog → Request redemption → Admin approval → Claim reward
+4. **Account Security**: Login → Access Profile → Change Password (self-service) → Logout.
+5. **Reward Redemption**: Accumulate points → Browse rewards catalog → Request redemption → Admin approval → Claim reward
+6. **Email Verification**: User inputs email → System sends verification link via Resend → User clicks link → Account marked as verified (Clean-as-you-go).
+7. **Forgot Password**: Request reset link via email → Token generated (1h expiry) → Verify token → Set new password.
 
 ---
 
@@ -42,6 +45,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - **File Upload**: multer ^2.0.2
 - **YouTube Integration**: youtubei.js ^16.0.1, youtube-transcript ^1.2.1
 - **Linting**: ESLint v9+ (using `globals` and `@eslint/js`)
+- **Email Service**: Resend (Transactional emails)
 
 ---
 
@@ -80,6 +84,10 @@ _This file contains critical rules and patterns that AI agents must follow when 
   - **Structure**: Tests located in `tests/` directory.
   - **Coverage**: Focus coverage on business logic (Points Calculation, Stock Deduction), not just boilerplate.
 - **Comments**: Explain "WHY" decisions were made, especially for complex SQL or AI prompt engineering.
+- **Email Patterns**:
+    - **Service**: Use `backend/utils/mailer.mjs` for all outgoing emails.
+    - **Tracking**: Disable click tracking in Resend for verification links to avoid "Dangerous Link" warnings in Gmail.
+    - **Sender**: Use domain-verified email (e.g., `admin@docterbee.com`) with `reply_to` pointing to the official Gmail.
 
 ### Development Workflow & Anti-Patterns
 
@@ -96,6 +104,32 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - **Financial/Stock Logic**:
   - **Atomic Transactions**: Use `START TRANSACTION` + `FOR UPDATE` locking for any logic affecting Product Stock or User Points.
   - **Trust Levels**: NEVER trust price/discount calculations from the frontend. Re-calculate everything on the backend.
+
+### Database Schema Highlights
+
+**Table: `users` (Core Security Columns)**
+- `password`: Hashed using `bcryptjs`.
+- `is_email_verified`: Boolean (TINYINT). 0 = Unverified (needs cleanup), 1 = Verified. 
+- `email_verification_token`: String. Used for email activation links.
+- `email_verification_expires`: DATETIME. Token expires after 24 hours.
+- `pending_email`: String. Stores new email during verification process to prevent locking out users.
+- `created_at` / `updated_at`: Standard timestamps.
+
+**Table: `coupon_usage` (Anti-Abuse)**
+- Tracks which user used which coupon for what order.
+- Prevents double-dipping on single-use coupons.
+
+**Performance Indexes (Auto-Migrated)**
+- `idx_email_verification_token`: Optimizes `/verify-email` token lookups.
+- `idx_reset_password_token`: Optimizes `/reset-password` token lookups.
+
+### Rate Limiting Strategy
+
+| Endpoint Category | Max Attempts | Cooldown | Purpose |
+|-------------------|--------------|----------|---------|
+| Login (`/login`) | 8 | 2 min | Brute-force prevention |
+| Email (`/update-email`, `/resend-verification`) | 3 | 10 min | Billing/reputation protection |
+| Forgot Password (`/forgot-password`) | 8 | 2 min | Uses login limiter |
 
 ---
 

@@ -2,8 +2,8 @@
 title: 'Email Cleanup & Verification System'
 slug: 'email-cleanup-system'
 created: '2026-01-05'
-status: 'ready-for-dev'
-stepsCompleted: [1, 2, 3, 4]
+status: 'completed'
+stepsCompleted: [1, 2, 3, 4, 5]
 tech_stack: ['Node.js (ESM)', 'Express.js', 'MySQL', 'Resend (Email Provider)', 'Vanilla JS']
 files_to_modify: []
 code_patterns: []
@@ -94,6 +94,11 @@ await resend.emails.send({
 - [ ] **AC1**: User dengan email dummy otomatis terdeteksi sebagai unverified.
 - [ ] **AC2**: Banner "Verifikasi Email" muncul di Journey page bagi user unverified.
 - [ ] **AC3**: Sistem mengirim email verifikasi menggunakan library Resend saat user input email baru.
-- [ ] **AC4**: Status database berubah menjadi `is_email_verified = 1` setelah token valid diakses via URL.
-- [ ] **AC5**: Banner menghilang secara otomatis setelah user berhasil verifikasi.
+- [x] **AC4**: Status database berubah menjadi `is_email_verified = 1` setelah token valid diakses via URL.
+- [x] **AC5**: Banner menghilang secara otomatis setelah user berhasil verifikasi.
+
+## Future Tasks (Out of Scope)
+
+1. **Forgot Password via Email**: Mengimplementasikan alur reset password menggunakan email yang sudah diverifikasi (menggantikan atau mendampingi alur WhatsApp).
+2. **Admin Verification Dashboard**: Menampilkan status verifikasi user di dashboard admin untuk monitoring.
 

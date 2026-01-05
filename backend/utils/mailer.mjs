@@ -69,3 +69,59 @@ export async function sendVerificationEmail(to, name, token) {
     throw err;
   }
 }
+/**
+ * Send Forgot Password Email
+ * @param {string} to - Recipient email address
+ * @param {string} name - Recipient name
+ * @param {string} token - Unique reset password token
+ */
+export async function sendForgotPasswordEmail(to, name, token) {
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const resetLink = `${baseUrl}/reset-password?token=${token}`;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'DocterBee <admin@docterbee.com>',
+      reply_to: 'docterbeeofficial@gmail.com',
+      to: to,
+      subject: 'Reset Password Akun DocterBee 🐝',
+      html: `
+        <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="https://docterbee.com/assets/images/logo-docterbee.png" alt="DocterBee" style="height: 50px;">
+          </div>
+          <h2 style="color: #1e293b; text-align: center;">Permintaan Reset Password</h2>
+          <p style="color: #475569; line-height: 1.6; text-align: center;">
+            Halo ${name}, kami menerima permintaan untuk mereset password akun DocterBee Anda. 
+            Silakan klik tombol di bawah ini untuk membuat password baru:
+          </p>
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${resetLink}" style="background: #ec3237; color: white; padding: 12px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+              Reset Password Saya
+            </a>
+          </div>
+          <p style="color: #64748b; font-size: 14px; text-align: center;">
+            Link ini hanya berlaku selama 1 jam. Jika Anda tidak merasa melakukan permintaan ini, abaikan saja email ini.
+          </p>
+          <p style="color: #64748b; font-size: 14px; text-align: center;">
+            Atau salin link berikut:<br>
+            <a href="${resetLink}" style="color: #6366f1;">${resetLink}</a>
+          </p>
+          <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 32px 0;">
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+            &copy; 2025 DocterBee. All rights reserved.
+          </p>
+        </div>
+      `,
+      headers: {
+        'X-Entity-Ref-ID': `pwd_reset_${Date.now()}`
+      }
+    });
+
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.error("❌ Failed to send reset password email:", err);
+    throw err;
+  }
+}

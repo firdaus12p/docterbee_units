@@ -2,8 +2,8 @@
 title: 'User Self-Service Password Change'
 slug: 'user-self-service-password-change'
 created: '2026-01-05'
-status: 'ready-for-dev'
-stepsCompleted: [1, 2, 3, 4]
+status: 'completed'
+stepsCompleted: [1, 2, 3, 4, 5]
 tech_stack: ['Node.js (ESM)', 'Express.js ^4.21.2', 'bcryptjs ^3.0.3', 'express-session ^1.18.2', 'mysql2 ^3.11.5', 'Vanilla HTML/CSS/JS', 'Tailwind CSS (CDN)']
 files_to_modify: ['backend/routes/auth.mjs', 'profile.html', 'login.html']
 code_patterns: ['Express route handlers with try/catch', 'bcrypt.compare() for password validation', 'Session-based authentication', 'Standardized JSON response format', 'Frontend fetch() with credentials: include']

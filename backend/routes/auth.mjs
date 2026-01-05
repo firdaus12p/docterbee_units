@@ -2,8 +2,8 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { query, queryOne } from "../db.mjs";
-import { loginRateLimiter } from "../utils/rate-limiter.mjs";
-import { sendVerificationEmail } from "../utils/mailer.mjs";
+import { loginRateLimiter, emailRateLimiter } from "../utils/rate-limiter.mjs";
+import { sendVerificationEmail, sendForgotPasswordEmail } from "../utils/mailer.mjs";
 
 const router = express.Router();
 
@@ -223,7 +223,7 @@ router.get("/me", async (req, res) => {
     }
 
     const user = await queryOne(
-      "SELECT id, name, email, phone, card_type, created_at FROM users WHERE id = ? AND is_active = 1",
+      "SELECT id, name, email, phone, card_type, is_email_verified, created_at FROM users WHERE id = ? AND is_active = 1",
       [req.session.userId]
     );
 
@@ -234,6 +234,9 @@ router.get("/me", async (req, res) => {
         error: "User tidak ditemukan",
       });
     }
+
+    // Convert is_email_verified to boolean for consistency
+    user.is_email_verified = !!user.is_email_verified;
 
     res.json({
       success: true,
@@ -321,13 +324,12 @@ router.post("/change-password", async (req, res) => {
       });
     }
 
-    // Get user from database
+    // MANDATORY: Check if email is verified
     const user = await queryOne(
-      "SELECT id, password FROM users WHERE id = ? AND is_active = 1",
+      "SELECT id, password, is_email_verified FROM users WHERE id = ? AND is_active = 1",
       [req.session.userId]
     );
 
-    // Security: Return same error for "user not found" to prevent user enumeration
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -335,8 +337,16 @@ router.post("/change-password", async (req, res) => {
       });
     }
 
+    if (!user.is_email_verified) {
+      return res.status(403).json({
+        success: false,
+        error: "Email Anda belum diverifikasi. Silakan verifikasi email terlebih dahulu untuk dapat mengubah password.",
+      });
+    }
+
     // Verify current password using bcrypt.compare (constant-time by design)
     const isValidPassword = await bcrypt.compare(trimmedCurrentPassword, user.password);
+
 
     if (!isValidPassword) {
       return res.status(401).json({
@@ -371,7 +381,7 @@ router.post("/change-password", async (req, res) => {
 // ============================================
 // POST /api/auth/update-email - Update & Send verification
 // ============================================
-router.post("/update-email", async (req, res) => {
+router.post("/update-email", emailRateLimiter.middleware(), async (req, res) => {
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, error: "Silakan login terlebih dahulu" });
@@ -394,11 +404,12 @@ router.post("/update-email", async (req, res) => {
     }
 
     const token = crypto.randomBytes(32).toString('hex');
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
     
     // Update pending_token and verification status
     await query(
-      "UPDATE users SET pending_email = ?, email_verification_token = ?, is_email_verified = 0 WHERE id = ?",
-      [email, token, req.session.userId]
+      "UPDATE users SET pending_email = ?, email_verification_token = ?, email_verification_expires = ?, is_email_verified = 0 WHERE id = ?",
+      [email, token, tokenExpires, req.session.userId]
     );
 
     // Get user name for email
@@ -428,7 +439,7 @@ router.get("/verify-email", async (req, res) => {
     }
 
     const user = await queryOne(
-      "SELECT id, pending_email FROM users WHERE email_verification_token = ?",
+      "SELECT id, pending_email FROM users WHERE email_verification_token = ? AND (email_verification_expires IS NULL OR email_verification_expires > NOW())",
       [token]
     );
 
@@ -442,9 +453,9 @@ router.get("/verify-email", async (req, res) => {
       `);
     }
 
-    // Success! Update email and mark as verified
+    // Success! Update email and mark as verified, clear token
     await query(
-      "UPDATE users SET email = ?, pending_email = NULL, email_verification_token = NULL, is_email_verified = 1 WHERE id = ?",
+      "UPDATE users SET email = ?, pending_email = NULL, email_verification_token = NULL, email_verification_expires = NULL, is_email_verified = 1 WHERE id = ?",
       [user.pending_email || 'check_db', user.id]
     );
 
@@ -463,6 +474,128 @@ router.get("/verify-email", async (req, res) => {
   } catch (error) {
     console.error("Error verifying email:", error);
     res.status(500).send("Terjadi kesalahan server");
+  }
+});
+
+// ============================================
+// POST /api/auth/resend-verification - Resend verification email
+// ============================================
+router.post("/resend-verification", emailRateLimiter.middleware(), async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ success: false, error: "Silakan login terlebih dahulu" });
+    }
+
+    const user = await queryOne("SELECT id, name, email, is_email_verified FROM users WHERE id = ?", [req.session.userId]);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User tidak ditemukan" });
+    }
+
+    if (user.is_email_verified) {
+      return res.status(400).json({ success: false, error: "Email sudah terverifikasi" });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    
+    // Update token in DB (invalidates old token automatically)
+    await query(
+      "UPDATE users SET email_verification_token = ?, email_verification_expires = ?, pending_email = ? WHERE id = ?",
+      [token, tokenExpires, user.email, user.id]
+    );
+
+    // Send email
+    await sendVerificationEmail(user.email, user.name, token);
+
+    res.json({
+      success: true,
+      message: "Link verifikasi baru telah dikirim ke " + user.email
+    });
+  } catch (error) {
+    console.error("Error resending verification:", error);
+    res.status(500).json({ success: false, error: "Gagal mengirim email verifikasi" });
+  }
+});
+
+// ============================================
+// POST /api/auth/forgot-password - Request reset link
+// ============================================
+router.post("/forgot-password", loginRateLimiter.middleware(), async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: "Email harus diisi" });
+    }
+
+    const user = await queryOne("SELECT id, name, email FROM users WHERE email = ? AND is_active = 1", [email]);
+    
+    // Security: Don't reveal if user exists or not
+    if (!user) {
+      return res.json({
+        success: true,
+        message: "Jika email tersebut terdaftar, link reset password akan segera dikirim."
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1 hour
+
+    await query(
+      "UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE id = ?",
+      [token, expires, user.id]
+    );
+
+    await sendForgotPasswordEmail(user.email, user.name, token);
+
+    res.json({
+      success: true,
+      message: "Jika email tersebut terdaftar, link reset password akan segera dikirim."
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ success: false, error: "Gagal memproses permintaan" });
+  }
+});
+
+// ============================================
+// POST /api/auth/reset-password - Perform reset
+// ============================================
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ success: false, error: "Token dan password baru harus diisi" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, error: "Password minimal 6 karakter" });
+    }
+
+    const user = await queryOne(
+      "SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > NOW()",
+      [token]
+    );
+
+    if (!user) {
+      return res.status(400).json({ success: false, error: "Token tidak valid atau sudah kadaluarsa" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await query(
+      "UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL, is_email_verified = 1 WHERE id = ?",
+      [hashedPassword, user.id]
+    );
+
+    res.json({
+      success: true,
+      message: "Password berhasil diubah. Silakan login dengan password baru Anda."
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ success: false, error: "Gagal mereset password" });
   }
 });
 

@@ -164,4 +164,11 @@ const loginRateLimiter = new RateLimiter({
   cooldownMs: 2 * 60 * 1000, // 2 minutes
 });
 
-export { RateLimiter, loginRateLimiter };
+// Create email rate limiter instance (stricter for email abuse prevention)
+// 3 attempts, 10 minute cooldown - protects Resend billing and domain reputation
+const emailRateLimiter = new RateLimiter({
+  maxAttempts: 3,
+  cooldownMs: 10 * 60 * 1000, // 10 minutes
+});
+
+export { RateLimiter, loginRateLimiter, emailRateLimiter };

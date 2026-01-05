@@ -70,6 +70,7 @@ async function initializeTables() {
       const usersColumns = [
         { name: "is_email_verified", type: "TINYINT(1) DEFAULT 0" },
         { name: "email_verification_token", type: "VARCHAR(255) DEFAULT NULL" },
+        { name: "email_verification_expires", type: "DATETIME DEFAULT NULL" },
         { name: "pending_email", type: "VARCHAR(100) DEFAULT NULL" }
       ];
 
@@ -83,7 +84,22 @@ async function initializeTables() {
         }
       }
 
-      // 2. Flag Migrated Emails
+      // 2. Add Reset Password Columns
+      const resetCols = [
+        { name: "reset_password_token", type: "VARCHAR(255) DEFAULT NULL" },
+        { name: "reset_password_expires", type: "DATETIME DEFAULT NULL" }
+      ];
+
+      for (const col of resetCols) {
+        try {
+          await connection.query(`ALTER TABLE users ADD COLUMN ${col.name} ${col.type}`);
+          console.log(`  ➕ Migration: Added column ${col.name}`);
+        } catch (e) {
+          if (e.errno !== 1060 && e.code !== 'ER_DUP_COLUMN_NAME') throw e;
+        }
+      }
+
+      // 3. Flag Migrated Emails
       await connection.query(`
         UPDATE users SET is_email_verified = 0 
         WHERE email LIKE '%@migrated.local' AND is_email_verified = 1
@@ -571,6 +587,12 @@ async function runMigrations(connection) {
     
     // Migration: Add index for deleted_at column in orders (for faster filtering)
     await safeAddIndex(connection, 'orders', 'idx_orders_deleted_at', 'deleted_at');
+    
+    // Migration: Add index for email_verification_token (optimize /verify-email lookups)
+    await safeAddIndex(connection, 'users', 'idx_email_verification_token', 'email_verification_token');
+    
+    // Migration: Add index for reset_password_token (optimize /reset-password lookups)
+    await safeAddIndex(connection, 'users', 'idx_reset_password_token', 'reset_password_token');
     
     console.log("✅ Migrations completed");
   } catch (error) {

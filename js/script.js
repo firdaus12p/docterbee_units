@@ -3493,27 +3493,28 @@ async function redeemReward(cost, rewardName, rewardId = null) {
             "Redeem Berhasil"
           );
         } else {
-          // Fallback to local storage only
-          const newValue = current - cost;
-          _db("db_points", { value: newValue });
-          addPoints(0);
-          updatePointsView();
-          showSuccess(
-            `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
-            "Redeem Berhasil"
-          );
+          // Handle specific error codes
+          if (result.error === 'VERIFICATION_REQUIRED') {
+            showWarning(
+              result.message || 
+              `Email Belum Terverifikasi!\n\n` +
+              `Silakan verifikasi email Anda di halaman Profil untuk menukarkan poin.`,
+              "Verifikasi Diperlukan"
+            );
+            return;
+          }
+
+          if (result.error === 'Tidak terautentikasi' || response.status === 401) {
+             showError("Silahkan login terlebih dahulu untuk menukar reward.");
+             return;
+          }
+
+          // Generic error - don't fallback to local if it's a server-side rejection
+          showError(result.error || "Gagal melakukan redeem. Silakan coba lagi nanti.");
         }
       } catch (error) {
         console.error("Error redeeming reward:", error);
-        // Fallback to local storage only
-        const newValue = current - cost;
-        _db("db_points", { value: newValue });
-        addPoints(0);
-        updatePointsView();
-        showSuccess(
-          `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
-          "Redeem Berhasil"
-        );
+        showError("Terjadi kesalahan teknis. Silakan coba lagi nanti.");
       }
     },
     null,
