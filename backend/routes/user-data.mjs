@@ -463,7 +463,7 @@ router.get("/activities/order/:orderId", requireAuth, async (req, res) => {
     const order = await queryOne(
       `SELECT id, order_number, user_id, customer_name, customer_phone, 
               total_amount, points_earned, status, payment_status, 
-              store_location, order_type, created_at, completed_at, 
+              store_location, order_type, created_at, completed_at, expires_at,
               items, coupon_code, coupon_discount, original_total, qr_code_data
        FROM orders 
        WHERE id = ? AND user_id = ?`,

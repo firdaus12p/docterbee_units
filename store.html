@@ -683,6 +683,12 @@
       </div>
     </div>
 
+    <!-- =============== FLOATING HISTORY BUTTON =============== -->
+    <button id="floating-history-btn" class="floating-history-button" onclick="toggleHistoryModal()" title="Riwayat Transaksi">
+      <i data-lucide="receipt"></i>
+      <span class="history-badge hidden" id="history-badge">!</span>
+    </button>
+
     <!-- =============== FLOATING CART BUTTON =============== -->
     <button id="floating-cart-btn" class="floating-cart-button" onclick="toggleCartDrawer()" title="Keranjang Belanja">
       <i data-lucide="shopping-cart"></i>
@@ -801,6 +807,71 @@
             <i data-lucide="check"></i>
             Pesan Sekarang
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== HISTORY MODAL =============== -->
+    <div id="history-modal" class="modal-base history-modal">
+      <div class="modal-overlay" onclick="toggleHistoryModal()"></div>
+      <div class="modal-content">
+        <button class="modal-close-btn" onclick="toggleHistoryModal()">×</button>
+        <div class="history-modal-header">
+          <h2><i data-lucide="receipt"></i> Riwayat Transaksi</h2>
+          <p>Lihat status pesanan dan transaksi Anda</p>
+        </div>
+        <div class="history-modal-body">
+          <!-- Filter Chips -->
+          <div class="history-filters">
+            <button class="history-filter-chip active" data-type="all" onclick="filterHistoryType('all')">Semua</button>
+            <button class="history-filter-chip" data-type="order" onclick="filterHistoryType('order')">🛒 Belanja</button>
+            <button class="history-filter-chip" data-type="reward" onclick="filterHistoryType('reward')">🎁 Reward</button>
+          </div>
+          
+          <!-- Loading State -->
+          <div id="historyLoading" class="history-loading">
+            <div class="loading-spinner"></div>
+            <p>Memuat riwayat...</p>
+          </div>
+          
+          <!-- Activities Container -->
+          <div id="historyContainer" class="history-container" style="display: none;"></div>
+          
+          <!-- Empty State -->
+          <div id="historyEmpty" class="history-empty" style="display: none;">
+            <div class="empty-icon">
+              <i data-lucide="inbox"></i>
+            </div>
+            <h3>Belum Ada Riwayat</h3>
+            <p>Mulai belanja untuk melihat riwayat transaksi Anda</p>
+          </div>
+          
+          <!-- Error State -->
+          <div id="historyError" class="history-empty" style="display: none;">
+            <p style="color: #b91c1c;">❌ Gagal memuat riwayat</p>
+            <button class="btn-retry" onclick="loadStoreHistory()">Coba Lagi</button>
+          </div>
+          
+          <!-- Guest State -->
+          <div id="historyGuest" class="history-empty" style="display: none;">
+            <div class="empty-icon">
+              <i data-lucide="user"></i>
+            </div>
+            <h3>Login Diperlukan</h3>
+            <p>Silakan login untuk melihat riwayat transaksi Anda</p>
+            <a href="/login" class="btn btn-primary" style="margin-top: 12px;">Login Sekarang</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== HISTORY DETAIL MODAL (For QR Code) =============== -->
+    <div id="historyDetailModal" class="modal-base history-detail-modal">
+      <div class="modal-overlay" onclick="closeHistoryDetailModal()"></div>
+      <div class="modal-content">
+        <button class="modal-close-btn" onclick="closeHistoryDetailModal()">×</button>
+        <div id="historyDetailContent">
+          <!-- Content will be injected dynamically -->
         </div>
       </div>
     </div>

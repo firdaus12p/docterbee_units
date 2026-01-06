@@ -161,6 +161,12 @@ _This file contains critical rules and patterns that AI agents must follow when 
 **Code Consolidation Notes (2026-01-05):**
 - `handleLogout` and `performLogout`: Consolidated to single source in `script.js`. `landing-navbar.js` delegates to global version.
 - `initMobileMenu`: Actual implementation in `landing-navbar.js`. Empty stub in `script.js` for backward compatibility.
+- **Transaction History (2026-01-06)**:
+  - Moved "Riwayat Aktivitas" from `profile.html` to `store.html` (via Floating History Button).
+  - Logic centralized in `js/store-enhancements.js` (`loadStoreHistory`, `openHistoryOrderDetail`).
+  - **Dual View Logic**: Pending orders show QR + Countdown + Check Status Button. Completed orders show full Receipt (Struk) style.
+  - **Backend**: Added `expires_at` column to `GET /api/user-data/activities/order/:id` response to support countdowns.
+
 
 ---
 

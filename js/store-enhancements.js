@@ -1186,3 +1186,698 @@ drawerStyles.textContent = `
   }
 `;
 document.head.appendChild(drawerStyles);
+
+// ============================================
+// 5. HISTORY MODAL FUNCTIONALITY
+// ============================================
+
+let historyModalOpen = false;
+let currentHistoryFilter = 'all';
+let historyCountdownInterval = null;
+
+/**
+ * Toggle history modal open/close
+ */
+function toggleHistoryModal() {
+  const modal = document.getElementById('history-modal');
+  if (!modal) return;
+
+  historyModalOpen = !historyModalOpen;
+
+  if (historyModalOpen) {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    loadStoreHistory();
+    
+    // Reinit icons
+    if (typeof lucide !== 'undefined') {
+      setTimeout(() => lucide.createIcons(), 50);
+    }
+  } else {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+/**
+ * Filter history by type
+ */
+function filterHistoryType(type) {
+  currentHistoryFilter = type;
+  
+  // Update active state
+  document.querySelectorAll('.history-filter-chip').forEach(chip => {
+    chip.classList.remove('active');
+    if (chip.dataset.type === type) {
+      chip.classList.add('active');
+    }
+  });
+  
+  loadStoreHistory();
+}
+
+/**
+ * Load store history from API
+ */
+async function loadStoreHistory() {
+  const loadingEl = document.getElementById('historyLoading');
+  const containerEl = document.getElementById('historyContainer');
+  const emptyEl = document.getElementById('historyEmpty');
+  const errorEl = document.getElementById('historyError');
+  const guestEl = document.getElementById('historyGuest');
+
+  // Show loading, hide others
+  loadingEl.style.display = 'block';
+  containerEl.style.display = 'none';
+  emptyEl.style.display = 'none';
+  errorEl.style.display = 'none';
+  guestEl.style.display = 'none';
+
+  try {
+    // Check if user is logged in
+    const authCheck = await fetch('/api/auth/check', { credentials: 'include' });
+    const authResult = await authCheck.json();
+    
+    if (!authResult.loggedIn) {
+      loadingEl.style.display = 'none';
+      guestEl.style.display = 'block';
+      if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 50);
+      }
+      return;
+    }
+
+    // Fetch activities
+    const params = new URLSearchParams({
+      page: '1',
+      limit: '20',
+      type: currentHistoryFilter
+    });
+
+    const response = await fetch(`/api/user-data/activities?${params.toString()}`, {
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch activities');
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to load activities');
+    }
+
+    const { activities } = result.data;
+
+    loadingEl.style.display = 'none';
+
+    if (activities.length === 0) {
+      emptyEl.style.display = 'block';
+      if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 50);
+      }
+    } else {
+      containerEl.style.display = 'flex';
+      renderHistoryCards(activities);
+    }
+
+    // Update pending badge
+    updateHistoryBadge(activities);
+
+  } catch (error) {
+    console.error('Error loading history:', error);
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'block';
+  }
+}
+
+/**
+ * Render history activity cards
+ */
+function renderHistoryCards(activities) {
+  const container = document.getElementById('historyContainer');
+  if (!container) return;
+
+  container.innerHTML = activities.map(activity => {
+    const isOrder = activity.type === 'order';
+    const isPending = activity.status === 'pending';
+    const icon = isOrder ? '🛒' : '🎁';
+    const iconClass = isPending ? 'pending' : (isOrder ? 'order' : 'reward');
+    const cardClass = isPending ? 'pending' : (isOrder ? 'order' : 'reward');
+
+    // Format date
+    const dateStr = typeof formatDateTime === 'function'
+      ? formatDateTime(activity.activity_date)
+      : new Date(activity.activity_date).toLocaleString('id-ID');
+
+    // Title
+    const title = isOrder
+      ? `Order #${escapeHtml(activity.order_number)}`
+      : escapeHtml(activity.reward_name);
+
+    // Amount
+    let amountHtml = '';
+    if (isOrder) {
+      const formatted = typeof formatCurrency === 'function'
+        ? formatCurrency(activity.total_amount)
+        : `Rp ${activity.total_amount.toLocaleString('id-ID')}`;
+      amountHtml = `
+        <div class="history-activity-value">${formatted}</div>
+        <div class="history-activity-points">+${activity.points_earned} poin</div>
+      `;
+    } else {
+      amountHtml = `
+        <div class="history-activity-value" style="color: #B45309;">-${activity.points_cost} poin</div>
+      `;
+    }
+
+    // Status badge
+    const statusBadge = getHistoryStatusBadge(activity.status);
+
+    // Click handler - pending orders show QR, others show detail
+    const clickHandler = isOrder
+      ? `openHistoryOrderDetail(${activity.id}, '${activity.status}')`
+      : `openHistoryRewardDetail(${activity.id})`;
+
+    return `
+      <div class="history-activity-card ${cardClass}" onclick="${clickHandler}">
+        <div class="history-activity-icon ${iconClass}">${icon}</div>
+        <div class="history-activity-info">
+          <div class="history-activity-title">${title}</div>
+          <div class="history-activity-date">${dateStr}</div>
+          ${statusBadge}
+        </div>
+        <div class="history-activity-amount">
+          ${amountHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/**
+ * Get status badge HTML for history
+ */
+function getHistoryStatusBadge(status) {
+  const statusMap = {
+    pending: { class: 'pending', label: 'Menunggu Bayar' },
+    completed: { class: 'completed', label: 'Selesai' },
+    approved: { class: 'approved', label: 'Disetujui' },
+    cancelled: { class: 'cancelled', label: 'Dibatalkan' },
+    rejected: { class: 'rejected', label: 'Ditolak' },
+    expired: { class: 'expired', label: 'Kadaluarsa' }
+  };
+
+  const info = statusMap[status] || { class: '', label: status };
+  return `<span class="history-status-badge ${info.class}">${info.label}</span>`;
+}
+
+/**
+ * Update history badge (show if has pending orders)
+ */
+function updateHistoryBadge(activities) {
+  const badge = document.getElementById('history-badge');
+  if (!badge) return;
+
+  const hasPending = activities.some(a => a.status === 'pending');
+  
+  if (hasPending) {
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+/**
+ * Check for pending orders on page load
+ */
+async function checkPendingOrdersOnLoad() {
+  try {
+    const authCheck = await fetch('/api/auth/check', { credentials: 'include' });
+    const authResult = await authCheck.json();
+    
+    if (!authResult.loggedIn) return;
+
+    const response = await fetch('/api/user-data/activities?page=1&limit=10&type=order', {
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success && result.data.activities) {
+        updateHistoryBadge(result.data.activities);
+      }
+    }
+  } catch (error) {
+    console.log('Could not check pending orders:', error);
+  }
+}
+
+/**
+ * Open history order detail (with QR for pending, receipt for completed)
+ */
+async function openHistoryOrderDetail(orderId, status) {
+  try {
+    const response = await fetch(`/api/user-data/activities/order/${orderId}`, {
+      credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch order');
+
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error);
+
+    const order = result.data;
+    const isPending = status === 'pending';
+
+    // Format date
+    const dateStr = typeof formatDateTime === 'function'
+      ? formatDateTime(order.created_at)
+      : new Date(order.created_at).toLocaleString('id-ID');
+
+    let contentHtml = '';
+
+    if (isPending) {
+      // ========================================
+      // PENDING ORDER: Show QR Code + Simple Info
+      // ========================================
+      const totalFormatted = typeof formatCurrency === 'function'
+        ? formatCurrency(order.total_amount)
+        : `Rp ${order.total_amount.toLocaleString('id-ID')}`;
+
+      contentHtml = `
+        <div class="history-detail-header">
+          <h3>⏳ Menunggu Pembayaran</h3>
+        </div>
+        <div class="history-detail-body">
+          <div class="history-qr-section">
+            <div class="history-qr-container" id="historyQrCode"></div>
+            <div class="history-countdown">
+              <div class="label">⏱️ QR Code Kadaluarsa Dalam:</div>
+              <div class="time" id="historyCountdown">--:--:--</div>
+            </div>
+          </div>
+          
+          <div class="history-order-info">
+            <div class="history-order-row">
+              <span class="label">Order Number</span>
+              <span class="value" id="historyOrderNumber">#${escapeHtml(order.order_number)}</span>
+            </div>
+            <div class="history-order-row">
+              <span class="label">Tanggal</span>
+              <span class="value">${dateStr}</span>
+            </div>
+            <div class="history-order-row">
+              <span class="label">Lokasi</span>
+              <span class="value">${escapeHtml(order.store_location || '-')}</span>
+            </div>
+            <div class="history-order-row">
+              <span class="label">Total Bayar</span>
+              <span class="value" style="color: #EC3237; font-weight: 700;">${totalFormatted}</span>
+            </div>
+          </div>
+          
+          <p style="text-align: center; font-size: 12px; color: #64748B; margin-top: 12px;">
+            Tunjukkan QR Code ini ke kasir untuk proses pembayaran
+          </p>
+          
+          <div class="history-detail-actions">
+            <button class="btn btn-primary" id="historyCheckStatusBtn" onclick="checkHistoryOrderStatus(${order.id})">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              Cek Status Pesanan
+            </button>
+            <button class="btn btn-outline" onclick="closeHistoryDetailModal()">
+              Tutup
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      // ========================================
+      // COMPLETED ORDER: Show Receipt/Struk Style
+      // ========================================
+      
+      // Parse items if string
+      const items = typeof order.items === 'string'
+        ? JSON.parse(order.items)
+        : (order.items || []);
+
+      // Build items HTML
+      let itemsHtml = items.map(item => {
+        const price = parseFloat(item.price) || 0;
+        const qty = parseInt(item.quantity) || 1;
+        const subtotal = price * qty;
+        const formattedPrice = typeof formatCurrency === 'function'
+          ? formatCurrency(subtotal)
+          : `Rp ${subtotal.toLocaleString('id-ID')}`;
+        return `
+          <div class="receipt-item">
+            <span class="receipt-item-name">${escapeHtml(item.name)}</span>
+            <span class="receipt-item-qty">x${qty}</span>
+            <span class="receipt-item-price">${formattedPrice}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Calculate totals
+      const subtotal = parseFloat(order.original_total || order.total_amount);
+      const discount = parseFloat(order.coupon_discount) || 0;
+      const total = parseFloat(order.total_amount);
+
+      const formatTotal = (val) => typeof formatCurrency === 'function'
+        ? formatCurrency(val)
+        : `Rp ${val.toLocaleString('id-ID')}`;
+
+      // Status badge
+      const statusBadge = getHistoryStatusBadge(order.status);
+
+      contentHtml = `
+        <div class="history-detail-body" style="padding: 24px;">
+          <div class="receipt-modal">
+            <div class="receipt-header">
+              <div class="receipt-logo">🐝 DocterBee</div>
+              <div class="receipt-order-number">#${escapeHtml(order.order_number)}</div>
+              ${statusBadge}
+            </div>
+            
+            <div class="receipt-info">
+              <div class="receipt-info-row">
+                <span>Tanggal:</span>
+                <span>${dateStr}</span>
+              </div>
+              <div class="receipt-info-row">
+                <span>Lokasi:</span>
+                <span>${escapeHtml(order.store_location || '-')}</span>
+              </div>
+              <div class="receipt-info-row">
+                <span>Tipe:</span>
+                <span>${escapeHtml(order.order_type || '-')}</span>
+              </div>
+            </div>
+            
+            <div class="receipt-items">
+              ${itemsHtml || '<div class="receipt-item"><span>-</span></div>'}
+            </div>
+            
+            <div class="receipt-summary">
+              ${discount > 0 ? `
+                <div class="receipt-summary-row">
+                  <span>Subtotal:</span>
+                  <span>${formatTotal(subtotal)}</span>
+                </div>
+                <div class="receipt-summary-row" style="color: #10b981;">
+                  <span>Diskon${order.coupon_code ? ` (${order.coupon_code})` : ''}:</span>
+                  <span>-${formatTotal(discount)}</span>
+                </div>
+              ` : ''}
+              <div class="receipt-summary-row">
+                <span>Poin Didapat:</span>
+                <span style="color: #667eea;">+${order.points_earned || 0} poin</span>
+              </div>
+              <div class="receipt-summary-row receipt-total">
+                <span>TOTAL:</span>
+                <span>${formatTotal(total)}</span>
+              </div>
+            </div>
+            
+            <div class="receipt-footer">
+              Terima kasih telah berbelanja di DocterBee!
+            </div>
+          </div>
+          
+          <div class="history-detail-actions" style="margin-top: 20px;">
+            <button class="btn btn-outline" onclick="closeHistoryDetailModal()">
+              Tutup
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    const contentEl = document.getElementById('historyDetailContent');
+    if (contentEl) {
+      contentEl.innerHTML = contentHtml;
+    }
+
+    // Show modal
+    const modal = document.getElementById('historyDetailModal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Generate QR code for pending orders
+    if (isPending && order.order_number) {
+      setTimeout(() => {
+        const qrContainer = document.getElementById('historyQrCode');
+        if (qrContainer && typeof QRCode !== 'undefined') {
+          qrContainer.innerHTML = '';
+          new QRCode(qrContainer, {
+            text: order.order_number,
+            width: 180,
+            height: 180,
+            colorDark: '#1E293B',
+            colorLight: '#FFFFFF',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+
+        // Start countdown if expires_at exists
+        if (order.expires_at) {
+          startHistoryCountdown(order.expires_at);
+        }
+
+        // Reinit Lucide icons for check status button
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+      }, 100);
+    }
+
+  } catch (error) {
+    console.error('Error fetching order detail:', error);
+    if (typeof showError === 'function') {
+      showError('Gagal memuat detail order');
+    }
+  }
+}
+
+/**
+ * Start countdown timer for history QR
+ */
+function startHistoryCountdown(expiresAt) {
+  const countdownEl = document.getElementById('historyCountdown');
+  if (!countdownEl) return;
+
+  // Clear any existing interval
+  if (historyCountdownInterval) {
+    clearInterval(historyCountdownInterval);
+  }
+
+  const expiryTime = new Date(expiresAt).getTime();
+
+  function updateCountdown() {
+    const now = Date.now();
+    const diff = expiryTime - now;
+
+    if (diff <= 0) {
+      countdownEl.textContent = 'KADALUARSA';
+      countdownEl.style.color = '#6B7280';
+      clearInterval(historyCountdownInterval);
+      return;
+    }
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    countdownEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  updateCountdown();
+  historyCountdownInterval = setInterval(updateCountdown, 1000);
+}
+
+/**
+ * Open reward detail modal
+ */
+async function openHistoryRewardDetail(redemptionId) {
+  try {
+    const response = await fetch(`/api/user-data/activities/reward/${redemptionId}`, {
+      credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch reward');
+
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error);
+
+    const reward = result.data;
+
+    const dateStr = typeof formatDateTime === 'function'
+      ? formatDateTime(reward.redeemed_at)
+      : new Date(reward.redeemed_at).toLocaleString('id-ID');
+
+    const contentHtml = `
+      <div class="history-detail-header">
+        <h3>🎁 Detail Reward</h3>
+      </div>
+      <div class="history-detail-body">
+        <div class="history-order-info">
+          <div class="history-order-row">
+            <span class="label">Reward</span>
+            <span class="value">${escapeHtml(reward.reward_name)}</span>
+          </div>
+          <div class="history-order-row">
+            <span class="label">Tanggal Redeem</span>
+            <span class="value">${dateStr}</span>
+          </div>
+          <div class="history-order-row">
+            <span class="label">Poin Digunakan</span>
+            <span class="value" style="color: #B45309;">-${reward.points_cost} poin</span>
+          </div>
+          <div class="history-order-row">
+            <span class="label">Status</span>
+            <span class="value">${getHistoryStatusBadge(reward.status)}</span>
+          </div>
+        </div>
+        
+        <div class="history-detail-actions">
+          <button class="btn btn-outline" onclick="closeHistoryDetailModal()">
+            Tutup
+          </button>
+        </div>
+      </div>
+    `;
+
+    const contentEl = document.getElementById('historyDetailContent');
+    if (contentEl) {
+      contentEl.innerHTML = contentHtml;
+    }
+
+    const modal = document.getElementById('historyDetailModal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+  } catch (error) {
+    console.error('Error fetching reward detail:', error);
+    if (typeof showError === 'function') {
+      showError('Gagal memuat detail reward');
+    }
+  }
+}
+
+/**
+ * Close history detail modal
+ */
+function closeHistoryDetailModal() {
+  const modal = document.getElementById('historyDetailModal');
+  if (modal) {
+    modal.classList.remove('open');
+    document.body.style.overflow = historyModalOpen ? 'hidden' : '';
+  }
+
+  // Clear countdown
+  if (historyCountdownInterval) {
+    clearInterval(historyCountdownInterval);
+    historyCountdownInterval = null;
+  }
+}
+
+/**
+ * Check order status from history modal (for pending orders)
+ * Similar to checkOrderStatus() in store-cart.js but for history modal
+ */
+async function checkHistoryOrderStatus(orderId) {
+  const checkBtn = document.getElementById('historyCheckStatusBtn');
+  
+  // Show loading state
+  if (checkBtn) {
+    checkBtn.disabled = true;
+    checkBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Mengecek...';
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  }
+
+  try {
+    // Fetch order status from backend
+    const response = await fetch(`/api/user-data/activities/order/${orderId}`, {
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch order');
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+
+    const order = result.data;
+
+    // Close current detail modal
+    closeHistoryDetailModal();
+
+    // Reload history list to update badges
+    loadStoreHistory();
+
+    // Check if status changed
+    if (order.status === 'completed' || order.status === 'paid') {
+      // Order completed! Show receipt view
+      if (typeof showToast === 'function') {
+        showToast('✅ Pesanan sudah di-accept! Poin Anda telah ditambahkan.', 'success');
+      }
+      
+      // Reopen with updated status (will show receipt)
+      setTimeout(() => {
+        openHistoryOrderDetail(orderId, order.status);
+      }, 300);
+
+    } else if (order.status === 'cancelled') {
+      if (typeof showToast === 'function') {
+        showToast('❌ Pesanan telah dibatalkan oleh admin', 'error');
+      }
+    } else if (order.status === 'expired') {
+      if (typeof showToast === 'function') {
+        showToast('⌛ Pesanan telah kadaluarsa', 'error');
+      }
+    } else {
+      // Still pending
+      if (typeof showToast === 'function') {
+        showToast('⏳ Pesanan masih pending, belum di-accept admin', 'info');
+      }
+      
+      // Reopen modal with refreshed data
+      setTimeout(() => {
+        openHistoryOrderDetail(orderId, order.status);
+      }, 300);
+    }
+
+  } catch (error) {
+    console.error('Error checking order status:', error);
+    if (typeof showToast === 'function') {
+      showToast('❌ Gagal mengecek status pesanan. Coba lagi.', 'error');
+    }
+    
+    // Restore button state
+    if (checkBtn) {
+      checkBtn.disabled = false;
+      checkBtn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Cek Status Pesanan';
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
+  }
+}
+
+// Check for pending orders on page load
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(checkPendingOrdersOnLoad, 1000);
+});
+
+
