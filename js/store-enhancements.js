@@ -133,12 +133,10 @@ function populateCartDrawer() {
       
       <div class="drawer-option-group">
         <label class="drawer-label">Lokasi Store</label>
-        <select id="drawerStoreLocation" class="drawer-select">
-          <option value="">-- Pilih Lokasi --</option>
-          <option value="kolaka">🏪 Docterbee Kolaka ZE Center</option>
-          <option value="makassar">🏪 Docterbee Makassar Pettarani</option>
-          <option value="kendari">🏪 Docterbee Kendari ByPass</option>
-        </select>
+        <div class="drawer-location-readonly p-2 bg-slate-100 rounded text-sm text-slate-700 font-medium flex items-center gap-2">
+            <i data-lucide="map-pin" class="w-4 h-4 text-red-500"></i>
+            <span id="drawerLocationName">Memuat lokasi...</span>
+        </div>
       </div>
       
       <div class="drawer-coupon-group">
@@ -177,11 +175,15 @@ function populateCartDrawer() {
   
   drawerBody.innerHTML = itemsHtml + orderOptionsHtml + totalHtml;
   
-  // Sync store location if already selected in main page
-  const mainLocation = document.getElementById('storeLocation');
-  if (mainLocation && mainLocation.value) {
-    const drawerLocation = document.getElementById('drawerStoreLocation');
-    if (drawerLocation) drawerLocation.value = mainLocation.value;
+  // Display current store location
+  const locNameEl = document.getElementById('drawerLocationName');
+  if (locNameEl) {
+    const loc = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
+    locNameEl.textContent = loc ? loc.name : 'Belum dipilih';
+    if (!loc) {
+       locNameEl.className += ' text-red-500 italic';
+       locNameEl.textContent = 'Klik lokasi di header untuk memilih';
+    }
   }
 }
 
@@ -475,20 +477,16 @@ async function openCheckoutModal() {
     return;
   }
   
-  // Validate store location
-  const drawerLocation = document.getElementById('drawerStoreLocation');
-  const mainLocation = document.getElementById('storeLocation');
-  const storeLocation = drawerLocation?.value || mainLocation?.value;
+  // Validate store location (Global)
+  const locationData = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
   
-  if (!storeLocation) {
+  if (!locationData) {
     if (typeof showError === 'function') {
-      showError('Pilih lokasi store terlebih dahulu');
+      showError('Pilih lokasi store terlebih dahulu via menu diatas');
     }
-    // Highlight the select
-    if (drawerLocation) {
-      drawerLocation.focus();
-      drawerLocation.style.borderColor = '#EF4444';
-      setTimeout(() => drawerLocation.style.borderColor = '', 2000);
+    // Show location modal if available
+    if (window.StoreLocationManager) {
+      window.StoreLocationManager.showLocationModal();
     }
     return;
   }
@@ -508,8 +506,10 @@ async function openCheckoutModal() {
       }
       
       // Sync store location to hidden form
-      if (drawerLocation && mainLocation && drawerLocation.value) {
-        mainLocation.value = drawerLocation.value;
+      const locationData = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
+      const mainLocation = document.getElementById('storeLocation');
+      if (mainLocation && locationData) {
+        mainLocation.value = locationData.id;
       }
       
       // Sync order type
@@ -634,11 +634,11 @@ async function confirmCheckout() {
     if (mainGuestAddress) mainGuestAddress.value = document.getElementById('checkout-guest-address')?.value || '';
   }
   
-  // Sync store location
-  const drawerLocation = document.getElementById('drawerStoreLocation');
+  // Sync store location ID to hidden input for backend compatibility
+  const locationData = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
   const mainLocation = document.getElementById('storeLocation');
-  if (drawerLocation && mainLocation && drawerLocation.value) {
-    mainLocation.value = drawerLocation.value;
+  if (mainLocation && locationData) {
+    mainLocation.value = locationData.id;
   }
   
   // Sync order type

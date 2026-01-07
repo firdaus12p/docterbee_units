@@ -128,6 +128,20 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Resolve location_id from request body or derive from store_location string
+    let locationId = req.body.location_id || null;
+    
+    if (!locationId && store_location) {
+      // Try to find location by name (case-insensitive match)
+      const location = await queryOne(
+        "SELECT id FROM locations WHERE LOWER(name) = LOWER(?) AND is_active = 1",
+        [store_location]
+      );
+      if (location) {
+        locationId = location.id;
+      }
+    }
+
     // Generate order number
     const orderNumber = generateOrderNumber();
 
@@ -146,6 +160,7 @@ router.post("/", async (req, res) => {
 
     // ============================================
     // STOCK VALIDATION & DEDUCTION (with race condition prevention)
+    // Supports multi-location inventory via product_stocks table
     // ============================================
     try {
       // Start transaction for atomic stock operations
@@ -156,9 +171,9 @@ router.post("/", async (req, res) => {
         // Skip if not a product (could be service/booking)
         if (!item.product_id) continue;
 
-        // Lock row to prevent concurrent modifications (race condition prevention)
+        // Check if product exists
         const product = await queryOne(
-          "SELECT id, name, stock FROM products WHERE id = ? FOR UPDATE",
+          "SELECT id, name FROM products WHERE id = ?",
           [item.product_id]
         );
 
@@ -166,11 +181,33 @@ router.post("/", async (req, res) => {
           throw new Error(`Produk dengan ID ${item.product_id} tidak ditemukan`);
         }
 
-        // Check stock availability
-        if (product.stock < item.quantity) {
-          throw new Error(
-            `Stok tidak cukup untuk ${product.name}. Tersedia: ${product.stock}, diminta: ${item.quantity}`
+        // Check stock availability based on location
+        if (locationId) {
+          // Multi-location mode: check product_stocks table
+          const locationStock = await queryOne(
+            "SELECT id, quantity FROM product_stocks WHERE product_id = ? AND location_id = ? FOR UPDATE",
+            [item.product_id, locationId]
           );
+
+          const availableStock = locationStock?.quantity || 0;
+
+          if (availableStock < item.quantity) {
+            throw new Error(
+              `Stok tidak cukup untuk ${product.name} di lokasi ini. Tersedia: ${availableStock}, diminta: ${item.quantity}`
+            );
+          }
+        } else {
+          // Legacy mode: check products.stock column
+          const productWithStock = await queryOne(
+            "SELECT stock FROM products WHERE id = ? FOR UPDATE",
+            [item.product_id]
+          );
+
+          if (productWithStock.stock < item.quantity) {
+            throw new Error(
+              `Stok tidak cukup untuk ${product.name}. Tersedia: ${productWithStock.stock}, diminta: ${item.quantity}`
+            );
+          }
         }
       }
 
@@ -178,19 +215,33 @@ router.post("/", async (req, res) => {
       for (const item of items) {
         if (!item.product_id) continue;
 
-        await query("UPDATE products SET stock = stock - ? WHERE id = ?", [
-          item.quantity,
-          item.product_id,
-        ]);
+        if (locationId) {
+          // Multi-location mode: deduct from product_stocks
+          const result = await query(
+            "UPDATE product_stocks SET quantity = quantity - ?, updated_at = NOW() WHERE product_id = ? AND location_id = ?",
+            [item.quantity, item.product_id, locationId]
+          );
+
+          // If no row was updated (stock record doesn't exist yet), this means 0 stock
+          if (result.affectedRows === 0) {
+            throw new Error(`Stok tidak tersedia untuk produk ID ${item.product_id} di lokasi ini`);
+          }
+        } else {
+          // Legacy mode: deduct from products.stock
+          await query("UPDATE products SET stock = stock - ? WHERE id = ?", [
+            item.quantity,
+            item.product_id,
+          ]);
+        }
       }
 
-      // Insert order
+      // Insert order (with location_id if available)
       const result = await query(
         `INSERT INTO orders 
        (order_number, user_id, customer_name, customer_phone, customer_address,
-        order_type, store_location, items, total_amount, points_earned, 
+        order_type, store_location, location_id, items, total_amount, points_earned, 
         qr_code_data, expires_at, coupon_code, coupon_discount, original_total)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           orderNumber,
           userId,
@@ -199,6 +250,7 @@ router.post("/", async (req, res) => {
           customerAddress,
           order_type,
           store_location,
+          locationId,
           JSON.stringify(items),
           total_amount,
           pointsEarned,
@@ -667,15 +719,26 @@ router.patch("/:id/cancel", async (req, res) => {
     }
 
     // Restore stock when order is cancelled
+    // Supports multi-location inventory via product_stocks table
     try {
       const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+      const locationId = order.location_id;
       
       for (const item of items) {
         if (item.product_id) {
-          await query("UPDATE products SET stock = stock + ? WHERE id = ?", [
-            item.quantity,
-            item.product_id,
-          ]);
+          if (locationId) {
+            // Multi-location mode: restore to product_stocks
+            await query(
+              "UPDATE product_stocks SET quantity = quantity + ?, updated_at = NOW() WHERE product_id = ? AND location_id = ?",
+              [item.quantity, item.product_id, locationId]
+            );
+          } else {
+            // Legacy mode: restore to products.stock
+            await query("UPDATE products SET stock = stock + ? WHERE id = ?", [
+              item.quantity,
+              item.product_id,
+            ]);
+          }
         }
       }
     } catch (stockError) {

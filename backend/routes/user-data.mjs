@@ -104,7 +104,7 @@ router.get("/rewards", requireAuth, async (req, res) => {
 router.post("/rewards/redeem", requireAuth, async (req, res) => {
   try {
     const userId = req.session.userId;
-    const { rewardName, pointsCost, rewardId } = req.body;
+    const { rewardName, pointsCost, rewardId, location_id } = req.body;
 
     // Validate input
     if (!rewardName || typeof pointsCost !== "number" || pointsCost <= 0) {
@@ -158,10 +158,10 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
         [userId, newPoints, newPoints]
       );
 
-      // Record redemption
+      // Record redemption (with location_id for multi-location tracking)
       const redemptionResult = await query(
-        "INSERT INTO reward_redemptions (user_id, reward_id, reward_name, points_cost) VALUES (?, ?, ?, ?)",
-        [userId, rewardId || null, rewardName, pointsCost]
+        "INSERT INTO reward_redemptions (user_id, reward_id, reward_name, points_cost, location_id) VALUES (?, ?, ?, ?, ?)",
+        [userId, rewardId || null, rewardName, pointsCost, location_id || null]
       );
 
       // Commit transaction

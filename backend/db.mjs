@@ -468,6 +468,39 @@ async function initializeTables() {
     `);
     console.log("✅ Table: unit_items");
 
+    // Create locations table for multi-location inventory management
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS locations (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        address TEXT DEFAULT NULL,
+        type ENUM('store', 'warehouse') DEFAULT 'store',
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_active (is_active),
+        INDEX idx_type (type)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: locations");
+
+    // Create product_stocks table for per-location inventory tracking
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS product_stocks (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        product_id INT NOT NULL,
+        location_id INT NOT NULL,
+        quantity INT DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_product_location (product_id, location_id),
+        INDEX idx_product (product_id),
+        INDEX idx_location (location_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: product_stocks");
+
     console.log("📦 All tables initialized successfully");
     
     // Run migrations for existing tables
@@ -593,6 +626,30 @@ async function runMigrations(connection) {
     
     // Migration: Add index for reset_password_token (optimize /reset-password lookups)
     await safeAddIndex(connection, 'users', 'idx_reset_password_token', 'reset_password_token');
+    
+    // ============================================
+    // MULTI-LOCATION INVENTORY MIGRATIONS
+    // ============================================
+    
+    // Migration: Add location_id to orders table (nullable for backward compatibility)
+    await safeAddColumn(connection, 'orders', 'location_id',
+      "INT DEFAULT NULL COMMENT 'FK to locations table - NULL for legacy orders' AFTER store_location");
+    
+    // Migration: Add index for location_id in orders
+    await safeAddIndex(connection, 'orders', 'idx_orders_location_id', 'location_id');
+    
+    // Migration: Add location_id to reward_redemptions table
+    await safeAddColumn(connection, 'reward_redemptions', 'location_id',
+      "INT DEFAULT NULL COMMENT 'Location where redemption occurred' AFTER reward_id");
+    
+    // Migration: Add index for location_id in reward_redemptions
+    await safeAddIndex(connection, 'reward_redemptions', 'idx_redemptions_location_id', 'location_id');
+    
+    // Migration: Seed initial locations based on existing store_location ENUM values
+    await seedInitialLocations(connection);
+    
+    // Migration: Migrate existing products.stock to product_stocks table
+    await migrateExistingStockToProductStocks(connection);
     
     console.log("✅ Migrations completed");
   } catch (error) {
@@ -740,6 +797,93 @@ async function seedDefaultJourney(connection) {
     console.log("  ✅ Default journey 'Hidup Sehat' seeded with 6 units");
   } catch (error) {
     console.error("  ⚠️ Could not seed default journey:", error.message);
+  }
+}
+
+// Helper: Seed initial locations (idempotent - based on existing store_location ENUM values)
+async function seedInitialLocations(connection) {
+  try {
+    // Check if any locations already exist
+    const [existing] = await connection.query("SELECT COUNT(*) as count FROM locations");
+    
+    if (existing[0].count > 0) {
+      console.log("  ✅ Locations already exist, skipping seed");
+      return;
+    }
+    
+    console.log("  🌱 Seeding initial locations...");
+    
+    // Initial locations matching the existing store_location ENUM values
+    const initialLocations = [
+      { name: 'Kolaka', address: 'Kolaka, Sulawesi Tenggara', type: 'store' },
+      { name: 'Makassar', address: 'Makassar, Sulawesi Selatan', type: 'store' },
+      { name: 'Kendari', address: 'Kendari, Sulawesi Tenggara', type: 'store' }
+    ];
+    
+    for (const loc of initialLocations) {
+      await connection.query(
+        `INSERT INTO locations (name, address, type, is_active) VALUES (?, ?, ?, 1)`,
+        [loc.name, loc.address, loc.type]
+      );
+    }
+    
+    console.log(`  ✅ Seeded ${initialLocations.length} initial locations`);
+  } catch (error) {
+    console.error("  ⚠️ Could not seed initial locations:", error.message);
+  }
+}
+
+// Helper: Migrate existing products.stock to product_stocks table
+// This ensures backward compatibility - existing stock gets distributed to all locations
+async function migrateExistingStockToProductStocks(connection) {
+  try {
+    // Check if product_stocks already has data (migration already done)
+    const [existingStocks] = await connection.query("SELECT COUNT(*) as count FROM product_stocks");
+    
+    if (existingStocks[0].count > 0) {
+      console.log("  ✅ product_stocks already has data, skipping migration");
+      return;
+    }
+    
+    // Get all products with stock > 0
+    const [products] = await connection.query("SELECT id, name, stock FROM products WHERE is_active = 1");
+    
+    if (products.length === 0) {
+      console.log("  ✅ No products to migrate");
+      return;
+    }
+    
+    // Get all active locations
+    const [locations] = await connection.query("SELECT id, name FROM locations WHERE is_active = 1");
+    
+    if (locations.length === 0) {
+      console.log("  ⚠️ No locations found, cannot migrate stock");
+      return;
+    }
+    
+    console.log(`  🌱 Migrating stock for ${products.length} products to ${locations.length} locations...`);
+    
+    let migratedCount = 0;
+    
+    for (const product of products) {
+      for (const location of locations) {
+        // Insert stock for each product at each location
+        // Use the existing products.stock value as initial stock for ALL locations
+        await connection.query(
+          `INSERT INTO product_stocks (product_id, location_id, quantity) 
+           VALUES (?, ?, ?) 
+           ON DUPLICATE KEY UPDATE quantity = quantity`,
+          [product.id, location.id, product.stock]
+        );
+        migratedCount++;
+      }
+    }
+    
+    console.log(`  ✅ Migrated stock: Created ${migratedCount} product_stocks records`);
+    console.log(`     Note: Each product now has the same stock (${products[0]?.stock || 0}) at all ${locations.length} locations`);
+    console.log(`     Adjust individual location stock via Admin Dashboard > Products Manager`);
+  } catch (error) {
+    console.error("  ⚠️ Could not migrate product stocks:", error.message);
   }
 }
 

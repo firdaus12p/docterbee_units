@@ -2895,7 +2895,16 @@ function showStoreTab(tabName) {
 // Fetch products from API
 async function loadProductsFromAPI() {
   try {
-    const response = await fetch("/api/products");
+    // Get current location from storage
+    const locationData = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
+    const locationId = locationData ? locationData.id : '';
+    
+    // Append location_id to URL if exists
+    const url = locationId 
+      ? `/api/products?location_id=${locationId}` 
+      : "/api/products";
+
+    const response = await fetch(url);
     const result = await response.json();
 
     if (result.success && result.data) {

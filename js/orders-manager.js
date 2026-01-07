@@ -13,6 +13,10 @@ async function loadOrders() {
   const tableBody = document.getElementById("ordersTableBody");
   if (!tableBody) return;
 
+  // Get current location from global state
+  const locationId = window.adminLocationState?.currentLocationId || null;
+  const locationName = window.adminLocationState?.currentLocationName || "Semua Lokasi";
+
   try {
     // Show loading
     tableBody.innerHTML = `
@@ -31,13 +35,31 @@ async function loadOrders() {
       throw new Error(result.error || "Gagal memuat orders");
     }
 
-    const orders = result.data;
+    let orders = result.data;
+
+    // Filter orders by selected location if applicable
+    if (locationId) {
+      orders = orders.filter((order) => {
+        // Match by location_id if present, otherwise match by store_location name
+        if (order.location_id) {
+          return order.location_id === locationId;
+        }
+        // Fallback: match store_location string to location name (case-insensitive)
+        return (
+          order.store_location &&
+          order.store_location.toLowerCase() === locationName.toLowerCase()
+        );
+      });
+    }
+
+    // Update location indicator in section header
+    updateOrdersLocationIndicator(locationName, locationId, orders.length);
 
     if (orders.length === 0) {
       tableBody.innerHTML = `
         <tr>
           <td colspan="9" class="text-center py-8 text-slate-400">
-            Belum ada order
+            ${locationId ? `Belum ada order di ${locationName}` : "Belum ada order"}
           </td>
         </tr>
       `;
@@ -158,6 +180,40 @@ async function loadOrders() {
     `;
   }
 }
+
+// Update the orders section header with location indicator
+function updateOrdersLocationIndicator(locationName, locationId, orderCount) {
+  const sectionHeader = document.querySelector("#section-orders h2");
+  if (!sectionHeader) return;
+
+  // Reset header
+  sectionHeader.innerHTML = "Orders Manager";
+
+  // Add location badge if filtering
+  if (locationId) {
+    sectionHeader.innerHTML = `
+      Orders Manager
+      <span class="ml-2 px-2 py-1 text-xs rounded-full bg-amber-900/30 text-amber-400 font-normal">
+        <i data-lucide="map-pin" class="w-3 h-3 inline"></i>
+        ${escapeHtml(locationName)} (${orderCount})
+      </span>
+    `;
+    // Refresh icons
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  }
+}
+
+// Listen for location changes to reload orders
+document.addEventListener("locationChanged", function (e) {
+  console.log("[Orders] Location changed, reloading orders...", e.detail);
+  // Only reload if orders section is currently visible
+  const ordersSection = document.getElementById("section-orders");
+  if (ordersSection && !ordersSection.classList.contains("hidden")) {
+    loadOrders();
+  }
+});
 
 // ============================================
 // QR SCANNER

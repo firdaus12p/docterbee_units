@@ -229,6 +229,11 @@ function showDashboard() {
   document.getElementById("loginOverlay").classList.add("hidden");
   document.getElementById("dashboardContainer").classList.remove("hidden");
 
+  // Initialize location state (multi-location support)
+  if (typeof window.adminLocationState !== "undefined" && window.adminLocationState.init) {
+    window.adminLocationState.init();
+  }
+
   // Load initial data
   loadBookings();
 
@@ -256,6 +261,7 @@ function switchSection(section) {
     users: "Users Manager",
     podcasts: "Podcasts Manager",
     journeys: "Journey Manager",
+    reports: "Reports & Analytics",
   };
 
   // Update active item (mobile menu)
@@ -325,6 +331,11 @@ function switchSection(section) {
     // Load journeys
     if (typeof loadAdminJourneys === "function") {
       loadAdminJourneys();
+    }
+  } else if (section === "reports") {
+    // Load reports from reports-manager.js
+    if (typeof window.loadReports === "function") {
+      window.loadReports();
     }
   }
 }
@@ -1838,14 +1849,34 @@ async function loadProducts() {
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
 
+  // Get current location from global state
+  const locationId = window.adminLocationState?.currentLocationId || null;
+  const locationName = window.adminLocationState?.currentLocationName || "Semua Lokasi";
+
   try {
-    const response = await adminFetch(`${API_BASE}/products`);
+    // Build URL with optional location_id parameter
+    let url = `${API_BASE}/products?is_active=all`;
+    if (locationId) {
+      url += `&location_id=${locationId}`;
+    }
+
+    const response = await adminFetch(url);
     const result = await response.json();
 
     if (result.success && result.data.length > 0) {
-      grid.innerHTML = result.data
-        .map(
-          (product) => `
+      // Location indicator HTML
+      const locationIndicator = locationId
+        ? `<div class="col-span-full mb-2 flex items-center gap-2 text-sm text-amber-400">
+            <i data-lucide="map-pin" class="w-4 h-4"></i>
+            <span>Menampilkan stok untuk: <strong>${escapeHtml(locationName)}</strong></span>
+           </div>`
+        : "";
+
+      grid.innerHTML =
+        locationIndicator +
+        result.data
+          .map(
+            (product) => `
         <div class="booking-container p-5 ${
           product.is_active === 0 ? "opacity-50 border-red-900/30" : ""
         }">
@@ -1876,9 +1907,13 @@ async function loadProducts() {
             </div>
             <div class="font-bold text-amber-600">Rp ${formatNumber(product.price)}</div>
             <div class="text-xs text-slate-700">
-              Stok: <span class="font-semibold ${
-                product.stock > 0 ? "text-emerald-600" : "text-red-600"
-              }">${product.stock}</span>
+              ${
+                locationId
+                  ? `Stok (${escapeHtml(locationName)}): `
+                  : "Stok Total: "
+              }<span class="font-semibold ${
+              product.stock > 0 ? "text-emerald-600" : "text-red-600"
+            }">${product.stock}</span>
             </div>
           </div>
           <div class="flex gap-2">
@@ -1889,6 +1924,20 @@ async function loadProducts() {
             >
               Edit
             </button>
+            ${
+              locationId
+                ? `<button 
+                    data-action="edit-stock"
+                    data-id="${product.id}"
+                    data-name="${escapeHtml(product.name)}"
+                    data-stock="${product.stock}"
+                    class="px-3 py-2 rounded text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                    title="Edit stok lokasi ini"
+                  >
+                    <i data-lucide="package" class="w-4 h-4"></i>
+                  </button>`
+                : ""
+            }
             <button 
               data-action="delete-product"
               data-id="${product.id}"
@@ -1900,8 +1949,8 @@ async function loadProducts() {
           </div>
         </div>
       `
-        )
-        .join("");
+          )
+          .join("");
     } else {
       grid.innerHTML =
         '<div class="booking-container p-6 text-center text-slate-700">Belum ada produk</div>';
@@ -1918,6 +1967,10 @@ async function loadProducts() {
         } else if (action === "delete-product") {
           const name = this.getAttribute("data-name");
           deleteProduct(parseInt(id), name);
+        } else if (action === "edit-stock") {
+          const name = this.getAttribute("data-name");
+          const stock = parseInt(this.getAttribute("data-stock") || "0");
+          openQuickStockModal(parseInt(id), name, stock);
         }
       });
     });
@@ -1932,6 +1985,233 @@ async function loadProducts() {
       '<div class="booking-container p-6 text-center text-red-400">Error loading data</div>';
   }
 }
+
+// ========== STOCK EDIT MODAL FUNCTIONALITY ==========
+
+let stockEditCurrentStock = 0;
+
+// Open stock edit modal for location-specific stock
+function openQuickStockModal(productId, productName, currentStock) {
+  const locationId = window.adminLocationState?.currentLocationId;
+  const locationName = window.adminLocationState?.currentLocationName || "";
+
+  if (!locationId) {
+    alert("Pilih lokasi terlebih dahulu untuk mengedit stok per-lokasi");
+    return;
+  }
+
+  // Store current stock for preview calculations
+  stockEditCurrentStock = currentStock;
+
+  // Populate modal
+  document.getElementById("stockEditProductId").value = productId;
+  document.getElementById("stockEditLocationId").value = locationId;
+  document.getElementById("stockEditProductName").textContent = productName;
+  document.getElementById("stockEditLocationName").textContent = locationName;
+  document.getElementById("stockEditCurrentStock").textContent = currentStock;
+  document.getElementById("stockEditQuantity").value = "";
+  document.getElementById("stockEditOperation").value = "set";
+
+  // Reset operation buttons - all to inactive (gray), then set "Set" as active (blue)
+  document.querySelectorAll(".stock-op-btn").forEach((btn) => {
+    btn.classList.remove("active", "border-blue-500", "bg-blue-500/20", "ring-2", "ring-blue-500/50");
+    btn.classList.add("border-slate-600", "bg-slate-800");
+  });
+  const setBtn = document.querySelector('.stock-op-btn[data-operation="set"]');
+  if (setBtn) {
+    setBtn.classList.remove("border-slate-600", "bg-slate-800");
+    setBtn.classList.add("active", "border-blue-500", "bg-blue-500/20", "ring-2", "ring-blue-500/50");
+  }
+
+  // Update preview
+  updateStockPreview();
+
+  // Initialize listeners (only once)
+  initStockEditModalListeners();
+
+  // Show modal
+  const modal = document.getElementById("stockEditModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  // Focus on quantity input
+  setTimeout(() => {
+    document.getElementById("stockEditQuantity").focus();
+  }, 100);
+
+  // Refresh icons
+  if (typeof lucide !== "undefined" && lucide.createIcons) {
+    lucide.createIcons();
+  }
+}
+
+// Close stock edit modal
+function closeStockEditModal() {
+  const modal = document.getElementById("stockEditModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+// Update preview of new stock value
+function updateStockPreview() {
+  const operation = document.getElementById("stockEditOperation").value;
+  const quantity = parseInt(document.getElementById("stockEditQuantity").value) || 0;
+  const currentStock = stockEditCurrentStock;
+
+  let newStock = 0;
+  switch (operation) {
+    case "add":
+      newStock = currentStock + quantity;
+      break;
+    case "subtract":
+      newStock = Math.max(0, currentStock - quantity);
+      break;
+    case "set":
+    default:
+      newStock = quantity;
+      break;
+  }
+
+  const preview = document.getElementById("stockEditPreview");
+  preview.innerHTML = `Stok baru akan menjadi: <span class="font-semibold ${
+    newStock > 0 ? "text-emerald-400" : "text-red-400"
+  }">${newStock}</span>`;
+}
+
+// Handle operation button clicks - flag to prevent duplicate listeners
+let stockEditListenersInitialized = false;
+
+function initStockEditModalListeners() {
+  if (stockEditListenersInitialized) return;
+
+  // Operation buttons - use onclick for reliability
+  document.querySelectorAll(".stock-op-btn").forEach((btn) => {
+    btn.onclick = function () {
+      const operation = this.getAttribute("data-operation");
+      document.getElementById("stockEditOperation").value = operation;
+
+      // Reset all buttons to inactive state (gray border)
+      document.querySelectorAll(".stock-op-btn").forEach((b) => {
+        b.classList.remove("active", "border-blue-500", "bg-blue-500/20", "ring-2", "ring-blue-500/50");
+        b.classList.add("border-slate-600", "bg-slate-800");
+      });
+
+      // Set this button as active (blue border)
+      this.classList.add("active", "border-blue-500", "bg-blue-500/20", "ring-2", "ring-blue-500/50");
+      this.classList.remove("border-slate-600", "bg-slate-800");
+
+      updateStockPreview();
+    };
+  });
+
+  // Quantity input
+  const quantityInput = document.getElementById("stockEditQuantity");
+  if (quantityInput) {
+    quantityInput.oninput = updateStockPreview;
+  }
+
+  // Close button
+  const closeBtn = document.getElementById("closeStockEditModal");
+  if (closeBtn) {
+    closeBtn.onclick = closeStockEditModal;
+  }
+
+  // Form submit
+  const form = document.getElementById("stockEditForm");
+  if (form) {
+    form.onsubmit = handleStockEditSubmit;
+  }
+
+  // Close on backdrop click
+  const modal = document.getElementById("stockEditModal");
+  if (modal) {
+    modal.onclick = function (e) {
+      if (e.target === this) {
+        closeStockEditModal();
+      }
+    };
+  }
+
+  stockEditListenersInitialized = true;
+  console.log("[StockModal] Listeners initialized");
+}
+
+// Handle form submission
+async function handleStockEditSubmit(e) {
+  e.preventDefault();
+
+  const productId = document.getElementById("stockEditProductId").value;
+  const locationId = document.getElementById("stockEditLocationId").value;
+  const operation = document.getElementById("stockEditOperation").value;
+  const quantity = parseInt(document.getElementById("stockEditQuantity").value);
+
+  if (isNaN(quantity) || quantity < 0) {
+    alert("Jumlah harus berupa angka positif");
+    return;
+  }
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalContent = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menyimpan...';
+
+  try {
+    await updateLocationStock(productId, locationId, quantity, operation);
+    closeStockEditModal();
+  } catch (error) {
+    console.error("Error:", error);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalContent;
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  }
+}
+
+// API call to update location-specific stock
+async function updateLocationStock(productId, locationId, quantity, operation = "set") {
+  try {
+    const response = await adminFetch(`${API_BASE}/products/${productId}/stocks`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location_id: locationId,
+        quantity: quantity,
+        operation: operation,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showSuccessModal(result.message || "Stok berhasil diupdate");
+      loadProducts(); // Reload products to show updated stock
+    } else {
+      alert("Gagal mengupdate stok: " + (result.error || "Unknown error"));
+    }
+  } catch (error) {
+    console.error("Error updating stock:", error);
+    alert("Gagal mengupdate stok");
+  }
+}
+
+// Initialize stock edit modal listeners when DOM is ready
+document.addEventListener("DOMContentLoaded", initStockEditModalListeners);
+
+// Expose functions globally
+window.openQuickStockModal = openQuickStockModal;
+window.closeStockEditModal = closeStockEditModal;
+
+// Listen for location changes to reload products
+document.addEventListener("locationChanged", function (e) {
+  console.log("[Products] Location changed, reloading products...", e.detail);
+  // Only reload if products section is currently visible
+  const productsSection = document.getElementById("section-products");
+  if (productsSection && !productsSection.classList.contains("hidden")) {
+    loadProducts();
+  }
+});
 
 function openProductModal(id = null) {
   const modal = document.getElementById("productModal");

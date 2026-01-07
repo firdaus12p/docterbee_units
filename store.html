@@ -337,6 +337,11 @@
           </button>
         </div>
 
+        <!-- Location Selector (Injected by StoreLocationManager) -->
+        <div id="storeLocationSelectorContainer" class="mb-4">
+          <!-- This will be populated by JS -->
+        </div>
+
         <!-- Products Grid -->
         <div
           id="productGrid"
@@ -355,12 +360,8 @@
           <input type="radio" name="orderType" value="take_away">
           
           <!-- Store Location (synced from drawer) -->
-          <select id="storeLocation">
-            <option value="">-- Pilih Lokasi --</option>
-            <option value="kolaka">Docterbee Kolaka ZE Center</option>
-            <option value="makassar">Docterbee Makassar Pettarani</option>
-            <option value="kendari">Docterbee Kendari ByPass</option>
-          </select>
+          <!-- Store Location (Auto-filled by StoreLocationManager) -->
+          <input type="hidden" id="storeLocation" name="storeLocation" />
           
           <!-- Guest Customer Info (synced from checkout modal) -->
           <div id="guestCustomerInfo">
@@ -699,7 +700,12 @@
     <div id="cart-drawer-overlay" class="cart-drawer-overlay" onclick="toggleCartDrawer()"></div>
     <div id="cart-drawer" class="cart-drawer">
       <div class="cart-drawer-header">
-        <h2><i data-lucide="shopping-cart"></i> Keranjang Belanja</h2>
+        <div>
+          <h2><i data-lucide="shopping-cart"></i> Keranjang Belanja</h2>
+          <div id="cartLocationDisplay" class="text-xs text-slate-500 mt-1 font-normal flex items-center">
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
         <button class="close-drawer-btn" onclick="toggleCartDrawer()">×</button>
       </div>
       <div class="cart-drawer-body" id="cart-drawer-body">
@@ -918,6 +924,7 @@
     </script>
     <script src="js/user-data-sync.js"></script>
     <script src="js/landing-navbar.js"></script>
+    <script src="js/store-location-manager.js"></script>
     <!-- Note: auth-check.js removed - Store supports guest mode -->
   </body>
 </html>

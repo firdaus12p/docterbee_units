@@ -125,6 +125,15 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - `idx_email_verification_token`: Optimizes `/verify-email` token lookups.
 - `idx_reset_password_token`: Optimizes `/reset-password` token lookups.
 
+**Multi-Location Inventory System (Planned - Tech Spec: `tech-spec-multi-location-inventory.md`)**
+- **Table: `locations`**: Dynamic store/warehouse management. Replaces hardcoded ENUMs.
+  - Columns: `id`, `name`, `address`, `type` (ENUM: store, warehouse), `is_active`.
+- **Table: `product_stocks`**: Per-location inventory tracking.
+  - Columns: `id`, `product_id` (FK), `location_id` (FK), `quantity`, `updated_at`.
+  - **Replaces**: `products.stock` column (legacy, will be deprecated).
+- **Modified: `orders`**: Added `location_id` (INT, nullable) for new orders.
+- **Modified: `reward_redemptions`**: Added `location_id` (INT) to track redemption location.
+
 ### Rate Limiting Strategy
 
 | Endpoint Category | Max Attempts | Cooldown | Purpose |
@@ -184,4 +193,4 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Review quarterly for outdated rules
 - Remove rules that become obvious over time
 
-Last Updated: 2026-01-05
+Last Updated: 2026-01-07

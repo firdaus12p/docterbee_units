@@ -411,7 +411,10 @@ async function submitOrder() {
 
   // Get order details
   const orderType = document.querySelector('input[name="orderType"]:checked')?.value;
-  const storeLocation = document.getElementById("storeLocation")?.value;
+  
+  // Get store location from global manager
+  const locationData = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
+  const storeLocation = locationData?.id;
 
   if (!orderType) {
     showToast("Pilih tipe order (Dine In / Take Away)", "error");
@@ -419,8 +422,17 @@ async function submitOrder() {
   }
 
   if (!storeLocation) {
-    showToast("Pilih lokasi store", "error");
+    showToast("Silakan pilih lokasi toko terlebih dahulu", "error");
+    if (window.StoreLocationManager) {
+      window.StoreLocationManager.showLocationModal();
+    }
     return;
+  }
+
+  // Update hidden input for backend consistency if needed
+  const locationInput = document.getElementById("storeLocation");
+  if (locationInput) {
+    locationInput.value = storeLocation;
   }
 
   // Get guest customer data (if form is visible)

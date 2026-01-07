@@ -24,6 +24,8 @@ import rewardsRouter from "./routes/rewards.mjs";
 import podcastsRouter from "./routes/podcasts.mjs";
 import journeysRouter from "./routes/journeys.mjs";
 import memberCheckRouter from "./routes/member-check.mjs";
+import locationsRouter from "./routes/locations.mjs";
+import reportsRouter from "./routes/reports.mjs";
 import bcrypt from "bcryptjs";
 import { loginRateLimiter } from "./utils/rate-limiter.mjs";
 
@@ -247,6 +249,8 @@ app.use("/api/rewards", rewardsRouter);
 app.use("/api/podcasts", podcastsRouter);
 app.use("/api/journeys", journeysRouter);
 app.use("/api/member-check", memberCheckRouter);
+app.use("/api/locations", locationsRouter);
+app.use("/api/reports", reportsRouter);
 
 // ============================================
 // STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)
