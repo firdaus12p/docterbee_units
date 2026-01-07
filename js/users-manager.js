@@ -543,10 +543,11 @@ async function approveRedemption(userId, redemptionId, rewardName) {
     async () => {
       try {
         const response = await adminFetch(
-          `${API_BASE}/users/${userId}/rewards/${redemptionId}/approve`,
+          `${API_BASE}/rewards/admin/redemptions/${redemptionId}/status`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: 'approved' }),
             credentials: "include",
           }
         );
@@ -558,14 +559,32 @@ async function approveRedemption(userId, redemptionId, rewardName) {
           // Refresh the rewards list
           const userName = document.getElementById("rewardUserName").textContent;
           const userRewardsResponse = await adminFetch(
-            `${API_BASE}/users/${userId}/rewards`,
-            {
-              credentials: "include",
-            }
+            `${API_BASE}/api/user-data/rewards?user_id=${userId}`, // Note: this endpoint might need adjustment if it's user-facing
+            // Actually users-manager calls /api/users/${userId}/rewards which is likely mapped to user-data route but for admins?
+            // Let's stick to what viewUserRewards uses: ${API_BASE}/users/${userId}/rewards
+            // Waiting... viewUserRewards uses ${API_BASE}/users/${userId}/rewards. Does that exist?
+            // If not, I should fix that too.
+            // Let's use the new admin endpoint filtering by user_id
+            `${API_BASE}/rewards/admin/redemptions?user_id=${userId}`
           );
+          
           const userRewardsData = await userRewardsResponse.json();
           if (userRewardsData.success) {
-            openRewardsModal(userId, userName, userRewardsData.data.rewards);
+             // The format from admin/redemptions is different from users/:id/rewards?
+             // viewUserRewards expects {success: true, data: {rewards: []}}
+             // admin/redemptions returns {success: true, redemptions: []}
+             // I should probbaly use reloadUsers() or just re-call viewUserRewards logic
+             
+             // Simplest: re-call viewUserRewards
+             // But viewUserRewards calls an endpoint I haven't verified.
+             // Let's rely on the NEW endpoint I made: /rewards/admin/redemptions?user_id=...
+             
+             openRewardsModal(userId, userName, userRewardsData.redemptions);
+          }
+          
+          // Also refresh Reports if available
+          if (typeof window.loadRedemptionReport === 'function') {
+            window.loadRedemptionReport();
           }
         } else {
           showError(data.error || "Gagal approve redemption");

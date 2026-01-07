@@ -55,6 +55,33 @@ router.get("/summary", requireAdmin, async (req, res) => {
       ORDER BY revenue DESC
     `, [startDate, endDate]);
 
+    // Top selling products (Global)
+    const topProducts = await query(`
+      SELECT 
+        p.id as product_id,
+        p.name as product_name,
+        COALESCE(SUM(sales.quantity), 0) as total_sold,
+        COALESCE(SUM(sales.total_price), 0) as total_revenue
+      FROM products p
+      JOIN (
+        SELECT 
+          items.product_id,
+          items.quantity,
+          (items.quantity * p2.price) as total_price
+        FROM orders o,
+        JSON_TABLE(o.items, '$[*]' COLUMNS(
+          product_id INT PATH '$.product_id',
+          quantity INT PATH '$.quantity'
+        )) AS items
+        JOIN products p2 ON items.product_id = p2.id
+        WHERE o.status = 'completed'
+          AND DATE(o.completed_at) BETWEEN ? AND ?
+      ) as sales ON p.id = sales.product_id
+      GROUP BY p.id, p.name
+      ORDER BY total_sold DESC
+      LIMIT 10
+    `, [startDate, endDate]);
+
     res.json({
       success: true,
       data: {
@@ -67,6 +94,7 @@ router.get("/summary", requireAdmin, async (req, res) => {
           total_points_spent: rewardsResult[0]?.total_points_spent || 0,
         },
         by_location: locationBreakdown,
+        top_products: topProducts,
       },
     });
   } catch (error) {

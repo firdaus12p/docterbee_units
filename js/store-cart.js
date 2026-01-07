@@ -536,6 +536,7 @@ async function submitOrder() {
   const orderData = {
     order_type: orderType,
     store_location: storeLocation,
+    location_id: storeLocation,
     items: cart,
     total_amount: finalTotal,
     coupon_code: couponCode,

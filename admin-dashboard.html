@@ -2258,6 +2258,11 @@
               </h2>
               <div class="flex gap-2 items-center flex-wrap">
                 <!-- Date Range Filters -->
+                <div class="flex bg-slate-800 rounded-lg p-1 mr-2">
+                  <button onclick="setReportDate('today')" class="px-3 py-1 text-xs rounded-md hover:bg-slate-700 text-slate-300 transition-colors">Hari Ini</button>
+                  <button onclick="setReportDate('7days')" class="px-3 py-1 text-xs rounded-md hover:bg-slate-700 text-slate-300 transition-colors">7 Hari</button>
+                  <button onclick="setReportDate('30days')" class="px-3 py-1 text-xs rounded-md hover:bg-slate-700 text-slate-300 transition-colors">30 Hari</button>
+                </div>
                 <input
                   type="date"
                   id="reportStartDate"
@@ -2274,7 +2279,7 @@
                   class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500 flex items-center gap-2"
                 >
                   <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                  <span>Refresh</span>
+                  <span class="hidden sm:inline">Refresh</span>
                 </button>
               </div>
             </div>
@@ -2312,6 +2317,64 @@
                   <i data-lucide="gift" class="w-5 h-5 text-purple-400"></i>
                 </div>
                 <div id="reportRewardsRedeemed" class="text-2xl font-bold text-white">-</div>
+              </div>
+            </div>
+
+            <!-- Best Selling Products Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-6">
+              <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-semibold flex items-center gap-2">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+                  Produk Terlaris
+                </h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-slate-800">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Nama Produk</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Terjual (Qty)</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold text-slate-400">Total Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportTopProductsTableBody">
+                    <tr>
+                      <td colspan="3" class="px-4 py-6 text-center text-slate-400">
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Reward Redemptions History -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-6">
+              <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-semibold flex items-center gap-2">
+                  <i data-lucide="gift" class="w-4 h-4 text-purple-400"></i>
+                  Riwayat Penukaran Reward
+                </h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-slate-800">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">User</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Reward</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Poin</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Tanggal</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportRedemptionsTableBody">
+                    <tr>
+                      <td colspan="5" class="px-4 py-6 text-center text-slate-400">
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -2895,6 +2958,56 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- User Rewards Modal -->
+    <div
+      id="rewardsModal"
+      class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex flex-col">
+            <h3 class="text-2xl font-bold text-white">Riwayat Reward</h3>
+            <p class="text-slate-400 text-sm">User: <span id="rewardUserName" class="text-white font-medium">-</span> (ID: <span id="rewardUserId">-</span>)</p>
+          </div>
+          <button
+            onclick="closeRewardsModal()"
+            class="text-slate-400 hover:text-slate-200 transition"
+          >
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-800">
+              <tr>
+                <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">#</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Reward</th>
+                <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Poin</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">Tanggal</th>
+                <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Status</th>
+                <th class="px-4 py-3 text-center text-xs font-semibold text-slate-400">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="rewardsHistoryBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-6 flex justify-end">
+          <button
+            onclick="closeRewardsModal()"
+            class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
+          >
+            Tutup
+          </button>
+        </div>
       </div>
     </div>
 

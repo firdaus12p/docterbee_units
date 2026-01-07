@@ -25,6 +25,94 @@ router.get("/", async (req, res) => {
 // ADMIN ROUTES (for management)
 // ============================================
 
+// ============================================
+// REDEMPTION MANAGEMENT (Admin)
+// ============================================
+
+// GET /api/rewards/admin/redemptions - Get all redemptions with user details
+router.get("/admin/redemptions", requireAdmin, async (req, res) => {
+  try {
+    const { status, user_id, start_date, end_date } = req.query;
+    
+    let queryStr = `
+      SELECT 
+        rr.id,
+        rr.user_id,
+        rr.reward_id,
+        rr.reward_name,
+        rr.points_cost,
+        rr.status,
+        rr.redeemed_at,
+        u.name as user_name,
+        u.email as user_email,
+        u.phone as user_phone
+      FROM reward_redemptions rr
+      JOIN users u ON rr.user_id = u.id
+      WHERE 1=1
+    `;
+    
+    const params = [];
+
+    if (status) {
+      queryStr += " AND rr.status = ?";
+      params.push(status);
+    }
+    
+    if (user_id) {
+      queryStr += " AND rr.user_id = ?";
+      params.push(user_id);
+    }
+
+    if (start_date && end_date) {
+      queryStr += " AND DATE(rr.redeemed_at) BETWEEN ? AND ?";
+      params.push(start_date, end_date);
+    }
+
+    queryStr += " ORDER BY rr.redeemed_at DESC LIMIT 100";
+
+    const redemptions = await query(queryStr, params);
+
+    res.json({ success: true, redemptions });
+  } catch (error) {
+    console.error("Error fetching redemptions:", error);
+    res.status(500).json({ success: false, error: "Gagal memuat data redemption" });
+  }
+});
+
+// PATCH /api/rewards/admin/redemptions/:id/status - Update redemption status
+router.patch("/admin/redemptions/:id/status", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ success: false, error: "Status tidak valid" });
+    }
+
+    // Update status
+    await query(
+      "UPDATE reward_redemptions SET status = ? WHERE id = ?",
+      [status, id]
+    );
+    
+    // Check if we need to refund points (if rejected)
+    if (status === 'rejected') {
+        const redemption = await queryOne("SELECT user_id, points_cost FROM reward_redemptions WHERE id = ?", [id]);
+        if (redemption) {
+           await query("UPDATE user_progress SET points = points + ? WHERE user_id = ?", [
+             redemption.points_cost,
+             redemption.user_id
+           ]);
+        }
+    }
+
+    res.json({ success: true, message: `Status update: ${status}` });
+  } catch (error) {
+    console.error("Error updating redemption:", error);
+    res.status(500).json({ success: false, error: "Gagal mengupdate status" });
+  }
+});
+
 // GET /api/rewards/admin/all - Get all rewards including inactive (admin only)
 router.get("/admin/all", requireAdmin, async (req, res) => {
   try {
@@ -212,5 +300,7 @@ router.delete("/admin/:id", requireAdmin, async (req, res) => {
     res.status(500).json({ success: false, error: "Gagal menghapus reward" });
   }
 });
+
+
 
 export default router;

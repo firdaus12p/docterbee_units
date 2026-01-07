@@ -129,16 +129,24 @@ router.post("/", async (req, res) => {
     }
 
     // Resolve location_id from request body or derive from store_location string
+    // Defense in Depth: Handle both explicit ID and legacy Name
     let locationId = req.body.location_id || null;
     
+    // If location_id not explicitly sent, try to resolve from store_location
     if (!locationId && store_location) {
-      // Try to find location by name (case-insensitive match)
-      const location = await queryOne(
-        "SELECT id FROM locations WHERE LOWER(name) = LOWER(?) AND is_active = 1",
-        [store_location]
-      );
-      if (location) {
-        locationId = location.id;
+      // 1. If store_location corresponds to a numeric ID, use it directly
+      if (!isNaN(store_location) && Number.isInteger(parseFloat(store_location))) {
+         locationId = parseInt(store_location);
+      } else {
+         // 2. If it's a legacy string name (e.g., "Kolaka"), resolve via DB lookup
+         // Try to find location by name (case-insensitive match)
+         const location = await queryOne(
+           "SELECT id FROM locations WHERE LOWER(name) = LOWER(?) AND is_active = 1",
+           [store_location]
+         );
+         if (location) {
+           locationId = location.id;
+         }
       }
     }
 
