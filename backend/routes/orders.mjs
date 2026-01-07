@@ -2,6 +2,7 @@ import express from "express";
 import { query, queryOne } from "../db.mjs";
 import { generateOrderNumber, calculateExpiryTime, calculatePoints } from "../utils/helpers.mjs";
 import { requireAdmin } from "../middleware/auth.mjs";
+import { createOrderValidator, assignPointsByPhoneValidator, validate } from "../middleware/validators.mjs";
 
 const router = express.Router();
 
@@ -70,7 +71,7 @@ router.get("/check-pending", async (req, res) => {
 // ============================================
 // POST /api/orders - Create new order
 // ============================================
-router.post("/", async (req, res) => {
+router.post("/", createOrderValidator, validate, async (req, res) => {
   try {
     const {
       guest_data,
@@ -113,20 +114,8 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // Validation
-    if (!order_type || !store_location || !items || !total_amount) {
-      return res.status(400).json({
-        success: false,
-        error: "Order type, store location, items, dan total amount harus diisi",
-      });
-    }
-
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: "Items harus berupa array dan tidak boleh kosong",
-      });
-    }
+    // NOTE: Basic validation (required fields, items array check)
+    // is now handled by createOrderValidator middleware
 
     // Resolve location_id from request body or derive from store_location string
     // Defense in Depth: Handle both explicit ID and legacy Name
@@ -772,17 +761,12 @@ router.patch("/:id/cancel", async (req, res) => {
 // ============================================
 // POST /api/orders/:id/assign-points-by-phone - Assign points to user by phone (admin only)
 // ============================================
-router.post("/:id/assign-points-by-phone", requireAdmin, async (req, res) => {
+router.post("/:id/assign-points-by-phone", requireAdmin, assignPointsByPhoneValidator, validate, async (req, res) => {
   try {
     const { id } = req.params;
     const { phone } = req.body;
 
-    if (!phone) {
-      return res.status(400).json({
-        success: false,
-        error: "Nomor HP harus diisi",
-      });
-    }
+    // NOTE: Phone validation is now handled by assignPointsByPhoneValidator middleware
 
     // Check if order exists
     const order = await queryOne("SELECT * FROM orders WHERE id = ?", [id]);

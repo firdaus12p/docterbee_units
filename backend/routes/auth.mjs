@@ -4,40 +4,27 @@ import crypto from "crypto";
 import { query, queryOne } from "../db.mjs";
 import { loginRateLimiter, emailRateLimiter } from "../utils/rate-limiter.mjs";
 import { sendVerificationEmail, sendForgotPasswordEmail } from "../utils/mailer.mjs";
+import {
+  registerValidator,
+  loginValidator,
+  changePasswordValidator,
+  updateEmailValidator,
+  forgotPasswordValidator,
+  resetPasswordValidator,
+  validate,
+} from "../middleware/validators.mjs";
 
 const router = express.Router();
 
 // ============================================
 // POST /api/auth/register - Register new user
 // ============================================
-router.post("/register", async (req, res) => {
+router.post("/register", registerValidator, validate, async (req, res) => {
   try {
     const { name, email, phone, password, card_type } = req.body;
 
-    // Validation
-    if (!name || !email || !phone || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Semua field harus diisi",
-      });
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        error: "Format email tidak valid",
-      });
-    }
-
-    // Password minimum length
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: "Password minimal 6 karakter",
-      });
-    }
+    // NOTE: Basic validation (required, email format, password length) 
+    // is now handled by registerValidator middleware
 
     // Check if email already exists
     const existingUser = await queryOne(
@@ -115,17 +102,11 @@ router.post("/register", async (req, res) => {
 // ============================================
 // POST /api/auth/login - Login user (with rate limiting)
 // ============================================
-router.post("/login", loginRateLimiter.middleware(), async (req, res) => {
+router.post("/login", loginRateLimiter.middleware(), loginValidator, validate, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Email dan password harus diisi",
-      });
-    }
+    // NOTE: Basic validation (required fields) is now handled by loginValidator middleware
 
     // Find user - explicitly select needed columns only (security: exclude loading unnecessary data)
     const user = await queryOne(
@@ -284,7 +265,7 @@ router.get("/check", async (req, res) => {
 // ============================================
 // POST /api/auth/change-password - Self-service password change
 // ============================================
-router.post("/change-password", async (req, res) => {
+router.post("/change-password", changePasswordValidator, validate, async (req, res) => {
   try {
     // Validate user is logged in
     if (!req.session.userId) {
@@ -296,33 +277,12 @@ router.post("/change-password", async (req, res) => {
 
     const { currentPassword, newPassword } = req.body;
 
-    // Validation - required fields
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({
-        success: false,
-        error: "Password saat ini dan password baru harus diisi",
-      });
-    }
+    // NOTE: Basic validation (required, min length, different from current)
+    // is now handled by changePasswordValidator middleware
 
     // Trim password inputs to prevent whitespace issues
     const trimmedCurrentPassword = currentPassword.trim();
     const trimmedNewPassword = newPassword.trim();
-
-    // Validate new password minimum length
-    if (trimmedNewPassword.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: "Password minimal 6 karakter",
-      });
-    }
-
-    // Validate new password is different from current
-    if (trimmedNewPassword === trimmedCurrentPassword) {
-      return res.status(400).json({
-        success: false,
-        error: "Password baru harus berbeda dari password saat ini",
-      });
-    }
 
     // MANDATORY: Check if email is verified
     const user = await queryOne(
@@ -381,21 +341,16 @@ router.post("/change-password", async (req, res) => {
 // ============================================
 // POST /api/auth/update-email - Update & Send verification
 // ============================================
-router.post("/update-email", emailRateLimiter.middleware(), async (req, res) => {
+router.post("/update-email", emailRateLimiter.middleware(), updateEmailValidator, validate, async (req, res) => {
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, error: "Silakan login terlebih dahulu" });
     }
 
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, error: "Email harus diisi" });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email) || email.endsWith('.local')) {
-      return res.status(400).json({ success: false, error: "Format email tidak valid" });
-    }
+    
+    // NOTE: Basic validation (required, email format, .local rejection)
+    // is now handled by updateEmailValidator middleware
 
     // Check if email taken
     const existing = await queryOne("SELECT id FROM users WHERE email = ? AND id != ?", [email, req.session.userId]);
@@ -521,12 +476,11 @@ router.post("/resend-verification", emailRateLimiter.middleware(), async (req, r
 // ============================================
 // POST /api/auth/forgot-password - Request reset link
 // ============================================
-router.post("/forgot-password", loginRateLimiter.middleware(), async (req, res) => {
+router.post("/forgot-password", loginRateLimiter.middleware(), forgotPasswordValidator, validate, async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, error: "Email harus diisi" });
-    }
+    
+    // NOTE: Required validation is now handled by forgotPasswordValidator middleware
 
     const user = await queryOne("SELECT id, name, email FROM users WHERE email = ? AND is_active = 1", [email]);
     
@@ -561,17 +515,12 @@ router.post("/forgot-password", loginRateLimiter.middleware(), async (req, res) 
 // ============================================
 // POST /api/auth/reset-password - Perform reset
 // ============================================
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", resetPasswordValidator, validate, async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    if (!token || !newPassword) {
-      return res.status(400).json({ success: false, error: "Token dan password baru harus diisi" });
-    }
-
-    if (newPassword.length < 6) {
-      return res.status(400).json({ success: false, error: "Password minimal 6 karakter" });
-    }
+    // NOTE: Basic validation (required, min length)
+    // is now handled by resetPasswordValidator middleware
 
     const user = await queryOne(
       "SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > NOW()",

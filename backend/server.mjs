@@ -205,7 +205,7 @@ app.get("/index.html", (req, res) => {
 
 // Initialize Google Generative AI
 const apiKey = process.env.GEMINI_API_KEY?.trim();
-console.log("🔑 API Key (first 10 chars):", apiKey?.substring(0, 10) + "...");
+console.log("🔑 API Key configured: ", apiKey ? "Yes" : "No");
 
 if (!apiKey) {
   console.error("❌ GEMINI_API_KEY tidak ditemukan di .env file!");

@@ -87,7 +87,9 @@ router.get("/:id", requireAdmin, async (req, res) => {
 });
 
 // POST /api/bookings - Create new booking
-router.post("/", async (req, res) => {
+import { createBookingValidator, validate } from "../middleware/validators.mjs";
+
+router.post("/", createBookingValidator, validate, async (req, res) => {
   try {
     const {
       serviceName,
@@ -107,20 +109,13 @@ router.post("/", async (req, res) => {
       // Price is ALWAYS determined server-side from database
     } = req.body;
 
-    // Validation
-    if (!serviceName || !branch || !practitioner || !date || !time || !mode) {
-      return res.status(400).json({
-        success: false,
-        error: "Data booking tidak lengkap",
-      });
-    }
-
-    // Validate customer data if provided
+    // Manual validation for conditional required fields checks (business logic)
+    // Validate customer data if provided - ensure completeness
     if (customerName || customerPhone || customerAge || customerGender || customerAddress) {
       if (!customerName || !customerPhone || !customerAge || !customerGender || !customerAddress) {
         return res.status(400).json({
           success: false,
-          error: "Data pribadi harus diisi lengkap",
+          error: "Data pribadi harus diisi lengkap jika menyertakan data pelanggan",
         });
       }
     }

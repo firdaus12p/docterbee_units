@@ -82,7 +82,12 @@ function displayArticle(article) {
   }
 
   // Content
-  document.getElementById("articleContent").innerHTML = article.content;
+  // SECURITY: Sanitize content before rendering HTML to prevent XSS
+  const cleanContent = DOMPurify.sanitize(article.content, {
+    ADD_TAGS: ["iframe"], // Allow YouTube embeds if needed
+    ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"],
+  });
+  document.getElementById("articleContent").innerHTML = cleanContent;
 
   // Initialize Lucide icons
   if (typeof lucide !== "undefined") {

@@ -1,0 +1,6 @@
+﻿Package                Current  Wanted  Latest  Location                            Depended by
+@google/generative-ai   0.21.0  0.21.0  0.24.1  node_modules/@google/generative-ai  docterbee_units
+dotenv                  16.6.1  16.6.1  17.2.3  node_modules/dotenv                 docterbee_units
+express                 4.22.1  4.22.1   5.2.1  node_modules/express                docterbee_units
+globals                 16.5.0  16.5.0  17.0.0  node_modules/globals                docterbee_units
+mysql2                  3.15.3  3.16.0  3.16.0  node_modules/mysql2                 docterbee_units
