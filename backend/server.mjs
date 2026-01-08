@@ -26,6 +26,7 @@ import journeysRouter from "./routes/journeys.mjs";
 import memberCheckRouter from "./routes/member-check.mjs";
 import locationsRouter from "./routes/locations.mjs";
 import reportsRouter from "./routes/reports.mjs";
+import eventRegistrationsRouter from "./routes/event-registrations.mjs";
 import bcrypt from "bcryptjs";
 import { loginRateLimiter } from "./utils/rate-limiter.mjs";
 
@@ -189,6 +190,7 @@ const cleanUrlPages = [
   "member-check",
   "about",
   "reset-password",
+  "event-registration",
 ];
 
 // Redirect .html URLs to clean URLs (SEO friendly)
@@ -251,6 +253,7 @@ app.use("/api/journeys", journeysRouter);
 app.use("/api/member-check", memberCheckRouter);
 app.use("/api/locations", locationsRouter);
 app.use("/api/reports", reportsRouter);
+app.use("/api/event-registrations", eventRegistrationsRouter);
 
 // ============================================
 // STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)

@@ -153,6 +153,10 @@
             <i data-lucide="video" class="w-5 h-5"></i>
             <span>Program Manager</span>
           </button>
+          <button class="admin-mobile-nav-item" data-section="eventRegistrations">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+            <span>Pendaftar Event</span>
+          </button>
           <button class="admin-mobile-nav-item" data-section="coupons">
             <i data-lucide="tag" class="w-5 h-5"></i>
             <span>Coupon Manager</span>
@@ -215,6 +219,10 @@
             <button class="admin-sidebar-nav-item" data-section="events">
               <i data-lucide="video" class="w-5 h-5"></i>
               <span>Program Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="eventRegistrations">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Pendaftar Event</span>
             </button>
             <button class="admin-sidebar-nav-item" data-section="coupons">
               <i data-lucide="tag" class="w-5 h-5"></i>
@@ -766,6 +774,64 @@
                   </div>
                 </form>
               </div>
+            </div>
+          </section>
+
+          <!-- Section: Event Registrations (Pendaftar Event) -->
+          <section id="section-eventRegistrations" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">Pendaftar Event</h2>
+              <div class="flex flex-wrap gap-2">
+                <select
+                  id="filterEventRegistrationsEvent"
+                  class="bg-slate-800 border border-slate-700 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm flex-1 sm:flex-none"
+                >
+                  <option value="">Semua Event</option>
+                  <!-- Options populated dynamically -->
+                </select>
+                <select
+                  id="filterEventRegistrationsStatus"
+                  class="bg-slate-800 border border-slate-700 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm flex-1 sm:flex-none"
+                >
+                  <option value="">Semua Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="attended">Attended</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <button
+                  id="refreshEventRegistrations"
+                  class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500"
+                >
+                  Refresh
+                </button>
+              </div>
+            </div>
+            <div class="booking-container overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-white border-b border-slate-200">
+                  <tr>
+                    <th class="text-left p-3 text-slate-900">#</th>
+                    <th class="text-left p-3 text-slate-900">Event</th>
+                    <th class="text-left p-3 text-slate-900">Nama</th>
+                    <th class="text-left p-3 text-slate-900">HP/WA</th>
+                    <th class="text-left p-3 text-slate-900">Email</th>
+                    <th class="text-left p-3 text-slate-900">Biaya</th>
+                    <th class="text-left p-3 text-slate-900">Tanggal Daftar</th>
+                    <th class="text-left p-3 text-slate-900">Status</th>
+                    <th class="text-left p-3 text-slate-900">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="eventRegistrationsTableBody">
+                  <tr>
+                    <td colspan="9" class="text-center p-6 text-slate-400">
+                      Loading...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </section>
 

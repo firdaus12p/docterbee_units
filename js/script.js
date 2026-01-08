@@ -1517,9 +1517,7 @@ async function renderEvents() {
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
         <div class="mt-3 flex flex-wrap gap-2">
-          <a href="/booking?service=${encodeURIComponent(
-            event.title
-          )}" class="btn-primary-sm">Daftar</a>
+          <a href="/event-registration?eventId=${event.id}" class="btn-primary-sm">Daftar</a>
           ${
             event.link
               ? `<a href="${escapeHtml(

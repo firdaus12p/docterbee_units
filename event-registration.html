@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Event & Webinar Kesehatan Islami | DocterBee</title>
+    <meta name="description" content="Daftar untuk mengikuti webinar dan workshop kesehatan Islami dari DocterBee. Belajar gaya hidup Rasulullah, nutrisi Al-Qur'ani, dan sains kesehatan." />
+    <meta name="keywords" content="daftar webinar kesehatan, registrasi event kesehatan islami, pendaftaran workshop, docterbee event" />
+    <meta name="author" content="DocterBee" />
+    
+    <!-- SEO & Indexing -->
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    
+    <!-- Geo-Targeting Indonesia -->
+    <meta name="geo.region" content="ID-SS" />
+    <meta name="geo.placename" content="Makassar, Kolaka, Indonesia" />
+    <meta name="language" content="Indonesian" />
+    <meta name="content-language" content="id-ID" />
+    
+    <!-- Mobile & Theme -->
+    <meta name="theme-color" content="#EC3237" />
+    <meta name="msapplication-TileColor" content="#EC3237" />
+    <meta name="apple-mobile-web-app-title" content="DocterBee" />
+    
+    <!-- Performance: Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <link rel="canonical" href="https://docterbee.com/event-registration" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DocterBee" />
+    <meta property="og:title" content="Daftar Event & Webinar Kesehatan Islami – DocterBee" />
+    <meta property="og:description" content="Daftar untuk mengikuti webinar dan workshop kesehatan Islami." />
+    <meta property="og:image" content="https://docterbee.com/assets/images/logo-docterbee.png" />
+    <meta property="og:url" content="https://docterbee.com/event-registration" />
+    <meta property="og:locale" content="id_ID" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@docterbee" />
+    <meta name="twitter:title" content="Daftar Event Kesehatan – DocterBee" />
+    <meta name="twitter:description" content="Daftar webinar dan workshop kesehatan Islami." />
+    <meta name="twitter:image" content="https://docterbee.com/assets/images/logo-docterbee.png" />
+    
+    <!-- Structured Data - BreadcrumbList -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://docterbee.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Events", "item": "https://docterbee.com/events"},
+          {"@type": "ListItem", "position": 3, "name": "Daftar Event", "item": "https://docterbee.com/event-registration"}
+        ]
+      }
+    </script>
+
+    <!-- External Stylesheets -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/landing-page.css" />
+    <style>
+      main,
+      main section,
+      main aside,
+      main div {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-slate-900">
+    <!-- Header Navigation (Landing Page Style) -->
+    <header>
+      <div class="container">
+        <nav>
+          <a href="/" class="logo">
+            <img
+              src="assets/images/logo-docterbee.png"
+              alt="DocterBee"
+              class="logo-img"
+            />
+          </a>
+          <div class="nav-links">
+            <a href="/" id="guestNavItem">Beranda</a>
+            <a href="/store">Produk</a>
+            <a href="/events" class="active">Program</a>
+            <a href="/ai-advisor">AI Advisor</a>
+            <div id="authButtons">
+              <button
+                class="btn btn-outline"
+                onclick="location.href='/login'"
+                style="margin-right: 8px"
+              >
+                Masuk
+              </button>
+              <button
+                class="btn btn-primary"
+                onclick="location.href='/register'"
+              >
+                Daftar Akun
+              </button>
+            </div>
+            <div
+              id="memberInfo"
+              style="display: none; align-items: center; gap: 12px"
+            >
+              <span class="points-display" id="pointsDisplay">
+                Points: <b id="navPoints">0</b>
+              </span>
+              <a
+                href="/profile"
+                id="profileBtn"
+                class="nav-link"
+                title="Profile"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </a>
+              <button id="logoutBtn" class="btn btn-outline-danger">
+                Logout
+              </button>
+            </div>
+          </div>
+
+          <!-- Hamburger Menu Button (Mobile) -->
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-header">
+        <div class="logo-box" style="margin: 0">
+          <img
+            src="assets/images/logo-docterbee.png"
+            alt="DocterBee"
+            style="height: 48px; width: auto"
+          />
+        </div>
+        <button
+          class="mobile-menu-close"
+          id="mobileMenuClose"
+          aria-label="Close"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="/" id="mobileGuestNavItem" class="mobile-nav-link">Beranda</a>
+        <a href="/store" class="mobile-nav-link">Produk</a>
+        <a href="/events" class="mobile-nav-link active">Program</a>
+        <a href="/ai-advisor" class="mobile-nav-link">AI Advisor</a>
+        <div class="mobile-menu-actions">
+          <div id="mobileAuthButtons">
+            <button
+              class="btn btn-outline"
+              onclick="location.href='/login'"
+              style="width: 100%"
+            >
+              Masuk
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="location.href='/register'"
+              style="width: 100%"
+            >
+              Daftar Akun
+            </button>
+          </div>
+          <div id="mobileMemberInfo" style="display: none">
+            <div class="mobile-points-display" id="mobilePointsDisplay">
+              Points: <b id="mobileNavPoints">0</b>
+            </div>
+            <a
+              href="/profile"
+              id="mobileProfileBtn"
+              class="mobile-nav-link"
+              style="display: flex; align-items: center; gap: 8px"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile
+            </a>
+            <button
+              id="mobileLogoutBtn"
+              class="btn btn-outline-danger"
+              style="width: 100%"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="mx-auto max-w-6xl px-4 md:px-6 py-8">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Daftar Event</h1>
+      <p class="text-slate-600 mb-6 max-w-2xl">
+        Lengkapi data diri Anda untuk mendaftar event ini. Kami akan menghubungi Anda melalui WhatsApp.
+      </p>
+
+      <!-- Event Info Card (populated by JS) -->
+      <div
+        id="eventInfoCard"
+        class="mb-6 rounded-2xl border-2 border-amber-400/40 bg-white p-5 hidden"
+      >
+        <div class="flex flex-col gap-3">
+          <div>
+            <div class="text-xs text-slate-500 mb-1">Event yang dipilih:</div>
+            <div id="eventTitle" class="text-xl font-bold text-amber-600"></div>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div>
+              <div class="text-slate-500">Tanggal</div>
+              <div id="eventDate" class="font-semibold"></div>
+            </div>
+            <div>
+              <div class="text-slate-500">Mode</div>
+              <div id="eventMode" class="font-semibold"></div>
+            </div>
+            <div>
+              <div class="text-slate-500">Pemateri</div>
+              <div id="eventSpeaker" class="font-semibold"></div>
+            </div>
+            <div>
+              <div class="text-slate-500">Biaya</div>
+              <div id="eventFee" class="font-bold text-red-600"></div>
+            </div>
+          </div>
+          <div id="eventDescription" class="text-sm text-slate-600 mt-2"></div>
+        </div>
+      </div>
+
+      <!-- Error Message (when event not found) -->
+      <div id="eventNotFound" class="hidden mb-6 rounded-2xl border-2 border-red-400/40 bg-red-50 p-5">
+        <div class="flex items-center gap-3 text-red-600">
+          <i data-lucide="alert-circle" class="w-6 h-6"></i>
+          <div>
+            <div class="font-semibold">Event Tidak Ditemukan</div>
+            <div class="text-sm">Silakan pilih event dari halaman <a href="/events" class="underline font-semibold">Program</a>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Registration Form -->
+        <div class="booking-container space-y-4 md:col-span-2">
+          <!-- Data Pribadi -->
+          <div class="mb-4">
+            <div class="text-base font-bold text-amber-500 mb-3">
+              Data Pribadi
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <label class="booking-label">
+                Nama Lengkap <span class="text-red-400">*</span>
+                <input
+                  id="customerName"
+                  type="text"
+                  class="booking-input"
+                  placeholder="Nama lengkap Anda"
+                  required
+                />
+              </label>
+              <label class="booking-label">
+                No. HP / WhatsApp <span class="text-red-400">*</span>
+                <input
+                  id="customerPhone"
+                  type="tel"
+                  class="booking-input"
+                  placeholder="08xx-xxxx-xxxx"
+                  required
+                />
+              </label>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3 mt-3">
+              <label class="booking-label">
+                Email (Opsional)
+                <input
+                  id="customerEmail"
+                  type="email"
+                  class="booking-input"
+                  placeholder="email@contoh.com"
+                />
+              </label>
+              <label class="booking-label">
+                Umur
+                <input
+                  id="customerAge"
+                  type="number"
+                  min="1"
+                  max="150"
+                  class="booking-input"
+                  placeholder="Tahun"
+                />
+              </label>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3 mt-3">
+              <label class="booking-label">
+                Jenis Kelamin
+                <select id="customerGender" class="booking-select">
+                  <option value="">Pilih...</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </label>
+              <label class="booking-label">
+                Alamat (Opsional)
+                <input
+                  id="customerAddress"
+                  type="text"
+                  class="booking-input"
+                  placeholder="Kota / Kabupaten"
+                />
+              </label>
+            </div>
+          </div>
+
+          <!-- Kode Promo (only shown if event has fee) -->
+          <div id="promoSection" class="hidden">
+            <div class="text-base font-bold text-amber-500 mb-3">
+              Kode Promo
+            </div>
+            <div class="grid md:grid-cols-3 gap-3 items-end">
+              <label class="booking-label md:col-span-2">
+                Kode Promo (Opsional)
+                <input
+                  id="promoCode"
+                  type="text"
+                  class="booking-input uppercase"
+                  placeholder="Masukkan kode promo"
+                />
+              </label>
+              <button
+                id="btnValidatePromo"
+                class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500 transition"
+              >
+                Validasi
+              </button>
+            </div>
+            <div id="promoResult" class="hidden text-sm mt-2"></div>
+          </div>
+
+          <!-- Price Summary -->
+          <div
+            id="priceSummary"
+            class="hidden bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl p-4 border border-slate-200"
+          >
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-slate-600">Biaya Pendaftaran:</span>
+              <span id="displayPrice" class="font-semibold text-lg">Rp 0</span>
+            </div>
+            <div
+              id="discountRow"
+              class="hidden flex justify-between items-center mb-2 text-emerald-600"
+            >
+              <span>Diskon:</span>
+              <span id="displayDiscount" class="font-semibold">- Rp 0</span>
+            </div>
+            <div
+              class="flex justify-between items-center pt-2 border-t border-slate-300"
+            >
+              <span class="text-amber-600 font-semibold">Total Bayar:</span>
+              <span
+                id="displayFinalPrice"
+                class="font-bold text-2xl text-amber-600"
+                >Rp 0</span
+              >
+            </div>
+          </div>
+
+          <!-- Catatan -->
+          <div>
+            <label class="booking-label">
+              Catatan (Opsional)
+              <textarea
+                id="notes"
+                rows="2"
+                class="booking-input"
+                placeholder="Pertanyaan atau informasi tambahan..."
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="flex gap-3">
+            <button id="btnSubmitRegistration" class="btn-primary">
+              Daftar Sekarang
+            </button>
+            <a href="/events" class="btn-secondary">
+              Lihat Event Lain
+            </a>
+          </div>
+        </div>
+
+        <!-- Sidebar Info -->
+        <aside class="booking-sidebar">
+          <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="info" class="w-4 h-4 text-amber-300"></i>
+            <b>Informasi</b>
+          </div>
+          <ul class="list-disc pl-5 text-slate-600 space-y-1">
+            <li>Data Anda akan disimpan dengan aman.</li>
+            <li>Admin akan menghubungi via WhatsApp untuk konfirmasi.</li>
+            <li>Untuk event online, link Zoom akan dikirim via WA/Email.</li>
+            <li>Untuk event offline, alamat lengkap akan dikirim H-1.</li>
+          </ul>
+          <div class="mt-4 flex items-center gap-2">
+            <i data-lucide="help-circle" class="w-4 h-4 text-sky-300"></i>
+            <b>Butuh Bantuan?</b>
+          </div>
+          <p class="text-slate-600">Hubungi: 0851-9155-4056</p>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>© 2025 DocterBee. All rights reserved.</div>
+          <div>
+            Berbasis <strong>Sains & Alam</strong>. | <a href="#">Privacy</a> ·
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- External Scripts -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="js/user-data-sync.js"></script>
+    <script src="js/modal-utils.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/landing-navbar.js"></script>
+    <script>
+      // Event Registration Page Script
+      const eventRegState = {
+        eventId: null,
+        eventData: null,
+        registrationFee: 0,
+        discountAmount: 0,
+        finalFee: 0,
+        validatedCoupon: null,
+      };
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Get event ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get("eventId");
+
+        if (!eventId) {
+          showEventNotFound();
+          return;
+        }
+
+        eventRegState.eventId = eventId;
+
+        // Load event data
+        await loadEventData(eventId);
+
+        // Initialize Lucide icons
+        if (typeof lucide !== "undefined" && lucide.createIcons) {
+          lucide.createIcons();
+        }
+
+        // Attach event listeners
+        document.getElementById("btnSubmitRegistration").addEventListener("click", submitRegistration);
+        document.getElementById("btnValidatePromo").addEventListener("click", validatePromoCode);
+      });
+
+      async function loadEventData(eventId) {
+        try {
+          const response = await fetch(`/api/event-registrations/event/${eventId}`);
+          const result = await response.json();
+
+          if (!result.success) {
+            showEventNotFound(result.error);
+            return;
+          }
+
+          const event = result.data;
+          eventRegState.eventData = event;
+          eventRegState.registrationFee = event.registration_fee || 0;
+          eventRegState.finalFee = eventRegState.registrationFee;
+
+          // Populate event info card
+          document.getElementById("eventTitle").textContent = event.title;
+          document.getElementById("eventDate").textContent = formatDate(event.event_date);
+          document.getElementById("eventMode").textContent = event.mode === "online" ? "Online (Zoom)" : "Offline";
+          document.getElementById("eventSpeaker").textContent = event.speaker || "-";
+          document.getElementById("eventFee").textContent = event.registration_fee > 0 
+            ? `Rp ${new Intl.NumberFormat("id-ID").format(event.registration_fee)}` 
+            : "GRATIS";
+          document.getElementById("eventDescription").textContent = event.description || "";
+
+          // Show event info card
+          document.getElementById("eventInfoCard").classList.remove("hidden");
+
+          // Show promo section if event has fee
+          if (event.registration_fee > 0) {
+            document.getElementById("promoSection").classList.remove("hidden");
+            updatePriceDisplay();
+          }
+
+        } catch (error) {
+          console.error("Error loading event:", error);
+          showEventNotFound("Gagal memuat data event. Silakan coba lagi.");
+        }
+      }
+
+      function showEventNotFound(message) {
+        document.getElementById("eventNotFound").classList.remove("hidden");
+        document.getElementById("eventInfoCard").classList.add("hidden");
+        document.getElementById("btnSubmitRegistration").disabled = true;
+        document.getElementById("btnSubmitRegistration").classList.add("opacity-50", "cursor-not-allowed");
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("id-ID", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+
+      function updatePriceDisplay() {
+        const priceSummary = document.getElementById("priceSummary");
+        const displayPrice = document.getElementById("displayPrice");
+        const discountRow = document.getElementById("discountRow");
+        const displayDiscount = document.getElementById("displayDiscount");
+        const displayFinalPrice = document.getElementById("displayFinalPrice");
+
+        if (eventRegState.registrationFee === 0) {
+          priceSummary.classList.add("hidden");
+          return;
+        }
+
+        priceSummary.classList.remove("hidden");
+        displayPrice.textContent = `Rp ${new Intl.NumberFormat("id-ID").format(eventRegState.registrationFee)}`;
+
+        if (eventRegState.discountAmount > 0) {
+          discountRow.classList.remove("hidden");
+          displayDiscount.textContent = `- Rp ${new Intl.NumberFormat("id-ID").format(eventRegState.discountAmount)}`;
+        } else {
+          discountRow.classList.add("hidden");
+        }
+
+        displayFinalPrice.textContent = `Rp ${new Intl.NumberFormat("id-ID").format(eventRegState.finalFee)}`;
+      }
+
+      async function validatePromoCode() {
+        const promoCodeInput = document.getElementById("promoCode");
+        const promoResult = document.getElementById("promoResult");
+        const code = promoCodeInput.value.trim();
+
+        if (!code) {
+          promoResult.className = "text-sm text-slate-500";
+          promoResult.textContent = "Masukkan kode promo terlebih dahulu";
+          promoResult.classList.remove("hidden");
+          return;
+        }
+
+        promoResult.className = "text-sm text-slate-500";
+        promoResult.textContent = "Memvalidasi...";
+        promoResult.classList.remove("hidden");
+
+        try {
+          const response = await fetch("/api/coupons/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              code: code.toUpperCase(),
+              booking_value: eventRegState.registrationFee,
+              type: "services",
+            }),
+            credentials: "include",
+          });
+
+          const result = await response.json();
+
+          if (result.success && result.valid) {
+            promoResult.className = "text-sm text-emerald-600 bg-emerald-50 p-3 rounded-lg";
+            promoResult.innerHTML = `
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <b>Kode promo valid!</b>
+              </div>
+              <div class="text-xs">Diskon: <b>${
+                result.data.discountType === "percentage"
+                  ? result.data.discountValue + "%"
+                  : "Rp " + result.data.discountValue.toLocaleString("id-ID")
+              }</b></div>
+            `;
+
+            eventRegState.validatedCoupon = result.data;
+
+            // Calculate discount
+            if (result.data.discountType === "percentage") {
+              eventRegState.discountAmount = Math.round((eventRegState.registrationFee * result.data.discountValue) / 100);
+            } else {
+              eventRegState.discountAmount = result.data.discountValue;
+            }
+            eventRegState.finalFee = Math.max(0, eventRegState.registrationFee - eventRegState.discountAmount);
+
+            updatePriceDisplay();
+
+            if (typeof lucide !== "undefined") lucide.createIcons();
+          } else {
+            promoResult.className = "text-sm text-red-600 bg-red-50 p-3 rounded-lg";
+            promoResult.innerHTML = `
+              <div class="flex items-center gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                <span>${typeof escapeHtml === 'function' ? escapeHtml(result.error || "Kode promo tidak valid") : (result.error || "Kode promo tidak valid")}</span>
+              </div>
+            `;
+
+            eventRegState.validatedCoupon = null;
+            eventRegState.discountAmount = 0;
+            eventRegState.finalFee = eventRegState.registrationFee;
+            updatePriceDisplay();
+
+            if (typeof lucide !== "undefined") lucide.createIcons();
+          }
+        } catch (error) {
+          console.error("Error validating promo:", error);
+          promoResult.className = "text-sm text-red-600";
+          promoResult.textContent = "Gagal memvalidasi kode promo.";
+          eventRegState.validatedCoupon = null;
+          eventRegState.discountAmount = 0;
+          eventRegState.finalFee = eventRegState.registrationFee;
+          updatePriceDisplay();
+        }
+
+        promoResult.classList.remove("hidden");
+      }
+
+      async function submitRegistration() {
+        // Validate required fields
+        const customerName = document.getElementById("customerName").value.trim();
+        const customerPhone = document.getElementById("customerPhone").value.trim();
+        const customerEmail = document.getElementById("customerEmail").value.trim();
+        const customerAge = document.getElementById("customerAge").value;
+        const customerGender = document.getElementById("customerGender").value;
+        const customerAddress = document.getElementById("customerAddress").value.trim();
+        const promoCode = document.getElementById("promoCode")?.value.trim() || "";
+        const notes = document.getElementById("notes").value.trim();
+
+        if (!customerName || !customerPhone) {
+          if (typeof showWarning === "function") {
+            showWarning("Nama dan No. HP wajib diisi.");
+          } else {
+            alert("Nama dan No. HP wajib diisi.");
+          }
+          return;
+        }
+
+        // Phone validation
+        const phoneRegex = /^(08|\+?628)[0-9]{8,13}$/;
+        if (!phoneRegex.test(customerPhone.replace(/[\s-]/g, ""))) {
+          if (typeof showWarning === "function") {
+            showWarning("Format nomor HP tidak valid. Gunakan format: 08xx-xxxx-xxxx");
+          } else {
+            alert("Format nomor HP tidak valid.");
+          }
+          return;
+        }
+
+        // Disable button
+        const submitBtn = document.getElementById("btnSubmitRegistration");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Mendaftar...";
+
+        try {
+          const response = await fetch("/api/event-registrations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              eventId: eventRegState.eventId,
+              customerName,
+              customerPhone,
+              customerEmail: customerEmail || null,
+              customerAge: customerAge ? parseInt(customerAge) : null,
+              customerGender: customerGender || null,
+              customerAddress: customerAddress || null,
+              promoCode: promoCode || null,
+              notes: notes || null,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            const eventTitle = eventRegState.eventData?.title || "Event";
+            if (typeof showSuccess === "function") {
+              showSuccess(
+                `Halo ${customerName},\n\nPendaftaran Anda untuk "${eventTitle}" berhasil!\n\nAdmin kami akan segera menghubungi Anda di ${customerPhone} untuk konfirmasi.\n\nTerima kasih! 🙏`,
+                "Pendaftaran Berhasil"
+              );
+            } else {
+              alert(`Pendaftaran berhasil! Kami akan menghubungi Anda di ${customerPhone}.`);
+            }
+
+            // Reset form
+            document.getElementById("customerName").value = "";
+            document.getElementById("customerPhone").value = "";
+            document.getElementById("customerEmail").value = "";
+            document.getElementById("customerAge").value = "";
+            document.getElementById("customerGender").value = "";
+            document.getElementById("customerAddress").value = "";
+            document.getElementById("promoCode").value = "";
+            document.getElementById("notes").value = "";
+            document.getElementById("promoResult").classList.add("hidden");
+
+            eventRegState.validatedCoupon = null;
+            eventRegState.discountAmount = 0;
+            eventRegState.finalFee = eventRegState.registrationFee;
+            updatePriceDisplay();
+
+          } else {
+            if (typeof showError === "function") {
+              showError(result.error || "Gagal mendaftar. Silakan coba lagi.");
+            } else {
+              alert(result.error || "Gagal mendaftar.");
+            }
+          }
+        } catch (error) {
+          console.error("Error submitting registration:", error);
+          if (typeof showError === "function") {
+            showError("Terjadi kesalahan. Silakan coba lagi.");
+          } else {
+            alert("Terjadi kesalahan.");
+          }
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Daftar Sekarang";
+        }
+      }
+    </script>
+  </body>
+</html>

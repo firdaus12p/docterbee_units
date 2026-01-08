@@ -200,6 +200,34 @@ async function initializeTables() {
     `);
     console.log("✅ Table: events");
 
+    // Create event_registrations table (for event participants - separate from bookings)
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS event_registrations (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        event_id INT NOT NULL,
+        customer_name VARCHAR(255) NOT NULL,
+        customer_phone VARCHAR(20) NOT NULL,
+        customer_email VARCHAR(100) DEFAULT NULL,
+        customer_age INT DEFAULT NULL,
+        customer_gender ENUM('Laki-laki', 'Perempuan') DEFAULT NULL,
+        customer_address TEXT DEFAULT NULL,
+        registration_fee DECIMAL(10, 2) DEFAULT 0 COMMENT 'Fee paid for this registration',
+        promo_code VARCHAR(50) DEFAULT NULL,
+        discount_amount DECIMAL(10, 2) DEFAULT 0,
+        final_fee DECIMAL(10, 2) DEFAULT 0,
+        status ENUM('pending', 'confirmed', 'attended', 'cancelled') DEFAULT 'pending',
+        notes TEXT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+        INDEX idx_event_id (event_id),
+        INDEX idx_status (status),
+        INDEX idx_customer_phone (customer_phone),
+        INDEX idx_created_at (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: event_registrations");
+
     // Create coupons table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS coupons (

@@ -253,6 +253,7 @@ function switchSection(section) {
     bookings: "Booking Monitor",
     insight: "Edukasi Manager",
     events: "Program Manager",
+    eventRegistrations: "Pendaftar Event",
     coupons: "Coupon Manager",
     services: "Services Manager",
     products: "Products Manager",
@@ -337,6 +338,9 @@ function switchSection(section) {
     if (typeof window.loadReports === "function") {
       window.loadReports();
     }
+  } else if (section === "eventRegistrations") {
+    // Load event registrations
+    loadEventRegistrations();
   }
 }
 
@@ -2666,3 +2670,197 @@ function removeInsightHeaderImage() {
 window.uploadInsightHeaderImage = uploadInsightHeaderImage;
 window.uploadInsightContentImage = uploadInsightContentImage;
 window.removeInsightHeaderImage = removeInsightHeaderImage;
+
+// ========== EVENT REGISTRATIONS (Pendaftar Event) ==========
+
+async function loadEventRegistrations() {
+  const eventId = document.getElementById("filterEventRegistrationsEvent")?.value || "";
+  const status = document.getElementById("filterEventRegistrationsStatus")?.value || "";
+  const tbody = document.getElementById("eventRegistrationsTableBody");
+
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="9" class="text-center p-6 text-white">Loading...</td></tr>';
+
+  try {
+    // Build URL with filters
+    let url = `${API_BASE}/event-registrations`;
+    const params = new URLSearchParams();
+    if (eventId) params.append("eventId", eventId);
+    if (status) params.append("status", status);
+    if (params.toString()) url += `?${params.toString()}`;
+
+    const response = await adminFetch(url);
+    const result = await response.json();
+
+    if (result.success && result.data.length > 0) {
+      tbody.innerHTML = result.data
+        .map(
+          (reg, index) => `
+        <tr class="border-b border-slate-200 hover:bg-slate-50">
+          <td class="p-3 text-slate-900 font-semibold">#${index + 1}</td>
+          <td class="p-3 text-slate-900">
+            <div class="font-medium">${escapeHtml(reg.event_title || "-")}</div>
+            <div class="text-xs text-slate-500">${formatDate(reg.event_date)}</div>
+          </td>
+          <td class="p-3 text-slate-900">${escapeHtml(reg.customer_name)}</td>
+          <td class="p-3">
+            <a href="https://wa.me/${reg.customer_phone.replace(/[^0-9]/g, "")}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-1">
+              <i data-lucide="phone" class="w-3 h-3"></i>
+              ${escapeHtml(reg.customer_phone)}
+            </a>
+          </td>
+          <td class="p-3 text-slate-900">${escapeHtml(reg.customer_email || "-")}</td>
+          <td class="p-3 text-slate-900">
+            ${reg.final_fee > 0 
+              ? "Rp " + new Intl.NumberFormat("id-ID").format(reg.final_fee)
+              : '<span class="text-emerald-600 font-semibold">GRATIS</span>'
+            }
+            ${reg.discount_amount > 0 
+              ? '<div class="text-xs text-red-600">Diskon: Rp ' + new Intl.NumberFormat("id-ID").format(reg.discount_amount) + '</div>'
+              : ''
+            }
+          </td>
+          <td class="p-3 text-slate-900">${new Date(reg.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</td>
+          <td class="p-3">
+            <select 
+              class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900 font-medium"
+              onchange="updateEventRegistrationStatus(${reg.id}, this.value)"
+            >
+              <option value="pending" ${reg.status === "pending" ? "selected" : ""}>Pending</option>
+              <option value="confirmed" ${reg.status === "confirmed" ? "selected" : ""}>Confirmed</option>
+              <option value="attended" ${reg.status === "attended" ? "selected" : ""}>Attended</option>
+              <option value="cancelled" ${reg.status === "cancelled" ? "selected" : ""}>Cancelled</option>
+            </select>
+          </td>
+          <td class="p-3">
+            <div class="flex gap-2 justify-center">
+              <button 
+                data-action="delete-event-registration"
+                data-id="${reg.id}"
+                class="text-red-600 hover:text-red-700 transition-colors"
+                title="Hapus pendaftaran"
+              >
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `
+        )
+        .join("");
+
+      // Attach delete handlers
+      tbody.querySelectorAll('[data-action="delete-event-registration"]').forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const id = this.getAttribute("data-id");
+          deleteEventRegistration(parseInt(id));
+        });
+      });
+
+      // Refresh Lucide icons
+      if (typeof lucide !== "undefined" && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    } else {
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center p-6 text-white">Belum ada pendaftaran event</td></tr>';
+    }
+  } catch (error) {
+    console.error("Error loading event registrations:", error);
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center p-6 text-red-300">Error loading data</td></tr>';
+  }
+
+  // Also load events filter dropdown
+  await loadEventRegistrationsFilterOptions();
+}
+
+async function loadEventRegistrationsFilterOptions() {
+  const select = document.getElementById("filterEventRegistrationsEvent");
+  if (!select) return;
+
+  // Don't clear existing options if already loaded
+  if (select.options.length > 1) return;
+
+  try {
+    const response = await adminFetch(`${API_BASE}/events?includeInactive=true`);
+    const result = await response.json();
+
+    if (result.success && result.data.length > 0) {
+      result.data.forEach((event) => {
+        const option = document.createElement("option");
+        option.value = event.id;
+        option.textContent = event.title;
+        select.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error("Error loading events for filter:", error);
+  }
+}
+
+async function updateEventRegistrationStatus(id, status) {
+  try {
+    const response = await adminFetch(`${API_BASE}/event-registrations/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("Status berhasil diupdate");
+    } else {
+      alert("Gagal update status: " + (result.error || "Unknown error"));
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
+    alert("Gagal update status");
+  }
+}
+
+async function deleteEventRegistration(id) {
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus pendaftaran ini secara permanen?",
+    async () => {
+      try {
+        const response = await adminFetch(`${API_BASE}/event-registrations/${id}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          showSuccessModal("Pendaftaran berhasil dihapus");
+          loadEventRegistrations();
+        } else {
+          alert("Gagal menghapus: " + (result.error || "Unknown error"));
+        }
+      } catch (error) {
+        console.error("Error deleting registration:", error);
+        alert("Gagal menghapus pendaftaran");
+      }
+    }
+  );
+}
+
+// Initialize event listeners for Event Registrations section
+document.addEventListener("DOMContentLoaded", () => {
+  const refreshBtn = document.getElementById("refreshEventRegistrations");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", loadEventRegistrations);
+  }
+
+  const eventFilter = document.getElementById("filterEventRegistrationsEvent");
+  if (eventFilter) {
+    eventFilter.addEventListener("change", loadEventRegistrations);
+  }
+
+  const statusFilter = document.getElementById("filterEventRegistrationsStatus");
+  if (statusFilter) {
+    statusFilter.addEventListener("change", loadEventRegistrations);
+  }
+});
+
+// Expose functions to window
+window.loadEventRegistrations = loadEventRegistrations;
+window.updateEventRegistrationStatus = updateEventRegistrationStatus;
+window.deleteEventRegistration = deleteEventRegistration;
