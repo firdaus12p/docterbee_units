@@ -1623,6 +1623,39 @@
                     />
                   </div>
 
+                  <!-- NEW: Reward Type -->
+                  <div>
+                    <label class="block text-sm mb-2">Tipe Reward</label>
+                    <select
+                      id="rewardType"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      onchange="toggleTargetProductField()"
+                    >
+                      <option value="discount">Diskon (Potongan Harga)</option>
+                      <option value="free_product">Produk Gratis</option>
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1">
+                      Pilih "Produk Gratis" untuk memberikan 1 item gratis
+                    </p>
+                  </div>
+
+                  <!-- NEW: Target Product (for free_product type) -->
+                  <div id="targetProductContainer" class="hidden">
+                    <label class="block text-sm mb-2"
+                      >Produk Target <span class="text-red-400">*</span></label
+                    >
+                    <select
+                      id="rewardTargetProduct"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                    >
+                      <option value="">-- Pilih Produk --</option>
+                      <!-- Will be populated by JS -->
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1">
+                      Produk yang akan diberikan gratis saat user menggunakan voucher ini
+                    </p>
+                  </div>
+
                   <div>
                     <label class="block text-sm mb-2">Warna Tema</label>
                     <select
@@ -2767,6 +2800,16 @@
                     class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
                   >
                     Tanggal
+                  </th>
+                  <th
+                    class="px-4 py-3 text-center text-xs font-semibold text-slate-400"
+                  >
+                    Kode Kupon
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-slate-400"
+                  >
+                    Kadaluarsa
                   </th>
                   <th
                     class="px-4 py-3 text-center text-xs font-semibold text-slate-400"

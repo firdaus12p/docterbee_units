@@ -42,6 +42,9 @@ router.get("/admin/redemptions", requireAdmin, async (req, res) => {
         rr.reward_name,
         rr.points_cost,
         rr.status,
+        rr.coupon_code,
+        rr.expires_at,
+        rr.coupon_id,
         rr.redeemed_at,
         u.name as user_name,
         u.email as user_email,
@@ -85,28 +88,56 @@ router.patch("/admin/redemptions/:id/status", requireAdmin, async (req, res) => 
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!['pending', 'approved', 'rejected'].includes(status)) {
+    // Support both old and new status values
+    const validStatuses = ['pending', 'approved', 'rejected', 'active', 'used', 'expired', 'cancelled'];
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, error: "Status tidak valid" });
     }
+
+    // Get redemption details before update
+    const redemption = await queryOne(
+      "SELECT user_id, points_cost, status as current_status, coupon_id, coupon_code FROM reward_redemptions WHERE id = ?", 
+      [id]
+    );
+    
+    if (!redemption) {
+      return res.status(404).json({ success: false, error: "Redemption tidak ditemukan" });
+    }
+
+    // Map statuses - keep values that exist in current ENUM
+    // Current ENUM: 'pending', 'approved', 'rejected'
+    // New statuses will work after ENUM is updated
+    let normalizedStatus = status;
+    // For now, map new → old for compatibility
+    if (status === 'active') normalizedStatus = 'pending';
+    if (status === 'used') normalizedStatus = 'approved';
+    if (status === 'cancelled' || status === 'expired') normalizedStatus = 'rejected';
 
     // Update status
     await query(
       "UPDATE reward_redemptions SET status = ? WHERE id = ?",
-      [status, id]
+      [normalizedStatus, id]
     );
     
-    // Check if we need to refund points (if rejected)
-    if (status === 'rejected') {
-        const redemption = await queryOne("SELECT user_id, points_cost FROM reward_redemptions WHERE id = ?", [id]);
-        if (redemption) {
-           await query("UPDATE user_progress SET points = points + ? WHERE user_id = ?", [
-             redemption.points_cost,
-             redemption.user_id
-           ]);
-        }
+    // Refund points if cancelled/rejected (and not already cancelled/rejected)
+    if ((normalizedStatus === 'rejected' || status === 'cancelled') && 
+        redemption.current_status !== 'rejected' && 
+        redemption.current_status !== 'cancelled') {
+      await query("UPDATE user_progress SET points = points + ? WHERE user_id = ?", [
+        redemption.points_cost,
+        redemption.user_id
+      ]);
+      
+      // Also deactivate the associated coupon
+      if (redemption.coupon_id) {
+        await query("UPDATE coupons SET is_active = 0 WHERE id = ?", [redemption.coupon_id]);
+      }
+      if (redemption.coupon_code) {
+        await query("UPDATE coupons SET is_active = 0 WHERE code = ?", [redemption.coupon_code]);
+      }
     }
 
-    res.json({ success: true, message: `Status update: ${status}` });
+    res.json({ success: true, message: `Status update: ${normalizedStatus}` });
   } catch (error) {
     console.error("Error updating redemption:", error);
     res.status(500).json({ success: false, error: "Gagal mengupdate status" });
@@ -156,6 +187,8 @@ router.post("/admin", requireAdmin, async (req, res) => {
       color_theme,
       is_active,
       sort_order,
+      reward_type,
+      target_product_id,
     } = req.body;
 
     // Validation
@@ -174,8 +207,8 @@ router.post("/admin", requireAdmin, async (req, res) => {
     }
 
     const result = await query(
-      `INSERT INTO rewards (name, description, points_cost, color_theme, is_active, sort_order) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO rewards (name, description, points_cost, color_theme, is_active, sort_order, reward_type, target_product_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         name,
         description || null,
@@ -183,6 +216,8 @@ router.post("/admin", requireAdmin, async (req, res) => {
         color_theme || "amber",
         is_active !== undefined ? is_active : 1,
         sort_order || 0,
+        reward_type || 'discount',
+        target_product_id || null,
       ]
     );
 
@@ -207,6 +242,8 @@ router.patch("/admin/:id", requireAdmin, async (req, res) => {
       color_theme,
       is_active,
       sort_order,
+      reward_type,
+      target_product_id,
     } = req.body;
     const rewardId = req.params.id;
 
@@ -255,6 +292,15 @@ router.patch("/admin/:id", requireAdmin, async (req, res) => {
     if (sort_order !== undefined) {
       updates.push("sort_order = ?");
       values.push(sort_order);
+    }
+    // NEW: Handle reward_type and target_product_id
+    if (reward_type !== undefined) {
+      updates.push("reward_type = ?");
+      values.push(reward_type);
+    }
+    if (target_product_id !== undefined) {
+      updates.push("target_product_id = ?");
+      values.push(target_product_id || null);
     }
 
     if (updates.length === 0) {

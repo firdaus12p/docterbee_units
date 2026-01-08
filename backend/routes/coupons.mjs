@@ -33,8 +33,27 @@ router.post("/validate", async (req, res) => {
       });
     }
 
-    // Check if user already used this coupon (one-time per user)
+    // Check if this is a personal coupon (has owner_user_id)
     const userId = req.session?.userId;
+    if (coupon.owner_user_id) {
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          valid: false,
+          error: "Silakan login untuk menggunakan kode promo ini",
+        });
+      }
+      
+      if (coupon.owner_user_id !== userId) {
+        return res.status(403).json({
+          success: false,
+          valid: false,
+          error: "Kode promo ini tidak berlaku untuk akun Anda",
+        });
+      }
+    }
+
+    // Check if user already used this coupon (one-time per user)
     if (userId) {
       const alreadyUsed = await queryOne(
         "SELECT id FROM coupon_usage WHERE user_id = ? AND coupon_id = ?",
@@ -62,8 +81,10 @@ router.post("/validate", async (req, res) => {
       });
     }
 
-    // Check minimum booking value
-    if (booking_value !== undefined && booking_value < coupon.min_booking_value) {
+    // Check minimum booking value (skip for free_product type)
+    if (coupon.discount_type !== 'free_product' && 
+        booking_value !== undefined && 
+        booking_value < coupon.min_booking_value) {
       return res.status(400).json({
         success: false,
         valid: false,
@@ -74,13 +95,16 @@ router.post("/validate", async (req, res) => {
 
     // Calculate discount amount
     let discountAmount = 0;
-    if (booking_value !== undefined) {
+    if (booking_value !== undefined && coupon.discount_type !== 'free_product') {
       if (coupon.discount_type === "percentage") {
         discountAmount = (booking_value * coupon.discount_value) / 100;
       } else {
         discountAmount = coupon.discount_value;
       }
     }
+    
+    // For free_product, discountAmount will be calculated by frontend based on product price
+    // We return target_product_id so frontend can find the product in cart
 
     res.json({
       success: true,
@@ -94,6 +118,9 @@ router.post("/validate", async (req, res) => {
         discountAmount: discountAmount,
         minBookingValue: coupon.min_booking_value,
         couponType: coupon.coupon_type,
+        // New fields for free_product support
+        targetProductId: coupon.target_product_id || null,
+        isPersonalCoupon: coupon.owner_user_id ? true : false,
       },
     });
   } catch (error) {

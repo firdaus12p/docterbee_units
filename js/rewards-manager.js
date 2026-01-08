@@ -6,6 +6,7 @@
 /* global showSuccess, showError, showWarning, showConfirm, API_BASE, adminFetch, escapeHtml */
 
 let currentRewardId = null;
+let productsCache = []; // Cache for product dropdown
 
 // Load all rewards
 async function loadRewards() {
@@ -146,6 +147,11 @@ async function editReward(id) {
       document.getElementById("rewardColor").value = reward.color_theme || "amber";
       document.getElementById("rewardActive").checked = reward.is_active === 1;
       document.getElementById("rewardSortOrder").value = reward.sort_order || 0;
+      
+      // NEW: Populate reward type and target product
+      document.getElementById("rewardType").value = reward.reward_type || "discount";
+      document.getElementById("rewardTargetProduct").value = reward.target_product_id || "";
+      toggleTargetProductField();
 
       openRewardModal(id);
     } else {
@@ -180,6 +186,16 @@ async function saveReward(event) {
     return;
   }
 
+  // NEW: Get reward type and target product
+  const rewardType = document.getElementById("rewardType").value;
+  const targetProductId = document.getElementById("rewardTargetProduct").value;
+  
+  // Validate target product for free_product type
+  if (rewardType === 'free_product' && !targetProductId) {
+    showWarning("Pilih produk target untuk reward tipe Produk Gratis");
+    return;
+  }
+
   const payload = {
     name,
     description,
@@ -187,6 +203,8 @@ async function saveReward(event) {
     color_theme: color,
     is_active: isActive,
     sort_order: sortOrder,
+    reward_type: rewardType,
+    target_product_id: rewardType === 'free_product' ? parseInt(targetProductId) : null,
   };
 
   try {
@@ -247,9 +265,59 @@ async function performDeleteReward(id) {
   }
 }
 
+// ============================================
+// NEW: Toggle target product field visibility
+// ============================================
+function toggleTargetProductField() {
+  const rewardType = document.getElementById("rewardType").value;
+  const container = document.getElementById("targetProductContainer");
+  
+  if (rewardType === 'free_product') {
+    container.classList.remove("hidden");
+    loadProductsDropdown(); // Load products if not already loaded
+  } else {
+    container.classList.add("hidden");
+  }
+}
+
+// ============================================
+// NEW: Load products for dropdown
+// ============================================
+async function loadProductsDropdown() {
+  const select = document.getElementById("rewardTargetProduct");
+  if (!select) return;
+  
+  // Skip if already loaded
+  if (productsCache.length > 0) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/products', { credentials: 'include' });
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      productsCache = result.data;
+      
+      // Clear and populate dropdown
+      select.innerHTML = '<option value="">-- Pilih Produk --</option>';
+      
+      for (const product of productsCache) {
+        const option = document.createElement('option');
+        option.value = product.id;
+        option.textContent = `${product.name} - Rp ${parseFloat(product.price).toLocaleString('id-ID')}`;
+        select.appendChild(option);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading products:', error);
+  }
+}
+
 // Initialize rewards manager when tab is shown
 function initRewardsManager() {
   loadRewards();
+  loadProductsDropdown(); // Pre-load products
 
   // Attach event listeners
   const btnNewReward = document.getElementById("btnNewReward");

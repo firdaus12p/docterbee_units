@@ -3501,10 +3501,38 @@ async function redeemReward(cost, rewardName, rewardId = null) {
           _db("db_points", { value: newValue });
           addPoints(0); // Trigger nav refresh
           updatePointsView();
-          showSuccess(
-            `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
-            "Redeem Berhasil"
-          );
+          
+          // Show success with coupon code if available
+          if (result.couponCode) {
+            // Show coupon code in a prominent way
+            const expiryDate = result.expiresAt 
+              ? new Date(result.expiresAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+              : '30 hari';
+            
+            showSuccess(
+              `🎉 Selamat! Kamu berhasil menukar ${rewardName}!\n\n` +
+              `📋 KODE VOUCHER KAMU:\n` +
+              `━━━━━━━━━━━━━━━━━━━━\n` +
+              `🎫  ${result.couponCode}\n` +
+              `━━━━━━━━━━━━━━━━━━━━\n\n` +
+              `📅 Berlaku sampai: ${expiryDate}\n` +
+              `💡 Gunakan kode ini di checkout untuk mendapatkan reward!\n\n` +
+              `Poin tersisa: ${newValue}`,
+              "Voucher Berhasil Didapat! 🎁"
+            );
+            
+            // Also copy to clipboard automatically
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(result.couponCode).then(() => {
+                showToast('📋 Kode voucher sudah disalin ke clipboard!', 'success');
+              }).catch(() => {});
+            }
+          } else {
+            showSuccess(
+              `Kamu berhasil redeem ${rewardName}. Points tersisa: ${newValue}`,
+              "Redeem Berhasil"
+            );
+          }
         } else {
           // Handle specific error codes
           if (result.error === 'VERIFICATION_REQUIRED') {

@@ -651,6 +651,49 @@ async function runMigrations(connection) {
     // Migration: Migrate existing products.stock to product_stocks table
     await migrateExistingStockToProductStocks(connection);
     
+    // ============================================
+    // ADVANCED REWARDS SYSTEM MIGRATIONS
+    // ============================================
+    
+    // Migration: Add reward_type and target_product_id to rewards table
+    await safeAddColumn(connection, 'rewards', 'reward_type',
+      "ENUM('discount', 'free_product') DEFAULT 'discount' COMMENT 'Type of reward' AFTER description");
+    await safeAddColumn(connection, 'rewards', 'target_product_id',
+      "INT DEFAULT NULL COMMENT 'Product ID for free_product type' AFTER reward_type");
+    await safeAddColumn(connection, 'rewards', 'discount_value',
+      "DECIMAL(10,2) DEFAULT NULL COMMENT 'Discount amount for discount type' AFTER target_product_id");
+    await safeAddColumn(connection, 'rewards', 'discount_type',
+      "ENUM('percentage', 'fixed') DEFAULT NULL COMMENT 'Discount type for discount rewards' AFTER discount_value");
+    await safeAddIndex(connection, 'rewards', 'idx_reward_type', 'reward_type');
+    await safeAddIndex(connection, 'rewards', 'idx_reward_target_product', 'target_product_id');
+    
+    // Migration: Extend coupons table for free_product support and personal coupons
+    await safeModifyEnum(connection, 'coupons', 'discount_type',
+      "ENUM('percentage', 'fixed', 'free_product') NOT NULL");
+    await safeAddColumn(connection, 'coupons', 'target_product_id',
+      "INT DEFAULT NULL COMMENT 'Product ID for free_product coupon' AFTER discount_value");
+    await safeAddColumn(connection, 'coupons', 'source_redemption_id',
+      "INT DEFAULT NULL COMMENT 'Links to reward_redemptions.id for traceability' AFTER target_product_id");
+    await safeAddColumn(connection, 'coupons', 'owner_user_id',
+      "INT DEFAULT NULL COMMENT 'User who owns this personal coupon' AFTER source_redemption_id");
+    await safeAddIndex(connection, 'coupons', 'idx_coupon_target_product', 'target_product_id');
+    await safeAddIndex(connection, 'coupons', 'idx_coupon_source_redemption', 'source_redemption_id');
+    await safeAddIndex(connection, 'coupons', 'idx_coupon_owner_user', 'owner_user_id');
+    
+    // Migration: Update reward_redemptions for coupon code storage and expiry
+    // NOTE: Keep using old status ENUM ('pending', 'approved', 'rejected') for now
+    // The code maps new statuses to old ones for backward compatibility
+    
+    await safeAddColumn(connection, 'reward_redemptions', 'coupon_code',
+      "VARCHAR(50) DEFAULT NULL COMMENT 'Generated unique coupon code' AFTER status");
+    await safeAddColumn(connection, 'reward_redemptions', 'expires_at',
+      "DATETIME DEFAULT NULL COMMENT 'Expiry date (30 days from redemption)' AFTER coupon_code");
+    await safeAddColumn(connection, 'reward_redemptions', 'coupon_id',
+      "INT DEFAULT NULL COMMENT 'Links to coupons.id' AFTER expires_at");
+    await safeAddIndex(connection, 'reward_redemptions', 'idx_redemption_coupon_code', 'coupon_code');
+    await safeAddIndex(connection, 'reward_redemptions', 'idx_redemption_expires_at', 'expires_at');
+    await safeAddIndex(connection, 'reward_redemptions', 'idx_redemption_coupon_id', 'coupon_id');
+    
     console.log("✅ Migrations completed");
   } catch (error) {
     console.error("❌ Migration error:", error.message);

@@ -248,27 +248,59 @@ async function validateStoreCoupon() {
     // Coupon is valid - store all data for recalculation
     storeCouponData = result.data;
 
-    // Build discount info text
-    let discountInfoText = "";
-    if (storeCouponData.discountType === "percentage") {
-      discountInfoText = `Diskon ${storeCouponData.discountValue}%`;
+    // ============================================
+    // HANDLE FREE PRODUCT COUPON TYPE
+    // ============================================
+    if (storeCouponData.discountType === 'free_product' && storeCouponData.targetProductId) {
+      // Check if target product is in cart
+      const targetProduct = cart.find(item => 
+        item.id === storeCouponData.targetProductId || 
+        item.product_id === storeCouponData.targetProductId
+      );
+      
+      if (!targetProduct) {
+        // Product NOT in cart - reject coupon with clear message
+        throw new Error(
+          `Harap masukkan produk yang sesuai ke keranjang untuk menggunakan voucher ini. ` +
+          `Voucher ini berlaku untuk produk tertentu.`
+        );
+      }
+      
+      // Product found - calculate discount as product price (for 1 qty)
+      storeCouponData.discountAmount = targetProduct.price;
+      storeCouponData.targetProductName = targetProduct.name;
+      
+      // Show success message for free product
+      statusDiv.innerHTML = `
+        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-700">
+          🎁 <strong>${code}</strong> - Gratis 1x ${targetProduct.name}!
+          <br><small>Diskon Rp ${targetProduct.price.toLocaleString("id-ID")}</small>
+        </div>
+      `;
     } else {
-      discountInfoText = `Diskon Rp ${storeCouponData.discountValue.toLocaleString("id-ID")}`;
-    }
+      // Build discount info text for regular coupons
+      let discountInfoText = "";
+      if (storeCouponData.discountType === "percentage") {
+        discountInfoText = `Diskon ${storeCouponData.discountValue}%`;
+      } else {
+        discountInfoText = `Diskon Rp ${storeCouponData.discountValue.toLocaleString("id-ID")}`;
+      }
 
-    // Show success message with discount info
-    statusDiv.innerHTML = `
-      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-700">
-        ✅ <strong>${code}</strong> - ${storeCouponData.description || discountInfoText}
-        ${
-          storeCouponData.minBookingValue > 0
-            ? `<br><small>Min. belanja: Rp ${storeCouponData.minBookingValue.toLocaleString(
-                "id-ID"
-              )}</small>`
-            : ""
-        }
-      </div>
-    `;
+      // Show success message with discount info
+      statusDiv.innerHTML = `
+        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-700">
+          ✅ <strong>${code}</strong> - ${storeCouponData.description || discountInfoText}
+          ${
+            storeCouponData.minBookingValue > 0
+              ? `<br><small>Min. belanja: Rp ${storeCouponData.minBookingValue.toLocaleString(
+                  "id-ID"
+                )}</small>`
+              : ""
+          }
+        </div>
+      `;
+    }
+    
     statusDiv.classList.remove("hidden");
 
     // Disable input and change button
@@ -333,8 +365,26 @@ function updateCartUIWithDiscount() {
       return;
     }
 
-    // Recalculate discount based on current total
-    if (storeCouponData.discountType === "percentage") {
+    // Recalculate discount based on current total and discount type
+    if (storeCouponData.discountType === 'free_product') {
+      // For free product, find the product in cart and use its price
+      const targetProduct = cart.find(item => 
+        item.id === storeCouponData.targetProductId || 
+        item.product_id === storeCouponData.targetProductId
+      );
+      
+      if (targetProduct) {
+        discountAmount = targetProduct.price; // Discount = 1x product price
+      } else {
+        // Product removed from cart - invalidate coupon
+        clearStoreCoupon();
+        showToast("⚠️ Produk gratis tidak ada di keranjang. Kupon dibatalkan.", "error");
+        document.getElementById("storeOriginalTotal").classList.add("hidden");
+        document.getElementById("storeDiscountAmount").classList.add("hidden");
+        document.getElementById("cartTotal").textContent = originalTotal.toLocaleString("id-ID");
+        return;
+      }
+    } else if (storeCouponData.discountType === "percentage") {
       discountAmount = Math.round((originalTotal * storeCouponData.discountValue) / 100);
     } else {
       // Fixed amount discount
@@ -527,10 +577,38 @@ async function submitOrder() {
   let couponCode = null;
 
   // Apply coupon discount if available
+  // Apply coupon discount if available
   if (storeCouponData) {
-    discountAmount = storeCouponData.discountAmount || 0;
-    finalTotal = Math.max(0, originalTotal - discountAmount);
-    couponCode = storeCouponData.code;
+    // Recalculate discount to ensure logical correctness at time of checkout
+    if (storeCouponData.discountType === 'free_product' && storeCouponData.targetProductId) {
+       const targetProduct = cart.find(item => 
+         item.id === storeCouponData.targetProductId || 
+         item.product_id === storeCouponData.targetProductId
+       );
+       
+       if (targetProduct) {
+         // Ensure price is a number
+         const price = parseFloat(targetProduct.price) || 0;
+         discountAmount = price; // Free 1 item
+       } else {
+         // Target product removed? Remove coupon
+         storeCouponData = null;
+         discountAmount = 0;
+         showToast("Voucher dihapus karena produk reward tidak ada di keranjang", "warning");
+       }
+    } else {
+       // Manual recalculation for percentage to be safe
+       if (storeCouponData.discountType === 'percentage') {
+         discountAmount = (originalTotal * (storeCouponData.discountValue || 0)) / 100;
+       } else {
+         discountAmount = parseFloat(storeCouponData.discountAmount || storeCouponData.discountValue || 0);
+       }
+    }
+
+    if (storeCouponData) {
+      finalTotal = Math.max(0, originalTotal - discountAmount);
+      couponCode = storeCouponData.code;
+    }
   }
 
   const orderData = {
@@ -1070,18 +1148,21 @@ function updateLastOrderButton() {
 
 function showToast(message, type = "success") {
   const toast = document.createElement("div");
-  toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all ${
+  // Position at bottom-center to avoid blocking cart drawer (right side)
+  toast.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg transition-all ${
     type === "error" ? "bg-red-500 text-white" : "bg-emerald-500 text-white"
   }`;
+  // Higher z-index to ensure visibility above most elements
+  toast.style.zIndex = "9999";
   toast.textContent = message;
 
   document.body.appendChild(toast);
 
-  // Display for 5 seconds (increased from 3s for better readability)
+  // Display for 3 seconds
   setTimeout(() => {
     toast.style.opacity = "0";
     setTimeout(() => toast.remove(), 300);
-  }, 5000);
+  }, 3000);
 }
 
 // ============================================

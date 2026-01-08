@@ -185,6 +185,11 @@ function populateCartDrawer() {
        locNameEl.textContent = 'Klik lokasi di header untuk memilih';
     }
   }
+
+  // Re-initialize icons immediately after rendering
+  if (typeof lucide !== 'undefined') {
+    setTimeout(() => lucide.createIcons(), 50);
+  }
 }
 
 /**
@@ -689,6 +694,69 @@ async function validateDrawerCoupon() {
       statusEl.innerHTML = mainStatus.innerHTML;
       statusEl.className = mainStatus.className;
     }
+    
+    // ✅ UPDATE DRAWER TOTAL WITH DISCOUNT
+    updateDrawerTotalWithDiscount();
+  }
+}
+
+/**
+ * Update drawer total display with discount applied
+ */
+function updateDrawerTotalWithDiscount() {
+  const cart = JSON.parse(localStorage.getItem('docterbee_cart') || '[]');
+  if (cart.length === 0) return;
+  
+  // Calculate subtotal
+  let subtotal = 0;
+  cart.forEach(item => {
+    subtotal += item.price * item.quantity;
+  });
+  
+  // Get discount from storeCouponData (set by validateStoreCoupon)
+  let discountAmount = 0;
+  if (typeof storeCouponData !== 'undefined' && storeCouponData) {
+    // Recalculate for free_product type
+    if (storeCouponData.discountType === 'free_product' && storeCouponData.targetProductId) {
+      const targetProduct = cart.find(item => 
+        item.id === storeCouponData.targetProductId || 
+        item.product_id === storeCouponData.targetProductId
+      );
+      if (targetProduct) {
+        discountAmount = parseFloat(targetProduct.price) || 0;
+      }
+    } else if (storeCouponData.discountType === 'percentage') {
+      discountAmount = Math.round((subtotal * (storeCouponData.discountValue || 0)) / 100);
+    } else {
+      discountAmount = parseFloat(storeCouponData.discountAmount || storeCouponData.discountValue || 0);
+    }
+    
+    // Ensure discount doesn't exceed subtotal
+    discountAmount = Math.min(discountAmount, subtotal);
+  }
+  
+  const finalTotal = Math.max(0, subtotal - discountAmount);
+  
+  // Update drawer discount row
+  const discountRow = document.getElementById('drawerDiscountRow');
+  const discountValue = document.getElementById('drawerDiscountValue');
+  const totalAmount = document.getElementById('drawerTotalAmount');
+  
+  if (discountAmount > 0) {
+    if (discountRow) {
+      discountRow.classList.remove('hidden');
+    }
+    if (discountValue) {
+      discountValue.textContent = `- Rp ${formatPrice(discountAmount)}`;
+    }
+  } else {
+    if (discountRow) {
+      discountRow.classList.add('hidden');
+    }
+  }
+  
+  if (totalAmount) {
+    totalAmount.textContent = `Rp ${formatPrice(finalTotal)}`;
   }
 }
 
@@ -1352,8 +1420,8 @@ function renderHistoryCards(activities) {
       `;
     }
 
-    // Status badge
-    const statusBadge = getHistoryStatusBadge(activity.status);
+    // Status badge - pass type to differentiate order vs reward labels
+    const statusBadge = getHistoryStatusBadge(activity.status, isOrder ? 'order' : 'reward');
 
     // Click handler - pending orders show QR, others show detail
     const clickHandler = isOrder
@@ -1378,15 +1446,25 @@ function renderHistoryCards(activities) {
 
 /**
  * Get status badge HTML for history
+ * @param {string} status - The status value
+ * @param {string} type - 'order' or 'reward' to determine appropriate label
  */
-function getHistoryStatusBadge(status) {
+function getHistoryStatusBadge(status, type = 'order') {
   const statusMap = {
-    pending: { class: 'pending', label: 'Menunggu Bayar' },
+    // Order statuses
+    pending: { 
+      class: 'pending', 
+      label: type === 'order' ? 'Menunggu Bayar' : 'Belum Digunakan' 
+    },
     completed: { class: 'completed', label: 'Selesai' },
-    approved: { class: 'approved', label: 'Disetujui' },
     cancelled: { class: 'cancelled', label: 'Dibatalkan' },
-    rejected: { class: 'rejected', label: 'Ditolak' },
-    expired: { class: 'expired', label: 'Kadaluarsa' }
+    expired: { class: 'expired', label: 'Kadaluarsa' },
+    // Reward redemption statuses (new)
+    active: { class: 'pending', label: 'Belum Digunakan' },
+    used: { class: 'completed', label: 'Sudah Digunakan' },
+    // Legacy reward statuses (backward compat)
+    approved: { class: 'approved', label: 'Disetujui' },
+    rejected: { class: 'rejected', label: 'Ditolak' }
   };
 
   const info = statusMap[status] || { class: '', label: status };
@@ -1550,7 +1628,7 @@ async function openHistoryOrderDetail(orderId, status) {
         : `Rp ${val.toLocaleString('id-ID')}`;
 
       // Status badge
-      const statusBadge = getHistoryStatusBadge(order.status);
+      const statusBadge = getHistoryStatusBadge(order.status, 'order');
 
       contentHtml = `
         <div class="history-detail-body" style="padding: 24px;">
@@ -1719,6 +1797,71 @@ async function openHistoryRewardDetail(redemptionId) {
       ? formatDateTime(reward.redeemed_at)
       : new Date(reward.redeemed_at).toLocaleString('id-ID');
 
+    // Format expiry date
+    let expiryStr = '-';
+    let isExpired = false;
+    if (reward.expires_at) {
+      const expiryDate = new Date(reward.expires_at);
+      isExpired = expiryDate < new Date();
+      expiryStr = expiryDate.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short', 
+        year: 'numeric'
+      });
+    }
+
+    // Determine display status (map old DB status to new display status)
+    let displayStatus = reward.status || 'active';
+    // Map old ENUM values to new display values
+    if (displayStatus === 'pending') displayStatus = 'active';
+    if (displayStatus === 'approved') displayStatus = 'used';
+    if (displayStatus === 'rejected') displayStatus = 'cancelled';
+    // Auto-detect expired for active vouchers
+    if (displayStatus === 'active' && isExpired) {
+      displayStatus = 'expired';
+    }
+
+    // Coupon code section HTML
+    let couponCodeHtml = '';
+    if (reward.coupon_code) {
+      // Can copy only if voucher is active (pending in DB) and not expired
+      const canCopy = displayStatus === 'active' && !isExpired;
+      
+      // Determine warning message based on status
+      let warningMsg = '';
+      if (displayStatus === 'used') {
+        warningMsg = '✅ Voucher ini sudah digunakan';
+      } else if (displayStatus === 'expired' || isExpired) {
+        warningMsg = '⚠️ Voucher sudah kadaluarsa';
+      } else if (displayStatus === 'cancelled') {
+        warningMsg = '❌ Voucher dibatalkan';
+      }
+      
+      couponCodeHtml = `
+        <div class="history-order-row" style="flex-direction: column; gap: 8px; margin-top: 16px; padding: 16px; background: ${canCopy ? '#F0FDF4' : '#FEF2F2'}; border-radius: 12px;">
+          <span class="label" style="font-size: 12px; color: ${canCopy ? '#166534' : '#991B1B'};">🎫 Kode Voucher Anda:</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <code style="flex: 1; padding: 12px 16px; background: white; border: 2px dashed ${canCopy ? '#22C55E' : '#DC2626'}; border-radius: 8px; font-size: 18px; font-weight: 700; color: ${canCopy ? '#166534' : '#991B1B'}; text-align: center; font-family: monospace;">${reward.coupon_code}</code>
+            ${canCopy ? `
+              <button onclick="copyVoucherCode('${reward.coupon_code}')" 
+                      style="padding: 12px 16px; background: #22C55E; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                📋 Copy
+              </button>
+            ` : ''}
+          </div>
+          ${!canCopy ? `
+            <p style="font-size: 11px; color: ${displayStatus === 'used' ? '#166534' : '#DC2626'}; margin-top: 4px;">
+              ${warningMsg}
+            </p>
+          ` : `
+            <p style="font-size: 11px; color: #166534; margin-top: 4px;">
+              Masukkan kode ini di halaman checkout untuk mendapatkan diskon
+            </p>
+          `}
+        </div>
+      `;
+    }
+
     const contentHtml = `
       <div class="history-detail-header">
         <h3>🎁 Detail Reward</h3>
@@ -1738,10 +1881,16 @@ async function openHistoryRewardDetail(redemptionId) {
             <span class="value" style="color: #B45309;">-${reward.points_cost} poin</span>
           </div>
           <div class="history-order-row">
+            <span class="label">Berlaku Sampai</span>
+            <span class="value" style="${isExpired ? 'color: #DC2626;' : ''}">${expiryStr} ${isExpired ? '(Kadaluarsa)' : ''}</span>
+          </div>
+          <div class="history-order-row">
             <span class="label">Status</span>
-            <span class="value">${getHistoryStatusBadge(reward.status)}</span>
+            <span class="value">${getHistoryStatusBadge(displayStatus, 'reward')}</span>
           </div>
         </div>
+        
+        ${couponCodeHtml}
         
         <div class="history-detail-actions">
           <button class="btn btn-outline" onclick="closeHistoryDetailModal()">
@@ -1768,6 +1917,50 @@ async function openHistoryRewardDetail(redemptionId) {
       showError('Gagal memuat detail reward');
     }
   }
+}
+
+/**
+ * Copy voucher code to clipboard
+ */
+function copyVoucherCode(code) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => {
+      if (typeof showToast === 'function') {
+        showToast('✅ Kode voucher berhasil disalin!', 'success');
+      } else {
+        alert('Kode voucher berhasil disalin!');
+      }
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+      fallbackCopyCode(code);
+    });
+  } else {
+    fallbackCopyCode(code);
+  }
+}
+
+/**
+ * Fallback copy method for older browsers
+ */
+function fallbackCopyCode(code) {
+  const textArea = document.createElement('textarea');
+  textArea.value = code;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-9999px';
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    if (typeof showToast === 'function') {
+      showToast('✅ Kode voucher berhasil disalin!', 'success');
+    }
+  } catch (err) {
+    console.error('Fallback copy failed:', err);
+    if (typeof showToast === 'function') {
+      showToast('❌ Gagal menyalin kode', 'error');
+    }
+  }
+  document.body.removeChild(textArea);
 }
 
 /**

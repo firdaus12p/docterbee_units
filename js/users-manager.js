@@ -462,7 +462,7 @@ function openRewardsModal(userId, userName, rewards) {
   if (!rewards || rewards.length === 0) {
     rewardsBody.innerHTML = `
       <tr>
-        <td colspan="6" class="px-4 py-8 text-center text-slate-400">
+        <td colspan="7" class="px-4 py-8 text-center text-slate-400">
           Belum ada riwayat penukaran reward
         </td>
       </tr>
@@ -479,34 +479,71 @@ function openRewardsModal(userId, userName, rewards) {
           minute: "2-digit",
         });
 
-        const status = reward.status || "pending";
-        const statusBadge =
-          status === "approved"
-            ? `<span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs font-semibold">Approved</span>`
-            : `<span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs font-semibold">Pending</span>`;
+        // Format expiry date if exists
+        let expiryText = "-";
+        let isExpired = false;
+        if (reward.expires_at) {
+          const expiryDate = new Date(reward.expires_at);
+          isExpired = expiryDate < new Date();
+          expiryText = expiryDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+        }
 
-        const actionButton =
-          status === "approved"
-            ? `<span class="text-slate-500 text-xs">-</span>`
-            : `<button 
-                onclick="approveRedemption(${userId}, ${
-                reward.id
-              }, '${escapeHtml(reward.reward_name)}')" 
-                class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded transition"
-              >
-                Di Claim
-              </button>`;
+        // Determine status based on new ENUM values (active, used, expired, cancelled)
+        // or fallback to old statuses for backward compat
+        let status = reward.status || "active";
+        
+        // Auto-detect expired status based on date
+        if (status === "active" && isExpired) {
+          status = "expired";
+        }
+        
+        // Status badge with appropriate colors
+        let statusBadge;
+        switch (status) {
+          case "used":
+          case "approved": // backward compat
+            statusBadge = `<span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs font-semibold">Terpakai</span>`;
+            break;
+          case "expired":
+            statusBadge = `<span class="px-2 py-1 bg-slate-500/20 text-slate-400 rounded text-xs font-semibold">Kadaluarsa</span>`;
+            break;
+          case "cancelled":
+          case "rejected": // backward compat
+            statusBadge = `<span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs font-semibold">Dibatalkan</span>`;
+            break;
+          case "active":
+          case "pending": // backward compat
+          default:
+            statusBadge = `<span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs font-semibold">Aktif</span>`;
+        }
+
+        // Coupon code display (if available)
+        const couponCodeDisplay = reward.coupon_code 
+          ? `<code class="px-2 py-1 bg-slate-700 text-emerald-300 rounded text-xs font-mono">${reward.coupon_code}</code>`
+          : `<span class="text-slate-500 text-xs">-</span>`;
+
+        // Only show Delete button (no more Claim button)
+        const actionButton = `
+          <button 
+            onclick="deleteRedemption(${userId}, ${reward.id}, '${escapeHtml(reward.reward_name)}')" 
+            class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded transition"
+            title="Hapus & Refund poin"
+          >
+            Hapus
+          </button>`;
 
         return `
           <tr class="border-t border-slate-800 hover:bg-slate-800/30">
             <td class="px-4 py-3 text-slate-300 text-center">${index + 1}</td>
-            <td class="px-4 py-3 text-slate-200">${escapeHtml(
-              reward.reward_name
-            )}</td>
-            <td class="px-4 py-3 text-amber-400 font-semibold text-center">${
-              reward.points_cost
-            } poin</td>
+            <td class="px-4 py-3 text-slate-200">${escapeHtml(reward.reward_name)}</td>
+            <td class="px-4 py-3 text-amber-400 font-semibold text-center">${reward.points_cost} poin</td>
             <td class="px-4 py-3 text-slate-400 text-xs">${formattedDate}</td>
+            <td class="px-4 py-3 text-center">${couponCodeDisplay}</td>
+            <td class="px-4 py-3 text-slate-400 text-xs ${isExpired ? 'text-red-400' : ''}">${expiryText}</td>
             <td class="px-4 py-3 text-center">${statusBadge}</td>
             <td class="px-4 py-3 text-center">${actionButton}</td>
           </tr>
@@ -600,6 +637,55 @@ async function approveRedemption(userId, redemptionId, rewardName) {
 // ============================================
 // Send WhatsApp to User
 // ============================================
+
+// ============================================
+// Delete Reward Redemption (with refund)
+// ============================================
+async function deleteRedemption(userId, redemptionId, rewardName) {
+  showConfirm(
+    `Hapus dan refund poin untuk penukaran "${rewardName}"?\n\nPoin akan dikembalikan ke user.`,
+    async () => {
+      try {
+        // First, set status to 'cancelled' (which triggers refund on backend)
+        const response = await adminFetch(
+          `${API_BASE}/rewards/admin/redemptions/${redemptionId}/status`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: 'cancelled' }),
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+          showSuccess("Redemption berhasil dihapus. Poin dikembalikan!");
+          // Refresh the rewards list
+          const userName = document.getElementById("rewardUserName").textContent;
+          const userRewardsResponse = await adminFetch(
+            `${API_BASE}/rewards/admin/redemptions?user_id=${userId}`
+          );
+          
+          const userRewardsData = await userRewardsResponse.json();
+          if (userRewardsData.success) {
+             openRewardsModal(userId, userName, userRewardsData.redemptions);
+          }
+          
+          // Also refresh Reports if available
+          if (typeof window.loadRedemptionReport === 'function') {
+            window.loadRedemptionReport();
+          }
+        } else {
+          showError(data.error || "Gagal menghapus redemption");
+        }
+      } catch (error) {
+        console.error("Error deleting redemption:", error);
+        showError("Terjadi kesalahan saat menghapus redemption");
+      }
+    }
+  );
+}
 function sendWhatsAppToUser(phone, userName) {
   // Clean phone number - remove all non-numeric characters
   const cleanPhone = phone.replace(/[^0-9]/g, "");

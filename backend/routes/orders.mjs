@@ -267,7 +267,7 @@ router.post("/", createOrderValidator, validate, async (req, res) => {
 
         // Record coupon usage for logged-in users (one-time per user)
         if (userId) {
-          const coupon = await queryOne("SELECT id FROM coupons WHERE code = ?", [
+          const coupon = await queryOne("SELECT id, source_redemption_id FROM coupons WHERE code = ?", [
             coupon_code.toUpperCase(),
           ]);
 
@@ -277,6 +277,21 @@ router.post("/", createOrderValidator, validate, async (req, res) => {
               `INSERT INTO coupon_usage (user_id, coupon_id, order_type, order_id) 
              VALUES (?, ?, 'store', ?)`,
               [userId, coupon.id, result.insertId]
+            );
+            
+            // If this coupon came from a reward redemption, mark it as 'approved' (used)
+            // Using 'approved' for backward compatibility with old ENUM
+            if (coupon.source_redemption_id) {
+              await query(
+                "UPDATE reward_redemptions SET status = 'approved' WHERE id = ?",
+                [coupon.source_redemption_id]
+              );
+            }
+            
+            // Also check by coupon_code directly in reward_redemptions
+            await query(
+              "UPDATE reward_redemptions SET status = 'approved' WHERE coupon_code = ? AND status = 'pending'",
+              [coupon_code.toUpperCase()]
             );
           }
         }

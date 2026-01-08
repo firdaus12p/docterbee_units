@@ -1,6 +1,16 @@
 import express from "express";
+import crypto from "crypto";
 import { query, queryOne } from "../db.mjs";
 import { requireUser as requireAuth } from "../middleware/auth.mjs";
+
+/**
+ * Generate unique coupon code for reward redemption
+ * Format: RWD-{userId}-{randomHex}
+ */
+function generateCouponCode(userId) {
+  const randomPart = crypto.randomBytes(3).toString('hex').toUpperCase();
+  return `RWD-${userId}-${randomPart}`;
+}
 
 const router = express.Router();
 
@@ -158,10 +168,77 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
         [userId, newPoints, newPoints]
       );
 
-      // Record redemption (with location_id for multi-location tracking)
+      // ============================================
+      // GENERATE UNIQUE COUPON CODE & CREATE COUPON
+      // ============================================
+      
+      // Generate unique coupon code
+      const couponCode = generateCouponCode(userId);
+      
+      // Calculate expiry date (30 days from now)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+      
+      // Get reward details for coupon creation
+      let rewardDetails = null;
+      if (rewardId) {
+        rewardDetails = await queryOne(
+          "SELECT reward_type, target_product_id, discount_value, discount_type FROM rewards WHERE id = ?",
+          [rewardId]
+        );
+      }
+      
+      // Determine coupon parameters based on reward type
+      let discountType = 'fixed'; // default
+      let discountValue = 0;
+      let targetProductId = null;
+      
+      if (rewardDetails) {
+        if (rewardDetails.reward_type === 'free_product') {
+          discountType = 'free_product';
+          targetProductId = rewardDetails.target_product_id;
+          discountValue = 100; // Will be replaced by product price during validation
+        } else if (rewardDetails.discount_type) {
+          discountType = rewardDetails.discount_type;
+          discountValue = rewardDetails.discount_value || 0;
+        }
+      }
+      
+      // Insert coupon into coupons table (for validation system integration)
+      const couponResult = await query(
+        `INSERT INTO coupons 
+         (code, description, discount_type, discount_value, target_product_id, 
+          min_booking_value, max_uses, used_count, coupon_type, expires_at,
+          source_redemption_id, owner_user_id, is_active)
+         VALUES (?, ?, ?, ?, ?, 0, 1, 0, 'store', ?, NULL, ?, 1)`,
+        [
+          couponCode,
+          `Reward: ${rewardName}`,
+          discountType,
+          discountValue,
+          targetProductId,
+          expiresAt,
+          userId
+        ]
+      );
+      
+      // Record redemption (with coupon info and expiry)
+      // Use 'pending' status for backward compatibility with old ENUM
+      // Status will be 'pending' initially, changes to 'approved' when used
       const redemptionResult = await query(
-        "INSERT INTO reward_redemptions (user_id, reward_id, reward_name, points_cost, location_id) VALUES (?, ?, ?, ?, ?)",
-        [userId, rewardId || null, rewardName, pointsCost, location_id || null]
+        `INSERT INTO reward_redemptions 
+         (user_id, reward_id, reward_name, points_cost, location_id, status, coupon_code, expires_at, coupon_id) 
+         VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
+        [
+          userId, 
+          rewardId || null, 
+          rewardName, 
+          pointsCost, 
+          location_id || null,
+          couponCode,
+          expiresAt,
+          couponResult.insertId
+        ]
       );
 
       // Commit transaction
@@ -172,6 +249,8 @@ router.post("/rewards/redeem", requireAuth, async (req, res) => {
         message: "Reward redeemed successfully",
         newPoints,
         redemptionId: redemptionResult.insertId,
+        couponCode: couponCode,
+        expiresAt: expiresAt.toISOString(),
       });
     } catch (txError) {
       // Rollback on any error
@@ -503,9 +582,10 @@ router.get("/activities/reward/:redemptionId", requireAuth, async (req, res) => 
       });
     }
 
-    // Query redemption with ownership verification
+    // Query redemption with ownership verification (include coupon info)
     const redemption = await queryOne(
-      `SELECT id, user_id, reward_id, reward_name, points_cost, status, redeemed_at
+      `SELECT id, user_id, reward_id, reward_name, points_cost, status, 
+              coupon_code, expires_at, redeemed_at
        FROM reward_redemptions 
        WHERE id = ? AND user_id = ?`,
       [redemptionId, userId]

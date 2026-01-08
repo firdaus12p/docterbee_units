@@ -22,6 +22,34 @@
         padding: 2rem 1rem;
       }
 
+      /* Critical Card Flip Styles */
+      /* Using !important to override global 'main div { transform: none !important }' */
+      .card-flip-wrapper {
+        transition: transform 0.6s !important;
+        transform-style: preserve-3d !important;
+      }
+      .card-flip-wrapper.flipped {
+        transform: rotateY(180deg) !important;
+      }
+      .card-face {
+        backface-visibility: hidden !important;
+        -webkit-backface-visibility: hidden !important;
+        position: absolute !important;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: transparent; /* Fix for some browsers */
+      }
+      .card-face-back {
+        transform: rotateY(180deg) !important;
+        z-index: 2; /* Ensure on top when flipped */
+      }
+      /* Ensure parent perspective is enforcing */
+      .card-preview-container {
+        perspective: 1000px !important;
+      }
+
       .profile-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 16px;
@@ -1321,12 +1349,33 @@
         },
       };
 
-      // Flip card on click
-      const profileCardFlipWrapper = document.getElementById(
-        "profileCardFlipWrapper"
-      );
-      profileCardFlipWrapper.addEventListener("click", function () {
-        this.classList.toggle("flipped");
+
+      // Global event delegation for Card Flip
+      // This ensures it works regardless of when the element is created or replaced
+      document.addEventListener("click", function(e) {
+        const wrapper = e.target.closest("#profileCardFlipWrapper");
+        if (wrapper) {
+            console.log("Card clicked! Toggling flip...");
+            
+            // Toggle class
+            wrapper.classList.toggle("flipped");
+            
+            // Force inline style to override any CSS conflicts
+            // Use requestAnimationFrame and !important to beat global styles
+            requestAnimationFrame(() => {
+                if (wrapper.classList.contains("flipped")) {
+                    wrapper.style.setProperty("transform", "rotateY(180deg)", "important");
+                    
+                    // Ensure backface visibility is enforced
+                    const backFace = wrapper.querySelector('.card-face-back');
+                    if (backFace) {
+                        backFace.style.setProperty("transform", "rotateY(180deg)", "important");
+                    }
+                } else {
+                    wrapper.style.setProperty("transform", "rotateY(0deg)", "important");
+                }
+            });
+        }
       });
 
       // Load profile data
@@ -1488,6 +1537,8 @@
         const mobileProfileBtn = document.getElementById("mobileProfileBtn");
         if (profileBtn) profileBtn.style.display = "block";
         if (mobileProfileBtn) mobileProfileBtn.style.display = "block";
+
+
       }
 
       // Logout functionality (using handleLogout from script.js)
