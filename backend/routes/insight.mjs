@@ -1,16 +1,33 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
-import { requireAdmin } from "../middleware/auth.mjs";
+import { requireAdmin, requireUser } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
-// GET /api/insight - List all published articles
+/**
+ * Helper: Check if user has unlocked a specific article
+ * @param {number} userId - User ID
+ * @param {number} articleId - Article ID
+ * @returns {Promise<boolean>} True if unlocked
+ */
+async function hasUserUnlockedArticle(userId, articleId) {
+  if (!userId) return false;
+  const unlock = await queryOne(
+    "SELECT id FROM user_unlocked_articles WHERE user_id = ? AND article_id = ?",
+    [userId, articleId]
+  );
+  return !!unlock;
+}
+
+// GET /api/insight - List all published articles with unlock status
 router.get("/", async (req, res) => {
   try {
     const { limit = 20, offset = 0 } = req.query;
+    const userId = req.session?.userId || null;
 
     const articles = await query(
-      `SELECT id, title, slug, excerpt, tags, category, article_type, product_id, created_at, updated_at 
+      `SELECT id, title, slug, excerpt, header_image, tags, category, article_type, product_id, 
+              points_cost, is_free, created_at, updated_at 
        FROM articles 
        WHERE is_published = 1 
        ORDER BY created_at DESC 
@@ -18,10 +35,24 @@ router.get("/", async (req, res) => {
       [parseInt(limit), parseInt(offset)]
     );
 
+    // Add unlock status for each article (per-user isolation)
+    const articlesWithStatus = await Promise.all(
+      articles.map(async (article) => {
+        // Free articles are always unlocked
+        if (article.is_free || article.points_cost === 0) {
+          return { ...article, is_unlocked: true };
+        }
+        
+        // Check if user has unlocked this specific article
+        const isUnlocked = await hasUserUnlockedArticle(userId, article.id);
+        return { ...article, is_unlocked: isUnlocked };
+      })
+    );
+
     res.json({
       success: true,
-      count: articles.length,
-      data: articles,
+      count: articlesWithStatus.length,
+      data: articlesWithStatus,
     });
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -82,10 +113,11 @@ router.get("/product/:productId", async (req, res) => {
   }
 });
 
-// GET /api/insight/:slug - Get single article by slug
+// GET /api/insight/:slug - Get single article by slug (with access control)
 router.get("/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
+    const userId = req.session?.userId || null;
 
     const article = await queryOne(
       "SELECT * FROM articles WHERE slug = ? AND is_published = 1",
@@ -99,9 +131,37 @@ router.get("/:slug", async (req, res) => {
       });
     }
 
+    // Check access: free articles are always accessible
+    const isFree = article.is_free || article.points_cost === 0;
+    const isUnlocked = isFree || await hasUserUnlockedArticle(userId, article.id);
+
+    if (!isUnlocked) {
+      // Return metadata only (no content) for locked articles
+      return res.json({
+        success: true,
+        locked: true,
+        data: {
+          id: article.id,
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt,
+          header_image: article.header_image,
+          tags: article.tags,
+          category: article.category,
+          points_cost: article.points_cost,
+          is_free: article.is_free,
+          created_at: article.created_at,
+          // CONTENT HIDDEN - user must unlock first
+          content: null,
+        },
+      });
+    }
+
+    // Full access - return complete article
     res.json({
       success: true,
-      data: article,
+      locked: false,
+      data: { ...article, is_unlocked: true },
     });
   } catch (error) {
     console.error("Error fetching article:", error);
@@ -141,11 +201,16 @@ router.post("/", requireAdmin, async (req, res) => {
     const validArticleType = article_type === "product" ? "product" : "general";
     const validProductId = validArticleType === "product" && product_id ? parseInt(product_id) : null;
 
+    // Extract points_cost and is_free from request body
+    const { points_cost, is_free } = req.body;
+    const validPointsCost = parseInt(points_cost) || 0;
+    const validIsFree = validPointsCost === 0 ? 1 : (is_free === false || is_free === 0 ? 0 : 1);
+
     // Insert article
     const result = await query(
       `INSERT INTO articles 
-       (title, slug, content, excerpt, tags, category, header_image, article_type, product_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (title, slug, content, excerpt, tags, category, header_image, article_type, product_id, points_cost, is_free)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         slug,
@@ -156,6 +221,8 @@ router.post("/", requireAdmin, async (req, res) => {
         header_image || null,
         validArticleType,
         validProductId,
+        validPointsCost,
+        validIsFree,
       ]
     );
 
@@ -192,6 +259,8 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       isPublished,
       article_type,
       product_id,
+      points_cost,
+      is_free,
     } = req.body;
 
     // Check if article exists
@@ -264,6 +333,22 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       updates.push("product_id = ?");
       params.push(product_id ? parseInt(product_id) : null);
     }
+    // Handle points_cost update
+    if (points_cost !== undefined) {
+      const validPointsCost = parseInt(points_cost) || 0;
+      updates.push("points_cost = ?");
+      params.push(validPointsCost);
+      // Auto-set is_free based on points_cost if is_free is not explicitly provided
+      if (is_free === undefined) {
+        updates.push("is_free = ?");
+        params.push(validPointsCost === 0 ? 1 : 0);
+      }
+    }
+    // Handle is_free update
+    if (is_free !== undefined) {
+      updates.push("is_free = ?");
+      params.push(is_free === true || is_free === 1 ? 1 : 0);
+    }
 
     if (updates.length === 0) {
       return res.status(400).json({
@@ -333,6 +418,169 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Gagal menghapus artikel",
+    });
+  }
+});
+
+// ============================================
+// ARTICLE UNLOCK SYSTEM (POINTS-BASED)
+// ============================================
+
+/**
+ * POST /api/insight/:id/unlock - Unlock article by paying points
+ * SECURE: Uses database transaction to ensure atomic point deduction
+ * User A cannot see articles unlocked by User B (per-user isolation)
+ */
+router.post("/:id/unlock", requireUser, async (req, res) => {
+  try {
+    const articleId = parseInt(req.params.id);
+    const userId = req.session.userId;
+
+    // Validate article ID
+    if (isNaN(articleId) || articleId <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "ID artikel tidak valid",
+      });
+    }
+
+    // Get article details
+    const article = await queryOne(
+      "SELECT id, title, points_cost, is_free, is_published FROM articles WHERE id = ?",
+      [articleId]
+    );
+
+    if (!article) {
+      return res.status(404).json({
+        success: false,
+        error: "Artikel tidak ditemukan",
+      });
+    }
+
+    if (!article.is_published) {
+      return res.status(400).json({
+        success: false,
+        error: "Artikel tidak tersedia",
+      });
+    }
+
+    // Check if article is free
+    if (article.is_free || article.points_cost === 0) {
+      return res.json({
+        success: true,
+        message: "Artikel ini gratis, tidak perlu membayar poin",
+        already_free: true,
+      });
+    }
+
+    // Check if already unlocked
+    const existingUnlock = await queryOne(
+      "SELECT id FROM user_unlocked_articles WHERE user_id = ? AND article_id = ?",
+      [userId, articleId]
+    );
+
+    if (existingUnlock) {
+      return res.json({
+        success: true,
+        message: "Artikel sudah dibeli sebelumnya",
+        already_unlocked: true,
+      });
+    }
+
+    // ============================================
+    // ATOMIC TRANSACTION: Point deduction + unlock record
+    // ============================================
+    try {
+      await query("START TRANSACTION");
+
+      // Lock user_progress row and get current points
+      const progress = await queryOne(
+        "SELECT points FROM user_progress WHERE user_id = ? FOR UPDATE",
+        [userId]
+      );
+
+      const currentPoints = progress ? progress.points : 0;
+      const pointsCost = article.points_cost;
+
+      // Check if user has enough points
+      if (currentPoints < pointsCost) {
+        await query("ROLLBACK");
+        return res.status(400).json({
+          success: false,
+          error: "INSUFFICIENT_POINTS",
+          message: `Poin tidak cukup. Dibutuhkan ${pointsCost} poin, Anda memiliki ${currentPoints} poin.`,
+          required: pointsCost,
+          available: currentPoints,
+        });
+      }
+
+      // Deduct points
+      const newPoints = currentPoints - pointsCost;
+      await query(
+        `INSERT INTO user_progress (user_id, unit_data, points) 
+         VALUES (?, '{}', ?)
+         ON DUPLICATE KEY UPDATE points = ?`,
+        [userId, newPoints, newPoints]
+      );
+
+      // Record unlock (per-user isolation - only this user can access)
+      await query(
+        `INSERT INTO user_unlocked_articles (user_id, article_id, points_paid) 
+         VALUES (?, ?, ?)`,
+        [userId, articleId, pointsCost]
+      );
+
+      // Commit transaction
+      await query("COMMIT");
+
+      console.log(`📖 Article unlocked: User=${userId}, Article=${articleId}, Points=${pointsCost}`);
+
+      res.json({
+        success: true,
+        message: `Artikel "${article.title}" berhasil dibeli dengan ${pointsCost} poin!`,
+        points_spent: pointsCost,
+        new_balance: newPoints,
+      });
+    } catch (txError) {
+      await query("ROLLBACK");
+      throw txError;
+    }
+  } catch (error) {
+    console.error("Error unlocking article:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal membeli artikel",
+    });
+  }
+});
+
+/**
+ * GET /api/insight/unlocked/my - Get list of articles unlocked by current user
+ */
+router.get("/unlocked/my", requireUser, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+
+    const unlockedArticles = await query(
+      `SELECT ua.id, ua.article_id, ua.points_paid, ua.unlocked_at,
+              a.title, a.slug, a.excerpt, a.header_image, a.category
+       FROM user_unlocked_articles ua
+       JOIN articles a ON ua.article_id = a.id
+       WHERE ua.user_id = ?
+       ORDER BY ua.unlocked_at DESC`,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      count: unlockedArticles.length,
+      data: unlockedArticles,
+    });
+  } catch (error) {
+    console.error("Error fetching unlocked articles:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil daftar artikel yang dibeli",
     });
   }
 });

@@ -722,6 +722,111 @@ async function runMigrations(connection) {
     await safeAddIndex(connection, 'reward_redemptions', 'idx_redemption_expires_at', 'expires_at');
     await safeAddIndex(connection, 'reward_redemptions', 'idx_redemption_coupon_id', 'coupon_id');
     
+    // ============================================
+    // EVENT TICKET SYSTEM MIGRATIONS
+    // ============================================
+    
+    // Migration: Add ticket_code column to event_registrations for secure QR codes
+    await safeAddColumn(connection, 'event_registrations', 'ticket_code',
+      "VARCHAR(100) DEFAULT NULL COMMENT 'Unique signed ticket code for QR' AFTER status");
+    
+    // Migration: Add index for ticket_code lookup
+    await safeAddIndex(connection, 'event_registrations', 'idx_ticket_code', 'ticket_code');
+
+    // Migration: Add user_id column to event_registrations to link to registered users
+    // This fixes the issue where tickets were visible across different accounts if sharing phone number
+    await safeAddColumn(connection, 'event_registrations', 'user_id',
+      "INT DEFAULT NULL COMMENT 'Link to users table for account isolation' AFTER event_id");
+    
+    await safeAddIndex(connection, 'event_registrations', 'idx_user_id', 'user_id');
+    
+    // ============================================
+    // DATA MIGRATION: Link existing registrations to user accounts
+    // ============================================
+    // Match event_registrations.customer_phone with users.phone to set user_id
+    // This ensures old tickets appear in their owner's "My Tickets"
+    try {
+      const [linkResult] = await connection.query(`
+        UPDATE event_registrations er
+        INNER JOIN users u ON er.customer_phone = u.phone
+        SET er.user_id = u.id
+        WHERE er.user_id IS NULL
+      `);
+      
+      if (linkResult.affectedRows > 0) {
+        console.log(`✅ Migration: Linked ${linkResult.affectedRows} existing registrations to user accounts`);
+      }
+    } catch (linkError) {
+      console.log("ℹ️ Data linking migration skipped or already done:", linkError.message);
+    }
+    
+    // ============================================
+    // SPEAKER INFO MIGRATIONS
+    // ============================================
+    
+    // Migration: Add speaker_photo column to events for speaker profile image
+    await safeAddColumn(connection, 'events', 'speaker_photo',
+      "VARCHAR(500) DEFAULT NULL COMMENT 'URL foto pemateri' AFTER speaker");
+    
+    // Migration: Add speaker_bio column to events for speaker background info
+    await safeAddColumn(connection, 'events', 'speaker_bio',
+      "TEXT DEFAULT NULL COMMENT 'Background/bio pemateri' AFTER speaker_photo");
+    
+    // ============================================
+    // POINTS-BASED ARTICLE UNLOCK SYSTEM MIGRATIONS
+    // ============================================
+    
+    // Migration: Add points_cost column to articles table
+    await safeAddColumn(connection, 'articles', 'points_cost',
+      "INT DEFAULT 0 COMMENT 'Point cost to unlock article (0 = free)' AFTER is_published");
+    
+    // Migration: Add is_free column to articles table (quick filter for free articles)
+    await safeAddColumn(connection, 'articles', 'is_free',
+      "TINYINT(1) DEFAULT 1 COMMENT 'Quick flag: 1 = free, 0 = requires points' AFTER points_cost");
+    
+    // Migration: Add index for is_free column (for filtering free/paid articles)
+    await safeAddIndex(connection, 'articles', 'idx_is_free', 'is_free');
+    
+    // Migration: Create user_unlocked_articles table for tracking purchased articles
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS user_unlocked_articles (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        article_id INT NOT NULL,
+        points_paid INT NOT NULL DEFAULT 0 COMMENT 'Points spent to unlock',
+        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user_article (user_id, article_id),
+        INDEX idx_user_id (user_id),
+        INDEX idx_article_id (article_id),
+        INDEX idx_unlocked_at (unlocked_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: user_unlocked_articles");
+    
+    // ============================================
+    // AI ADVISOR USAGE TRACKING MIGRATIONS
+    // ============================================
+    
+    // Migration: Create ai_advisor_usage table for tracking AI advisor usage and point deduction
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS ai_advisor_usage (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        question TEXT NOT NULL COMMENT 'User question (for audit/analytics)',
+        points_cost INT NOT NULL DEFAULT 1 COMMENT 'Points deducted',
+        status ENUM('success', 'failed', 'refunded') DEFAULT 'success',
+        response_source ENUM('gemini', 'fallback', 'error') DEFAULT 'gemini',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        INDEX idx_user_id (user_id),
+        INDEX idx_status (status),
+        INDEX idx_created_at (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: ai_advisor_usage");
+    
     console.log("✅ Migrations completed");
   } catch (error) {
     console.error("❌ Migration error:", error.message);

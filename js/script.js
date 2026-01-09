@@ -1464,10 +1464,16 @@ async function renderEvents() {
             )}`
           : "GRATIS";
 
-      // Format registration deadline
+      // Check if registration is closed
+      let isRegistrationClosed = false;
       let deadlineText = "";
       if (event.registration_deadline) {
         const deadline = new Date(event.registration_deadline);
+        // Set to end of day for comparison
+        deadline.setHours(23, 59, 59, 999);
+        const now = new Date();
+        isRegistrationClosed = now > deadline;
+        
         deadlineText = `
           <div class="text-xs text-slate-900 mt-1 flex items-center gap-1">
             <i data-lucide="clock" class="w-3 h-3"></i>
@@ -1476,6 +1482,7 @@ async function renderEvents() {
               month: "short",
               year: "numeric",
             })}
+            ${isRegistrationClosed ? '<span class="text-red-600 font-semibold ml-1">(Ditutup)</span>' : ''}
           </div>
         `;
       }
@@ -1489,6 +1496,19 @@ async function renderEvents() {
             ${escapeHtml(event.location)}
           </div>
         `;
+      }
+
+      // Determine button markup based on registration status
+      let buttonHtml;
+      if (isRegistrationClosed) {
+        buttonHtml = `
+          <button disabled class="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold cursor-not-allowed opacity-60">
+            Pendaftaran Ditutup
+          </button>
+        `;
+      } else {
+        // Use onclick to check login status before redirecting
+        buttonHtml = `<button onclick="handleEventRegistration(${event.id})" class="btn-primary-sm">Daftar</button>`;
       }
 
       card.innerHTML = `
@@ -1517,12 +1537,15 @@ async function renderEvents() {
           event.description || "Event kesehatan Islami bersama Docterbee"
         )}</p>
         <div class="mt-3 flex flex-wrap gap-2">
-          <a href="/event-registration?eventId=${event.id}" class="btn-primary-sm">Daftar</a>
+          ${buttonHtml}
           ${
-            event.link
-              ? `<a href="${escapeHtml(
-                  event.link
-                )}" target="_blank" class="btn-secondary-sm">Info</a>`
+            event.speaker
+              ? `<button onclick='showSpeakerInfoModal(${JSON.stringify({
+                  name: event.speaker,
+                  photo: event.speaker_photo || "",
+                  bio: event.speaker_bio || "",
+                  eventTitle: event.title
+                }).replace(/'/g, "&#39;")})' class="btn-secondary-sm">Info Pemateri</button>`
               : ""
           }
         </div>
@@ -1594,6 +1617,145 @@ function initEvents() {
 
   // Refresh navigation points
   refreshNav();
+}
+
+/**
+ * Handle event registration button click
+ * Check if user is logged in before allowing registration
+ * @param {number} eventId - Event ID to register for
+ */
+async function handleEventRegistration(eventId) {
+  try {
+    // Check if user is logged in
+    const response = await fetch("/api/auth/check", {
+      method: "GET",
+      credentials: "include",
+    });
+    
+    const data = await response.json();
+    
+    if (data.loggedIn) {
+      // User is logged in, redirect to registration
+      window.location.href = `/event-registration?eventId=${eventId}`;
+    } else {
+      // User is not logged in, show modal
+      if (typeof showModal === "function") {
+        showModal({
+          title: "Login Diperlukan",
+          message: "Untuk mendaftar event, Anda harus login terlebih dahulu.\n\nSilakan daftar akun atau login jika sudah memiliki akun.",
+          type: "warning",
+          confirmText: "Daftar Akun",
+          showCancel: true,
+          cancelText: "Login",
+          autoCloseDelay: 0,
+          onConfirm: () => {
+            window.location.href = "/register";
+          },
+          onCancel: () => {
+            window.location.href = "/login";
+          },
+        });
+      } else {
+        alert("Silakan login terlebih dahulu untuk mendaftar event.");
+        window.location.href = "/login";
+      }
+    }
+  } catch (error) {
+    console.error("Error checking auth status:", error);
+    // On error, assume not logged in
+    if (typeof showModal === "function") {
+      showModal({
+        title: "Login Diperlukan",
+        message: "Untuk mendaftar event, Anda harus login terlebih dahulu.",
+        type: "warning",
+        confirmText: "Login",
+        autoCloseDelay: 0,
+        onConfirm: () => {
+          window.location.href = "/login";
+        },
+      });
+    } else {
+      alert("Silakan login terlebih dahulu.");
+      window.location.href = "/login";
+    }
+  }
+}
+
+/**
+ * Show speaker info modal with photo and bio
+ * @param {Object} speaker - Speaker data { name, photo, bio, eventTitle }
+ */
+function showSpeakerInfoModal(speaker) {
+  // Remove existing modal if any
+  const existingModal = document.getElementById("speakerInfoModal");
+  if (existingModal) existingModal.remove();
+
+  // Build photo HTML
+  const photoHtml = speaker.photo 
+    ? `<img src="${escapeHtml(speaker.photo)}" alt="${escapeHtml(speaker.name)}" 
+           class="w-28 h-28 rounded-full object-cover border-4 border-red-200 shadow-lg mx-auto" 
+           onerror="this.parentElement.innerHTML='<div class=\\'w-28 h-28 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg mx-auto\\'>${speaker.name.charAt(0).toUpperCase()}</div>'"/>`
+    : `<div class="w-28 h-28 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg mx-auto">
+         ${speaker.name.charAt(0).toUpperCase()}
+       </div>`;
+
+  // Build bio HTML
+  const bioHtml = speaker.bio 
+    ? `<p class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${escapeHtml(speaker.bio)}</p>`
+    : `<p class="text-slate-400 text-sm italic text-center">Informasi pemateri belum tersedia.</p>`;
+
+  // Create modal HTML
+  const modalHtml = `
+    <div id="speakerInfoModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onclick="if(event.target === this) this.remove()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-fade-in">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4 text-white">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-lg">Info Pemateri</h3>
+            <button onclick="document.getElementById('speakerInfoModal').remove()" class="text-white/80 hover:text-white transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6">
+          <!-- Photo -->
+          <div class="mb-4">
+            ${photoHtml}
+          </div>
+          
+          <!-- Name -->
+          <h4 class="text-xl font-bold text-slate-900 text-center mb-2">${escapeHtml(speaker.name)}</h4>
+          
+          <!-- Event badge -->
+          <div class="text-center mb-4">
+            <span class="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
+              Pemateri ${escapeHtml(speaker.eventTitle)}
+            </span>
+          </div>
+          
+          <!-- Bio -->
+          <div class="max-h-40 overflow-y-auto">
+            ${bioHtml}
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-200">
+          <button onclick="document.getElementById('speakerInfoModal').remove()" 
+                  class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert and show modal
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
 }
 
 // ==================== INSIGHT PAGE FUNCTIONS ====================

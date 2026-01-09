@@ -625,6 +625,7 @@
                 </svg>
               </span>
               <span id="analyzeBtnText">Analisis Sekarang</span>
+              <span class="ml-1 px-2 py-0.5 bg-amber-400 text-slate-900 text-xs font-bold rounded">1 Poin</span>
             </button>
             <button
               onclick="loadSample(0)"
@@ -870,10 +871,34 @@
             headers: {
               "Content-Type": "application/json",
             },
+            credentials: "include", // Include session for point deduction
             body: JSON.stringify({ question }),
           });
 
           const result = await response.json();
+
+          // Handle insufficient points error
+          if (result.error === "INSUFFICIENT_POINTS") {
+            resultDiv.innerHTML = `
+              <div class="p-6 rounded-lg bg-amber-50 border border-amber-300">
+                <div class="flex items-center gap-3 mb-3">
+                  <i data-lucide="coins" class="w-6 h-6 text-amber-600"></i>
+                  <h3 class="font-bold text-amber-800">Poin Tidak Cukup</h3>
+                </div>
+                <p class="text-amber-800 mb-4">${result.message}</p>
+                <div class="flex gap-3">
+                  <a href="/journey.html" class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition text-sm font-semibold">
+                    Dapatkan Poin Gratis
+                  </a>
+                  <a href="/store.html" class="px-4 py-2 border border-amber-500 text-amber-700 rounded-lg hover:bg-amber-100 transition text-sm font-semibold">
+                    Lihat Cara Lain
+                  </a>
+                </div>
+              </div>
+            `;
+            lucide.createIcons();
+            return;
+          }
 
           if (!response.ok) {
             throw new Error(result.error || "Gagal menganalisis pertanyaan");
@@ -882,34 +907,46 @@
           // Check if fallback mode (non-JSON response)
           if (result.fallbackMode) {
             renderFallbackResponse(result.rawText);
-            return;
+          } else {
+            // Render structured response
+            renderStructuredResponse(result.data);
           }
 
-          // Render structured response
-          renderStructuredResponse(result.data);
+          // Refresh points display after successful AI call
+          if (result.pointsCharged && result.pointsCharged > 0) {
+            console.log("💰 Points charged:", result.pointsCharged, "| New balance:", result.newBalance);
+            // Refresh navbar points if function exists
+            if (typeof refreshNav === "function") {
+              refreshNav();
+            }
+            // Update UserDataSync if available
+            if (window.UserDataSync) {
+              window.UserDataSync.refresh();
+            }
+          }
 
           // Smooth scroll to result
           resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
         } catch (error) {
           console.error("Error:", error);
 
-          // Check if it's quota error
+          // Check if it's quota error - NO POINTS DEDUCTED
           if (
             error.message.includes("quota") ||
             error.message.includes("429")
           ) {
             renderErrorWithFallback(
-              "Quota API tercapai. Menggunakan analisis lokal...",
+              "Quota API tercapai. Poin tidak dipotong. Menggunakan analisis lokal...",
               question
             );
           } else if (error.message.includes("Failed to fetch")) {
             renderErrorWithFallback(
-              "Tidak dapat terhubung ke server. Menggunakan analisis lokal...",
+              "Tidak dapat terhubung ke server. Poin tidak dipotong. Menggunakan analisis lokal...",
               question
             );
           } else {
             renderErrorWithFallback(
-              "Terjadi kesalahan. Menggunakan analisis lokal...",
+              "Terjadi kesalahan. Poin tidak dipotong. Menggunakan analisis lokal...",
               question
             );
           }

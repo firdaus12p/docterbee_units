@@ -89,6 +89,8 @@ router.post("/", requireAdmin, async (req, res) => {
       topic,
       description,
       speaker,
+      speakerPhoto,
+      speakerBio,
       registrationFee,
       registrationDeadline,
       location,
@@ -106,8 +108,8 @@ router.post("/", requireAdmin, async (req, res) => {
     // Insert event
     const result = await query(
       `INSERT INTO events 
-       (title, event_date, mode, topic, description, speaker, registration_fee, registration_deadline, location, link)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (title, event_date, mode, topic, description, speaker, speaker_photo, speaker_bio, registration_fee, registration_deadline, location, link)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         eventDate,
@@ -115,6 +117,8 @@ router.post("/", requireAdmin, async (req, res) => {
         topic,
         description || null,
         speaker || null,
+        speakerPhoto || null,
+        speakerBio || null,
         registrationFee || 0,
         registrationDeadline || null,
         location || null,
@@ -153,6 +157,8 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       topic,
       description,
       speaker,
+      speakerPhoto,
+      speakerBio,
       registrationFee,
       registrationDeadline,
       location,
@@ -195,6 +201,14 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     if (speaker !== undefined) {
       updates.push("speaker = ?");
       params.push(speaker);
+    }
+    if (speakerPhoto !== undefined) {
+      updates.push("speaker_photo = ?");
+      params.push(speakerPhoto);
+    }
+    if (speakerBio !== undefined) {
+      updates.push("speaker_bio = ?");
+      params.push(speakerBio);
     }
     if (registrationFee !== undefined) {
       updates.push("registration_fee = ?");

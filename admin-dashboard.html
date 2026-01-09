@@ -155,7 +155,7 @@
           </button>
           <button class="admin-mobile-nav-item" data-section="eventRegistrations">
             <i data-lucide="user-check" class="w-5 h-5"></i>
-            <span>Pendaftar Event</span>
+            <span>Pendaftar Program</span>
           </button>
           <button class="admin-mobile-nav-item" data-section="coupons">
             <i data-lucide="tag" class="w-5 h-5"></i>
@@ -222,7 +222,7 @@
             </button>
             <button class="admin-sidebar-nav-item" data-section="eventRegistrations">
               <i data-lucide="user-check" class="w-5 h-5"></i>
-              <span>Pendaftar Event</span>
+              <span>Pendaftar Program</span>
             </button>
             <button class="admin-sidebar-nav-item" data-section="coupons">
               <i data-lucide="tag" class="w-5 h-5"></i>
@@ -588,6 +588,52 @@
                     </p>
                   </div>
 
+                  <!-- Akses Artikel (Gratis/Berbayar) -->
+                  <div class="border-t border-slate-700 pt-4 mt-4">
+                    <label class="block text-sm mb-3 font-semibold text-amber-400">💰 Pengaturan Akses Artikel</label>
+                    
+                    <div class="flex gap-4 mb-3">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="articleAccess"
+                          id="articleAccessFree"
+                          value="free"
+                          checked
+                          class="w-4 h-4 accent-amber-400"
+                          onchange="togglePointsCostInput()"
+                        />
+                        <span class="text-sm">🆓 Gratis (Semua Orang)</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="articleAccess"
+                          id="articleAccessPaid"
+                          value="paid"
+                          class="w-4 h-4 accent-amber-400"
+                          onchange="togglePointsCostInput()"
+                        />
+                        <span class="text-sm">🔒 Berbayar (Poin)</span>
+                      </label>
+                    </div>
+                    
+                    <div id="pointsCostContainer" class="hidden">
+                      <label class="block text-sm mb-2">Harga Poin</label>
+                      <input
+                        type="number"
+                        id="articlePointsCost"
+                        min="1"
+                        value="5"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                        placeholder="Contoh: 5"
+                      />
+                      <p class="text-xs text-slate-400 mt-1">
+                        User harus membayar poin ini untuk membaca artikel. User A tidak bisa melihat artikel yang dibeli User B.
+                      </p>
+                    </div>
+                  </div>
+
                   <div class="flex gap-2">
                     <button
                       type="submit"
@@ -713,6 +759,42 @@
                       placeholder="Nama pemateri atau host acara"
                     />
                   </div>
+                  <div>
+                    <label class="block text-sm mb-2">Foto Pemateri</label>
+                    <div class="flex items-center gap-4">
+                      <div id="eventSpeakerPhotoPreview" class="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center overflow-hidden border-2 border-slate-600">
+                        <i data-lucide="user" class="w-8 h-8 text-slate-500"></i>
+                      </div>
+                      <div class="flex-1">
+                        <input
+                          type="file"
+                          id="eventSpeakerPhotoFile"
+                          accept="image/*"
+                          class="hidden"
+                          onchange="previewSpeakerPhoto(this)"
+                        />
+                        <input type="hidden" id="eventSpeakerPhoto" />
+                        <button
+                          type="button"
+                          onclick="document.getElementById('eventSpeakerPhotoFile').click()"
+                          class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+                        >
+                          <i data-lucide="upload" class="w-4 h-4 inline mr-1"></i>
+                          Upload Foto
+                        </button>
+                        <p class="text-xs text-slate-500 mt-1">JPG, PNG. Maks 2MB</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm mb-2">Background / Bio Pemateri</label>
+                    <textarea
+                      id="eventSpeakerBio"
+                      rows="3"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Pengalaman, keahlian, dan latar belakang pemateri"
+                    ></textarea>
+                  </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label class="block text-sm mb-2"
@@ -777,12 +859,12 @@
             </div>
           </section>
 
-          <!-- Section: Event Registrations (Pendaftar Event) -->
+          <!-- Section: Event Registrations (Pendaftar Program) -->
           <section id="section-eventRegistrations" class="dashboard-section hidden">
             <div
               class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
             >
-              <h2 class="text-xl sm:text-2xl font-bold">Pendaftar Event</h2>
+              <h2 class="text-xl sm:text-2xl font-bold">Pendaftar Program</h2>
               <div class="flex flex-wrap gap-2">
                 <select
                   id="filterEventRegistrationsEvent"
@@ -797,9 +879,8 @@
                 >
                   <option value="">Semua Status</option>
                   <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="attended">Attended</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="confirmed">Konfirm</option>
+                  <option value="attended">Hadir</option>
                 </select>
                 <button
                   id="refreshEventRegistrations"
@@ -816,7 +897,6 @@
                     <th class="text-left p-3 text-slate-900">#</th>
                     <th class="text-left p-3 text-slate-900">Event</th>
                     <th class="text-left p-3 text-slate-900">Nama</th>
-                    <th class="text-left p-3 text-slate-900">HP/WA</th>
                     <th class="text-left p-3 text-slate-900">Email</th>
                     <th class="text-left p-3 text-slate-900">Biaya</th>
                     <th class="text-left p-3 text-slate-900">Tanggal Daftar</th>
@@ -826,7 +906,7 @@
                 </thead>
                 <tbody id="eventRegistrationsTableBody">
                   <tr>
-                    <td colspan="9" class="text-center p-6 text-slate-400">
+                    <td colspan="8" class="text-center p-6 text-slate-400">
                       Loading...
                     </td>
                   </tr>

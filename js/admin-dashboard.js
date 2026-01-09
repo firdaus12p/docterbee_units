@@ -253,7 +253,7 @@ function switchSection(section) {
     bookings: "Booking Monitor",
     insight: "Edukasi Manager",
     events: "Program Manager",
-    eventRegistrations: "Pendaftar Event",
+    eventRegistrations: "Pendaftar Program",
     coupons: "Coupon Manager",
     services: "Services Manager",
     products: "Products Manager",
@@ -888,6 +888,13 @@ function toggleProductSelect() {
   }
 }
 
+// Toggle points cost input visibility based on article access type
+function togglePointsCostInput() {
+  const container = document.getElementById("pointsCostContainer");
+  const isPaid = document.getElementById("articleAccessPaid").checked;
+  container.classList.toggle("hidden", !isPaid);
+}
+
 // Load products for article dropdown
 async function loadProductsForArticle() {
   const select = document.getElementById("articleProductId");
@@ -945,6 +952,11 @@ async function handleArticleSubmit(e) {
     header_image: document.getElementById("insightHeaderImage").value || null,
     article_type: isProductType ? "product" : "general",
     product_id: productId,
+    // Points-based access control
+    is_free: document.getElementById("articleAccessFree").checked,
+    points_cost: document.getElementById("articleAccessPaid").checked 
+      ? parseInt(document.getElementById("articlePointsCost").value) || 5 
+      : 0,
   };
 
   try {
@@ -1015,6 +1027,16 @@ async function editArticle(id) {
       } else {
         document.getElementById("articleTypeGeneral").checked = true;
         document.getElementById("productSelectContainer").classList.add("hidden");
+      }
+
+      // Populate points access fields
+      if (article.is_free === 0 || article.points_cost > 0) {
+        document.getElementById("articleAccessPaid").checked = true;
+        document.getElementById("pointsCostContainer").classList.remove("hidden");
+        document.getElementById("articlePointsCost").value = article.points_cost || 5;
+      } else {
+        document.getElementById("articleAccessFree").checked = true;
+        document.getElementById("pointsCostContainer").classList.add("hidden");
       }
 
       openArticleModal(id);
@@ -1138,9 +1160,71 @@ function openEventModal(id = null) {
   document.getElementById("eventModalTitle").textContent = id ? "Edit Program" : "Program Baru";
   document.getElementById("eventForm").reset();
   document.getElementById("eventId").value = id || "";
+  
+  // Reset speaker photo preview
+  const preview = document.getElementById("eventSpeakerPhotoPreview");
+  if (preview) {
+    preview.innerHTML = '<i data-lucide="user" class="w-8 h-8 text-slate-500"></i>';
+  }
+  document.getElementById("eventSpeakerPhoto").value = "";
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
+  }
+}
+
+/**
+ * Preview speaker photo before upload
+ */
+function previewSpeakerPhoto(input) {
+  const preview = document.getElementById("eventSpeakerPhotoPreview");
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    
+    // Validate size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Ukuran file maksimal 2MB");
+      input.value = "";
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="Preview"/>`;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/**
+ * Upload speaker photo to server and return URL
+ */
+async function uploadSpeakerPhoto() {
+  const fileInput = document.getElementById("eventSpeakerPhotoFile");
+  if (!fileInput.files || !fileInput.files[0]) {
+    // Return existing URL if no new file
+    return document.getElementById("eventSpeakerPhoto").value || null;
+  }
+  
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append("file", file); // Use 'file' field as per upload.mjs
+  
+  try {
+    const response = await adminFetch(`${API_BASE}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+    
+    const result = await response.json();
+    if (result.success && result.data && result.data.url) {
+      return result.data.url;
+    }
+    console.error("Upload failed:", result.error);
+    return document.getElementById("eventSpeakerPhoto").value || null;
+  } catch (error) {
+    console.error("Error uploading speaker photo:", error);
+    return document.getElementById("eventSpeakerPhoto").value || null;
   }
 }
 
@@ -1160,21 +1244,27 @@ async function handleEventSubmit(e) {
   submitBtn.disabled = true;
   submitBtn.textContent = "Menyimpan...";
 
-  const id = document.getElementById("eventId").value;
-  const data = {
-    title: document.getElementById("eventTitle").value,
-    eventDate: document.getElementById("eventDate").value,
-    mode: document.getElementById("eventMode").value,
-    topic: document.getElementById("eventTopic").value,
-    description: document.getElementById("eventDescription").value,
-    speaker: document.getElementById("eventSpeaker").value,
-    registrationFee: parsePriceInput(document.getElementById("eventRegistrationFee").value),
-    registrationDeadline: document.getElementById("eventRegistrationDeadline").value,
-    location: document.getElementById("eventLocation").value,
-    link: document.getElementById("eventLink").value,
-  };
-
   try {
+    // Upload speaker photo first if new file selected
+    const speakerPhotoUrl = await uploadSpeakerPhoto();
+    
+    const id = document.getElementById("eventId").value;
+    const data = {
+      title: document.getElementById("eventTitle").value,
+      eventDate: document.getElementById("eventDate").value,
+      mode: document.getElementById("eventMode").value,
+      topic: document.getElementById("eventTopic").value,
+      description: document.getElementById("eventDescription").value,
+      speaker: document.getElementById("eventSpeaker").value,
+      speakerPhoto: speakerPhotoUrl,
+      speakerBio: document.getElementById("eventSpeakerBio").value,
+      registrationFee: parsePriceInput(document.getElementById("eventRegistrationFee").value),
+      registrationDeadline: document.getElementById("eventRegistrationDeadline").value,
+      location: document.getElementById("eventLocation").value,
+      link: document.getElementById("eventLink").value,
+    };
+
+  
     const url = id ? `${API_BASE}/events/${id}` : `${API_BASE}/events`;
     const method = id ? "PATCH" : "POST";
 
@@ -1234,6 +1324,17 @@ async function editEvent(id) {
       document.getElementById("eventTopic").value = event.topic || "quranic";
       document.getElementById("eventDescription").value = event.description || "";
       document.getElementById("eventSpeaker").value = event.speaker || "";
+      document.getElementById("eventSpeakerPhoto").value = event.speaker_photo || "";
+      document.getElementById("eventSpeakerBio").value = event.speaker_bio || "";
+      
+      // Show existing speaker photo preview
+      if (event.speaker_photo) {
+        const preview = document.getElementById("eventSpeakerPhotoPreview");
+        if (preview) {
+          preview.innerHTML = `<img src="${event.speaker_photo}" class="w-full h-full object-cover" alt="Preview" onerror="this.parentElement.innerHTML='<i data-lucide=\\'user\\' class=\\'w-8 h-8 text-slate-500\\'></i>'"/>`;
+        }
+      }
+      
       // Format registration fee with thousand separator
       document.getElementById("eventRegistrationFee").value = parseInt(
         event.registration_fee || 0
@@ -2680,7 +2781,7 @@ async function loadEventRegistrations() {
 
   if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="9" class="text-center p-6 text-white">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8" class="text-center p-6 text-white">Loading...</td></tr>';
 
   try {
     // Build URL with filters
@@ -2704,12 +2805,6 @@ async function loadEventRegistrations() {
             <div class="text-xs text-slate-500">${formatDate(reg.event_date)}</div>
           </td>
           <td class="p-3 text-slate-900">${escapeHtml(reg.customer_name)}</td>
-          <td class="p-3">
-            <a href="https://wa.me/${reg.customer_phone.replace(/[^0-9]/g, "")}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-1">
-              <i data-lucide="phone" class="w-3 h-3"></i>
-              ${escapeHtml(reg.customer_phone)}
-            </a>
-          </td>
           <td class="p-3 text-slate-900">${escapeHtml(reg.customer_email || "-")}</td>
           <td class="p-3 text-slate-900">
             ${reg.final_fee > 0 
@@ -2728,13 +2823,20 @@ async function loadEventRegistrations() {
               onchange="updateEventRegistrationStatus(${reg.id}, this.value)"
             >
               <option value="pending" ${reg.status === "pending" ? "selected" : ""}>Pending</option>
-              <option value="confirmed" ${reg.status === "confirmed" ? "selected" : ""}>Confirmed</option>
-              <option value="attended" ${reg.status === "attended" ? "selected" : ""}>Attended</option>
-              <option value="cancelled" ${reg.status === "cancelled" ? "selected" : ""}>Cancelled</option>
+              <option value="confirmed" ${reg.status === "confirmed" ? "selected" : ""}>Konfirm</option>
+              <option value="attended" ${reg.status === "attended" ? "selected" : ""}>Hadir</option>
             </select>
           </td>
           <td class="p-3">
             <div class="flex gap-2 justify-center">
+              <a 
+                href="https://wa.me/${reg.customer_phone.replace(/[^0-9]/g, "")}" 
+                target="_blank" 
+                class="text-emerald-600 hover:text-emerald-700 transition-colors"
+                title="Hubungi via WhatsApp"
+              >
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+              </a>
               <button 
                 data-action="delete-event-registration"
                 data-id="${reg.id}"
@@ -2763,11 +2865,11 @@ async function loadEventRegistrations() {
         lucide.createIcons();
       }
     } else {
-      tbody.innerHTML = '<tr><td colspan="9" class="text-center p-6 text-white">Belum ada pendaftaran event</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center p-6 text-white">Belum ada pendaftaran event</td></tr>';
     }
   } catch (error) {
     console.error("Error loading event registrations:", error);
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center p-6 text-red-300">Error loading data</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center p-6 text-red-300">Error loading data</td></tr>';
   }
 
   // Also load events filter dropdown

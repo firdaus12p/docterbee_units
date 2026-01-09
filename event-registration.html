@@ -510,6 +510,9 @@
         // Load event data
         await loadEventData(eventId);
 
+        // Load user data for auto-fill
+        await loadUserDataForAutoFill();
+
         // Initialize Lucide icons
         if (typeof lucide !== "undefined" && lucide.createIcons) {
           lucide.createIcons();
@@ -520,13 +523,73 @@
         document.getElementById("btnValidatePromo").addEventListener("click", validatePromoCode);
       });
 
+      /**
+       * Load logged-in user data and auto-fill form fields
+       */
+      async function loadUserDataForAutoFill() {
+        try {
+          const response = await fetch("/api/auth/check", {
+            method: "GET",
+            credentials: "include",
+          });
+          
+          const data = await response.json();
+          
+          if (data.loggedIn && data.user) {
+            // Auto-fill form fields with user data
+            const nameField = document.getElementById("customerName");
+            const phoneField = document.getElementById("customerPhone");
+            const emailField = document.getElementById("customerEmail");
+            
+            if (nameField && data.user.name) {
+              nameField.value = data.user.name;
+            }
+            
+            if (phoneField && data.user.phone) {
+              phoneField.value = data.user.phone;
+            }
+            
+            if (emailField && data.user.email) {
+              // Don't auto-fill migrated placeholder emails
+              if (!data.user.email.includes("@migrated.local")) {
+                emailField.value = data.user.email;
+              }
+            }
+            
+            console.log("✅ User data auto-filled");
+          } else {
+            // User not logged in, redirect to login
+            if (typeof showModal === "function") {
+              showModal({
+                title: "Login Diperlukan",
+                message: "Untuk mendaftar event, Anda harus login terlebih dahulu.",
+                type: "warning",
+                confirmText: "Login",
+                autoCloseDelay: 0,
+                onConfirm: () => {
+                  window.location.href = "/login";
+                },
+              });
+            } else {
+              alert("Silakan login terlebih dahulu.");
+              window.location.href = "/login";
+            }
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+          // On error, redirect to login
+          window.location.href = "/login";
+        }
+      }
+
       async function loadEventData(eventId) {
         try {
           const response = await fetch(`/api/event-registrations/event/${eventId}`);
           const result = await response.json();
 
           if (!result.success) {
-            showEventNotFound(result.error);
+            // Show the actual error message from API
+            showEventNotFound(result.error || "Event tidak ditemukan");
             return;
           }
 
@@ -561,7 +624,14 @@
       }
 
       function showEventNotFound(message) {
-        document.getElementById("eventNotFound").classList.remove("hidden");
+        const errorDiv = document.getElementById("eventNotFound");
+        // Update the error message dynamically
+        const errorText = errorDiv.querySelector(".text-sm");
+        if (errorText && message) {
+          // Replace the default message with the actual error
+          errorText.innerHTML = message + ' Silakan pilih event dari halaman <a href="/events" class="underline font-semibold">Program</a>.';
+        }
+        errorDiv.classList.remove("hidden");
         document.getElementById("eventInfoCard").classList.add("hidden");
         document.getElementById("btnSubmitRegistration").disabled = true;
         document.getElementById("btnSubmitRegistration").classList.add("opacity-50", "cursor-not-allowed");
@@ -746,30 +816,30 @@
 
           if (result.success) {
             const eventTitle = eventRegState.eventData?.title || "Event";
-            if (typeof showSuccess === "function") {
-              showSuccess(
-                `Halo ${customerName},\n\nPendaftaran Anda untuk "${eventTitle}" berhasil!\n\nAdmin kami akan segera menghubungi Anda di ${customerPhone} untuk konfirmasi.\n\nTerima kasih! 🙏`,
-                "Pendaftaran Berhasil"
-              );
+            const registeredPhone = customerPhone.replace(/[\s-]/g, "");
+            
+            
+            // Show success message with auto-redirect
+            if (typeof showModal === "function") {
+              showModal({
+                title: "Pendaftaran Berhasil! 🎉",
+                message: `Halo ${customerName},\n\nPendaftaran Anda untuk "${eventTitle}" berhasil!\n\n${eventRegState.finalFee > 0 
+                  ? "Silakan lakukan pembayaran dan konfirmasi ke admin." 
+                  : "Admin kami akan segera mengkonfirmasi pendaftaran Anda."}\n\nAnda akan diarahkan ke halaman tiket.`,
+                type: "success",
+                confirmText: "Lihat Tiket Saya",
+                autoCloseDelay: 0, // Don't auto-close
+                onConfirm: () => {
+                  // Redirect to events page - tickets modal will auto-open
+                  localStorage.setItem("docterbee_open_tickets_modal", "true");
+                  window.location.href = "/events";
+                },
+              });
             } else {
               alert(`Pendaftaran berhasil! Kami akan menghubungi Anda di ${customerPhone}.`);
+              localStorage.setItem("docterbee_open_tickets_modal", "true");
+              window.location.href = "/events";
             }
-
-            // Reset form
-            document.getElementById("customerName").value = "";
-            document.getElementById("customerPhone").value = "";
-            document.getElementById("customerEmail").value = "";
-            document.getElementById("customerAge").value = "";
-            document.getElementById("customerGender").value = "";
-            document.getElementById("customerAddress").value = "";
-            document.getElementById("promoCode").value = "";
-            document.getElementById("notes").value = "";
-            document.getElementById("promoResult").classList.add("hidden");
-
-            eventRegState.validatedCoupon = null;
-            eventRegState.discountAmount = 0;
-            eventRegState.finalFee = eventRegState.registrationFee;
-            updatePriceDisplay();
 
           } else {
             if (typeof showError === "function") {

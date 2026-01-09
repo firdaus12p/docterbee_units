@@ -835,7 +835,9 @@ async function fetchTranscriptWithRetry(videoId) {
   }
 }
 
-// POST /api/ai-advisor endpoint (AI Advisor Qur'ani)
+// POST /api/ai-advisor endpoint (AI Advisor Qur'ani with Points System)
+// COST: 1 point per successful AI response
+// SAFETY: Points only deducted AFTER AI responds successfully
 app.post("/api/ai-advisor", async (req, res) => {
   if (!genAI) {
     return res.status(500).json({
@@ -843,8 +845,14 @@ app.post("/api/ai-advisor", async (req, res) => {
     });
   }
 
+  const AI_ADVISOR_COST = 1; // Point cost per analysis
+  const userId = req.session?.userId || null;
+  
+  // Flag to track if we should charge points (only for logged in users)
+  const shouldChargePoints = userId !== null;
+
   try {
-    const { question } = req.body;
+    const { question, skipPointCheck } = req.body;
 
     // Validation
     if (!question || question.trim() === "") {
@@ -857,7 +865,42 @@ app.post("/api/ai-advisor", async (req, res) => {
       "🧠 AI Advisor - Pertanyaan user:",
       question.substring(0, 100) + "..."
     );
+    console.log("   User ID:", userId || "GUEST (no point charge)");
 
+    // ==========================================
+    // STEP 1: Check user points BEFORE AI call
+    // ==========================================
+    let currentPoints = 0;
+    if (shouldChargePoints) {
+      try {
+        const progress = await queryOne(
+          "SELECT points FROM user_progress WHERE user_id = ?",
+          [userId]
+        );
+        currentPoints = progress ? progress.points : 0;
+        
+        // Check if user has enough points
+        if (currentPoints < AI_ADVISOR_COST) {
+          return res.status(400).json({
+            success: false,
+            error: "INSUFFICIENT_POINTS",
+            message: `Poin tidak cukup. Dibutuhkan ${AI_ADVISOR_COST} poin, Anda memiliki ${currentPoints} poin.`,
+            required: AI_ADVISOR_COST,
+            available: currentPoints,
+          });
+        }
+        
+        console.log(`   ✅ User has ${currentPoints} points, cost is ${AI_ADVISOR_COST}`);
+      } catch (dbError) {
+        console.error("Error checking user points:", dbError);
+        // Continue without charging if DB error (graceful degradation)
+      }
+    }
+
+    // ==========================================
+    // STEP 2: Call AI (THE CORE LOGIC)
+    // If this fails, NO points are deducted
+    // ==========================================
     const modelName = "gemini-2.5-flash";
     const model = genAI.getGenerativeModel({ model: modelName });
 
@@ -920,7 +963,7 @@ PENTING:
 - Jika ada yang bertentangan dengan Islam atau sains, berikan koreksi dengan sopan
 - Gunakan Bahasa Indonesia yang jelas dan profesional`;
 
-    // Generate content
+    // Generate content - THIS IS WHERE IT CAN FAIL
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
@@ -939,32 +982,94 @@ PENTING:
 
     // Parse JSON response
     let jsonResponse;
+    let aiSuccess = false;
+    let responseSource = 'gemini';
+    
     try {
       jsonResponse = JSON.parse(text);
+      
+      // Validate structure
+      if (
+        jsonResponse.verdict &&
+        jsonResponse.recommendations &&
+        jsonResponse.nbsnAnalysis
+      ) {
+        aiSuccess = true;
+      }
     } catch (parseError) {
       console.error("❌ JSON parsing error:", parseError.message);
       console.log("📄 Raw response:", text.substring(0, 200));
+      
+      // Fallback mode - AI responded but not in expected format
+      // We still count this as a success (AI did work)
+      aiSuccess = true;
+      responseSource = 'fallback';
+    }
 
-      // Fallback to text response
+    // ==========================================
+    // STEP 3: DEDUCT POINTS ONLY AFTER AI SUCCESS
+    // ==========================================
+    let pointsCharged = false;
+    let newBalance = currentPoints;
+    
+    if (shouldChargePoints && aiSuccess) {
+      try {
+        // Use transaction for atomic point deduction
+        await query("START TRANSACTION");
+        
+        // Lock and get current points
+        const progress = await queryOne(
+          "SELECT points FROM user_progress WHERE user_id = ? FOR UPDATE",
+          [userId]
+        );
+        
+        const pointsNow = progress ? progress.points : 0;
+        
+        // Double-check balance (could have changed)
+        if (pointsNow >= AI_ADVISOR_COST) {
+          newBalance = pointsNow - AI_ADVISOR_COST;
+          
+          // Deduct points
+          await query(
+            `INSERT INTO user_progress (user_id, unit_data, points) 
+             VALUES (?, '{}', ?)
+             ON DUPLICATE KEY UPDATE points = ?`,
+            [userId, newBalance, newBalance]
+          );
+          
+          // Log usage for analytics
+          await query(
+            `INSERT INTO ai_advisor_usage (user_id, question, points_cost, status, response_source) 
+             VALUES (?, ?, ?, 'success', ?)`,
+            [userId, question.substring(0, 500), AI_ADVISOR_COST, responseSource]
+          );
+          
+          await query("COMMIT");
+          pointsCharged = true;
+          
+          console.log(`💰 Points deducted: ${AI_ADVISOR_COST}, new balance: ${newBalance}`);
+        } else {
+          await query("ROLLBACK");
+          console.log("⚠️ Point deduction skipped - insufficient balance at charge time");
+        }
+      } catch (txError) {
+        await query("ROLLBACK");
+        console.error("Error in point deduction transaction:", txError);
+        // Continue without charging - don't fail the whole request
+      }
+    }
+
+    // ==========================================
+    // STEP 4: RETURN RESPONSE
+    // ==========================================
+    if (responseSource === 'fallback') {
       return res.json({
         success: true,
         fallbackMode: true,
         rawText: text,
         error: "Response tidak dalam format JSON, menggunakan fallback",
-      });
-    }
-
-    // Validate structure
-    if (
-      !jsonResponse.verdict ||
-      !jsonResponse.recommendations ||
-      !jsonResponse.nbsnAnalysis
-    ) {
-      return res.json({
-        success: true,
-        fallbackMode: true,
-        rawText: text,
-        error: "Struktur JSON tidak lengkap",
+        pointsCharged: pointsCharged ? AI_ADVISOR_COST : 0,
+        newBalance: shouldChargePoints ? newBalance : null,
       });
     }
 
@@ -974,14 +1079,35 @@ PENTING:
       data: jsonResponse,
       modelUsed: modelName,
       timestamp: new Date().toISOString(),
+      pointsCharged: pointsCharged ? AI_ADVISOR_COST : 0,
+      newBalance: shouldChargePoints ? newBalance : null,
     });
   } catch (error) {
     console.error("❌ AI Advisor Error:", error.message);
+
+    // ==========================================
+    // AI FAILED - NO POINTS DEDUCTED
+    // ==========================================
+    console.log("⚠️ AI failed - no points deducted from user");
+    
+    // Log failed attempt if user is logged in
+    if (shouldChargePoints) {
+      try {
+        await query(
+          `INSERT INTO ai_advisor_usage (user_id, question, points_cost, status, response_source) 
+           VALUES (?, ?, 0, 'failed', 'error')`,
+          [userId, req.body.question?.substring(0, 500) || '']
+        );
+      } catch (logError) {
+        console.error("Error logging failed attempt:", logError);
+      }
+    }
 
     // Handle specific errors
     if (error.message.includes("API key")) {
       return res.status(500).json({
         error: "Konfigurasi API key tidak valid",
+        pointsCharged: 0,
       });
     }
 
@@ -998,11 +1124,15 @@ PENTING:
           : "Quota harian habis, coba besok atau upgrade",
         waitTime: isPerMinute ? "60 detik" : "24 jam",
         retryAfter: isPerMinute ? 60 : 86400,
+        pointsCharged: 0,
+        message: "Poin Anda TIDAK dipotong karena AI gagal merespon.",
       });
     }
 
     res.status(500).json({
       error: "Gagal memproses analisis: " + error.message,
+      pointsCharged: 0,
+      message: "Poin Anda TIDAK dipotong karena AI gagal merespon.",
     });
   }
 });

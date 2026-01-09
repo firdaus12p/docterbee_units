@@ -1,10 +1,118 @@
 import express from "express";
 import { query, queryOne } from "../db.mjs";
-import { requireAdmin } from "../middleware/auth.mjs";
+import { requireAdmin, requireUser } from "../middleware/auth.mjs";
+
+import crypto from "crypto";
 
 const router = express.Router();
 
+// ==================== HELPER FUNCTIONS ====================
+
+/**
+ * Generate a unique ticket code with signature for security
+ * Format: EVTK-{registrationId}-{randomHex}-{signature}
+ */
+function generateTicketCode(registrationId, eventId) {
+  const randomPart = crypto.randomBytes(4).toString("hex").toUpperCase();
+  const payload = `${registrationId}-${eventId}-${randomPart}`;
+  const secretKey = process.env.TICKET_SECRET || "docterbee-event-2026";
+  const signature = crypto
+    .createHmac("sha256", secretKey)
+    .update(payload)
+    .digest("hex")
+    .substring(0, 8)
+    .toUpperCase();
+  return `EVTK-${payload}-${signature}`;
+}
+
+/**
+ * Verify ticket code signature
+ */
+function verifyTicketCode(ticketCode) {
+  if (!ticketCode || !ticketCode.startsWith("EVTK-")) return false;
+  const parts = ticketCode.split("-");
+  if (parts.length < 5) return false;
+  // Extract: EVTK, registrationId, eventId, randomPart, signature
+  const regId = parts[1];
+  const eventId = parts[2];
+  const randomPart = parts[3];
+  const providedSig = parts[4];
+  const payload = `${regId}-${eventId}-${randomPart}`;
+  const secretKey = process.env.TICKET_SECRET || "docterbee-event-2026";
+  const expectedSig = crypto
+    .createHmac("sha256", secretKey)
+    .update(payload)
+    .digest("hex")
+    .substring(0, 8)
+    .toUpperCase();
+  return providedSig === expectedSig;
+}
+
 // ==================== PUBLIC ROUTES ====================
+
+// GET /api/event-registrations/lookup/:phone - Lookup user's registrations by phone (public)
+router.get("/lookup/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+    
+    // Normalize phone number
+    const normalizedPhone = phone.replace(/[\s-]/g, "");
+    
+    if (!normalizedPhone || normalizedPhone.length < 10) {
+      return res.status(400).json({
+        success: false,
+        error: "Nomor HP tidak valid",
+      });
+    }
+
+    // Fetch all registrations for this phone number (not cancelled)
+    const registrations = await query(
+      `SELECT er.id, er.event_id, er.customer_name, er.customer_phone, 
+              er.registration_fee, er.discount_amount, er.final_fee,
+              er.status, er.ticket_code, er.created_at,
+              e.title as event_title, e.event_date, e.mode as event_mode,
+              e.location, e.speaker
+       FROM event_registrations er
+       JOIN events e ON er.event_id = e.id
+       WHERE er.customer_phone = ? AND er.status != 'cancelled'
+       ORDER BY e.event_date DESC`,
+      [normalizedPhone]
+    );
+
+    // Add validity info to each registration
+    const now = new Date();
+    const enrichedRegistrations = registrations.map((reg) => {
+      const eventDate = new Date(reg.event_date);
+      // Set to end of event day
+      eventDate.setHours(23, 59, 59, 999);
+      const isExpired = now > eventDate;
+      const isPending = reg.status === "pending";
+      const isConfirmed = reg.status === "confirmed";
+      const isAttended = reg.status === "attended";
+      
+      return {
+        ...reg,
+        is_expired: isExpired,
+        is_pending: isPending,
+        is_confirmed: isConfirmed,
+        is_attended: isAttended,
+        can_use_ticket: isConfirmed && !isExpired,
+      };
+    });
+
+    res.json({
+      success: true,
+      count: enrichedRegistrations.length,
+      data: enrichedRegistrations,
+    });
+  } catch (error) {
+    console.error("Error looking up registrations:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil data pendaftaran",
+    });
+  }
+});
 
 // GET /api/event-registrations/event/:eventId - Get event details for registration form
 router.get("/event/:eventId", async (req, res) => {
@@ -27,8 +135,11 @@ router.get("/event/:eventId", async (req, res) => {
     }
 
     // Check if registration deadline has passed
+    // Allow registration until the END of the deadline day (23:59:59)
     if (event.registration_deadline) {
       const deadline = new Date(event.registration_deadline);
+      // Set deadline to end of day (23:59:59.999)
+      deadline.setHours(23, 59, 59, 999);
       const now = new Date();
       if (now > deadline) {
         return res.status(400).json({
@@ -51,26 +162,82 @@ router.get("/event/:eventId", async (req, res) => {
   }
 });
 
-// POST /api/event-registrations - Register for an event (public)
-router.post("/", async (req, res) => {
+// ==================== AUTHENTICATED ROUTES ====================
+
+// GET /api/event-registrations/my-tickets - Get logged-in user's tickets
+router.get("/my-tickets", requireUser, async (req, res) => {
   try {
+    const userId = req.session.userId;
+    
+    // Fetch registrations for this user
+    const registrations = await query(
+      `SELECT er.id, er.event_id, er.customer_name, er.customer_phone, 
+              er.registration_fee, er.discount_amount, er.final_fee,
+              er.status, er.ticket_code, er.created_at,
+              e.title as event_title, e.event_date, e.mode as event_mode,
+              e.location, e.speaker
+       FROM event_registrations er
+       JOIN events e ON er.event_id = e.id
+       WHERE er.user_id = ? AND er.status != 'cancelled'
+       ORDER BY e.event_date DESC`,
+      [userId]
+    );
+
+    // Add validity info to each registration
+    const now = new Date();
+    const enrichedRegistrations = registrations.map((reg) => {
+      const eventDate = new Date(reg.event_date);
+      // Set to end of event day
+      eventDate.setHours(23, 59, 59, 999);
+      const isExpired = now > eventDate;
+      const isPending = reg.status === "pending";
+      const isConfirmed = reg.status === "confirmed";
+      const isAttended = reg.status === "attended";
+      
+      return {
+        ...reg,
+        is_expired: isExpired,
+        is_pending: isPending,
+        is_confirmed: isConfirmed,
+        is_attended: isAttended,
+        can_use_ticket: isConfirmed && !isExpired,
+      };
+    });
+
+    res.json({
+      success: true,
+      data: enrichedRegistrations,
+    });
+  } catch (error) {
+    console.error("Error fetching my tickets:", error);
+    res.status(500).json({
+      success: false,
+      error: "Gagal mengambil tiket saya",
+    });
+  }
+});
+
+// POST /api/event-registrations - Create a new registration
+router.post("/", requireUser, async (req, res) => {
+  try {
+    const userId = req.session.userId;
     const {
       eventId,
       customerName,
       customerPhone,
       customerEmail,
       customerAge,
-      customerGender,
-      customerAddress,
+      gender: customerGender,
+      address: customerAddress,
       promoCode,
       notes,
     } = req.body;
 
-    // Validation
+    // Validate required fields
     if (!eventId || !customerName || !customerPhone) {
       return res.status(400).json({
         success: false,
-        error: "Event ID, Nama, dan No. HP wajib diisi",
+        error: "Data wajib harus diisi (Event, Nama, No. HP)",
       });
     }
 
@@ -99,8 +266,11 @@ router.post("/", async (req, res) => {
     }
 
     // Check registration deadline
+    // Allow registration until the END of the deadline day (23:59:59)
     if (event.registration_deadline) {
       const deadline = new Date(event.registration_deadline);
+      // Set deadline to end of day (23:59:59.999)
+      deadline.setHours(23, 59, 59, 999);
       const now = new Date();
       if (now > deadline) {
         return res.status(400).json({
@@ -110,17 +280,19 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // Check if already registered (same phone for same event)
+    // Check existing confirmed/pending registration for this user
+    // We check either by user_id OR by phone number to be safe
     const existingReg = await queryOne(
       `SELECT id FROM event_registrations 
-       WHERE event_id = ? AND customer_phone = ? AND status != 'cancelled'`,
-      [eventId, customerPhone.replace(/[\s-]/g, "")]
+       WHERE event_id = ? AND status IN ('pending', 'confirmed') 
+       AND (user_id = ? OR customer_phone = ?)`,
+      [eventId, userId, customerPhone.replace(/[\s-]/g, "")]
     );
 
     if (existingReg) {
       return res.status(400).json({
         success: false,
-        error: "Nomor HP ini sudah terdaftar untuk event ini",
+        error: "Anda sudah terdaftar di event ini",
       });
     }
 
@@ -167,12 +339,13 @@ router.post("/", async (req, res) => {
     // Insert registration
     const result = await query(
       `INSERT INTO event_registrations 
-       (event_id, customer_name, customer_phone, customer_email, customer_age, 
+       (event_id, user_id, customer_name, customer_phone, customer_email, customer_age, 
         customer_gender, customer_address, registration_fee, promo_code, 
         discount_amount, final_fee, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         eventId,
+        userId,
         customerName,
         customerPhone.replace(/[\s-]/g, ""),
         customerEmail || null,
@@ -187,6 +360,13 @@ router.post("/", async (req, res) => {
       ]
     );
 
+    // Generate and save ticket code
+    const ticketCode = generateTicketCode(result.insertId, eventId);
+    await query(
+      "UPDATE event_registrations SET ticket_code = ? WHERE id = ?",
+      [ticketCode, result.insertId]
+    );
+
     res.status(201).json({
       success: true,
       message: "Pendaftaran berhasil!",
@@ -194,10 +374,11 @@ router.post("/", async (req, res) => {
         id: result.insertId,
         eventTitle: event.title,
         customerName,
-        customerPhone,
+        customerPhone: customerPhone.replace(/[\s-]/g, ""),
         registrationFee,
         discountAmount,
         finalFee,
+        ticketCode,
       },
     });
   } catch (error) {
