@@ -42,14 +42,24 @@ function renderArticleCard(article) {
     `;
   }
 
-  // Overlay for locked articles
-  const lockedOverlay = !canRead ? `
-    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl">
-      <svg class="w-10 h-10 text-amber-400 mb-2" fill="currentColor" viewBox="0 0 24 24">
+  // Lock icon badge on image (small, non-intrusive) - only for locked articles
+  const lockIconOnImage = !canRead ? `
+    <div class="absolute top-2 right-2 bg-amber-500 text-white p-1.5 rounded-full shadow-lg">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 1C8.676 1 6 3.676 6 7v2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V11a2 2 0 00-2-2h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm0 10a2 2 0 110 4 2 2 0 010-4z"/>
       </svg>
-      <p class="text-white font-semibold text-sm">Buka dengan ${article.points_cost} Poin</p>
-      <p class="text-slate-300 text-xs mt-1">Klik untuk membeli</p>
+    </div>
+  ` : '';
+
+  // Buy button for locked articles (clear call-to-action at bottom)
+  const buyButton = !canRead ? `
+    <div class="mt-3 pt-3 border-t border-amber-200">
+      <button class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:from-amber-600 hover:to-orange-600 transition-all shadow-md">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 1C8.676 1 6 3.676 6 7v2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V11a2 2 0 00-2-2h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm0 10a2 2 0 110 4 2 2 0 010-4z"/>
+        </svg>
+        Buka Artikel - ${article.points_cost} Poin
+      </button>
     </div>
   ` : '';
 
@@ -59,7 +69,7 @@ function renderArticleCard(article) {
 
   return `
     <article 
-      class="article-card group relative bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${!canRead ? 'ring-2 ring-amber-300' : ''}"
+      class="article-card flex flex-col h-full group relative bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${!canRead ? 'border-amber-300 border-2' : ''}"
       onclick="${clickHandler}"
     >
       ${article.header_image ? `
@@ -67,13 +77,13 @@ function renderArticleCard(article) {
           <img 
             src="${article.header_image}" 
             alt="${escapeHtml(article.title)}"
-            class="w-full h-36 object-cover ${!canRead ? 'grayscale-[30%]' : ''}"
+            class="w-full h-48 object-cover"
             onerror="this.parentElement.style.display='none'"
           >
-          ${!canRead ? '<div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>' : ''}
+          ${lockIconOnImage}
         </div>
       ` : ""}
-      <div class="p-4">
+      <div class="p-4 flex flex-col flex-1">
         <div class="flex items-center gap-2 mb-2 flex-wrap">
           <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCategoryColor(article.category)}">
             ${article.category || 'Umum'}
@@ -84,16 +94,19 @@ function renderArticleCard(article) {
           ${escapeHtml(article.title)}
         </h3>
         ${article.excerpt ? `
-          <p class="text-sm text-slate-600 line-clamp-2 mb-2">
+          <p class="text-sm text-slate-600 line-clamp-2 break-words mb-4">
             ${escapeHtml(article.excerpt)}
           </p>
         ` : ""}
-        <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-gray-100">
-          <span>${article.author || 'DocterBee'}</span>
-          <span>${formatDate(article.created_at)}</span>
+        
+        <div class="mt-auto">
+          <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 pt-2 border-t border-gray-100">
+            <span>${article.author || 'DocterBee'}</span>
+            <span>${formatDate(article.created_at)}</span>
+          </div>
+          ${buyButton}
         </div>
       </div>
-      ${lockedOverlay}
     </article>
   `;
 }
@@ -112,14 +125,50 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
     const authResult = await authResponse.json();
     
     if (!authResult.loggedIn) {
-      // Show login prompt
-      if (typeof showWarning === 'function') {
-        showWarning('Silakan login terlebih dahulu untuk membeli artikel dengan poin.');
-      } else {
-        alert('Silakan login terlebih dahulu untuk membeli artikel dengan poin.');
-      }
-      // Redirect to login
-      window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+      // Show Login Required Modal instead of auto-redirect
+      const loginModalHTML = `
+        <div id="loginRequiredModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick="closeLoginRequiredModal(event)">
+          <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onclick="event.stopPropagation()">
+            <div class="text-center mb-6">
+              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 mb-2">Login Diperlukan</h3>
+              <p class="text-slate-600 text-sm">Silakan login terlebih dahulu untuk membeli artikel dengan poin.</p>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+              <a 
+                href="/login?redirect=${encodeURIComponent(window.location.pathname)}" 
+                class="w-full px-4 py-3 bg-red-600 text-white rounded-xl font-semibold text-center hover:bg-red-700 transition"
+              >
+                Login
+              </a>
+              <a 
+                href="/register?redirect=${encodeURIComponent(window.location.pathname)}" 
+                class="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold text-center hover:bg-slate-50 transition"
+              >
+                Daftar Akun Baru
+              </a>
+              <button 
+                onclick="closeLoginRequiredModal()"
+                class="w-full px-4 py-2 text-slate-500 text-sm hover:text-slate-700 transition"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Remove existing modal if any
+      const existingModal = document.getElementById('loginRequiredModal');
+      if (existingModal) existingModal.remove();
+      
+      // Add modal to page
+      document.body.insertAdjacentHTML('beforeend', loginModalHTML);
       return;
     }
     
@@ -216,6 +265,15 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
 function closeUnlockModal(event) {
   if (event && event.target.id !== 'unlockArticleModal') return;
   const modal = document.getElementById('unlockArticleModal');
+  if (modal) modal.remove();
+}
+
+/**
+ * Close login required modal
+ */
+function closeLoginRequiredModal(event) {
+  if (event && event.target.id !== 'loginRequiredModal') return;
+  const modal = document.getElementById('loginRequiredModal');
   if (modal) modal.remove();
 }
 
