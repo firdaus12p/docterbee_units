@@ -96,6 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnNewService").addEventListener("click", () => openServiceModal());
   document.getElementById("cancelService").addEventListener("click", closeServiceModal);
   document.getElementById("serviceForm").addEventListener("submit", handleServiceSubmit);
+  document.getElementById("serviceImage").addEventListener("change", handleServiceImageChange);
+  document.getElementById("removeServiceImageBtn").addEventListener("click", removeServiceImage);
 
   // Products section
   document.getElementById("btnNewProduct").addEventListener("click", () => openProductModal());
@@ -1162,11 +1164,18 @@ function openEventModal(id = null) {
   document.getElementById("eventId").value = id || "";
   
   // Reset speaker photo preview
-  const preview = document.getElementById("eventSpeakerPhotoPreview");
-  if (preview) {
-    preview.innerHTML = '<i data-lucide="user" class="w-8 h-8 text-slate-500"></i>';
+  const speakerPreview = document.getElementById("eventSpeakerPhotoPreview");
+  if (speakerPreview) {
+    speakerPreview.innerHTML = '<i data-lucide="user" class="w-8 h-8 text-slate-500"></i>';
   }
   document.getElementById("eventSpeakerPhoto").value = "";
+
+  // Reset event image preview
+  const eventImagePreview = document.getElementById("eventImagePreview");
+  if (eventImagePreview) {
+    eventImagePreview.innerHTML = '<i data-lucide="image" class="w-8 h-8 text-slate-500"></i>';
+  }
+  document.getElementById("eventImage").value = "";
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
@@ -1228,6 +1237,61 @@ async function uploadSpeakerPhoto() {
   }
 }
 
+/**
+ * Preview event image (hero/banner) before upload
+ */
+function previewEventImage(input) {
+  const preview = document.getElementById("eventImagePreview");
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    
+    // Validate size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Ukuran file maksimal 2MB");
+      input.value = "";
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="Preview"/>`;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/**
+ * Upload event image (hero/banner) to server and return URL
+ */
+async function uploadEventImage() {
+  const fileInput = document.getElementById("eventImageFile");
+  if (!fileInput.files || !fileInput.files[0]) {
+    // Return existing URL if no new file
+    return document.getElementById("eventImage").value || null;
+  }
+  
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+  
+  try {
+    const response = await adminFetch(`${API_BASE}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+    
+    const result = await response.json();
+    if (result.success && result.data && result.data.url) {
+      return result.data.url;
+    }
+    console.error("Upload failed:", result.error);
+    return document.getElementById("eventImage").value || null;
+  } catch (error) {
+    console.error("Error uploading event image:", error);
+    return document.getElementById("eventImage").value || null;
+  }
+}
+
 function closeEventModal() {
   document.getElementById("eventModal").classList.add("hidden");
 }
@@ -1247,6 +1311,8 @@ async function handleEventSubmit(e) {
   try {
     // Upload speaker photo first if new file selected
     const speakerPhotoUrl = await uploadSpeakerPhoto();
+    // Upload event image (hero/banner) if new file selected
+    const eventImageUrl = await uploadEventImage();
     
     const id = document.getElementById("eventId").value;
     const data = {
@@ -1255,6 +1321,7 @@ async function handleEventSubmit(e) {
       mode: document.getElementById("eventMode").value,
       topic: document.getElementById("eventTopic").value,
       description: document.getElementById("eventDescription").value,
+      eventImage: eventImageUrl,
       speaker: document.getElementById("eventSpeaker").value,
       speakerPhoto: speakerPhotoUrl,
       speakerBio: document.getElementById("eventSpeakerBio").value,
@@ -1323,10 +1390,19 @@ async function editEvent(id) {
       document.getElementById("eventMode").value = event.mode || "online";
       document.getElementById("eventTopic").value = event.topic || "quranic";
       document.getElementById("eventDescription").value = event.description || "";
+      document.getElementById("eventImage").value = event.event_image || "";
       document.getElementById("eventSpeaker").value = event.speaker || "";
       document.getElementById("eventSpeakerPhoto").value = event.speaker_photo || "";
       document.getElementById("eventSpeakerBio").value = event.speaker_bio || "";
       
+      // Show existing event image preview (hero/banner)
+      if (event.event_image) {
+        const eventImagePreview = document.getElementById("eventImagePreview");
+        if (eventImagePreview) {
+          eventImagePreview.innerHTML = `<img src="${event.event_image}" class="w-full h-full object-cover" alt="Preview" onerror="this.parentElement.innerHTML='<i data-lucide=\\'image\\' class=\\'w-8 h-8 text-slate-500\\'></i>'"/>`;
+        }
+      }
+
       // Show existing speaker photo preview
       if (event.speaker_photo) {
         const preview = document.getElementById("eventSpeakerPhotoPreview");
@@ -1788,6 +1864,12 @@ function openServiceModal(id = null) {
   document.getElementById("serviceId").value = "";
   document.getElementById("serviceIsActive").checked = true;
 
+  // Reset image preview
+  document.getElementById("serviceImageUrl").value = "";
+  document.getElementById("serviceImage").value = "";
+  document.getElementById("serviceImagePreview").classList.add("hidden");
+  document.getElementById("serviceImagePreviewImg").src = "";
+
   // Uncheck all branch checkboxes
   document.querySelectorAll('input[name="serviceBranch"]').forEach((checkbox) => {
     checkbox.checked = false;
@@ -1810,6 +1892,52 @@ function openServiceModal(id = null) {
 function closeServiceModal() {
   const modal = document.getElementById("serviceModal");
   modal.classList.add("hidden");
+}
+
+// Handle service image file selection for preview
+function handleServiceImageChange(e) {
+  const file = e.target.files[0];
+  const preview = document.getElementById("serviceImagePreview");
+  const previewImg = document.getElementById("serviceImagePreviewImg");
+
+  if (file) {
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ukuran gambar maksimal 5MB");
+      e.target.value = "";
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Format gambar harus JPG, PNG, atau WebP");
+      e.target.value = "";
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      previewImg.src = event.target.result;
+      preview.classList.remove("hidden");
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // No file selected, hide preview if no existing image
+    if (!document.getElementById("serviceImageUrl").value) {
+      preview.classList.add("hidden");
+      previewImg.src = "";
+    }
+  }
+}
+
+// Remove service image
+function removeServiceImage() {
+  document.getElementById("serviceImage").value = "";
+  document.getElementById("serviceImageUrl").value = "";
+  document.getElementById("serviceImagePreview").classList.add("hidden");
+  document.getElementById("serviceImagePreviewImg").src = "";
 }
 
 let isSubmittingService = false;
@@ -1844,6 +1972,40 @@ async function handleServiceSubmit(e) {
   const mode = document.getElementById("serviceMode").value;
   const practitioner = document.getElementById("servicePractitioner").value.trim();
   const is_active = document.getElementById("serviceIsActive").checked;
+  
+  // Get image URL (from hidden input or upload)
+  let imageUrl = document.getElementById("serviceImageUrl").value;
+  const imageFile = document.getElementById("serviceImage").files[0];
+
+  // If there's a new image file, upload it first
+  if (imageFile) {
+    try {
+      const formData = new FormData();
+      formData.append("file", imageFile); // Backend expects 'file' not 'image'
+
+      const uploadResponse = await adminFetch(`${API_BASE}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+      if (uploadResult.success) {
+        // Backend returns URL in data.url or filePath
+        imageUrl = uploadResult.data?.url || uploadResult.filePath || "";
+      } else {
+        throw new Error(uploadResult.error || "Gagal upload gambar");
+      }
+    } catch (uploadError) {
+      console.error("Error uploading service image:", uploadError);
+      alert("Gagal upload gambar: " + uploadError.message);
+      isSubmittingService = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+      return;
+    }
+  }
 
   const data = {
     name,
@@ -1853,6 +2015,7 @@ async function handleServiceSubmit(e) {
     branch,
     mode,
     practitioner: practitioner || null,
+    image: imageUrl || null,
     is_active: is_active ? 1 : 0,
   };
 
@@ -1917,6 +2080,16 @@ async function editService(id) {
     document.getElementById("serviceMode").value = service.mode;
     document.getElementById("servicePractitioner").value = service.practitioner || "";
     document.getElementById("serviceIsActive").checked = service.is_active === 1;
+
+    // Handle image preview
+    if (service.image) {
+      document.getElementById("serviceImageUrl").value = service.image;
+      document.getElementById("serviceImagePreviewImg").src = service.image;
+      document.getElementById("serviceImagePreview").classList.remove("hidden");
+    } else {
+      document.getElementById("serviceImageUrl").value = "";
+      document.getElementById("serviceImagePreview").classList.add("hidden");
+    }
   } catch (error) {
     console.error("Error loading service:", error);
     alert("Error: " + error.message);

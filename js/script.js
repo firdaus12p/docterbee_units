@@ -1452,111 +1452,152 @@ async function renderEvents() {
 
     eventsContainer.innerHTML = "";
 
-    result.data.forEach((event) => {
+    result.data.forEach((event, index) => {
       const card = document.createElement("div");
       card.className = "event-card";
+      card.style.animationDelay = `${0.1 + index * 0.1}s`;
 
       // Format registration fee
-      const feeText =
-        event.registration_fee && event.registration_fee > 0
-          ? `Rp ${new Intl.NumberFormat("id-ID").format(
-              event.registration_fee
-            )}`
-          : "GRATIS";
+      const isFree = !event.registration_fee || event.registration_fee === 0;
+      const feeText = isFree
+        ? "GRATIS"
+        : `Rp ${new Intl.NumberFormat("id-ID").format(event.registration_fee)}`;
+      const priceClass = isFree ? "event-price-free" : "event-price-paid";
 
       // Check if registration is closed
       let isRegistrationClosed = false;
-      let deadlineText = "";
+      let deadlineHtml = "";
       if (event.registration_deadline) {
         const deadline = new Date(event.registration_deadline);
-        // Set to end of day for comparison
         deadline.setHours(23, 59, 59, 999);
         const now = new Date();
         isRegistrationClosed = now > deadline;
         
-        deadlineText = `
-          <div class="text-xs text-slate-900 mt-1 flex items-center gap-1">
-            <i data-lucide="clock" class="w-3 h-3"></i>
-            Daftar sebelum: ${deadline.toLocaleDateString("id-ID", {
+        deadlineHtml = `
+          <div class="event-meta-item event-deadline">
+            <i data-lucide="clock"></i>
+            <span>Daftar sebelum: ${deadline.toLocaleDateString("id-ID", {
               day: "numeric",
               month: "short",
               year: "numeric",
-            })}
-            ${isRegistrationClosed ? '<span class="text-red-600 font-semibold ml-1">(Ditutup)</span>' : ''}
+            })}${isRegistrationClosed ? ' <span class="event-deadline-closed">(Ditutup)</span>' : ''}</span>
           </div>
         `;
       }
 
       // Format location for offline events
-      let locationText = "";
+      let locationHtml = "";
       if (event.mode === "offline" && event.location) {
-        locationText = `
-          <div class="text-xs text-slate-900 mt-1 flex items-center gap-1">
-            <i data-lucide="map-pin" class="w-3 h-3 text-red-600"></i>
-            ${escapeHtml(event.location)}
+        locationHtml = `
+          <div class="event-meta-item event-location">
+            <i data-lucide="map-pin"></i>
+            <span>${escapeHtml(event.location)}</span>
           </div>
         `;
       }
 
+      // Speaker info
+      let speakerHtml = "";
+      if (event.speaker) {
+        speakerHtml = `
+          <div class="event-meta-item event-speaker">
+            <i data-lucide="user"></i>
+            <span>Pemateri: ${escapeHtml(event.speaker)}</span>
+          </div>
+        `;
+      }
+
+      // Image section
+      const imageHtml = event.event_image
+        ? `<img src="${escapeHtml(event.event_image)}" alt="${escapeHtml(event.title)}" loading="lazy">`
+        : `<div class="event-card-image-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </div>`;
+
+      // Badge for mode
+      const modeBadgeClass = event.mode === "online" ? "event-badge-online" : "event-badge-offline";
+      const modeIcon = event.mode === "online" 
+        ? '<i data-lucide="video" class="w-3 h-3"></i>' 
+        : '<i data-lucide="map-pin" class="w-3 h-3"></i>';
+
       // Determine button markup based on registration status
-      let buttonHtml;
+      let primaryButtonHtml;
       if (isRegistrationClosed) {
-        buttonHtml = `
-          <button disabled class="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold cursor-not-allowed opacity-60">
+        primaryButtonHtml = `
+          <button disabled class="btn-primary-sm" style="background: #9ca3af; cursor: not-allowed; opacity: 0.7;">
             Pendaftaran Ditutup
           </button>
         `;
       } else {
-        // Use onclick to check login status before redirecting
-        buttonHtml = `<button onclick="handleEventRegistration(${event.id})" class="btn-primary-sm">Daftar</button>`;
+        primaryButtonHtml = `<button onclick="handleEventRegistration(${event.id})" class="btn-primary-sm">Daftar Sekarang</button>`;
+      }
+
+      // Info Program button
+      let infoButtonHtml = "";
+      if (event.speaker || event.description) {
+        infoButtonHtml = `<button onclick='showClassInfoModal(${JSON.stringify({
+          name: event.speaker || "DocterBee",
+          photo: event.speaker_photo || "",
+          bio: event.speaker_bio || "",
+          eventTitle: event.title,
+          description: event.description || "Bergabunglah di program eksklusif ini bersama DocterBee.",
+          eventImage: event.event_image || ""
+        }).replace(/'/g, "&#39;")})' class="btn-secondary-sm">Info Program</button>`;
       }
 
       card.innerHTML = `
-        <div class="text-lg font-semibold">${escapeHtml(event.title)}</div>
-        <div class="text-xs text-red-500 mt-1">${escapeHtml(
-          event.mode.toUpperCase()
-        )} · ${escapeHtml(event.topic)}</div>
-        <div class="text-sm text-slate-900 mt-1 flex items-center gap-1">
-          <i data-lucide="calendar" class="w-3 h-3"></i>
-          ${formatEventDate(event.event_date)}
+        <!-- Image Section -->
+        <div class="event-card-image">
+          ${imageHtml}
         </div>
-        ${
-          event.speaker
-            ? `
-          <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
-            <i data-lucide="user" class="w-3 h-3"></i>
-            Pemateri: ${escapeHtml(event.speaker)}
+        
+        <!-- Body Section -->
+        <div class="event-card-body">
+          <!-- Badges -->
+          <div class="flex flex-wrap gap-2">
+            <span class="event-badge ${modeBadgeClass}">
+              ${modeIcon}
+              ${event.mode.toUpperCase()}
+            </span>
+            <span class="event-badge event-badge-topic">${escapeHtml(event.topic)}</span>
           </div>
-        `
-            : ""
-        }
-        ${locationText}
-        ${deadlineText}
-        <div class="text-sm font-semibold text-red-600 mt-2">${feeText}</div>
-        <p class="text-sm text-slate-900 mt-2">${escapeHtml(
-          event.description || "Event kesehatan Islami bersama Docterbee"
-        )}</p>
-        <div class="mt-3 flex flex-wrap gap-2">
-          ${buttonHtml}
-          ${
-            event.speaker
-              ? `<button onclick='showSpeakerInfoModal(${JSON.stringify({
-                  name: event.speaker,
-                  photo: event.speaker_photo || "",
-                  bio: event.speaker_bio || "",
-                  eventTitle: event.title
-                }).replace(/'/g, "&#39;")})' class="btn-secondary-sm">Info Pemateri</button>`
-              : ""
-          }
+          
+          <!-- Title -->
+          <h3 class="event-card-title">${escapeHtml(event.title)}</h3>
+          
+          <!-- Meta Info -->
+          <div class="event-meta">
+            <div class="event-meta-item">
+              <i data-lucide="calendar"></i>
+              <span>${formatEventDate(event.event_date)}</span>
+            </div>
+            ${speakerHtml}
+            ${locationHtml}
+            ${deadlineHtml}
+          </div>
+          
+          <!-- Price -->
+          <div class="event-price ${priceClass}">${feeText}</div>
+        </div>
+        
+        <!-- Footer Section -->
+        <div class="event-card-footer">
+          ${primaryButtonHtml}
+          ${infoButtonHtml}
         </div>
       `;
+      
       eventsContainer.appendChild(card);
-
-      // Re-initialize Lucide icons for the newly added card
-      if (typeof lucide !== "undefined") {
-        lucide.createIcons();
-      }
     });
+    
+    // Re-initialize Lucide icons after all cards are added
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
   } catch (error) {
     console.error("Error loading events:", error);
     eventsContainer.innerHTML =
@@ -1682,71 +1723,75 @@ async function handleEventRegistration(eventId) {
 }
 
 /**
- * Show speaker info modal with photo and bio
- * @param {Object} speaker - Speaker data { name, photo, bio, eventTitle }
+ * Show Class Info Modal (formerly Speaker Info)
  */
-function showSpeakerInfoModal(speaker) {
+function showClassInfoModal(data) {
   // Remove existing modal if any
   const existingModal = document.getElementById("speakerInfoModal");
   if (existingModal) existingModal.remove();
 
-  // Build photo HTML
-  const photoHtml = speaker.photo 
-    ? `<img src="${escapeHtml(speaker.photo)}" alt="${escapeHtml(speaker.name)}" 
-           class="w-28 h-28 rounded-full object-cover border-4 border-red-200 shadow-lg mx-auto" 
-           onerror="this.parentElement.innerHTML='<div class=\\'w-28 h-28 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg mx-auto\\'>${speaker.name.charAt(0).toUpperCase()}</div>'"/>`
-    : `<div class="w-28 h-28 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg mx-auto">
-         ${speaker.name.charAt(0).toUpperCase()}
+  // 1. Hero Image (Boxy & Large - Tall Portrait Style)
+  // Use eventImage (dedicated banner) first, then fall back to speaker photo
+  const heroImageSrc = data.eventImage || data.photo;
+  const heroImageHtml = heroImageSrc 
+    ? `<img src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(data.eventTitle)}" 
+           class="w-full aspect-[4/5] md:aspect-[3/2] object-cover rounded-xl shadow-md mb-6" 
+           onerror="this.parentElement.innerHTML='<div class=\\'w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6\\'>${data.name.charAt(0).toUpperCase()}</div>'"/>`
+    : `<div class="w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6">
+         ${data.name.charAt(0).toUpperCase()}
        </div>`;
 
-  // Build bio HTML
-  const bioHtml = speaker.bio 
-    ? `<p class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${escapeHtml(speaker.bio)}</p>`
-    : `<p class="text-slate-400 text-sm italic text-center">Informasi pemateri belum tersedia.</p>`;
+  // 2. Class Description Section
+  // 2. Class Description Section
+  const classInfoHtml = `
+    <div class="mb-6 w-full">
+      <h4 class="font-bold text-black text-lg mb-2">Tentang Kelas</h4>
+      <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line break-words w-full">${escapeHtml(data.description)}</div>
+    </div>
+  `;
+
+  // 3. Speaker Section
+  const speakerInfoHtml = `
+    <div class="w-full">
+      <h4 class="font-bold text-xl text-slate-900 mb-2">Pemateri</h4>
+      <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 w-full">
+        <div class="flex-shrink-0">
+             ${data.photo ? `<img src="${escapeHtml(data.photo)}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm">` : `<div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-xl">${data.name.charAt(0)}</div>`}
+        </div>
+        <div class="min-w-0 flex-1">
+            <div class="font-semibold text-slate-900 break-words">${escapeHtml(data.name)}</div>
+            <div class="text-xs text-red-500 font-medium mb-1">Praktisi DocterBee</div>
+            <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line mt-1 break-words">${escapeHtml(data.bio || "Informasi profil belum tersedia.")}</div>
+        </div>
+      </div>
+    </div>
+  `;
 
   // Create modal HTML
   const modalHtml = `
-    <div id="speakerInfoModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onclick="if(event.target === this) this.remove()">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-fade-in">
+    <div id="speakerInfoModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onclick="if(event.target === this) this.remove()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4 text-white">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-lg">Info Pemateri</h3>
-            <button onclick="document.getElementById('speakerInfoModal').remove()" class="text-white/80 hover:text-white transition">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
+        <div class="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
+          <h3 class="font-bold text-lg text-slate-900 truncate pr-4">${escapeHtml(data.eventTitle)}</h3>
+          <button onclick="document.getElementById('speakerInfoModal').remove()" class="text-slate-400 hover:text-red-500 transition bg-slate-100 p-1.5 rounded-full">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
         
-        <!-- Content -->
-        <div class="p-6">
-          <!-- Photo -->
-          <div class="mb-4">
-            ${photoHtml}
-          </div>
-          
-          <!-- Name -->
-          <h4 class="text-xl font-bold text-slate-900 text-center mb-2">${escapeHtml(speaker.name)}</h4>
-          
-          <!-- Event badge -->
-          <div class="text-center mb-4">
-            <span class="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
-              Pemateri ${escapeHtml(speaker.eventTitle)}
-            </span>
-          </div>
-          
-          <!-- Bio -->
-          <div class="max-h-40 overflow-y-auto">
-            ${bioHtml}
-          </div>
+        <!-- Content (Scrollable) -->
+        <div class="p-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
+          ${heroImageHtml}
+          ${classInfoHtml}
+          ${speakerInfoHtml}
         </div>
         
         <!-- Footer -->
         <div class="px-6 py-4 bg-slate-50 border-t border-slate-200">
           <button onclick="document.getElementById('speakerInfoModal').remove()" 
-                  class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+                  class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-lg shadow-slate-200/50">
             Tutup
           </button>
         </div>
@@ -1754,7 +1799,6 @@ function showSpeakerInfoModal(speaker) {
     </div>
   `;
 
-  // Insert and show modal
   document.body.insertAdjacentHTML("beforeend", modalHtml);
 }
 
@@ -2794,46 +2838,77 @@ async function renderServices() {
 
     // Render services
     grid.innerHTML = services
-      .map((service) => {
+      .map((service, index) => {
         const categoryBadge = getCategoryBadgeHTML(service.category);
-        const modeInfo = getModeInfoHTML(service.mode);
         const price = formatPrice(service.price);
+        
+        // Mode badge class
+        const modeBadgeClass = service.mode === "online" ? "event-badge-online" : "event-badge-offline";
+        const modeIcon = service.mode === "online" ? "video" : "home";
+        const modeLabel = service.mode === "online" ? "ONLINE" : service.mode === "offline" ? "OFFLINE" : "ONLINE & OFFLINE";
+
+        // Image placeholder atau gambar service jika ada
+        const imageHtml = service.image
+          ? `<img src="${escapeHtml(service.image)}" alt="${escapeHtml(service.name)}" loading="lazy">`
+          : `<div class="event-card-image-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>`;
 
         return `
-          <div class="event-card">
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-              <div class="text-lg font-semibold text-slate-900">${escapeHtml(
-                service.name
-              )}</div>
-              ${categoryBadge}
+          <div class="service-card" style="animation-delay: ${0.1 + index * 0.1}s;">
+            <!-- Image Section -->
+            <div class="event-card-image">
+              ${imageHtml}
             </div>
-            <p class="text-sm text-slate-900 mb-3">
-              ${escapeHtml(service.description)}
-            </p>
-            ${
-              service.practitioner
-                ? `<div class="flex items-center gap-2 mb-2 text-xs text-slate-900">
-                <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-                <span>Praktisi: ${escapeHtml(service.practitioner)}</span>
-              </div>`
-                : ""
-            }
-            <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="tag" class="w-4 h-4 text-red-600"></i>
-              <span class="text-lg font-bold text-red-600">${price}</span>
+            
+            <!-- Body Section -->
+            <div class="event-card-body">
+              <!-- Badges -->
+              <div class="flex flex-wrap gap-2">
+                <span class="event-badge ${modeBadgeClass}">
+                  <i data-lucide="${modeIcon}" class="w-3 h-3"></i>
+                  ${modeLabel}
+                </span>
+                ${categoryBadge}
+              </div>
+              
+              <!-- Title -->
+              <h3 class="event-card-title">${escapeHtml(service.name)}</h3>
+              
+              <!-- Description -->
+              <p class="text-sm text-slate-600 line-clamp-2">${escapeHtml(service.description)}</p>
+              
+              <!-- Meta Info -->
+              <div class="event-meta">
+                ${service.practitioner ? `
+                  <div class="event-meta-item event-speaker">
+                    <i data-lucide="user-check"></i>
+                    <span>Praktisi: ${escapeHtml(service.practitioner)}</span>
+                  </div>
+                ` : ''}
+                <div class="event-meta-item event-location">
+                  <i data-lucide="map-pin"></i>
+                  <span>${escapeHtml(service.branch)}</span>
+                </div>
+              </div>
+              
+              <!-- Price -->
+              <div class="event-price event-price-paid">${price}</div>
             </div>
-            <div class="flex items-center gap-2 mb-2 text-xs text-slate-900">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-              <span>${escapeHtml(service.branch)}</span>
+            
+            <!-- Footer Section -->
+            <div class="event-card-footer">
+              <a
+                href="/booking?service=${encodeURIComponent(service.name)}"
+                class="btn-primary-sm flex items-center justify-center gap-2 w-full"
+              >
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                Booking Sekarang
+              </a>
             </div>
-            ${modeInfo}
-            <a
-              href="/booking?service=${encodeURIComponent(service.name)}"
-              class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-red-600 text-white px-4 py-2 text-sm font-semibold hover:from-red-600 hover:to-red-700 transition-all shadow-sm hover:shadow-md mt-3"
-            >
-              <i data-lucide="calendar" class="w-4 h-4"></i>
-              Booking Sekarang
-            </a>
           </div>
         `;
       })
@@ -2859,13 +2934,13 @@ async function renderServices() {
 function getCategoryBadgeHTML(category) {
   const badges = {
     manual:
-      '<span class="text-xs rounded-full bg-red-600/10 border border-red-600/40 px-2 py-1 text-red-500">Manual</span>',
+      '<span class="event-badge event-badge-topic" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); color: #dc2626; border-color: rgba(220, 38, 38, 0.2);">Manual</span>',
     klinis:
-      '<span class="text-xs rounded-full bg-sky-400/10 border border-sky-400/40 px-2 py-1 text-sky-300">Klinis</span>',
+      '<span class="event-badge event-badge-topic" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #0284c7; border-color: rgba(2, 132, 199, 0.2);">Klinis</span>',
     konsultasi:
-      '<span class="text-xs rounded-full bg-purple-400/10 border border-purple-400/40 px-2 py-1 text-purple-300">Konsultasi</span>',
+      '<span class="event-badge event-badge-topic" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #9333ea; border-color: rgba(147, 51, 234, 0.2);">Konsultasi</span>',
     perawatan:
-      '<span class="text-xs rounded-full bg-emerald-400/10 border border-emerald-400/40 px-2 py-1 text-emerald-300">Perawatan</span>',
+      '<span class="event-badge event-badge-topic" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); color: #059669; border-color: rgba(5, 150, 105, 0.2);">Perawatan</span>',
   };
   return badges[category] || "";
 }

@@ -88,6 +88,7 @@ router.post("/", requireAdmin, async (req, res) => {
       mode,
       topic,
       description,
+      eventImage,
       speaker,
       speakerPhoto,
       speakerBio,
@@ -108,14 +109,15 @@ router.post("/", requireAdmin, async (req, res) => {
     // Insert event
     const result = await query(
       `INSERT INTO events 
-       (title, event_date, mode, topic, description, speaker, speaker_photo, speaker_bio, registration_fee, registration_deadline, location, link)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (title, event_date, mode, topic, description, event_image, speaker, speaker_photo, speaker_bio, registration_fee, registration_deadline, location, link)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         eventDate,
         mode,
         topic,
         description || null,
+        eventImage || null,
         speaker || null,
         speakerPhoto || null,
         speakerBio || null,
@@ -156,6 +158,7 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       mode,
       topic,
       description,
+      eventImage,
       speaker,
       speakerPhoto,
       speakerBio,
@@ -197,6 +200,10 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     if (description !== undefined) {
       updates.push("description = ?");
       params.push(description);
+    }
+    if (eventImage !== undefined) {
+      updates.push("event_image = ?");
+      params.push(eventImage);
     }
     if (speaker !== undefined) {
       updates.push("speaker = ?");

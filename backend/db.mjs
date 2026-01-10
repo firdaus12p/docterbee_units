@@ -827,6 +827,14 @@ async function runMigrations(connection) {
     `);
     console.log("✅ Table: ai_advisor_usage");
     
+    // ============================================
+    // SERVICES IMAGE MIGRATIONS
+    // ============================================
+    
+    // Migration: Add image column to services table for service images
+    await safeAddColumn(connection, 'services', 'image',
+      "VARCHAR(500) DEFAULT NULL COMMENT 'URL gambar layanan' AFTER practitioner");
+    
     console.log("✅ Migrations completed");
   } catch (error) {
     console.error("❌ Migration error:", error.message);

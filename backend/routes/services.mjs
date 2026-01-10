@@ -98,7 +98,7 @@ router.get("/:id", async (req, res) => {
  */
 router.post("/", requireAdmin, async (req, res) => {
   try {
-    const { name, category, price, description, branch, mode, practitioner } =
+    const { name, category, price, description, branch, mode, practitioner, image } =
       req.body;
 
     // Validation
@@ -128,11 +128,11 @@ router.post("/", requireAdmin, async (req, res) => {
       });
     }
 
-    // Insert service
+    // Insert service with image field
     const result = await query(
-      `INSERT INTO services (name, category, price, description, branch, mode, practitioner, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
-      [name, category, price, description, branch, mode, practitioner || null]
+      `INSERT INTO services (name, category, price, description, branch, mode, practitioner, image, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+      [name, category, price, description, branch, mode, practitioner || null, image || null]
     );
 
     // Get the newly created service
@@ -170,6 +170,7 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       branch,
       mode,
       practitioner,
+      image,
       is_active,
     } = req.body;
 
@@ -241,6 +242,11 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     if (is_active !== undefined) {
       updates.push("is_active = ?");
       params.push(is_active ? 1 : 0);
+    }
+
+    if (image !== undefined) {
+      updates.push("image = ?");
+      params.push(image || null);
     }
 
     if (updates.length === 0) {
