@@ -189,6 +189,10 @@
             <i data-lucide="compass" class="w-5 h-5"></i>
             <span>Journey Manager</span>
           </button>
+          <button class="admin-mobile-nav-item" data-section="gallery">
+            <i data-lucide="image" class="w-5 h-5"></i>
+            <span>Gallery Manager</span>
+          </button>
           <button class="admin-mobile-nav-item" data-section="reports">
             <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
             <span>Reports</span>
@@ -255,6 +259,10 @@
             <button class="admin-sidebar-nav-item" data-section="journeys">
               <i data-lucide="compass" class="w-5 h-5"></i>
               <span>Journey Manager</span>
+            </button>
+            <button class="admin-sidebar-nav-item" data-section="gallery">
+              <i data-lucide="image" class="w-5 h-5"></i>
+              <span>Gallery Manager</span>
             </button>
             <button class="admin-sidebar-nav-item" data-section="reports">
               <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
@@ -2483,6 +2491,166 @@
             </div>
           </section>
 
+          <!-- SECTION: GALLERY MANAGER -->
+          <section id="section-gallery" class="dashboard-section hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+            >
+              <h2 class="text-xl sm:text-2xl font-bold">
+                <i data-lucide="image" class="w-6 h-6 inline mr-2 text-amber-400"></i>
+                Gallery Manager
+              </h2>
+              <button
+                id="btnNewGalleryImage"
+                class="bg-amber-400 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-amber-500 w-full sm:w-auto flex items-center justify-center gap-2"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Tambah Foto</span>
+              </button>
+            </div>
+
+            <p class="text-slate-400 text-sm mb-4">
+              Kelola foto untuk galeri bergerak di halaman beranda. Foto akan ditampilkan dalam animasi infinite scroll.
+            </p>
+
+            <!-- Gallery Grid -->
+            <div
+              id="galleryGrid"
+              class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+            >
+              <div class="col-span-full text-center py-8 text-slate-400">
+                Loading...
+              </div>
+            </div>
+
+            <!-- Gallery Form Modal -->
+            <div
+              id="galleryModal"
+              class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+            >
+              <div
+                class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xl font-bold" id="galleryModalTitle">
+                    Tambah Foto Galeri
+                  </h3>
+                  <button
+                    id="closeGalleryModal"
+                    class="text-slate-400 hover:text-slate-200"
+                  >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                  </button>
+                </div>
+                <form id="galleryForm" class="space-y-4">
+                  <input type="hidden" id="galleryId" />
+                  <input type="hidden" id="galleryImageUrl" />
+
+                  <div>
+                    <label class="block text-sm mb-2">Judul (Opsional)</label>
+                    <input
+                      type="text"
+                      id="galleryTitle"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="Contoh: Suasana Toko Makassar"
+                    />
+                    <p class="text-xs text-slate-400 mt-1">
+                      Digunakan sebagai alt text untuk aksesibilitas
+                    </p>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Deskripsi (Opsional)</label>
+                    <textarea
+                      id="galleryDescription"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      rows="2"
+                      placeholder="Deskripsi singkat foto"
+                    ></textarea>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2"
+                      >Upload Foto <span class="text-red-400">*</span></label
+                    >
+                    <input
+                      type="file"
+                      id="galleryImageFile"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-400 file:text-slate-900 hover:file:bg-amber-500"
+                    />
+                    <p class="text-xs text-slate-400 mt-1">
+                      Format: JPG, PNG, WebP. Maksimal 5MB. Rasio ideal: 4:3 atau 16:9
+                    </p>
+                  </div>
+
+                  <!-- Image Preview -->
+                  <div id="galleryImagePreview" class="hidden">
+                    <label class="block text-sm mb-2">Preview</label>
+                    <div class="relative">
+                      <img
+                        id="galleryPreviewImg"
+                        src=""
+                        alt="Preview"
+                        class="w-full h-40 object-cover rounded-lg border border-slate-700"
+                      />
+                      <button
+                        type="button"
+                        id="removeGalleryImage"
+                        class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-lg transition"
+                      >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-2">Urutan</label>
+                    <input
+                      type="number"
+                      id="gallerySortOrder"
+                      class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:border-amber-400 focus:outline-none"
+                      placeholder="0"
+                      value="0"
+                      min="0"
+                    />
+                    <p class="text-xs text-slate-400 mt-1">
+                      Angka lebih kecil tampil lebih awal
+                    </p>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="galleryIsActive"
+                      class="w-4 h-4 accent-amber-400"
+                      checked
+                    />
+                    <label for="galleryIsActive" class="text-sm"
+                      >Aktif (tampil di beranda)</label
+                    >
+                  </div>
+
+                  <div class="flex gap-2 pt-4">
+                    <button
+                      type="submit"
+                      class="flex-1 bg-amber-400 text-slate-900 py-2 rounded-lg font-semibold hover:bg-amber-500 transition"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      id="cancelGallery"
+                      class="px-6 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg transition"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
           <!-- SECTION: REPORTS -->
           <section id="section-reports" class="dashboard-section hidden">
             <div
@@ -3271,6 +3439,7 @@
     <script src="js/rewards-manager.js"></script>
     <script src="js/podcasts-manager.js"></script>
     <script src="js/journey-manager.js"></script>
+    <script src="js/gallery-manager.js"></script>
     <script src="js/reports-manager.js"></script>
   </body>
 </html>

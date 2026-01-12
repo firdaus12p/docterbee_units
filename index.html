@@ -833,6 +833,69 @@
         </div>
       </section>
 
+      <!-- ================= GALERI BERGERAK ================= -->
+      <section id="home-gallery">
+        <div class="gallery-header">
+          <div class="container">
+            <div class="section-eyebrow">Galeri DocterBee</div>
+            <h2 class="section-title">Momen Bersama Kami</h2>
+            <p class="section-desc">
+              Lihat suasana toko, layanan, dan kebersamaan pelanggan DocterBee.
+            </p>
+          </div>
+        </div>
+
+        <!-- Gallery Marquee Container -->
+        <div class="gallery-marquee-wrapper">
+          <!-- Row 1: Scroll Right -->
+          <div class="gallery-marquee gallery-marquee-right" id="galleryRowTop">
+            <div class="gallery-marquee-track">
+              <!-- Images will be loaded dynamically -->
+              <div class="gallery-marquee-loading">
+                <div class="gallery-loading-spinner"></div>
+                <span>Memuat galeri...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Scroll Left -->
+          <div class="gallery-marquee gallery-marquee-left" id="galleryRowBottom">
+            <div class="gallery-marquee-track">
+              <!-- Images will be loaded dynamically -->
+              <div class="gallery-marquee-loading">
+                <div class="gallery-loading-spinner"></div>
+                <span>Memuat galeri...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= EDUKASI TERBARU (ARTIKEL GRATIS) ================= -->
+      <section id="latest-insight">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-eyebrow">Edukasi Terbaru</div>
+            <h2 class="section-title">Baca Artikel Gratis</h2>
+            <p class="section-desc">
+              Pelajari tips kesehatan alami berbasis sains dan Qur'ani. Gratis untuk semua.
+            </p>
+          </div>
+
+          <div class="grid-3" id="homeInsightGrid">
+            <!-- Loading state -->
+            <div class="insight-loading" id="insightLoading">
+              <div class="insight-loading-spinner"></div>
+              <p>Memuat artikel...</p>
+            </div>
+          </div>
+
+          <div class="section-cta">
+            <a href="/insight" class="btn btn-outline">Lihat Semua Artikel →</a>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= COMPARISON ================= -->
       <section id="problem">
         <div class="container">
@@ -1473,5 +1536,201 @@
     </script>
     <script src="js/modal-utils.js"></script>
     <script src="js/landing-navbar.js"></script>
+    
+    <!-- Home Insight Preview Script -->
+    <script>
+      // ============================================
+      // HOME PAGE - ARTIKEL GRATIS PREVIEW
+      // ============================================
+      
+      /**
+       * Format tanggal ke format Indonesia
+       */
+      function formatDateIndo(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', { 
+          day: 'numeric', 
+          month: 'short', 
+          year: 'numeric' 
+        });
+      }
+
+      /**
+       * Escape HTML untuk mencegah XSS
+       */
+      function escapeHtmlHome(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      /**
+       * Render kartu artikel untuk halaman beranda
+       */
+      function renderHomeInsightCard(article) {
+        const imageHtml = article.header_image 
+          ? `<img src="${article.header_image}" alt="${escapeHtmlHome(article.title)}" class="insight-card-image" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="insight-card-image" style="display:flex;align-items:center;justify-content:center;font-size:3rem;">📰</div>`;
+        
+        return `
+          <article class="insight-card" onclick="window.location.href='/article?slug=${article.slug}'">
+            ${imageHtml}
+            <div class="insight-card-body">
+              <span class="insight-card-category">${article.category || 'Umum'}</span>
+              <h3 class="insight-card-title">${escapeHtmlHome(article.title)}</h3>
+              <p class="insight-card-excerpt">${escapeHtmlHome(article.excerpt || '')}</p>
+              <div class="insight-card-footer">
+                <span class="insight-card-badge">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                  </svg>
+                  Gratis
+                </span>
+                <span class="insight-card-read-more">Baca →</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      /**
+       * Load dan tampilkan artikel gratis di halaman beranda
+       */
+      async function loadHomeInsightArticles() {
+        const container = document.getElementById('homeInsightGrid');
+        const loading = document.getElementById('insightLoading');
+        
+        if (!container) return;
+
+        try {
+          const response = await fetch('/api/insight');
+          const result = await response.json();
+
+          if (!result.success) {
+            throw new Error(result.error || 'Gagal memuat artikel');
+          }
+
+          // Filter hanya artikel gratis
+          const freeArticles = result.data.filter(article => 
+            article.is_free === true || article.points_cost === 0
+          );
+
+          // Ambil 3 artikel terbaru
+          const latestFree = freeArticles.slice(0, 3);
+
+          // Hapus loading
+          if (loading) loading.remove();
+
+          if (latestFree.length === 0) {
+            container.innerHTML = `
+              <div class="insight-empty">
+                <div class="insight-empty-icon">📚</div>
+                <p>Belum ada artikel gratis tersedia.</p>
+              </div>
+            `;
+            return;
+          }
+
+          // Render artikel
+          container.innerHTML = latestFree.map(article => renderHomeInsightCard(article)).join('');
+
+        } catch (error) {
+          console.error('Error loading home insight articles:', error);
+          if (loading) loading.remove();
+          container.innerHTML = `
+            <div class="insight-empty">
+              <div class="insight-empty-icon">⚠️</div>
+              <p>Gagal memuat artikel. <button onclick="loadHomeInsightArticles()" style="color:#d32f2f;text-decoration:underline;background:none;border:none;cursor:pointer;">Coba lagi</button></p>
+            </div>
+          `;
+        }
+      }
+
+      // Load artikel saat halaman siap
+      document.addEventListener('DOMContentLoaded', loadHomeInsightArticles);
+    </script>
+
+    <!-- Home Gallery Script -->
+    <script>
+      // ============================================
+      // HOME PAGE - GALERI BERGERAK (INFINITE SCROLL)
+      // ============================================
+      
+      /**
+       * Load dan render galeri bergerak di halaman beranda
+       */
+      async function loadHomeGallery() {
+        const rowTop = document.getElementById('galleryRowTop');
+        const rowBottom = document.getElementById('galleryRowBottom');
+        
+        if (!rowTop || !rowBottom) return;
+
+        try {
+          const response = await fetch('/api/gallery');
+          const result = await response.json();
+
+          if (!result.success) {
+            throw new Error(result.error || 'Gagal memuat galeri');
+          }
+
+          const images = result.data || [];
+
+          if (images.length === 0) {
+            // Show empty state
+            const emptyHtml = '<div class="gallery-marquee-empty">Belum ada foto di galeri</div>';
+            rowTop.querySelector('.gallery-marquee-track').innerHTML = emptyHtml;
+            rowBottom.querySelector('.gallery-marquee-track').innerHTML = emptyHtml;
+            return;
+          }
+
+          // Split images into two rows
+          const midPoint = Math.ceil(images.length / 2);
+          const topImages = images.slice(0, midPoint);
+          const bottomImages = images.slice(midPoint);
+
+          // Render row top (scroll right)
+          renderGalleryRow(rowTop, topImages);
+          
+          // Render row bottom (scroll left) - use remaining images or duplicate from top if not enough
+          const bottomRowImages = bottomImages.length > 0 ? bottomImages : topImages;
+          renderGalleryRow(rowBottom, bottomRowImages);
+
+        } catch (error) {
+          console.error('Error loading home gallery:', error);
+          const errorHtml = '<div class="gallery-marquee-empty">Galeri tidak tersedia</div>';
+          if (rowTop) rowTop.querySelector('.gallery-marquee-track').innerHTML = errorHtml;
+          if (rowBottom) rowBottom.querySelector('.gallery-marquee-track').innerHTML = errorHtml;
+        }
+      }
+
+      /**
+       * Render gallery images in a marquee row
+       * Duplicates images to create seamless infinite scroll
+       */
+      function renderGalleryRow(rowElement, images) {
+        const track = rowElement.querySelector('.gallery-marquee-track');
+        if (!track || images.length === 0) return;
+
+        // Generate HTML for images
+        const imagesHtml = images.map(img => `
+          <div class="gallery-marquee-item">
+            <img 
+              src="${img.image_url}" 
+              alt="${img.title || 'Gallery DocterBee'}"
+              loading="lazy"
+              onerror="this.parentElement.style.display='none'"
+            />
+          </div>
+        `).join('');
+
+        // Duplicate images for seamless loop (need at least 2 copies)
+        track.innerHTML = imagesHtml + imagesHtml;
+      }
+
+      // Load galeri saat halaman siap
+      document.addEventListener('DOMContentLoaded', loadHomeGallery);
+    </script>
   </body>
 </html>

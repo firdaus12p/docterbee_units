@@ -27,6 +27,7 @@ import memberCheckRouter from "./routes/member-check.mjs";
 import locationsRouter from "./routes/locations.mjs";
 import reportsRouter from "./routes/reports.mjs";
 import eventRegistrationsRouter from "./routes/event-registrations.mjs";
+import galleryRouter from "./routes/gallery.mjs";
 import bcrypt from "bcryptjs";
 import { loginRateLimiter } from "./utils/rate-limiter.mjs";
 
@@ -254,6 +255,7 @@ app.use("/api/member-check", memberCheckRouter);
 app.use("/api/locations", locationsRouter);
 app.use("/api/reports", reportsRouter);
 app.use("/api/event-registrations", eventRegistrationsRouter);
+app.use("/api/gallery", galleryRouter);
 
 // ============================================
 // STATIC FILES & CLEAN URLs (MUST BE AFTER API ROUTES)

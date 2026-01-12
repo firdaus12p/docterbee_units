@@ -529,6 +529,23 @@ async function initializeTables() {
     `);
     console.log("✅ Table: product_stocks");
 
+    // Create gallery_images table for homepage gallery
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS gallery_images (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) DEFAULT NULL COMMENT 'Optional title for alt text',
+        description TEXT DEFAULT NULL COMMENT 'Optional description',
+        image_url VARCHAR(500) NOT NULL,
+        sort_order INT DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_active (is_active),
+        INDEX idx_sort_order (sort_order)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log("✅ Table: gallery_images");
+
     console.log("📦 All tables initialized successfully");
     
     // Run migrations for existing tables

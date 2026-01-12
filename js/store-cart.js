@@ -141,7 +141,7 @@ function updateCartUI() {
     <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-gray-200">
       ${
         item.image
-          ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">`
+          ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg" loading="lazy">`
           : `<div class="w-16 h-16 bg-slate-200 rounded-lg flex items-center justify-center">
                <i data-lucide="package" class="w-6 h-6 text-slate-400"></i>
              </div>`

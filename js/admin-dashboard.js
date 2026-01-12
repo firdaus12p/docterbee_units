@@ -264,6 +264,7 @@ function switchSection(section) {
     users: "Users Manager",
     podcasts: "Podcasts Manager",
     journeys: "Journey Manager",
+    gallery: "Gallery Manager",
     reports: "Reports & Analytics",
   };
 
@@ -335,6 +336,11 @@ function switchSection(section) {
     if (typeof loadAdminJourneys === "function") {
       loadAdminJourneys();
     }
+  } else if (section === "gallery") {
+    // Load gallery images from gallery-manager.js
+    if (typeof loadGalleryImages === "function") {
+      loadGalleryImages();
+    }
   } else if (section === "reports") {
     // Load reports from reports-manager.js
     if (typeof window.loadReports === "function") {
@@ -374,13 +380,44 @@ function closeAdminMobileMenu() {
   }
 }
 
+// ==================== SKELETON HELPER FUNCTIONS ====================
+
+function getCardSkeleton() {
+  return `
+    <div class="booking-container p-5 border border-slate-800 bg-slate-900/50">
+      <div class="skeleton-dark h-6 w-3/4 mb-3"></div>
+      <div class="skeleton-dark h-4 w-full mb-2"></div>
+      <div class="skeleton-dark h-4 w-1/2 mb-4"></div>
+      <div class="flex gap-2">
+         <div class="skeleton-dark h-9 flex-1 rounded"></div>
+         <div class="skeleton-dark h-9 w-20 rounded"></div>
+      </div>
+    </div>
+  `;
+}
+
 // ========== BOOKINGS ==========
 
 async function loadBookings() {
   const status = document.getElementById("filterBookingStatus").value;
   const tbody = document.getElementById("bookingsTableBody");
 
-  tbody.innerHTML = '<tr><td colspan="11" class="text-center p-6 text-white">Loading...</td></tr>';
+  // Show skeleton loading
+  tbody.innerHTML = Array(5).fill(0).map(() => `
+    <tr class="border-b border-slate-800 animate-pulse">
+      <td class="p-3"><div class="skeleton-dark h-4 w-8"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-32"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-24"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-24"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-24"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-16"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-6 w-20 rounded"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-24"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-4 w-24"></div></td>
+      <td class="p-3"><div class="skeleton-dark h-8 w-24 rounded"></div></td>
+      <td class="p-3"><div class="flex gap-2 justify-center"><div class="skeleton-dark h-8 w-8 rounded"></div><div class="skeleton-dark h-8 w-8 rounded"></div></div></td>
+    </tr>
+  `).join('');
 
   try {
     const url = `${API_BASE}/bookings${status ? `?status=${status}` : ""}`;
@@ -794,7 +831,7 @@ function closeBookingDetailModal() {
 
 async function loadArticles() {
   const grid = document.getElementById("articlesGrid");
-  grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+  grid.innerHTML = Array(6).fill(0).map(() => getCardSkeleton()).join('');
 
   try {
     const response = await adminFetch(`${API_BASE}/insight`);
@@ -1077,7 +1114,7 @@ async function deleteArticle(id) {
 
 async function loadEvents() {
   const grid = document.getElementById("eventsGrid");
-  grid.innerHTML = '<div class="booking-container p-6 text-center text-white">Loading...</div>';
+  grid.innerHTML = Array(4).fill(0).map(() => getCardSkeleton()).join('');
 
   try {
     // Admin: includeInactive=true to see all events (active & inactive)

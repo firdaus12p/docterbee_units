@@ -224,6 +224,61 @@ function setState(state) {
 // ==================== UI RENDERING ====================
 
 /**
+ * Show skeleton loading state for tabs
+ * Called while journey data is being fetched
+ */
+function showTabsSkeleton() {
+  const tabsContainer = document.getElementById("tabs");
+  if (!tabsContainer) return;
+
+  tabsContainer.innerHTML = "";
+  // Show 4 skeleton tabs as placeholder
+  for (let i = 0; i < 4; i++) {
+    const skeletonTab = document.createElement("div");
+    skeletonTab.className = "skeleton skeleton-tab";
+    tabsContainer.appendChild(skeletonTab);
+  }
+}
+
+/**
+ * Show skeleton loading state for unit content
+ * Called while journey data is being fetched
+ */
+function showUnitSkeleton() {
+  const unitWrap = document.getElementById("unitWrap");
+  if (!unitWrap) return;
+
+  // Generate 3 skeleton cards as placeholder
+  const skeletonCards = Array(3)
+    .fill(0)
+    .map(
+      () => `
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-line full"></div>
+        <div class="skeleton skeleton-line medium"></div>
+        <div class="skeleton skeleton-line short"></div>
+        <div class="skeleton-buttons">
+          <div class="skeleton skeleton-btn"></div>
+          <div class="skeleton skeleton-btn"></div>
+          <div class="skeleton skeleton-btn"></div>
+        </div>
+      </div>
+    `
+    )
+    .join("");
+
+  unitWrap.innerHTML = `
+    <div class="unit-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-btn" style="width: 8rem;"></div>
+    </div>
+    <div class="card-grid">
+      ${skeletonCards}
+    </div>
+  `;
+}
+
+/**
  * Build and render tab navigation
  */
 function buildTabs() {
@@ -743,6 +798,10 @@ async function init() {
       return;
     }
   }
+
+  // Show skeleton loading state immediately while data loads
+  showTabsSkeleton();
+  showUnitSkeleton();
 
   // Load journey data from API
   const journey = await loadJourneyFromAPI(slug);
@@ -1735,7 +1794,7 @@ function showClassInfoModal(data) {
   const heroImageSrc = data.eventImage || data.photo;
   const heroImageHtml = heroImageSrc 
     ? `<img src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(data.eventTitle)}" 
-           class="w-full aspect-[4/5] md:aspect-[3/2] object-cover rounded-xl shadow-md mb-6" 
+           class="w-full aspect-[4/5] md:aspect-[3/2] object-cover rounded-xl shadow-md mb-6" loading="lazy" 
            onerror="this.parentElement.innerHTML='<div class=\\'w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6\\'>${data.name.charAt(0).toUpperCase()}</div>'"/>`
     : `<div class="w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6">
          ${data.name.charAt(0).toUpperCase()}
@@ -1756,7 +1815,7 @@ function showClassInfoModal(data) {
       <h4 class="font-bold text-xl text-slate-900 mb-2">Pemateri</h4>
       <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 w-full">
         <div class="flex-shrink-0">
-             ${data.photo ? `<img src="${escapeHtml(data.photo)}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm">` : `<div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-xl">${data.name.charAt(0)}</div>`}
+             ${data.photo ? `<img src="${escapeHtml(data.photo)}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" loading="lazy">` : `<div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-xl">${data.name.charAt(0)}</div>`}
         </div>
         <div class="min-w-0 flex-1">
             <div class="font-semibold text-slate-900 break-words">${escapeHtml(data.name)}</div>
@@ -3532,6 +3591,7 @@ async function filterStoreCategory(category) {
           ? `<img src="${escapeHtml(p.image)}" 
                alt="${escapeHtml(p.name)}" 
                class="w-full h-48 object-cover"
+               loading="lazy"
                onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">`
           : `<div class="w-full h-48 bg-slate-200 flex items-center justify-center text-slate-400">
                <i data-lucide="image-off" class="w-12 h-12"></i>

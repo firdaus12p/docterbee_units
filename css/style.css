@@ -3191,3 +3191,91 @@ select::after {
 .mobile-nav-submenu a:hover i {
   opacity: 1;
 }
+
+/* ========================================
+   Skeleton Loading States
+   ======================================== */
+
+/* Base skeleton shimmer effect */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 25%,
+    #e2e8f0 50%,
+    #f1f5f9 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+.skeleton-dark {
+  background: linear-gradient(
+    90deg,
+    #1e293b 25%,
+    #334155 50%,
+    #1e293b 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+/* Skeleton card for question cards */
+.skeleton-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #fafafa;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.skeleton-card .skeleton-line {
+  height: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.skeleton-card .skeleton-line.short {
+  width: 60%;
+}
+
+.skeleton-card .skeleton-line.medium {
+  width: 80%;
+}
+
+.skeleton-card .skeleton-line.full {
+  width: 100%;
+}
+
+.skeleton-card .skeleton-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.skeleton-card .skeleton-btn {
+  height: 2rem;
+  width: 4rem;
+  border-radius: 0.5rem;
+}
+
+/* Skeleton tab buttons */
+.skeleton-tab {
+  height: 2.25rem;
+  width: 6rem;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Skeleton header text */
+.skeleton-title {
+  height: 1.5rem;
+  width: 40%;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-subtitle {
+  height: 1rem;
+  width: 70%;
+}
