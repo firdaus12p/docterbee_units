@@ -443,11 +443,11 @@ async function loadBookings() {
             </span>
           </td>
           <td class="p-3 text-slate-900">
-            ${booking.price ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price) : "-"}
+            ${booking.price ? "Rp " + formatNumber(booking.price) : "-"}
             ${
               booking.discount_amount > 0
                 ? '<div class="text-xs text-red-600 font-semibold">- Rp ' +
-                  new Intl.NumberFormat("id-ID").format(booking.discount_amount) +
+                  formatNumber(booking.discount_amount) +
                   "</div>"
                 : ""
             }
@@ -455,9 +455,9 @@ async function loadBookings() {
           <td class="p-3 font-bold text-amber-600">
             ${
               booking.final_price
-                ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.final_price)
+                ? "Rp " + formatNumber(booking.final_price)
                 : booking.price
-                ? "Rp " + new Intl.NumberFormat("id-ID").format(booking.price)
+                ? "Rp " + formatNumber(booking.price)
                 : "-"
             }
           </td>
@@ -734,7 +734,7 @@ async function viewBookingDetail(id) {
           <div class="space-y-2">
             <div class="flex justify-between items-center">
               <span class="text-slate-300">Harga Layanan</span>
-              <span class="text-white font-semibold">Rp ${new Intl.NumberFormat("id-ID").format(
+              <span class="text-white font-semibold">Rp ${formatNumber(
                 booking.price
               )}</span>
             </div>
@@ -743,7 +743,7 @@ async function viewBookingDetail(id) {
                 ? `
             <div class="flex justify-between items-center text-red-400">
               <span>Diskon ${booking.promo_code ? `(${booking.promo_code})` : ""}</span>
-              <span class="font-semibold">- Rp ${new Intl.NumberFormat("id-ID").format(
+              <span class="font-semibold">- Rp ${formatNumber(
                 booking.discount_amount
               )}</span>
             </div>
@@ -753,7 +753,7 @@ async function viewBookingDetail(id) {
             <hr class="border-slate-700">
             <div class="flex justify-between items-center text-lg">
               <span class="text-amber-300 font-semibold">Total Bayar</span>
-              <span class="text-amber-300 font-bold">Rp ${new Intl.NumberFormat("id-ID").format(
+              <span class="text-amber-300 font-bold">Rp ${formatNumber(
                 booking.final_price || booking.price
               )}</span>
             </div>
@@ -1449,9 +1449,9 @@ async function editEvent(id) {
       }
       
       // Format registration fee with thousand separator
-      document.getElementById("eventRegistrationFee").value = parseInt(
+      document.getElementById("eventRegistrationFee").value = formatNumber(
         event.registration_fee || 0
-      ).toLocaleString("id-ID");
+      );
       document.getElementById("eventRegistrationDeadline").value = formatDateForInput(
         event.registration_deadline
       );
@@ -1668,9 +1668,9 @@ async function editCoupon(id) {
       document.getElementById("couponDiscountValue").value = coupon.discount_value;
       document.getElementById("couponType").value = coupon.coupon_type || "both";
       // Format min booking value with thousand separator
-      document.getElementById("couponMinBookingValue").value = parseInt(
+      document.getElementById("couponMinBookingValue").value = formatNumber(
         coupon.min_booking_value || 0
-      ).toLocaleString("id-ID");
+      );
       document.getElementById("couponMaxUses").value = coupon.max_uses || "";
       if (coupon.expires_at) {
         document.getElementById("couponExpiresAt").value = coupon.expires_at
@@ -2106,7 +2106,7 @@ async function editService(id) {
     document.getElementById("serviceName").value = service.name;
     document.getElementById("serviceCategory").value = service.category;
     // Format price with thousand separator
-    document.getElementById("servicePrice").value = parseInt(service.price).toLocaleString("id-ID");
+    document.getElementById("servicePrice").value = formatNumber(service.price);
     document.getElementById("serviceDescription").value = service.description;
 
     // Parse branch string and check appropriate checkboxes
@@ -2741,16 +2741,10 @@ async function editProduct(id) {
     document.getElementById("productId").value = product.id;
     document.getElementById("productName").value = product.name;
     document.getElementById("productCategory").value = product.category;
-    // Format price with thousand separator
-    document.getElementById("productPrice").value = parseInt(product.price).toLocaleString("id-ID");
-    // Format member price if exists
-    if (product.member_price !== null && product.member_price !== undefined) {
-      document.getElementById("productMemberPrice").value = parseInt(
-        product.member_price
-      ).toLocaleString("id-ID");
-    } else {
-      document.getElementById("productMemberPrice").value = "";
-    }
+    document.getElementById("productPrice").value = formatNumber(product.price);
+    document.getElementById("productMemberPrice").value = formatNumber(
+      product.member_price || 0
+    );
     // Populate promo text
     document.getElementById("productPromoText").value = product.promo_text || "";
     document.getElementById("productDescription").value = product.description;
@@ -3018,11 +3012,11 @@ async function loadEventRegistrations() {
           <td class="p-3 text-slate-900">${escapeHtml(reg.customer_email || "-")}</td>
           <td class="p-3 text-slate-900">
             ${reg.final_fee > 0 
-              ? "Rp " + new Intl.NumberFormat("id-ID").format(reg.final_fee)
+              ? "Rp " + formatNumber(reg.final_fee)
               : '<span class="text-emerald-600 font-semibold">GRATIS</span>'
             }
             ${reg.discount_amount > 0 
-              ? '<div class="text-xs text-red-600">Diskon: Rp ' + new Intl.NumberFormat("id-ID").format(reg.discount_amount) + '</div>'
+              ? '<div class="text-xs text-red-600">Diskon: Rp ' + formatNumber(reg.discount_amount) + '</div>'
               : ''
             }
           </td>

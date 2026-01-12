@@ -1324,10 +1324,7 @@ function updatePriceDisplay() {
   priceSummary?.classList.remove("hidden");
 
   // Format price
-  const formattedPrice = new Intl.NumberFormat("id-ID").format(
-    bookingState.price
-  );
-  displayPrice.textContent = `Rp ${formattedPrice}`;
+  displayPrice.textContent = formatCurrency(bookingState.price);
 
   // Calculate discount if coupon is validated
   let discountAmount = 0;
@@ -1346,18 +1343,14 @@ function updatePriceDisplay() {
 
     // Show discount row
     discountRow?.classList.remove("hidden");
-    const formattedDiscount = new Intl.NumberFormat("id-ID").format(
-      discountAmount
-    );
-    displayDiscount.textContent = `- Rp ${formattedDiscount}`;
+    displayDiscount.textContent = `- ${formatCurrency(discountAmount)}`;
   } else {
     // Hide discount row
     discountRow?.classList.add("hidden");
   }
 
   // Display final price
-  const formattedFinalPrice = new Intl.NumberFormat("id-ID").format(finalPrice);
-  displayFinalPrice.textContent = `Rp ${formattedFinalPrice}`;
+  displayFinalPrice.textContent = formatCurrency(finalPrice);
 
   // Store for later use
   bookingState.discountAmount = discountAmount;
@@ -1520,7 +1513,7 @@ async function renderEvents() {
       const isFree = !event.registration_fee || event.registration_fee === 0;
       const feeText = isFree
         ? "GRATIS"
-        : `Rp ${new Intl.NumberFormat("id-ID").format(event.registration_fee)}`;
+        : formatCurrency(event.registration_fee);
       const priceClass = isFree ? "event-price-free" : "event-price-paid";
 
       // Check if registration is closed
@@ -3033,7 +3026,7 @@ function getModeInfoHTML(mode) {
  * Format price to Indonesian Rupiah
  */
 function formatPrice(price) {
-  return `Rp ${parseInt(price).toLocaleString("id-ID")}`;
+  return `Rp ${formatNumber(price)}`;
 }
 
 /**
@@ -3339,9 +3332,9 @@ function renderDineInMenuItem(product, color) {
     product.member_price && product.member_price < product.price;
 
   // Format prices
-  const normalPrice = `Rp ${product.price.toLocaleString("id-ID")}`;
+  const normalPrice = `Rp ${formatNumber(product.price)}`;
   const memberPrice = hasMemberPrice
-    ? `Rp ${product.member_price.toLocaleString("id-ID")}`
+    ? `Rp ${formatNumber(product.member_price)}`
     : null;
 
   return `
@@ -3413,11 +3406,11 @@ function renderProductPricing(product) {
     return `
       <div class="space-y-1">
         <div class="text-emerald-600 font-bold text-xl">
-          Rp ${product.member_price.toLocaleString("id-ID")}
+          Rp ${formatNumber(product.member_price)}
         </div>
         <div class="flex items-center gap-2">
           <span class="text-slate-400 text-sm line-through">
-            Rp ${product.price.toLocaleString("id-ID")}
+            Rp ${formatNumber(product.price)}
           </span>
           <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded">
             Hemat ${savingsPercent}%
@@ -3439,7 +3432,7 @@ function renderProductPricing(product) {
     return `
       <div class="space-y-1">
         <div class="text-red-600 font-bold text-lg">
-          Rp ${product.price.toLocaleString("id-ID")}
+          Rp ${formatNumber(product.price)}
         </div>
         <a href="/login.html" class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold hover:text-emerald-700">
           🔐 Hemat hingga 20% untuk member
@@ -3458,7 +3451,7 @@ function renderProductPricing(product) {
   // No member price: just show normal price
   return `
     <div class="text-red-600 font-bold text-lg">
-      Rp ${product.price.toLocaleString("id-ID")}
+      Rp ${formatNumber(product.price)}
     </div>
     ${
       product.promo_text
@@ -3720,7 +3713,7 @@ function updateCartDisplay() {
           <div class="font-medium text-slate-200">${escapeHtml(item.name)}</div>
           <div class="text-xs text-slate-400">${
             item.qty
-          } × Rp ${item.price.toLocaleString("id-ID")}</div>
+          } × Rp ${formatNumber(item.price)}</div>
         </div>
         <div class="font-semibold text-red-500">Rp ${subtotal.toLocaleString(
           "id-ID"
@@ -3735,7 +3728,7 @@ function updateCartDisplay() {
       ${rows}
       <div class="flex items-center justify-between pt-2 font-bold">
         <span class="text-slate-300">Total</span>
-        <span class="text-red-500">Rp ${total.toLocaleString("id-ID")}</span>
+        <span class="text-red-500">Rp ${formatNumber(total)}</span>
       </div>
     </div>
   `;

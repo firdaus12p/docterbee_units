@@ -87,14 +87,14 @@ async function loadReportSummary() {
     const data = result.data;
 
     // Update summary cards
-    document.getElementById("reportTotalOrders").textContent = 
-      data.summary.total_orders.toLocaleString("id-ID");
-    document.getElementById("reportTotalRevenue").textContent = 
-      `Rp ${data.summary.total_revenue.toLocaleString("id-ID")}`;
-    document.getElementById("reportPointsEarned").textContent = 
-      `+${data.summary.total_points_earned.toLocaleString("id-ID")}`;
-    document.getElementById("reportRewardsRedeemed").textContent = 
-      `${data.summary.total_redemptions} (${data.summary.total_points_spent.toLocaleString("id-ID")} Poin)`;
+    document.getElementById("reportTotalOrders").textContent =
+      formatNumber(data.summary.total_orders);
+    document.getElementById("reportTotalRevenue").textContent =
+      `Rp ${formatNumber(data.summary.total_revenue)}`;
+    document.getElementById("reportPointsEarned").textContent =
+      `+${formatNumber(data.summary.total_points_earned)}`;
+    document.getElementById("reportRewardsRedeemed").textContent =
+      `${data.summary.total_redemptions} (${formatNumber(data.summary.total_points_spent)} Poin)`;
 
     // Update location breakdown table
     renderLocationTable(data.by_location, data.summary.total_revenue);
@@ -163,7 +163,7 @@ function renderLocationTable(locations, totalRevenue) {
             </span>
           </td>
           <td class="px-4 py-3 text-right font-semibold text-emerald-400">
-            Rp ${revenue.toLocaleString("id-ID")}
+            Rp ${formatNumber(revenue)}
           </td>
           <td class="px-4 py-3 text-right">
             <div class="flex items-center justify-end gap-2">
@@ -245,7 +245,7 @@ async function loadInventoryReport() {
               </span>
             </td>
             <td class="px-4 py-3 text-center font-semibold text-white">
-              ${loc.total_stock.toLocaleString("id-ID")}
+              ${formatNumber(loc.total_stock)}
             </td>
             <td class="px-4 py-3 text-center ${lowStockClass}">
               ${loc.low_stock_count > 0 ? `⚠️ ${loc.low_stock_count}` : "-"}
@@ -263,7 +263,7 @@ async function loadInventoryReport() {
       <tr class="bg-slate-800/50 font-semibold">
         <td class="px-4 py-3 text-amber-400">Total</td>
         <td class="px-4 py-3 text-center text-white">${data.totals.total_products_with_stock}</td>
-        <td class="px-4 py-3 text-center text-white">${data.totals.total_units_in_stock.toLocaleString("id-ID")}</td>
+        <td class="px-4 py-3 text-center text-white">${formatNumber(data.totals.total_units_in_stock)}</td>
         <td class="px-4 py-3 text-center text-slate-400">-</td>
         <td class="px-4 py-3 text-center ${data.totals.products_without_any_stock > 0 ? 'text-red-400' : 'text-slate-400'}">
           ${data.totals.products_without_any_stock > 0 ? `⚠️ ${data.totals.products_without_any_stock} products` : "-"}
@@ -444,7 +444,7 @@ function renderTopProducts(products) {
           </span>
         </td>
         <td class="px-4 py-3 text-right font-semibold text-emerald-400">
-          Rp ${parseFloat(product.total_revenue).toLocaleString("id-ID")}
+          Rp ${formatNumber(product.total_revenue)}
         </td>
       </tr>
     `)

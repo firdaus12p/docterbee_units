@@ -148,7 +148,7 @@ function updateCartUI() {
       }
       <div class="flex-1">
         <h4 class="font-semibold text-sm text-slate-900">${item.name}</h4>
-        <p class="text-xs text-amber-500 font-bold">Rp ${item.price.toLocaleString("id-ID")}</p>
+        <p class="text-xs text-amber-500 font-bold">Rp ${formatNumber(item.price)}</p>
       </div>
       <div class="flex items-center gap-2">
         <button 
@@ -274,7 +274,7 @@ async function validateStoreCoupon() {
       statusDiv.innerHTML = `
         <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-700">
           🎁 <strong>${code}</strong> - Gratis 1x ${targetProduct.name}!
-          <br><small>Diskon Rp ${targetProduct.price.toLocaleString("id-ID")}</small>
+          <br><small>Diskon Rp ${formatNumber(targetProduct.price)}</small>
         </div>
       `;
     } else {
@@ -283,7 +283,7 @@ async function validateStoreCoupon() {
       if (storeCouponData.discountType === "percentage") {
         discountInfoText = `Diskon ${storeCouponData.discountValue}%`;
       } else {
-        discountInfoText = `Diskon Rp ${storeCouponData.discountValue.toLocaleString("id-ID")}`;
+        discountInfoText = `Diskon Rp ${formatNumber(storeCouponData.discountValue)}`;
       }
 
       // Show success message with discount info
@@ -315,7 +315,7 @@ async function validateStoreCoupon() {
 
     // Show calculated discount amount in info
     const calculatedDiscount = storeCouponData.discountAmount || 0;
-    discountInfo.textContent = `💰 Hemat: Rp ${calculatedDiscount.toLocaleString("id-ID")}`;
+    discountInfo.textContent = `💰 Hemat: Rp ${formatNumber(calculatedDiscount)}`;
     discountInfo.classList.remove("hidden");
 
     showToast("✅ Kode promo berhasil diterapkan", "success");
@@ -361,7 +361,7 @@ function updateCartUIWithDiscount() {
       // Update display without discount
       document.getElementById("storeOriginalTotal").classList.add("hidden");
       document.getElementById("storeDiscountAmount").classList.add("hidden");
-      document.getElementById("cartTotal").textContent = originalTotal.toLocaleString("id-ID");
+      document.getElementById("cartTotal").textContent = formatNumber(originalTotal);
       return;
     }
 
@@ -381,7 +381,7 @@ function updateCartUIWithDiscount() {
         showToast("⚠️ Produk gratis tidak ada di keranjang. Kupon dibatalkan.", "error");
         document.getElementById("storeOriginalTotal").classList.add("hidden");
         document.getElementById("storeDiscountAmount").classList.add("hidden");
-        document.getElementById("cartTotal").textContent = originalTotal.toLocaleString("id-ID");
+        document.getElementById("cartTotal").textContent = formatNumber(originalTotal);
         return;
       }
     } else if (storeCouponData.discountType === "percentage") {
@@ -399,17 +399,15 @@ function updateCartUIWithDiscount() {
     storeCouponData.discountAmount = discountAmount;
 
     // Show original total and discount
-    document.getElementById("storeOriginalAmount").textContent =
-      originalTotal.toLocaleString("id-ID");
-    document.getElementById("storeDiscountValue").textContent =
-      discountAmount.toLocaleString("id-ID");
+      document.getElementById("storeOriginalAmount").textContent = formatNumber(originalTotal);
+      document.getElementById("storeDiscountValue").textContent = formatNumber(discountAmount);
     document.getElementById("storeOriginalTotal").classList.remove("hidden");
     document.getElementById("storeDiscountAmount").classList.remove("hidden");
 
     // Update discount info display
     const discountInfo = document.getElementById("storeDiscountInfo");
     if (discountInfo) {
-      discountInfo.textContent = `💰 Hemat: Rp ${discountAmount.toLocaleString("id-ID")}`;
+      discountInfo.textContent = `💰 Hemat: Rp ${formatNumber(discountAmount)}`;
       discountInfo.classList.remove("hidden");
     }
   } else {
@@ -424,7 +422,7 @@ function updateCartUIWithDiscount() {
   }
 
   // Update final total
-  document.getElementById("cartTotal").textContent = finalTotal.toLocaleString("id-ID");
+  document.getElementById("cartTotal").textContent = formatNumber(finalTotal);
 }
 
 // Clear coupon data
@@ -1175,11 +1173,7 @@ function showPendingOrderModal(orderData) {
 
   // Populate order info
   document.getElementById("pendingOrderNumber").textContent = orderData.order_number;
-  document.getElementById("pendingOrderTotal").textContent = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(orderData.total_amount);
+  document.getElementById("pendingOrderTotal").textContent = formatCurrency(orderData.total_amount);
 
   // Format order type
   const orderTypeText = orderData.order_type === "dine_in" ? "Dine In" : "Take Away";
@@ -1203,11 +1197,7 @@ function showPendingOrderModal(orderData) {
       (item) => `
     <div class="flex justify-between text-xs text-slate-700">
       <span>${item.name} x${item.quantity}</span>
-      <span class="font-semibold">${new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-      }).format(item.price * item.quantity)}</span>
+      <span class="font-semibold">${formatCurrency(item.price * item.quantity)}</span>
     </div>
   `
     )

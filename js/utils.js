@@ -120,51 +120,7 @@ function getCategoryColor(category) {
   return colors[category] || "bg-gray-100 text-gray-700";
 }
 
-/**
- * Get status badge configuration for activity history
- * Unified function to avoid duplication between profile and admin pages
- * @param {string} status - Status value (pending, completed, approved, etc.)
- * @param {string} activityType - Type of activity: 'order' or 'reward'
- * @returns {Object} { className: string, label: string }
- */
-function getActivityStatusConfig(status, activityType) {
-  const statusLower = (status || "").toLowerCase();
-  
-  // Default config
-  let config = { className: "status-pending", label: status || "Unknown" };
-  
-  if (activityType === "order") {
-    // Order statuses
-    const orderConfigs = {
-      completed: { className: "status-completed", label: "Selesai" },
-      pending: { className: "status-pending", label: "Menunggu" },
-      cancelled: { className: "status-cancelled", label: "Dibatalkan" },
-      expired: { className: "status-expired", label: "Kedaluwarsa" }
-    };
-    config = orderConfigs[statusLower] || config;
-  } else if (activityType === "reward") {
-    // Reward redemption statuses
-    const rewardConfigs = {
-      approved: { className: "status-approved", label: "Disetujui" },
-      pending: { className: "status-pending", label: "Menunggu" },
-      rejected: { className: "status-rejected", label: "Ditolak" }
-    };
-    config = rewardConfigs[statusLower] || config;
-  }
-  
-  return config;
-}
 
-/**
- * Generate status badge HTML for activity history
- * @param {string} status - Status value
- * @param {string} activityType - 'order' or 'reward'
- * @returns {string} HTML string for status badge
- */
-function getActivityStatusBadgeHtml(status, activityType) {
-  const config = getActivityStatusConfig(status, activityType);
-  return `<span class="status-badge ${config.className}">${config.label}</span>`;
-}
 
 // Make functions globally available
 window.escapeHtml = escapeHtml;
@@ -175,6 +131,5 @@ window.formatNumber = formatNumber;
 window.debounce = debounce;
 window.copyToClipboard = copyToClipboard;
 window.getCategoryColor = getCategoryColor;
-window.getActivityStatusConfig = getActivityStatusConfig;
-window.getActivityStatusBadgeHtml = getActivityStatusBadgeHtml;
+
 

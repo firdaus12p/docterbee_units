@@ -101,9 +101,9 @@ async function loadOrders() {
               order.store_location
             }</td>
             <td class="px-4 py-3">
-              <span class="font-semibold text-amber-400">Rp ${parseFloat(
+              <span class="font-semibold text-amber-400">Rp ${formatNumber(
                 order.total_amount
-              ).toLocaleString("id-ID")}</span>
+              )}</span>
             </td>
             <td class="px-4 py-3">
               ${statusBadge}
@@ -113,7 +113,7 @@ async function loadOrders() {
               ${pointsStatus}
             </td>
             <td class="px-4 py-3 text-xs text-slate-400">
-              ${formatOrderDateTime(order.created_at)}
+              ${formatDateTime(order.created_at)}
             </td>
             <td class="px-4 py-3">
               <div class="flex flex-col gap-2">
@@ -354,10 +354,10 @@ async function viewOrderDetails(orderNumber) {
                   <div class="font-semibold">${item.name}</div>
                   <div class="text-xs text-slate-400">${
                     item.quantity
-                  }x @ Rp ${item.price.toLocaleString("id-ID")}</div>
+                  }x @ Rp ${formatNumber(item.price)}</div>
                 </div>
                 <div class="font-bold text-amber-400">
-                  Rp ${(item.price * item.quantity).toLocaleString("id-ID")}
+                  Rp ${formatNumber(item.price * item.quantity)}
                 </div>
               </div>
             `
@@ -370,9 +370,9 @@ async function viewOrderDetails(orderNumber) {
         <div class="bg-amber-900/20 border border-amber-400/30 rounded-lg p-4">
           <div class="flex justify-between items-center mb-2">
             <span class="text-lg font-semibold">Total</span>
-            <span class="text-2xl font-bold text-amber-400">Rp ${parseFloat(
+            <span class="text-2xl font-bold text-amber-400">Rp ${formatNumber(
               order.total_amount
-            ).toLocaleString("id-ID")}</span>
+            )}</span>
           </div>
           <div class="flex justify-between items-center text-sm">
             <span class="text-slate-400">Points Earned</span>
@@ -393,7 +393,7 @@ async function viewOrderDetails(orderNumber) {
             <div class="text-sm ${
               isExpired ? "text-red-400" : "text-slate-300"
             }">
-              ${expiryDate.toLocaleString("id-ID")}
+              ${formatDateTime(expiryDate)}
             </div>
           </div>
         </div>
@@ -551,17 +551,7 @@ function getExpiryStatus(expiresAt, status) {
   return "";
 }
 
-// Note: Using local function instead of global formatDate because orders need time display
-function formatOrderDateTime(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+
 
 function getPointsStatus(order) {
   if (order.status !== "completed") {
