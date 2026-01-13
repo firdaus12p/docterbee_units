@@ -1,10 +1,10 @@
 ---
 project_name: 'docterbee_units'
 user_name: 'Daus'
-date: '2026-01-05'
-sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns', 'business_context', 'architecture_details', 'key_files']
+date: '2026-01-13'
+sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns', 'business_context', 'architecture_details', 'key_files', 'gallery_system', 'points_article']
 status: 'complete'
-rule_count: 60
+rule_count: 72
 optimized_for_llm: true
 ---
 
@@ -31,6 +31,8 @@ _This file contains critical rules and patterns that AI agents must follow when 
 5. **Reward Redemption**: Accumulate points → Browse rewards catalog → Request redemption → Admin approval → Claim reward
 6. **Email Verification**: User inputs email → System sends verification link via Resend → User clicks link → Account marked as verified (Clean-as-you-go).
 7. **Forgot Password**: Request reset link via email → Token generated (1h expiry) → Verify token → Set new password.
+8. **Premium Article Purchase** (NEW): Browse articles → Click locked article → System checks points balance → Deduct points → Unlock article access permanently.
+9. **Gallery Management** (Admin): Login admin → Navigate to Gallery section → Upload/Edit/Delete images → Set sort order → Toggle active status.
 
 ---
 
@@ -134,6 +136,22 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - **Modified: `orders`**: Added `location_id` (INT, nullable) for new orders.
 - **Modified: `reward_redemptions`**: Added `location_id` (INT) to track redemption location.
 
+**Table: `gallery_images` (NEW - 2026-01-13)**
+- Manages image gallery for landing page and promotional content.
+- Columns: `id`, `title`, `description`, `image_url`, `sort_order`, `is_active`, `created_at`, `updated_at`.
+- **Soft Active**: Uses `is_active` flag (not soft delete) to show/hide images.
+- **Sorting**: `sort_order ASC, created_at DESC` for display order.
+
+**Table: `articles` (Enhanced - 2026-01-13)**
+- **NEW Columns for Points-Based Access**:
+  - `points_cost` (INT): Number of points required to unlock article. 0 = free.
+  - `is_free` (TINYINT): Boolean flag. Auto-set based on `points_cost`.
+- **Purchase Tracking**: `article_purchases` table tracks which user purchased which article.
+
+**Table: `ai_advisor_usage` (Tracking)**
+- Logs AI Advisor usage with `points_cost` per query (currently 1 point).
+- Columns: `user_id`, `question`, `points_cost`, `status`, `response_source`.
+
 ### Rate Limiting Strategy
 
 | Endpoint Category | Max Attempts | Cooldown | Purpose |
@@ -161,6 +179,20 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - `POST /api/auth/forgot-password`: Request password reset link.
 - `POST /api/auth/reset-password`: Set new password with valid token.
 
+**Gallery Routes (`backend/routes/gallery.mjs`) (NEW - 2026-01-13):**
+- `GET /api/gallery`: Public endpoint. Returns active gallery images sorted by `sort_order`.
+- `GET /api/gallery/admin`: Admin only. Returns all images including inactive.
+- `POST /api/gallery`: Admin only. Create new gallery image. Requires `image_url`.
+- `PUT /api/gallery/:id`: Admin only. Update gallery image (partial update supported).
+- `DELETE /api/gallery/:id`: Admin only. Hard delete gallery image.
+
+**Insight/Article Routes (`backend/routes/insight.mjs`) (Enhanced - 2026-01-13):**
+- `GET /api/insight`: List articles. Includes `points_cost` and `is_free` fields.
+- `GET /api/insight/:slug`: Get article detail. **Points check enforced** - returns locked content for unpurchased premium articles.
+- `POST /api/insight/:id/purchase`: **Purchase article with points**. Deducts `points_cost` from user's balance and grants permanent access.
+- `POST /api/insight`: Admin only. Create article with optional `points_cost`.
+- `PUT /api/insight/:id`: Admin only. Update article including `points_cost` and `is_free`.
+
 **Frontend Shared Functions:**
 - `js/utils.js`: Global utilities (`escapeHtml`, `formatCurrency`, `formatDate`, `debounce`, etc.). All exported to `window.*`.
 - `js/modal-utils.js`: Modal dialogs (`showSuccess`, `showError`, `showWarning`, `showConfirm`).
@@ -175,6 +207,13 @@ _This file contains critical rules and patterns that AI agents must follow when 
   - Logic centralized in `js/store-enhancements.js` (`loadStoreHistory`, `openHistoryOrderDetail`).
   - **Dual View Logic**: Pending orders show QR + Countdown + Check Status Button. Completed orders show full Receipt (Struk) style.
   - **Backend**: Added `expires_at` column to `GET /api/user-data/activities/order/:id` response to support countdowns.
+
+**Updates (2026-01-13):**
+- **Gallery Management**: Full CRUD in admin dashboard via `js/gallery-manager.js` (if exists) or embedded in `admin-dashboard.js`.
+- **Points-Based Articles**: Articles can be set as premium (requires points to read). Purchase flow in `index.html` and `insight.html`.
+- **Skeleton Loading Pattern**: Use CSS skeleton classes for loading states. Pattern: `<div class="skeleton skeleton-text"></div>` for text, `skeleton-card` for cards.
+- **Admin Dashboard Sections**: Bookings, Articles (Insight), Events, Coupons, Services, Products, Rewards, Users, Reports, Event Registrations, Gallery.
+- **UI Improvements**: Enhanced CSS in `landing-page.css` (+410 lines) for services and program display.
 
 
 ---
@@ -193,4 +232,15 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Review quarterly for outdated rules
 - Remove rules that become obvious over time
 
-Last Updated: 2026-01-07
+Last Updated: 2026-01-13
+
+---
+
+## Changelog
+
+| Date | Changes |
+|------|--------|
+| 2026-01-13 | Added Gallery Management System, Points-Based Article Purchase, Skeleton Loading patterns, Admin Dashboard enhancements |
+| 2026-01-07 | Initial version with core features documented |
+| 2026-01-06 | Transaction History moved to store.html |
+| 2026-01-05 | Code consolidation (handleLogout, initMobileMenu) |
