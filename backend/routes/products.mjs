@@ -28,19 +28,23 @@ router.get("/", async (req, res) => {
 
     if (location_id) {
       // Multi-location mode: join with product_stocks for specific location
+      // Using LEFT JOIN instead of subquery for article_slug to avoid N+1 query problem
       sql = `SELECT p.*, 
         COALESCE(ps.quantity, 0) as stock,
         ps.location_id,
-        (SELECT a.slug FROM articles a WHERE a.product_id = p.id AND a.is_published = 1 LIMIT 1) as article_slug
+        a.slug as article_slug
       FROM products p
       LEFT JOIN product_stocks ps ON p.id = ps.product_id AND ps.location_id = ?
+      LEFT JOIN articles a ON p.id = a.product_id AND a.is_published = 1
       WHERE 1=1`;
       params.push(location_id);
     } else {
       // Legacy mode: use products.stock column
-      sql = `SELECT p.*, 
-        (SELECT a.slug FROM articles a WHERE a.product_id = p.id AND a.is_published = 1 LIMIT 1) as article_slug
-      FROM products p WHERE 1=1`;
+      // Using LEFT JOIN instead of subquery for article_slug to avoid N+1 query problem
+      sql = `SELECT p.*, a.slug as article_slug
+      FROM products p
+      LEFT JOIN articles a ON p.id = a.product_id AND a.is_published = 1
+      WHERE 1=1`;
     }
 
     // Filter by category
