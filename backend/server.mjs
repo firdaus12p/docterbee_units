@@ -426,15 +426,14 @@ app.get("/api/admin/check", (req, res) => {
 });
 
 // DEBUG ENDPOINT - Untuk troubleshooting database
-// Security:
-// - Production: Requires admin login, shows minimal info
-// - Development: Open but shows warning
+// Security: COMPLETELY DISABLED in production
+// Only available in development mode for local debugging
 app.get("/api/debug", async (req, res) => {
-  // Security check: In production, require admin login
-  if (isProduction && !(req.session && req.session.isAdmin)) {
-    return res.status(401).json({
+  // Security: Completely block in production - no config info should be exposed
+  if (isProduction) {
+    return res.status(404).json({
       success: false,
-      error: "Debug endpoint hanya tersedia untuk admin di production.",
+      error: "Endpoint tidak ditemukan",
     });
   }
 
@@ -849,7 +848,7 @@ app.post("/api/ai-advisor", async (req, res) => {
 
   const AI_ADVISOR_COST = 1; // Point cost per analysis
   const userId = req.session?.userId || null;
-  
+
   // Flag to track if we should charge points (only for logged in users)
   const shouldChargePoints = userId !== null;
 
@@ -880,7 +879,7 @@ app.post("/api/ai-advisor", async (req, res) => {
           [userId]
         );
         currentPoints = progress ? progress.points : 0;
-        
+
         // Check if user has enough points
         if (currentPoints < AI_ADVISOR_COST) {
           return res.status(400).json({
@@ -891,8 +890,10 @@ app.post("/api/ai-advisor", async (req, res) => {
             available: currentPoints,
           });
         }
-        
-        console.log(`   ✅ User has ${currentPoints} points, cost is ${AI_ADVISOR_COST}`);
+
+        console.log(
+          `   ✅ User has ${currentPoints} points, cost is ${AI_ADVISOR_COST}`
+        );
       } catch (dbError) {
         console.error("Error checking user points:", dbError);
         // Continue without charging if DB error (graceful degradation)
@@ -985,11 +986,11 @@ PENTING:
     // Parse JSON response
     let jsonResponse;
     let aiSuccess = false;
-    let responseSource = 'gemini';
-    
+    let responseSource = "gemini";
+
     try {
       jsonResponse = JSON.parse(text);
-      
+
       // Validate structure
       if (
         jsonResponse.verdict &&
@@ -1001,11 +1002,11 @@ PENTING:
     } catch (parseError) {
       console.error("❌ JSON parsing error:", parseError.message);
       console.log("📄 Raw response:", text.substring(0, 200));
-      
+
       // Fallback mode - AI responded but not in expected format
       // We still count this as a success (AI did work)
       aiSuccess = true;
-      responseSource = 'fallback';
+      responseSource = "fallback";
     }
 
     // ==========================================
@@ -1013,24 +1014,24 @@ PENTING:
     // ==========================================
     let pointsCharged = false;
     let newBalance = currentPoints;
-    
+
     if (shouldChargePoints && aiSuccess) {
       try {
         // Use transaction for atomic point deduction
         await query("START TRANSACTION");
-        
+
         // Lock and get current points
         const progress = await queryOne(
           "SELECT points FROM user_progress WHERE user_id = ? FOR UPDATE",
           [userId]
         );
-        
+
         const pointsNow = progress ? progress.points : 0;
-        
+
         // Double-check balance (could have changed)
         if (pointsNow >= AI_ADVISOR_COST) {
           newBalance = pointsNow - AI_ADVISOR_COST;
-          
+
           // Deduct points
           await query(
             `INSERT INTO user_progress (user_id, unit_data, points) 
@@ -1038,21 +1039,30 @@ PENTING:
              ON DUPLICATE KEY UPDATE points = ?`,
             [userId, newBalance, newBalance]
           );
-          
+
           // Log usage for analytics
           await query(
             `INSERT INTO ai_advisor_usage (user_id, question, points_cost, status, response_source) 
              VALUES (?, ?, ?, 'success', ?)`,
-            [userId, question.substring(0, 500), AI_ADVISOR_COST, responseSource]
+            [
+              userId,
+              question.substring(0, 500),
+              AI_ADVISOR_COST,
+              responseSource,
+            ]
           );
-          
+
           await query("COMMIT");
           pointsCharged = true;
-          
-          console.log(`💰 Points deducted: ${AI_ADVISOR_COST}, new balance: ${newBalance}`);
+
+          console.log(
+            `💰 Points deducted: ${AI_ADVISOR_COST}, new balance: ${newBalance}`
+          );
         } else {
           await query("ROLLBACK");
-          console.log("⚠️ Point deduction skipped - insufficient balance at charge time");
+          console.log(
+            "⚠️ Point deduction skipped - insufficient balance at charge time"
+          );
         }
       } catch (txError) {
         await query("ROLLBACK");
@@ -1064,7 +1074,7 @@ PENTING:
     // ==========================================
     // STEP 4: RETURN RESPONSE
     // ==========================================
-    if (responseSource === 'fallback') {
+    if (responseSource === "fallback") {
       return res.json({
         success: true,
         fallbackMode: true,
@@ -1091,14 +1101,14 @@ PENTING:
     // AI FAILED - NO POINTS DEDUCTED
     // ==========================================
     console.log("⚠️ AI failed - no points deducted from user");
-    
+
     // Log failed attempt if user is logged in
     if (shouldChargePoints) {
       try {
         await query(
           `INSERT INTO ai_advisor_usage (user_id, question, points_cost, status, response_source) 
            VALUES (?, ?, 0, 'failed', 'error')`,
-          [userId, req.body.question?.substring(0, 500) || '']
+          [userId, req.body.question?.substring(0, 500) || ""]
         );
       } catch (logError) {
         console.error("Error logging failed attempt:", logError);

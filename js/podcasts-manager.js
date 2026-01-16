@@ -91,14 +91,18 @@ async function loadPodcasts() {
       <tr class="border-b border-slate-800 hover:bg-slate-800/50 transition">
         <td class="px-4 py-3 text-slate-400">${podcast.id}</td>
         <td class="px-4 py-3">
-          <span class="font-medium text-white">${escapeHtml(podcast.title)}</span>
+          <span class="font-medium text-white">${escapeHtml(
+            podcast.title
+          )}</span>
         </td>
         <td class="px-4 py-3">
           <audio controls class="h-8 w-48">
             <source src="${escapeHtml(podcast.audio_url)}" type="audio/mpeg">
           </audio>
         </td>
-        <td class="px-4 py-3 text-center text-slate-400">${podcast.sort_order}</td>
+        <td class="px-4 py-3 text-center text-slate-400">${
+          podcast.sort_order
+        }</td>
         <td class="px-4 py-3 text-center">
           <button 
             onclick="togglePodcastStatus(${podcast.id})"
@@ -123,7 +127,9 @@ async function loadPodcasts() {
               </svg>
             </button>
             <button
-              onclick="deletePodcast(${podcast.id}, '${escapeHtml(podcast.title).replace(/'/g, "\\'")}')"
+              onclick="deletePodcast(${podcast.id}, '${escapeJsString(
+          podcast.title
+        )}')"
               class="p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition"
               title="Hapus"
             >
@@ -187,8 +193,10 @@ async function openPodcastModal(id = null) {
         if (podcast) {
           document.getElementById("podcastId").value = podcast.id;
           document.getElementById("podcastTitle").value = podcast.title;
-          document.getElementById("podcastSortOrder").value = podcast.sort_order || 0;
-          document.getElementById("podcastIsActive").checked = !!podcast.is_active;
+          document.getElementById("podcastSortOrder").value =
+            podcast.sort_order || 0;
+          document.getElementById("podcastIsActive").checked =
+            !!podcast.is_active;
 
           // Show current audio
           if (podcast.audio_url) {
@@ -285,7 +293,9 @@ async function handlePodcastSubmit(e) {
       throw new Error(data.error || "Gagal menyimpan podcast");
     }
 
-    showSuccess(podcastId ? "Podcast berhasil diperbarui" : "Podcast berhasil ditambahkan");
+    showSuccess(
+      podcastId ? "Podcast berhasil diperbarui" : "Podcast berhasil ditambahkan"
+    );
     closePodcastModalFn();
     loadPodcasts();
   } catch (error) {
@@ -371,4 +381,3 @@ window.openPodcastModal = openPodcastModal;
 window.editPodcast = editPodcast;
 window.deletePodcast = deletePodcast;
 window.togglePodcastStatus = togglePodcastStatus;
-

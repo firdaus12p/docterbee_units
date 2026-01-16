@@ -16,9 +16,9 @@ function renderArticleCard(article) {
   const isFree = article.is_free || article.points_cost === 0;
   const isUnlocked = article.is_unlocked;
   const canRead = isFree || isUnlocked;
-  
+
   // Access badge
-  let accessBadge = '';
+  let accessBadge = "";
   if (isFree) {
     accessBadge = `
       <span class="text-xs font-semibold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 flex items-center gap-1">
@@ -43,16 +43,19 @@ function renderArticleCard(article) {
   }
 
   // Lock icon badge on image (small, non-intrusive) - only for locked articles
-  const lockIconOnImage = !canRead ? `
+  const lockIconOnImage = !canRead
+    ? `
     <div class="absolute top-2 right-2 bg-amber-500 text-white p-1.5 rounded-full shadow-lg">
       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 1C8.676 1 6 3.676 6 7v2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V11a2 2 0 00-2-2h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm0 10a2 2 0 110 4 2 2 0 010-4z"/>
       </svg>
     </div>
-  ` : '';
+  `
+    : "";
 
   // Buy button for locked articles (clear call-to-action at bottom)
-  const buyButton = !canRead ? `
+  const buyButton = !canRead
+    ? `
     <div class="mt-3 pt-3 border-t border-amber-200">
       <button class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:from-amber-600 hover:to-orange-600 transition-all shadow-md">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -61,18 +64,25 @@ function renderArticleCard(article) {
         Buka Artikel - ${article.points_cost} Poin
       </button>
     </div>
-  ` : '';
+  `
+    : "";
 
-  const clickHandler = canRead 
+  const clickHandler = canRead
     ? `openArticle('${article.slug}')`
-    : `showUnlockModal(${article.id}, '${escapeHtml(article.title).replace(/'/g, "\\'")}', ${article.points_cost})`;
+    : `showUnlockModal(${article.id}, '${escapeJsString(article.title)}', ${
+        article.points_cost
+      })`;
 
   return `
     <article 
-      class="article-card flex flex-col h-full group relative bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${!canRead ? 'border-amber-300 border-2' : ''}"
+      class="article-card flex flex-col h-full group relative bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
+        !canRead ? "border-amber-300 border-2" : ""
+      }"
       onclick="${clickHandler}"
     >
-      ${article.header_image ? `
+      ${
+        article.header_image
+          ? `
         <div class="article-image relative">
           <img 
             src="${article.header_image}" 
@@ -82,26 +92,34 @@ function renderArticleCard(article) {
           >
           ${lockIconOnImage}
         </div>
-      ` : ""}
+      `
+          : ""
+      }
       <div class="p-4 flex flex-col flex-1">
         <div class="flex items-center gap-2 mb-2 flex-wrap">
-          <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCategoryColor(article.category)}">
-            ${article.category || 'Umum'}
+          <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCategoryColor(
+            article.category
+          )}">
+            ${article.category || "Umum"}
           </span>
           ${accessBadge}
         </div>
         <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2">
           ${escapeHtml(article.title)}
         </h3>
-        ${article.excerpt ? `
+        ${
+          article.excerpt
+            ? `
           <p class="text-sm text-slate-600 line-clamp-2 break-words mb-4">
             ${escapeHtml(article.excerpt)}
           </p>
-        ` : ""}
+        `
+            : ""
+        }
         
         <div class="mt-auto">
           <div class="article-meta flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-slate-500 pt-2 border-t border-gray-100">
-            <span>${article.author || 'DocterBee'}</span>
+            <span>${article.author || "DocterBee"}</span>
             <span>${formatDate(article.created_at)}</span>
           </div>
           ${buyButton}
@@ -121,9 +139,11 @@ function renderArticleCard(article) {
 async function showUnlockModal(articleId, articleTitle, pointsCost) {
   // Check if user is logged in first
   try {
-    const authResponse = await fetch('/api/auth/check', { credentials: 'include' });
+    const authResponse = await fetch("/api/auth/check", {
+      credentials: "include",
+    });
     const authResult = await authResponse.json();
-    
+
     if (!authResult.loggedIn) {
       // Show Login Required Modal instead of auto-redirect
       const loginModalHTML = `
@@ -141,13 +161,17 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
             
             <div class="flex flex-col gap-3">
               <a 
-                href="/login?redirect=${encodeURIComponent(window.location.pathname)}" 
+                href="/login?redirect=${encodeURIComponent(
+                  window.location.pathname
+                )}" 
                 class="w-full px-4 py-3 bg-red-600 text-white rounded-xl font-semibold text-center hover:bg-red-700 transition"
               >
                 Login
               </a>
               <a 
-                href="/register?redirect=${encodeURIComponent(window.location.pathname)}" 
+                href="/register?redirect=${encodeURIComponent(
+                  window.location.pathname
+                )}" 
                 class="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold text-center hover:bg-slate-50 transition"
               >
                 Daftar Akun Baru
@@ -162,24 +186,28 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
           </div>
         </div>
       `;
-      
+
       // Remove existing modal if any
-      const existingModal = document.getElementById('loginRequiredModal');
+      const existingModal = document.getElementById("loginRequiredModal");
       if (existingModal) existingModal.remove();
-      
+
       // Add modal to page
-      document.body.insertAdjacentHTML('beforeend', loginModalHTML);
+      document.body.insertAdjacentHTML("beforeend", loginModalHTML);
       return;
     }
-    
+
     // Get user's current points
-    const progressResponse = await fetch('/api/user-data/progress', { credentials: 'include' });
+    const progressResponse = await fetch("/api/user-data/progress", {
+      credentials: "include",
+    });
     const progressResult = await progressResponse.json();
-    const currentPoints = progressResult.success ? (progressResult.data?.points || 0) : 0;
-    
+    const currentPoints = progressResult.success
+      ? progressResult.data?.points || 0
+      : 0;
+
     // Create and show modal
     const hasEnoughPoints = currentPoints >= pointsCost;
-    
+
     const modalHTML = `
       <div id="unlockArticleModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick="closeUnlockModal(event)">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl" onclick="event.stopPropagation()">
@@ -205,19 +233,29 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
             <hr class="my-2 border-slate-200">
             <div class="flex justify-between items-center">
               <span class="text-slate-600">Sisa setelah pembelian</span>
-              <span class="font-bold ${hasEnoughPoints ? 'text-emerald-600' : 'text-red-600'}">
-                ${hasEnoughPoints ? currentPoints - pointsCost : 'Tidak cukup'} ${hasEnoughPoints ? 'Poin' : ''}
+              <span class="font-bold ${
+                hasEnoughPoints ? "text-emerald-600" : "text-red-600"
+              }">
+                ${
+                  hasEnoughPoints ? currentPoints - pointsCost : "Tidak cukup"
+                } ${hasEnoughPoints ? "Poin" : ""}
               </span>
             </div>
           </div>
           
-          ${!hasEnoughPoints ? `
+          ${
+            !hasEnoughPoints
+              ? `
             <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
               <p class="text-red-700 text-sm text-center">
-                <strong>Poin tidak cukup!</strong> Anda membutuhkan ${pointsCost - currentPoints} poin lagi.
+                <strong>Poin tidak cukup!</strong> Anda membutuhkan ${
+                  pointsCost - currentPoints
+                } poin lagi.
               </p>
             </div>
-          ` : ''}
+          `
+              : ""
+          }
           
           <div class="flex gap-3">
             <button 
@@ -229,13 +267,13 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
             <button 
               onclick="confirmUnlockArticle(${articleId})"
               class="flex-1 px-4 py-3 rounded-xl font-semibold transition ${
-                hasEnoughPoints 
-                  ? 'bg-amber-500 text-white hover:bg-amber-600' 
-                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                hasEnoughPoints
+                  ? "bg-amber-500 text-white hover:bg-amber-600"
+                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
               }"
-              ${!hasEnoughPoints ? 'disabled' : ''}
+              ${!hasEnoughPoints ? "disabled" : ""}
             >
-              ${hasEnoughPoints ? 'Beli Sekarang' : 'Poin Tidak Cukup'}
+              ${hasEnoughPoints ? "Beli Sekarang" : "Poin Tidak Cukup"}
             </button>
           </div>
           
@@ -245,17 +283,16 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
         </div>
       </div>
     `;
-    
+
     // Remove existing modal if any
-    const existingModal = document.getElementById('unlockArticleModal');
+    const existingModal = document.getElementById("unlockArticleModal");
     if (existingModal) existingModal.remove();
-    
+
     // Add modal to page
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
   } catch (error) {
-    console.error('Error showing unlock modal:', error);
-    alert('Terjadi kesalahan. Silakan coba lagi.');
+    console.error("Error showing unlock modal:", error);
+    alert("Terjadi kesalahan. Silakan coba lagi.");
   }
 }
 
@@ -263,8 +300,8 @@ async function showUnlockModal(articleId, articleTitle, pointsCost) {
  * Close unlock modal
  */
 function closeUnlockModal(event) {
-  if (event && event.target.id !== 'unlockArticleModal') return;
-  const modal = document.getElementById('unlockArticleModal');
+  if (event && event.target.id !== "unlockArticleModal") return;
+  const modal = document.getElementById("unlockArticleModal");
   if (modal) modal.remove();
 }
 
@@ -272,8 +309,8 @@ function closeUnlockModal(event) {
  * Close login required modal
  */
 function closeLoginRequiredModal(event) {
-  if (event && event.target.id !== 'loginRequiredModal') return;
-  const modal = document.getElementById('loginRequiredModal');
+  if (event && event.target.id !== "loginRequiredModal") return;
+  const modal = document.getElementById("loginRequiredModal");
   if (modal) modal.remove();
 }
 
@@ -281,50 +318,51 @@ function closeLoginRequiredModal(event) {
  * Confirm and execute article unlock (point deduction)
  */
 async function confirmUnlockArticle(articleId) {
-  const modal = document.getElementById('unlockArticleModal');
-  const confirmBtn = modal?.querySelector('button:last-child');
-  
+  const modal = document.getElementById("unlockArticleModal");
+  const confirmBtn = modal?.querySelector("button:last-child");
+
   if (confirmBtn) {
     confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Memproses...';
+    confirmBtn.innerHTML =
+      '<span class="inline-block animate-spin mr-2">⏳</span> Memproses...';
   }
-  
+
   try {
     const response = await fetch(`/api/insight/${articleId}/unlock`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
-    
+
     const result = await response.json();
-    
+
     if (result.success) {
       // Close modal
       closeUnlockModal();
-      
+
       // Show success message
-      if (typeof showSuccess === 'function') {
-        showSuccess(result.message || 'Artikel berhasil dibeli!');
+      if (typeof showSuccess === "function") {
+        showSuccess(result.message || "Artikel berhasil dibeli!");
       } else {
-        alert(result.message || 'Artikel berhasil dibeli!');
+        alert(result.message || "Artikel berhasil dibeli!");
       }
-      
+
       // Refresh points display if function exists
-      if (typeof refreshNav === 'function') {
+      if (typeof refreshNav === "function") {
         refreshNav();
       }
-      
+
       // Reload articles to reflect new unlock status
       loadInsightArticles();
-      
+
       // If already_free or already_unlocked, redirect to article
       if (result.already_free || result.already_unlocked) {
         // Article already accessible, find and open it
         setTimeout(() => {
           // Find the article slug from DOM if available
-          const articleCards = document.querySelectorAll('.article-card');
-          articleCards.forEach(card => {
-            const onclick = card.getAttribute('onclick');
+          const articleCards = document.querySelectorAll(".article-card");
+          articleCards.forEach((card) => {
+            const onclick = card.getAttribute("onclick");
             if (onclick && onclick.includes(articleId)) {
               // Extract slug if possible, or reload
               loadInsightArticles();
@@ -334,29 +372,31 @@ async function confirmUnlockArticle(articleId) {
       }
     } else {
       // Handle specific errors
-      if (result.error === 'INSUFFICIENT_POINTS') {
-        if (typeof showWarning === 'function') {
-          showWarning(result.message || 'Poin tidak cukup!');
+      if (result.error === "INSUFFICIENT_POINTS") {
+        if (typeof showWarning === "function") {
+          showWarning(result.message || "Poin tidak cukup!");
         } else {
-          alert(result.message || 'Poin tidak cukup!');
+          alert(result.message || "Poin tidak cukup!");
         }
       } else {
-        throw new Error(result.error || result.message || 'Gagal membeli artikel');
+        throw new Error(
+          result.error || result.message || "Gagal membeli artikel"
+        );
       }
-      
+
       // Re-enable button
       if (confirmBtn) {
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = 'Beli Sekarang';
+        confirmBtn.innerHTML = "Beli Sekarang";
       }
     }
   } catch (error) {
-    console.error('Error unlocking article:', error);
-    alert('Gagal membeli artikel: ' + error.message);
-    
+    console.error("Error unlocking article:", error);
+    alert("Gagal membeli artikel: " + error.message);
+
     if (confirmBtn) {
       confirmBtn.disabled = false;
-      confirmBtn.innerHTML = 'Beli Sekarang';
+      confirmBtn.innerHTML = "Beli Sekarang";
     }
   }
 }
@@ -378,7 +418,7 @@ async function loadInsightArticles() {
 
   try {
     // Use /api/insight which now includes unlock status per user
-    const response = await fetch("/api/insight", { credentials: 'include' });
+    const response = await fetch("/api/insight", { credentials: "include" });
     const result = await response.json();
 
     if (!result.success) {
@@ -393,7 +433,7 @@ async function loadInsightArticles() {
         title: articles[0].title,
         is_free: articles[0].is_free,
         points_cost: articles[0].points_cost,
-        is_unlocked: articles[0].is_unlocked
+        is_unlocked: articles[0].is_unlocked,
       });
     }
 
@@ -439,7 +479,7 @@ async function filterArticlesByCategory() {
   if (!articlesContainer) return;
 
   try {
-    const response = await fetch("/api/insight", { credentials: 'include' });
+    const response = await fetch("/api/insight", { credentials: "include" });
     const result = await response.json();
 
     if (!result.success) {

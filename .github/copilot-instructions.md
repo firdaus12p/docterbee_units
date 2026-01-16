@@ -261,3 +261,4 @@ Whitelist-only: `docterbee.com`, `localhost:3000` ([backend/server.mjs](../backe
 - [rules-for-ai.md](../rules-for-ai.md) - Detailed editing constraints
 - [AGENTS.md](../AGENTS.md) - Code style and naming conventions
 - [database_schema.sql](../database_schema.sql) - Full schema reference
+- [js/index.md](../js/index.md) - Directory index for frontend JavaScript modules

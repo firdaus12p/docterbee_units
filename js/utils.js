@@ -1,7 +1,7 @@
 /**
  * Shared Frontend Utilities
  * Common functions used across multiple JS files
- * 
+ *
  * Include this file before other JS files that use these utilities.
  * <script src="/js/utils.js"></script>
  */
@@ -16,6 +16,24 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
+}
+
+/**
+ * Escape string for use in JavaScript string literals within HTML attributes
+ * Prevents XSS when inserting user data into onclick handlers etc.
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text safe for JS string in HTML attribute
+ */
+function escapeJsString(text) {
+  if (!text) return "";
+  return String(text)
+    .replace(/\\/g, "\\\\") // Escape backslash first
+    .replace(/'/g, "\\'") // Escape single quotes
+    .replace(/"/g, "&quot;") // Escape double quotes for HTML attribute
+    .replace(/</g, "\\x3c") // Escape < to prevent script injection
+    .replace(/>/g, "\\x3e") // Escape > to prevent script injection
+    .replace(/\n/g, "\\n") // Escape newlines
+    .replace(/\r/g, "\\r"); // Escape carriage returns
 }
 
 /**
@@ -120,10 +138,9 @@ function getCategoryColor(category) {
   return colors[category] || "bg-gray-100 text-gray-700";
 }
 
-
-
 // Make functions globally available
 window.escapeHtml = escapeHtml;
+window.escapeJsString = escapeJsString;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.formatCurrency = formatCurrency;
@@ -131,5 +148,3 @@ window.formatNumber = formatNumber;
 window.debounce = debounce;
 window.copyToClipboard = copyToClipboard;
 window.getCategoryColor = getCategoryColor;
-
-

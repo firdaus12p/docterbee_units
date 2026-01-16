@@ -36,7 +36,9 @@ async function loadAdminJourneys() {
         if (journeyId) {
           loadJourneyDetail(parseInt(journeyId));
         } else {
-          document.getElementById("journeyDetailsPanel").classList.add("hidden");
+          document
+            .getElementById("journeyDetailsPanel")
+            .classList.add("hidden");
         }
       };
     }
@@ -67,9 +69,10 @@ async function loadJourneyDetail(journeyId) {
       // Update journey info
       document.getElementById("journeyDetailName").textContent = journey.name;
       document.getElementById("journeyDetailSlug").textContent = journey.slug;
-      document.getElementById("journeyDetailStatus").innerHTML = journey.is_active
-        ? '<span class="text-emerald-400">Aktif</span>'
-        : '<span class="text-red-400">Nonaktif</span>';
+      document.getElementById("journeyDetailStatus").innerHTML =
+        journey.is_active
+          ? '<span class="text-emerald-400">Aktif</span>'
+          : '<span class="text-red-400">Nonaktif</span>';
 
       // Render units table
       renderUnitsTable(journey.units || []);
@@ -95,7 +98,8 @@ function renderUnitsTable(units) {
   if (!tbody) return;
 
   if (units.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Belum ada unit</td></tr>';
+    tbody.innerHTML =
+      '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">Belum ada unit</td></tr>';
     return;
   }
 
@@ -106,14 +110,24 @@ function renderUnitsTable(units) {
         <td class="px-4 py-2 font-mono text-xs">${unit.id}</td>
         <td class="px-4 py-2">${escapeHtml(unit.title)}</td>
         <td class="px-4 py-2 text-center">
-          <span class="${unit.color_class} text-xs font-semibold">${unit.color_class}</span>
+          <span class="${escapeHtml(
+            unit.color_class
+          )} text-xs font-semibold">${escapeHtml(unit.color_class)}</span>
         </td>
-        <td class="px-4 py-2 text-center">${unit.items ? unit.items.length : 0}</td>
+        <td class="px-4 py-2 text-center">${
+          unit.items ? unit.items.length : 0
+        }</td>
         <td class="px-4 py-2">
           <div class="flex gap-1 justify-center">
-            <button onclick="showUnitItems(${unit.id}, '${escapeHtml(unit.title)}')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded">Items</button>
-            <button onclick="openEditUnitModal(${unit.id})" class="text-xs bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded">Edit</button>
-            <button onclick="deleteUnit(${unit.id})" class="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded">Hapus</button>
+            <button onclick="showUnitItems(${unit.id}, '${escapeJsString(
+        unit.title
+      )}')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded">Items</button>
+            <button onclick="openEditUnitModal(${
+              unit.id
+            })" class="text-xs bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded">Edit</button>
+            <button onclick="deleteUnit(${
+              unit.id
+            })" class="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded">Hapus</button>
           </div>
         </td>
       </tr>
@@ -145,7 +159,8 @@ function renderItemsTable(items) {
   if (!tbody) return;
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-slate-400">Belum ada item</td></tr>';
+    tbody.innerHTML =
+      '<tr><td colspan="3" class="px-4 py-6 text-center text-slate-400">Belum ada item</td></tr>';
     return;
   }
 
@@ -153,12 +168,21 @@ function renderItemsTable(items) {
     .map(
       (item) => `
       <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-        <td class="px-4 py-2 font-mono text-xs">${escapeHtml(item.item_key)}</td>
-        <td class="px-4 py-2 text-sm">${escapeHtml(item.question).substring(0, 80)}${item.question.length > 80 ? "..." : ""}</td>
+        <td class="px-4 py-2 font-mono text-xs">${escapeHtml(
+          item.item_key
+        )}</td>
+        <td class="px-4 py-2 text-sm">${escapeHtml(item.question).substring(
+          0,
+          80
+        )}${item.question.length > 80 ? "..." : ""}</td>
         <td class="px-4 py-2">
           <div class="flex gap-1 justify-center">
-            <button onclick="openEditItemModal(${item.id})" class="text-xs bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded">Edit</button>
-            <button onclick="deleteItem(${item.id})" class="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded">Hapus</button>
+            <button onclick="openEditItemModal(${
+              item.id
+            })" class="text-xs bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded">Edit</button>
+            <button onclick="deleteItem(${
+              item.id
+            })" class="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded">Hapus</button>
           </div>
         </td>
       </tr>
@@ -182,8 +206,10 @@ function openJourneyModal(editId = null) {
     document.getElementById("journeyFormId").value = currentJourneyData.id;
     document.getElementById("journeyFormName").value = currentJourneyData.name;
     document.getElementById("journeyFormSlug").value = currentJourneyData.slug;
-    document.getElementById("journeyFormDesc").value = currentJourneyData.description || "";
-    document.getElementById("journeyFormActive").checked = currentJourneyData.is_active;
+    document.getElementById("journeyFormDesc").value =
+      currentJourneyData.description || "";
+    document.getElementById("journeyFormActive").checked =
+      currentJourneyData.is_active;
   } else {
     title.textContent = "Journey Baru";
   }
@@ -244,28 +270,36 @@ async function handleJourneySubmit(e) {
 async function deleteJourney() {
   if (!currentSelectedJourneyId) return;
 
-  showDeleteModal("Apakah Anda yakin ingin menghapus journey ini? Semua unit dan item di dalamnya juga akan dihapus.", async () => {
-    try {
-      const response = await adminFetch(`/api/journeys/admin/${currentSelectedJourneyId}`, {
-        method: "DELETE",
-      });
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus journey ini? Semua unit dan item di dalamnya juga akan dihapus.",
+    async () => {
+      try {
+        const response = await adminFetch(
+          `/api/journeys/admin/${currentSelectedJourneyId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success) {
-        loadAdminJourneys();
-        document.getElementById("journeyDetailsPanel").classList.add("hidden");
-        currentSelectedJourneyId = null;
-        currentJourneyData = null;
-        showSuccessModal("Journey berhasil dihapus");
-      } else {
-        alert("Error: " + (result.error || "Gagal menghapus journey"));
+        if (result.success) {
+          loadAdminJourneys();
+          document
+            .getElementById("journeyDetailsPanel")
+            .classList.add("hidden");
+          currentSelectedJourneyId = null;
+          currentJourneyData = null;
+          showSuccessModal("Journey berhasil dihapus");
+        } else {
+          alert("Error: " + (result.error || "Gagal menghapus journey"));
+        }
+      } catch (error) {
+        console.error("Error deleting journey:", error);
+        alert("Error: " + error.message);
       }
-    } catch (error) {
-      console.error("Error deleting journey:", error);
-      alert("Error: " + error.message);
     }
-  });
+  );
 }
 
 // ========== UNIT MODAL ==========
@@ -322,7 +356,9 @@ async function handleUnitSubmit(e) {
   };
 
   try {
-    const url = id ? `/api/journeys/admin/units/${id}` : "/api/journeys/admin/units";
+    const url = id
+      ? `/api/journeys/admin/units/${id}`
+      : "/api/journeys/admin/units";
     const method = id ? "PATCH" : "POST";
 
     const response = await adminFetch(url, {
@@ -347,26 +383,32 @@ async function handleUnitSubmit(e) {
 }
 
 async function deleteUnit(unitId) {
-  showDeleteModal("Apakah Anda yakin ingin menghapus unit ini? Semua item di dalamnya juga akan dihapus.", async () => {
-    try {
-      const response = await adminFetch(`/api/journeys/admin/units/${unitId}`, {
-        method: "DELETE",
-      });
+  showDeleteModal(
+    "Apakah Anda yakin ingin menghapus unit ini? Semua item di dalamnya juga akan dihapus.",
+    async () => {
+      try {
+        const response = await adminFetch(
+          `/api/journeys/admin/units/${unitId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success) {
-        loadJourneyDetail(currentSelectedJourneyId);
-        document.getElementById("itemsPanel").classList.add("hidden");
-        showSuccessModal("Unit berhasil dihapus");
-      } else {
-        alert("Error: " + (result.error || "Gagal menghapus unit"));
+        if (result.success) {
+          loadJourneyDetail(currentSelectedJourneyId);
+          document.getElementById("itemsPanel").classList.add("hidden");
+          showSuccessModal("Unit berhasil dihapus");
+        } else {
+          alert("Error: " + (result.error || "Gagal menghapus unit"));
+        }
+      } catch (error) {
+        console.error("Error deleting unit:", error);
+        alert("Error: " + error.message);
       }
-    } catch (error) {
-      console.error("Error deleting unit:", error);
-      alert("Error: " + error.message);
     }
-  });
+  );
 }
 
 // ========== ITEM MODAL ==========
@@ -381,7 +423,9 @@ function openItemModal(editId = null) {
   document.getElementById("itemFormUnitId").value = currentSelectedUnitId;
 
   if (editId) {
-    const unit = currentJourneyData?.units?.find((u) => u.id === currentSelectedUnitId);
+    const unit = currentJourneyData?.units?.find(
+      (u) => u.id === currentSelectedUnitId
+    );
     const item = unit?.items?.find((i) => i.id === editId);
     if (item) {
       title.textContent = "Edit Item";
@@ -430,7 +474,9 @@ async function handleItemSubmit(e) {
   };
 
   try {
-    const url = id ? `/api/journeys/admin/items/${id}` : "/api/journeys/admin/items";
+    const url = id
+      ? `/api/journeys/admin/items/${id}`
+      : "/api/journeys/admin/items";
     const method = id ? "PATCH" : "POST";
 
     const response = await adminFetch(url, {
@@ -446,7 +492,10 @@ async function handleItemSubmit(e) {
       loadJourneyDetail(currentSelectedJourneyId);
       // Re-show items for current unit
       setTimeout(() => {
-        showUnitItems(currentSelectedUnitId, document.getElementById("selectedUnitTitle").textContent);
+        showUnitItems(
+          currentSelectedUnitId,
+          document.getElementById("selectedUnitTitle").textContent
+        );
       }, 100);
       showSuccessModal(result.message || "Item berhasil disimpan");
     } else {
@@ -470,7 +519,10 @@ async function deleteItem(itemId) {
       if (result.success) {
         loadJourneyDetail(currentSelectedJourneyId);
         setTimeout(() => {
-          showUnitItems(currentSelectedUnitId, document.getElementById("selectedUnitTitle").textContent);
+          showUnitItems(
+            currentSelectedUnitId,
+            document.getElementById("selectedUnitTitle").textContent
+          );
         }, 100);
         showSuccessModal("Item berhasil dihapus");
       } else {
@@ -494,7 +546,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnEditJourney = document.getElementById("btnEditJourney");
   if (btnEditJourney) {
-    btnEditJourney.addEventListener("click", () => openJourneyModal(currentSelectedJourneyId));
+    btnEditJourney.addEventListener("click", () =>
+      openJourneyModal(currentSelectedJourneyId)
+    );
   }
 
   const btnDeleteJourney = document.getElementById("btnDeleteJourney");

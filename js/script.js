@@ -1524,7 +1524,7 @@ async function renderEvents() {
         deadline.setHours(23, 59, 59, 999);
         const now = new Date();
         isRegistrationClosed = now > deadline;
-        
+
         deadlineHtml = `
           <div class="event-meta-item event-deadline">
             <i data-lucide="clock"></i>
@@ -1532,7 +1532,11 @@ async function renderEvents() {
               day: "numeric",
               month: "short",
               year: "numeric",
-            })}${isRegistrationClosed ? ' <span class="event-deadline-closed">(Ditutup)</span>' : ''}</span>
+            })}${
+          isRegistrationClosed
+            ? ' <span class="event-deadline-closed">(Ditutup)</span>'
+            : ""
+        }</span>
           </div>
         `;
       }
@@ -1561,7 +1565,9 @@ async function renderEvents() {
 
       // Image section
       const imageHtml = event.event_image
-        ? `<img src="${escapeHtml(event.event_image)}" alt="${escapeHtml(event.title)}" loading="lazy">`
+        ? `<img src="${escapeHtml(event.event_image)}" alt="${escapeHtml(
+            event.title
+          )}" loading="lazy">`
         : `<div class="event-card-image-placeholder">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -1571,10 +1577,12 @@ async function renderEvents() {
           </div>`;
 
       // Badge for mode
-      const modeBadgeClass = event.mode === "online" ? "event-badge-online" : "event-badge-offline";
-      const modeIcon = event.mode === "online" 
-        ? '<i data-lucide="video" class="w-3 h-3"></i>' 
-        : '<i data-lucide="map-pin" class="w-3 h-3"></i>';
+      const modeBadgeClass =
+        event.mode === "online" ? "event-badge-online" : "event-badge-offline";
+      const modeIcon =
+        event.mode === "online"
+          ? '<i data-lucide="video" class="w-3 h-3"></i>'
+          : '<i data-lucide="map-pin" class="w-3 h-3"></i>';
 
       // Determine button markup based on registration status
       let primaryButtonHtml;
@@ -1596,9 +1604,14 @@ async function renderEvents() {
           photo: event.speaker_photo || "",
           bio: event.speaker_bio || "",
           eventTitle: event.title,
-          description: event.description || "Bergabunglah di program eksklusif ini bersama DocterBee.",
-          eventImage: event.event_image || ""
-        }).replace(/'/g, "&#39;")})' class="btn-secondary-sm">Info Program</button>`;
+          description:
+            event.description ||
+            "Bergabunglah di program eksklusif ini bersama DocterBee.",
+          eventImage: event.event_image || "",
+        }).replace(
+          /'/g,
+          "&#39;"
+        )})' class="btn-secondary-sm">Info Program</button>`;
       }
 
       card.innerHTML = `
@@ -1615,7 +1628,9 @@ async function renderEvents() {
               ${modeIcon}
               ${event.mode.toUpperCase()}
             </span>
-            <span class="event-badge event-badge-topic">${escapeHtml(event.topic)}</span>
+            <span class="event-badge event-badge-topic">${escapeHtml(
+              event.topic
+            )}</span>
           </div>
           
           <!-- Title -->
@@ -1642,10 +1657,10 @@ async function renderEvents() {
           ${infoButtonHtml}
         </div>
       `;
-      
+
       eventsContainer.appendChild(card);
     });
-    
+
     // Re-initialize Lucide icons after all cards are added
     if (typeof lucide !== "undefined") {
       lucide.createIcons();
@@ -1724,9 +1739,9 @@ async function handleEventRegistration(eventId) {
       method: "GET",
       credentials: "include",
     });
-    
+
     const data = await response.json();
-    
+
     if (data.loggedIn) {
       // User is logged in, redirect to registration
       window.location.href = `/event-registration?eventId=${eventId}`;
@@ -1735,7 +1750,8 @@ async function handleEventRegistration(eventId) {
       if (typeof showModal === "function") {
         showModal({
           title: "Login Diperlukan",
-          message: "Untuk mendaftar event, Anda harus login terlebih dahulu.\n\nSilakan daftar akun atau login jika sudah memiliki akun.",
+          message:
+            "Untuk mendaftar event, Anda harus login terlebih dahulu.\n\nSilakan daftar akun atau login jika sudah memiliki akun.",
           type: "warning",
           confirmText: "Daftar Akun",
           showCancel: true,
@@ -1785,10 +1801,14 @@ function showClassInfoModal(data) {
   // 1. Hero Image (Boxy & Large - Tall Portrait Style)
   // Use eventImage (dedicated banner) first, then fall back to speaker photo
   const heroImageSrc = data.eventImage || data.photo;
-  const heroImageHtml = heroImageSrc 
-    ? `<img src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(data.eventTitle)}" 
+  const heroImageHtml = heroImageSrc
+    ? `<img src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(
+        data.eventTitle
+      )}" 
            class="w-full aspect-[4/5] md:aspect-[3/2] object-cover rounded-xl shadow-md mb-6" loading="lazy" 
-           onerror="this.parentElement.innerHTML='<div class=\\'w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6\\'>${data.name.charAt(0).toUpperCase()}</div>'"/>`
+           onerror="this.parentElement.innerHTML='<div class=\\'w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6\\'>${data.name
+             .charAt(0)
+             .toUpperCase()}</div>'"/>`
     : `<div class="w-full aspect-[4/5] md:aspect-[3/2] bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-3xl font-bold rounded-xl shadow-md mb-6">
          ${data.name.charAt(0).toUpperCase()}
        </div>`;
@@ -1798,7 +1818,9 @@ function showClassInfoModal(data) {
   const classInfoHtml = `
     <div class="mb-6 w-full">
       <h4 class="font-bold text-black text-lg mb-2">Tentang Kelas</h4>
-      <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line break-words w-full">${escapeHtml(data.description)}</div>
+      <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line break-words w-full">${escapeHtml(
+        data.description
+      )}</div>
     </div>
   `;
 
@@ -1808,12 +1830,24 @@ function showClassInfoModal(data) {
       <h4 class="font-bold text-xl text-slate-900 mb-2">Pemateri</h4>
       <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 w-full">
         <div class="flex-shrink-0">
-             ${data.photo ? `<img src="${escapeHtml(data.photo)}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" loading="lazy">` : `<div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-xl">${data.name.charAt(0)}</div>`}
+             ${
+               data.photo
+                 ? `<img src="${escapeHtml(
+                     data.photo
+                   )}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" loading="lazy">`
+                 : `<div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-xl">${data.name.charAt(
+                     0
+                   )}</div>`
+             }
         </div>
         <div class="min-w-0 flex-1">
-            <div class="font-semibold text-slate-900 break-words">${escapeHtml(data.name)}</div>
+            <div class="font-semibold text-slate-900 break-words">${escapeHtml(
+              data.name
+            )}</div>
             <div class="text-xs text-red-500 font-medium mb-1">Praktisi DocterBee</div>
-            <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line mt-1 break-words">${escapeHtml(data.bio || "Informasi profil belum tersedia.")}</div>
+            <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line mt-1 break-words">${escapeHtml(
+              data.bio || "Informasi profil belum tersedia."
+            )}</div>
         </div>
       </div>
     </div>
@@ -1825,7 +1859,9 @@ function showClassInfoModal(data) {
       <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
-          <h3 class="font-bold text-lg text-slate-900 truncate pr-4">${escapeHtml(data.eventTitle)}</h3>
+          <h3 class="font-bold text-lg text-slate-900 truncate pr-4">${escapeHtml(
+            data.eventTitle
+          )}</h3>
           <button onclick="document.getElementById('speakerInfoModal').remove()" class="text-slate-400 hover:text-red-500 transition bg-slate-100 p-1.5 rounded-full">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -2893,15 +2929,25 @@ async function renderServices() {
       .map((service, index) => {
         const categoryBadge = getCategoryBadgeHTML(service.category);
         const price = formatPrice(service.price);
-        
+
         // Mode badge class
-        const modeBadgeClass = service.mode === "online" ? "event-badge-online" : "event-badge-offline";
+        const modeBadgeClass =
+          service.mode === "online"
+            ? "event-badge-online"
+            : "event-badge-offline";
         const modeIcon = service.mode === "online" ? "video" : "home";
-        const modeLabel = service.mode === "online" ? "ONLINE" : service.mode === "offline" ? "OFFLINE" : "ONLINE & OFFLINE";
+        const modeLabel =
+          service.mode === "online"
+            ? "ONLINE"
+            : service.mode === "offline"
+            ? "OFFLINE"
+            : "ONLINE & OFFLINE";
 
         // Image placeholder atau gambar service jika ada
         const imageHtml = service.image
-          ? `<img src="${escapeHtml(service.image)}" alt="${escapeHtml(service.name)}" loading="lazy">`
+          ? `<img src="${escapeHtml(service.image)}" alt="${escapeHtml(
+              service.name
+            )}" loading="lazy">`
           : `<div class="event-card-image-placeholder">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -2910,7 +2956,9 @@ async function renderServices() {
             </div>`;
 
         return `
-          <div class="service-card" style="animation-delay: ${0.1 + index * 0.1}s;">
+          <div class="service-card" style="animation-delay: ${
+            0.1 + index * 0.1
+          }s;">
             <!-- Image Section -->
             <div class="event-card-image">
               ${imageHtml}
@@ -2931,16 +2979,22 @@ async function renderServices() {
               <h3 class="event-card-title">${escapeHtml(service.name)}</h3>
               
               <!-- Description -->
-              <p class="text-sm text-slate-600 line-clamp-2">${escapeHtml(service.description)}</p>
+              <p class="text-sm text-slate-600 line-clamp-2">${escapeHtml(
+                service.description
+              )}</p>
               
               <!-- Meta Info -->
               <div class="event-meta">
-                ${service.practitioner ? `
+                ${
+                  service.practitioner
+                    ? `
                   <div class="event-meta-item event-speaker">
                     <i data-lucide="user-check"></i>
                     <span>Praktisi: ${escapeHtml(service.practitioner)}</span>
                   </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 <div class="event-meta-item event-location">
                   <i data-lucide="map-pin"></i>
                   <span>${escapeHtml(service.branch)}</span>
@@ -3183,12 +3237,14 @@ function showStoreTab(tabName) {
 async function loadProductsFromAPI() {
   try {
     // Get current location from storage
-    const locationData = JSON.parse(localStorage.getItem('docterbee_store_location') || 'null');
-    const locationId = locationData ? locationData.id : '';
-    
+    const locationData = JSON.parse(
+      localStorage.getItem("docterbee_store_location") || "null"
+    );
+    const locationId = locationData ? locationData.id : "";
+
     // Append location_id to URL if exists
-    const url = locationId 
-      ? `/api/products?location_id=${locationId}` 
+    const url = locationId
+      ? `/api/products?location_id=${locationId}`
       : "/api/products";
 
     const response = await fetch(url);
@@ -3270,11 +3326,19 @@ async function renderDineInMenu() {
   };
 
   // Define category order for consistent rendering
-  const CATEGORY_ORDER = ["Coffee", "Cold Pressed", "Tea", "Jus", "Zona Honey", "Zona Sunnah", "1001 Rempah"];
+  const CATEGORY_ORDER = [
+    "Coffee",
+    "Cold Pressed",
+    "Tea",
+    "Jus",
+    "Zona Honey",
+    "Zona Sunnah",
+    "1001 Rempah",
+  ];
 
   // Render categories in defined order
   let html = "";
-  
+
   // First render categories in order
   CATEGORY_ORDER.forEach((category) => {
     if (categorizedProducts[category]) {
@@ -3287,13 +3351,15 @@ async function renderDineInMenu() {
             ${style.icon} ${escapeHtml(category)}
           </h3>
           <div class="grid gap-3 sm:grid-cols-2">
-            ${products.map((p) => renderDineInMenuItem(p, style.color)).join("")}
+            ${products
+              .map((p) => renderDineInMenuItem(p, style.color))
+              .join("")}
           </div>
         </div>
       `;
     }
   });
-  
+
   // Then render any remaining categories not in the order list
   Object.keys(categorizedProducts).forEach((category) => {
     if (!CATEGORY_ORDER.includes(category)) {
@@ -3306,7 +3372,9 @@ async function renderDineInMenu() {
             ${style.icon} ${escapeHtml(category)}
           </h3>
           <div class="grid gap-3 sm:grid-cols-2">
-            ${products.map((p) => renderDineInMenuItem(p, style.color)).join("")}
+            ${products
+              .map((p) => renderDineInMenuItem(p, style.color))
+              .join("")}
           </div>
         </div>
       `;
@@ -3500,7 +3568,15 @@ async function filterStoreCategory(category) {
   if (!grid) return;
 
   // Category order for sorting products (used when showing "all")
-  const CATEGORY_ORDER = ["Coffee", "Cold Pressed", "Tea", "Jus", "Zona Honey", "Zona Sunnah", "1001 Rempah"];
+  const CATEGORY_ORDER = [
+    "Coffee",
+    "Cold Pressed",
+    "Tea",
+    "Jus",
+    "Zona Honey",
+    "Zona Sunnah",
+    "1001 Rempah",
+  ];
 
   // Update active state for filter buttons IMMEDIATELY (synchronous)
   const filterButtons = [
@@ -3711,9 +3787,9 @@ function updateCartDisplay() {
       <div class="flex items-center justify-between text-sm border-b border-slate-800 pb-2">
         <div class="flex-1">
           <div class="font-medium text-slate-200">${escapeHtml(item.name)}</div>
-          <div class="text-xs text-slate-400">${
-            item.qty
-          } × Rp ${formatNumber(item.price)}</div>
+          <div class="text-xs text-slate-400">${item.qty} × Rp ${formatNumber(
+        item.price
+      )}</div>
         </div>
         <div class="font-semibold text-red-500">Rp ${subtotal.toLocaleString(
           "id-ID"
@@ -3789,31 +3865,41 @@ async function redeemReward(cost, rewardName, rewardId = null) {
           _db("db_points", { value: newValue });
           addPoints(0); // Trigger nav refresh
           updatePointsView();
-          
+
           // Show success with coupon code if available
           if (result.couponCode) {
             // Show coupon code in a prominent way
-            const expiryDate = result.expiresAt 
-              ? new Date(result.expiresAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
-              : '30 hari';
-            
+            const expiryDate = result.expiresAt
+              ? new Date(result.expiresAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "30 hari";
+
             showSuccess(
               `🎉 Selamat! Kamu berhasil menukar ${rewardName}!\n\n` +
-              `📋 KODE VOUCHER KAMU:\n` +
-              `━━━━━━━━━━━━━━━━━━━━\n` +
-              `🎫  ${result.couponCode}\n` +
-              `━━━━━━━━━━━━━━━━━━━━\n\n` +
-              `📅 Berlaku sampai: ${expiryDate}\n` +
-              `💡 Gunakan kode ini di checkout untuk mendapatkan reward!\n\n` +
-              `Poin tersisa: ${newValue}`,
+                `📋 KODE VOUCHER KAMU:\n` +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                `🎫  ${result.couponCode}\n` +
+                `━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `📅 Berlaku sampai: ${expiryDate}\n` +
+                `💡 Gunakan kode ini di checkout untuk mendapatkan reward!\n\n` +
+                `Poin tersisa: ${newValue}`,
               "Voucher Berhasil Didapat! 🎁"
             );
-            
+
             // Also copy to clipboard automatically
             if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(result.couponCode).then(() => {
-                showToast('📋 Kode voucher sudah disalin ke clipboard!', 'success');
-              }).catch(() => {});
+              navigator.clipboard
+                .writeText(result.couponCode)
+                .then(() => {
+                  showToast(
+                    "📋 Kode voucher sudah disalin ke clipboard!",
+                    "success"
+                  );
+                })
+                .catch(() => {});
             }
           } else {
             showSuccess(
@@ -3823,23 +3909,28 @@ async function redeemReward(cost, rewardName, rewardId = null) {
           }
         } else {
           // Handle specific error codes
-          if (result.error === 'VERIFICATION_REQUIRED') {
+          if (result.error === "VERIFICATION_REQUIRED") {
             showWarning(
-              result.message || 
-              `Email Belum Terverifikasi!\n\n` +
-              `Silakan verifikasi email Anda di halaman Profil untuk menukarkan poin.`,
+              result.message ||
+                `Email Belum Terverifikasi!\n\n` +
+                  `Silakan verifikasi email Anda di halaman Profil untuk menukarkan poin.`,
               "Verifikasi Diperlukan"
             );
             return;
           }
 
-          if (result.error === 'Tidak terautentikasi' || response.status === 401) {
-             showError("Silahkan login terlebih dahulu untuk menukar reward.");
-             return;
+          if (
+            result.error === "Tidak terautentikasi" ||
+            response.status === 401
+          ) {
+            showError("Silahkan login terlebih dahulu untuk menukar reward.");
+            return;
           }
 
           // Generic error - don't fallback to local if it's a server-side rejection
-          showError(result.error || "Gagal melakukan redeem. Silakan coba lagi nanti.");
+          showError(
+            result.error || "Gagal melakukan redeem. Silakan coba lagi nanti."
+          );
         }
       } catch (error) {
         console.error("Error redeeming reward:", error);
@@ -4013,9 +4104,9 @@ function renderRewards(rewards) {
 
       return `
         <button
-          onclick="redeemReward(${reward.points_cost}, '${escapeHtml(
+          onclick="redeemReward(${reward.points_cost}, '${escapeJsString(
         reward.name
-      ).replace(/'/g, "\\'")}', ${reward.id})"
+      )}', ${reward.id})"
           class="rounded-lg border border-gray-200 bg-white p-3 hover:border-${hoverBorderClass} hover:bg-${hoverBgClass} transition text-left"
         >
           <div class="text-xs text-${colorClass} mb-1 font-semibold">

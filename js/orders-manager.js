@@ -15,7 +15,8 @@ async function loadOrders() {
 
   // Get current location from global state
   const locationId = window.adminLocationState?.currentLocationId || null;
-  const locationName = window.adminLocationState?.currentLocationName || "Semua Lokasi";
+  const locationName =
+    window.adminLocationState?.currentLocationName || "Semua Lokasi";
 
   try {
     // Show loading
@@ -59,7 +60,11 @@ async function loadOrders() {
       tableBody.innerHTML = `
         <tr>
           <td colspan="9" class="text-center py-8 text-slate-400">
-            ${locationId ? `Belum ada order di ${locationName}` : "Belum ada order"}
+            ${
+              locationId
+                ? `Belum ada order di ${locationName}`
+                : "Belum ada order"
+            }
           </td>
         </tr>
       `;
@@ -119,7 +124,9 @@ async function loadOrders() {
               <div class="flex flex-col gap-2">
                 <div class="flex gap-2">
                   <button
-                    onclick="viewOrderDetails('${order.order_number}')"
+                    onclick="viewOrderDetails('${escapeJsString(
+                      order.order_number
+                    )}')"
                     class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition"
                     title="View Details"
                   >
@@ -149,7 +156,11 @@ async function loadOrders() {
                   !order.user_id &&
                   order.customer_phone
                     ? `<button
-                        onclick="openAssignPointsModal(${order.id}, '${order.order_number}', ${order.points_earned}, '${order.customer_phone}')"
+                        onclick="openAssignPointsModal(${
+                          order.id
+                        }, '${escapeJsString(order.order_number)}', ${
+                        order.points_earned
+                      }, '${escapeJsString(order.customer_phone)}')"
                         class="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs transition w-full"
                         title="Assign Points by Phone"
                       >
@@ -243,7 +254,9 @@ function openQRScanner() {
     )
     .catch((err) => {
       console.error("Error starting QR scanner:", err);
-      showError("Gagal membuka camera. Pastikan browser memiliki akses ke camera.");
+      showError(
+        "Gagal membuka camera. Pastikan browser memiliki akses ke camera."
+      );
     });
 }
 
@@ -443,9 +456,12 @@ async function completeOrder(orderId) {
     "Complete order ini? Status akan berubah menjadi PAID dan COMPLETED.",
     async () => {
       try {
-        const response = await adminFetch(`${API_BASE}/orders/${orderId}/complete`, {
-          method: "PATCH",
-        });
+        const response = await adminFetch(
+          `${API_BASE}/orders/${orderId}/complete`,
+          {
+            method: "PATCH",
+          }
+        );
 
         const result = await response.json();
 
@@ -550,8 +566,6 @@ function getExpiryStatus(expiresAt, status) {
 
   return "";
 }
-
-
 
 function getPointsStatus(order) {
   if (order.status !== "completed") {

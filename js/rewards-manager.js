@@ -51,11 +51,15 @@ function displayRewards(rewards) {
   grid.innerHTML = rewards
     .map(
       (reward) => `
-    <div class="booking-container p-4 hover:border-${reward.color_theme}-400/50 transition">
+    <div class="booking-container p-4 hover:border-${
+      reward.color_theme
+    }-400/50 transition">
       <div class="flex justify-between items-start mb-3">
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-2">
-            <h3 class="font-semibold text-slate-900">${escapeHtml(reward.name)}</h3>
+            <h3 class="font-semibold text-slate-900">${escapeHtml(
+              reward.name
+            )}</h3>
             ${
               reward.is_active
                 ? '<span class="text-xs bg-emerald-500/20 text-emerald-700 font-semibold px-2 py-0.5 rounded">Aktif</span>'
@@ -67,7 +71,9 @@ function displayRewards(rewards) {
           </div>
           ${
             reward.description
-              ? `<p class="text-sm text-slate-600 mb-3">${escapeHtml(reward.description)}</p>`
+              ? `<p class="text-sm text-slate-600 mb-3">${escapeHtml(
+                  reward.description
+                )}</p>`
               : ""
           }
         </div>
@@ -82,7 +88,7 @@ function displayRewards(rewards) {
           Edit
         </button>
         <button
-          onclick="deleteReward(${reward.id}, '${escapeHtml(reward.name).replace(/'/g, "\\'")}')"
+          onclick="deleteReward(${reward.id}, '${escapeJsString(reward.name)}')"
           class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"
         >
           <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -142,15 +148,19 @@ async function editReward(id) {
       // Populate form fields
       document.getElementById("rewardId").value = reward.id;
       document.getElementById("rewardName").value = reward.name;
-      document.getElementById("rewardDescription").value = reward.description || "";
+      document.getElementById("rewardDescription").value =
+        reward.description || "";
       document.getElementById("rewardPoints").value = reward.points_cost;
-      document.getElementById("rewardColor").value = reward.color_theme || "amber";
+      document.getElementById("rewardColor").value =
+        reward.color_theme || "amber";
       document.getElementById("rewardActive").checked = reward.is_active === 1;
       document.getElementById("rewardSortOrder").value = reward.sort_order || 0;
-      
+
       // NEW: Populate reward type and target product
-      document.getElementById("rewardType").value = reward.reward_type || "discount";
-      document.getElementById("rewardTargetProduct").value = reward.target_product_id || "";
+      document.getElementById("rewardType").value =
+        reward.reward_type || "discount";
+      document.getElementById("rewardTargetProduct").value =
+        reward.target_product_id || "";
       toggleTargetProductField();
 
       openRewardModal(id);
@@ -173,7 +183,8 @@ async function saveReward(event) {
   const points = parseInt(document.getElementById("rewardPoints").value);
   const color = document.getElementById("rewardColor").value;
   const isActive = document.getElementById("rewardActive").checked ? 1 : 0;
-  const sortOrder = parseInt(document.getElementById("rewardSortOrder").value) || 0;
+  const sortOrder =
+    parseInt(document.getElementById("rewardSortOrder").value) || 0;
 
   // Validation
   if (!name) {
@@ -189,9 +200,9 @@ async function saveReward(event) {
   // NEW: Get reward type and target product
   const rewardType = document.getElementById("rewardType").value;
   const targetProductId = document.getElementById("rewardTargetProduct").value;
-  
+
   // Validate target product for free_product type
-  if (rewardType === 'free_product' && !targetProductId) {
+  if (rewardType === "free_product" && !targetProductId) {
     showWarning("Pilih produk target untuk reward tipe Produk Gratis");
     return;
   }
@@ -204,11 +215,14 @@ async function saveReward(event) {
     is_active: isActive,
     sort_order: sortOrder,
     reward_type: rewardType,
-    target_product_id: rewardType === 'free_product' ? parseInt(targetProductId) : null,
+    target_product_id:
+      rewardType === "free_product" ? parseInt(targetProductId) : null,
   };
 
   try {
-    const url = id ? `${API_BASE}/rewards/admin/${id}` : `${API_BASE}/rewards/admin`;
+    const url = id
+      ? `${API_BASE}/rewards/admin/${id}`
+      : `${API_BASE}/rewards/admin`;
     const method = id ? "PATCH" : "POST";
 
     const response = await adminFetch(url, {
@@ -244,7 +258,6 @@ async function deleteReward(id, name) {
 }
 
 async function performDeleteReward(id) {
-
   try {
     const response = await adminFetch(`${API_BASE}/rewards/admin/${id}`, {
       method: "DELETE",
@@ -271,8 +284,8 @@ async function performDeleteReward(id) {
 function toggleTargetProductField() {
   const rewardType = document.getElementById("rewardType").value;
   const container = document.getElementById("targetProductContainer");
-  
-  if (rewardType === 'free_product') {
+
+  if (rewardType === "free_product") {
     container.classList.remove("hidden");
     loadProductsDropdown(); // Load products if not already loaded
   } else {
@@ -286,31 +299,33 @@ function toggleTargetProductField() {
 async function loadProductsDropdown() {
   const select = document.getElementById("rewardTargetProduct");
   if (!select) return;
-  
+
   // Skip if already loaded
   if (productsCache.length > 0) {
     return;
   }
-  
+
   try {
-    const response = await fetch('/api/products', { credentials: 'include' });
+    const response = await fetch("/api/products", { credentials: "include" });
     const result = await response.json();
-    
+
     if (result.success && result.data) {
       productsCache = result.data;
-      
+
       // Clear and populate dropdown
       select.innerHTML = '<option value="">-- Pilih Produk --</option>';
-      
+
       for (const product of productsCache) {
-        const option = document.createElement('option');
+        const option = document.createElement("option");
         option.value = product.id;
-        option.textContent = `${product.name} - Rp ${parseFloat(product.price).toLocaleString('id-ID')}`;
+        option.textContent = `${product.name} - Rp ${parseFloat(
+          product.price
+        ).toLocaleString("id-ID")}`;
         select.appendChild(option);
       }
     }
   } catch (error) {
-    console.error('Error loading products:', error);
+    console.error("Error loading products:", error);
   }
 }
 

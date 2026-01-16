@@ -26,7 +26,7 @@ async function loadUsers() {
       allUsers = data.data; // Store all users
       displayUsers(allUsers);
       document.getElementById("totalUsers").textContent = data.count || 0;
-      
+
       // Clear search when reloading
       const searchInput = document.getElementById("usersSearchInput");
       if (searchInput) {
@@ -54,7 +54,7 @@ async function loadUsers() {
 // ============================================
 function searchUsers(query) {
   const searchTerm = query.toLowerCase().trim();
-  
+
   if (!searchTerm) {
     // Show all users if search is empty
     displayUsers(allUsers);
@@ -62,20 +62,20 @@ function searchUsers(query) {
     hideClearButton();
     return;
   }
-  
+
   // Filter users by name, email, or phone
   const filteredUsers = allUsers.filter((user) => {
     const name = (user.name || "").toLowerCase();
     const email = (user.email || "").toLowerCase();
     const phone = (user.phone || "").toLowerCase();
-    
+
     return (
       name.includes(searchTerm) ||
       email.includes(searchTerm) ||
       phone.includes(searchTerm)
     );
   });
-  
+
   displayUsers(filteredUsers);
   showSearchInfo(filteredUsers.length);
   showClearButton();
@@ -130,12 +130,12 @@ function clearSearch() {
 // Debounced search handler
 function handleSearchInput(e) {
   const query = e.target.value;
-  
+
   // Clear previous timeout
   if (searchDebounceTimer) {
     clearTimeout(searchDebounceTimer);
   }
-  
+
   // Debounce the search
   searchDebounceTimer = setTimeout(() => {
     searchUsers(query);
@@ -191,7 +191,7 @@ function displayUsers(users) {
           <td class="px-4 py-3 text-center">
             <div class="flex items-center justify-center gap-2">
               <button
-                onclick="viewUserRewards(${user.id}, '${escapeHtml(
+                onclick="viewUserRewards(${user.id}, '${escapeJsString(
         user.name
       )}')"
                 class="text-emerald-400 hover:text-emerald-300 p-1"
@@ -200,9 +200,9 @@ function displayUsers(users) {
                 <i data-lucide="award" class="w-4 h-4"></i>
               </button>
               <button
-                onclick="openResetPasswordModal(${user.id}, '${escapeHtml(
+                onclick="openResetPasswordModal(${user.id}, '${escapeJsString(
         user.name
-      )}', '${escapeHtml(user.email)}')"
+      )}', '${escapeJsString(user.email)}')"
                 class="text-amber-400 hover:text-amber-300 p-1"
                 title="Reset Password"
               >
@@ -218,7 +218,7 @@ function displayUsers(users) {
                 }" class="w-4 h-4"></i>
               </button>
               <button
-                onclick="confirmDeleteUser(${user.id}, '${escapeHtml(
+                onclick="confirmDeleteUser(${user.id}, '${escapeJsString(
         user.name
       )}')"
                 class="text-red-400 hover:text-red-300 p-1"
@@ -229,9 +229,9 @@ function displayUsers(users) {
               ${
                 user.phone
                   ? `<button
-                onclick="sendWhatsAppToUser('${escapeHtml(user.phone)}', '${escapeHtml(
-                      user.name
-                    )}')"
+                onclick="sendWhatsAppToUser('${escapeJsString(
+                  user.phone
+                )}', '${escapeJsString(user.name)}')"
                 class="text-green-400 hover:text-green-300 p-1"
                 title="Kirim WhatsApp"
               >
@@ -289,17 +289,13 @@ document.getElementById("userForm")?.addEventListener("submit", async (e) => {
     showWarning("Password minimal 6 karakter");
     return;
   }
-  
-  showConfirm(
-    "Reset password untuk user ini?",
-    async () => {
-      await performPasswordReset(userId, password);
-    }
-  );
+
+  showConfirm("Reset password untuk user ini?", async () => {
+    await performPasswordReset(userId, password);
+  });
 });
 
 async function performPasswordReset(userId, password) {
-
   try {
     const response = await adminFetch(`${API_BASE}/users/${userId}/password`, {
       method: "PATCH",
@@ -329,29 +325,26 @@ async function performPasswordReset(userId, password) {
 // Toggle User Status
 // ============================================
 async function toggleUserStatus(userId) {
-  showConfirm(
-    "Ubah status user ini?",
-    async () => {
-      try {
-        const response = await adminFetch(`${API_BASE}/users/${userId}/toggle`, {
-          method: "PATCH",
-        });
+  showConfirm("Ubah status user ini?", async () => {
+    try {
+      const response = await adminFetch(`${API_BASE}/users/${userId}/toggle`, {
+        method: "PATCH",
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.success) {
-          showSuccess(data.message);
-          usersLoaded = false;
-          loadUsers();
-        } else {
-          showError(data.error || "Gagal mengubah status user");
-        }
-      } catch (error) {
-        console.error("Error toggling user status:", error);
-        showError("Terjadi kesalahan saat mengubah status user");
+      if (data.success) {
+        showSuccess(data.message);
+        usersLoaded = false;
+        loadUsers();
+      } else {
+        showError(data.error || "Gagal mengubah status user");
       }
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+      showError("Terjadi kesalahan saat mengubah status user");
     }
-  );
+  });
 }
 
 // ============================================
@@ -495,12 +488,12 @@ function openRewardsModal(userId, userName, rewards) {
         // Determine status based on new ENUM values (active, used, expired, cancelled)
         // or fallback to old statuses for backward compat
         let status = reward.status || "active";
-        
+
         // Auto-detect expired status based on date
         if (status === "active" && isExpired) {
           status = "expired";
         }
-        
+
         // Status badge with appropriate colors
         let statusBadge;
         switch (status) {
@@ -522,14 +515,16 @@ function openRewardsModal(userId, userName, rewards) {
         }
 
         // Coupon code display (if available)
-        const couponCodeDisplay = reward.coupon_code 
+        const couponCodeDisplay = reward.coupon_code
           ? `<code class="px-2 py-1 bg-slate-700 text-emerald-300 rounded text-xs font-mono">${reward.coupon_code}</code>`
           : `<span class="text-slate-500 text-xs">-</span>`;
 
         // Only show Delete button (no more Claim button)
         const actionButton = `
           <button 
-            onclick="deleteRedemption(${userId}, ${reward.id}, '${escapeHtml(reward.reward_name)}')" 
+            onclick="deleteRedemption(${userId}, ${reward.id}, '${escapeHtml(
+          reward.reward_name
+        )}')" 
             class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded transition"
             title="Hapus & Refund poin"
           >
@@ -539,11 +534,17 @@ function openRewardsModal(userId, userName, rewards) {
         return `
           <tr class="border-t border-slate-800 hover:bg-slate-800/30">
             <td class="px-4 py-3 text-slate-300 text-center">${index + 1}</td>
-            <td class="px-4 py-3 text-slate-200">${escapeHtml(reward.reward_name)}</td>
-            <td class="px-4 py-3 text-amber-400 font-semibold text-center">${reward.points_cost} poin</td>
+            <td class="px-4 py-3 text-slate-200">${escapeHtml(
+              reward.reward_name
+            )}</td>
+            <td class="px-4 py-3 text-amber-400 font-semibold text-center">${
+              reward.points_cost
+            } poin</td>
             <td class="px-4 py-3 text-slate-400 text-xs">${formattedDate}</td>
             <td class="px-4 py-3 text-center">${couponCodeDisplay}</td>
-            <td class="px-4 py-3 text-slate-400 text-xs ${isExpired ? 'text-red-400' : ''}">${expiryText}</td>
+            <td class="px-4 py-3 text-slate-400 text-xs ${
+              isExpired ? "text-red-400" : ""
+            }">${expiryText}</td>
             <td class="px-4 py-3 text-center">${statusBadge}</td>
             <td class="px-4 py-3 text-center">${actionButton}</td>
           </tr>
@@ -575,63 +576,60 @@ function closeRewardsModal() {
 // Approve Reward Redemption
 // ============================================
 async function approveRedemption(userId, redemptionId, rewardName) {
-  showConfirm(
-    `Approve penukaran reward "${rewardName}"?`,
-    async () => {
-      try {
-        const response = await adminFetch(
-          `${API_BASE}/rewards/admin/redemptions/${redemptionId}/status`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: 'approved' }),
-            credentials: "include",
-          }
+  showConfirm(`Approve penukaran reward "${rewardName}"?`, async () => {
+    try {
+      const response = await adminFetch(
+        `${API_BASE}/rewards/admin/redemptions/${redemptionId}/status`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "approved" }),
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccess("Redemption berhasil di-approve!");
+        // Refresh the rewards list
+        const userName = document.getElementById("rewardUserName").textContent;
+        const userRewardsResponse = await adminFetch(
+          `${API_BASE}/api/user-data/rewards?user_id=${userId}`, // Note: this endpoint might need adjustment if it's user-facing
+          // Actually users-manager calls /api/users/${userId}/rewards which is likely mapped to user-data route but for admins?
+          // Let's stick to what viewUserRewards uses: ${API_BASE}/users/${userId}/rewards
+          // Waiting... viewUserRewards uses ${API_BASE}/users/${userId}/rewards. Does that exist?
+          // If not, I should fix that too.
+          // Let's use the new admin endpoint filtering by user_id
+          `${API_BASE}/rewards/admin/redemptions?user_id=${userId}`
         );
 
-        const data = await response.json();
+        const userRewardsData = await userRewardsResponse.json();
+        if (userRewardsData.success) {
+          // The format from admin/redemptions is different from users/:id/rewards?
+          // viewUserRewards expects {success: true, data: {rewards: []}}
+          // admin/redemptions returns {success: true, redemptions: []}
+          // I should probbaly use reloadUsers() or just re-call viewUserRewards logic
 
-        if (data.success) {
-          showSuccess("Redemption berhasil di-approve!");
-          // Refresh the rewards list
-          const userName = document.getElementById("rewardUserName").textContent;
-          const userRewardsResponse = await adminFetch(
-            `${API_BASE}/api/user-data/rewards?user_id=${userId}`, // Note: this endpoint might need adjustment if it's user-facing
-            // Actually users-manager calls /api/users/${userId}/rewards which is likely mapped to user-data route but for admins?
-            // Let's stick to what viewUserRewards uses: ${API_BASE}/users/${userId}/rewards
-            // Waiting... viewUserRewards uses ${API_BASE}/users/${userId}/rewards. Does that exist?
-            // If not, I should fix that too.
-            // Let's use the new admin endpoint filtering by user_id
-            `${API_BASE}/rewards/admin/redemptions?user_id=${userId}`
-          );
-          
-          const userRewardsData = await userRewardsResponse.json();
-          if (userRewardsData.success) {
-             // The format from admin/redemptions is different from users/:id/rewards?
-             // viewUserRewards expects {success: true, data: {rewards: []}}
-             // admin/redemptions returns {success: true, redemptions: []}
-             // I should probbaly use reloadUsers() or just re-call viewUserRewards logic
-             
-             // Simplest: re-call viewUserRewards
-             // But viewUserRewards calls an endpoint I haven't verified.
-             // Let's rely on the NEW endpoint I made: /rewards/admin/redemptions?user_id=...
-             
-             openRewardsModal(userId, userName, userRewardsData.redemptions);
-          }
-          
-          // Also refresh Reports if available
-          if (typeof window.loadRedemptionReport === 'function') {
-            window.loadRedemptionReport();
-          }
-        } else {
-          showError(data.error || "Gagal approve redemption");
+          // Simplest: re-call viewUserRewards
+          // But viewUserRewards calls an endpoint I haven't verified.
+          // Let's rely on the NEW endpoint I made: /rewards/admin/redemptions?user_id=...
+
+          openRewardsModal(userId, userName, userRewardsData.redemptions);
         }
-      } catch (error) {
-        console.error("Error approving redemption:", error);
-        showError("Terjadi kesalahan saat approve redemption");
+
+        // Also refresh Reports if available
+        if (typeof window.loadRedemptionReport === "function") {
+          window.loadRedemptionReport();
+        }
+      } else {
+        showError(data.error || "Gagal approve redemption");
       }
+    } catch (error) {
+      console.error("Error approving redemption:", error);
+      showError("Terjadi kesalahan saat approve redemption");
     }
-  );
+  });
 }
 
 // ============================================
@@ -652,7 +650,7 @@ async function deleteRedemption(userId, redemptionId, rewardName) {
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: 'cancelled' }),
+            body: JSON.stringify({ status: "cancelled" }),
             credentials: "include",
           }
         );
@@ -662,18 +660,19 @@ async function deleteRedemption(userId, redemptionId, rewardName) {
         if (data.success) {
           showSuccess("Redemption berhasil dihapus. Poin dikembalikan!");
           // Refresh the rewards list
-          const userName = document.getElementById("rewardUserName").textContent;
+          const userName =
+            document.getElementById("rewardUserName").textContent;
           const userRewardsResponse = await adminFetch(
             `${API_BASE}/rewards/admin/redemptions?user_id=${userId}`
           );
-          
+
           const userRewardsData = await userRewardsResponse.json();
           if (userRewardsData.success) {
-             openRewardsModal(userId, userName, userRewardsData.redemptions);
+            openRewardsModal(userId, userName, userRewardsData.redemptions);
           }
-          
+
           // Also refresh Reports if available
-          if (typeof window.loadRedemptionReport === 'function') {
+          if (typeof window.loadRedemptionReport === "function") {
             window.loadRedemptionReport();
           }
         } else {
@@ -689,7 +688,7 @@ async function deleteRedemption(userId, redemptionId, rewardName) {
 function sendWhatsAppToUser(phone, userName) {
   // Clean phone number - remove all non-numeric characters
   const cleanPhone = phone.replace(/[^0-9]/g, "");
-  
+
   // Format phone number for WhatsApp (add 62 prefix if starts with 0)
   let formattedPhone = cleanPhone;
   if (formattedPhone.startsWith("0")) {
@@ -697,16 +696,16 @@ function sendWhatsAppToUser(phone, userName) {
   } else if (!formattedPhone.startsWith("62")) {
     formattedPhone = "62" + formattedPhone;
   }
-  
+
   // Default message template
   const defaultMessage = `Halo ${userName}, saya dari Tim DocterBee. `;
-  
+
   // Encode message for URL
   const encodedMessage = encodeURIComponent(defaultMessage);
-  
+
   // Create WhatsApp URL
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
-  
+
   // Open WhatsApp in new tab
   window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 }
@@ -719,14 +718,14 @@ let searchListenersInitialized = false;
 function initSearchListeners() {
   // Prevent duplicate listeners
   if (searchListenersInitialized) return;
-  
+
   const searchInput = document.getElementById("usersSearchInput");
   const clearBtn = document.getElementById("clearUsersSearch");
-  
+
   if (searchInput) {
     // Search on input with debounce
     searchInput.addEventListener("input", handleSearchInput);
-    
+
     // Clear search on Escape key
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -734,13 +733,13 @@ function initSearchListeners() {
       }
     });
   }
-  
+
   if (clearBtn) {
     clearBtn.addEventListener("click", clearSearch);
   }
-  
+
   searchListenersInitialized = true;
-  
+
   // Re-initialize Lucide icons for search bar
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
@@ -762,4 +761,3 @@ if (typeof window !== "undefined") {
   window.clearSearch = clearSearch;
   window.searchUsers = searchUsers;
 }
-
